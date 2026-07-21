@@ -1,0 +1,35 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# local Claude Code config/skills - not part of the site
+/.claude/
+
+# internal business docs (pricing proposals, contracts, private notes) -
+# not meant for the public repo
+/docs/
+/archive/
+/*.pdf
+/*.docx
+/Rav Messer API.txt
