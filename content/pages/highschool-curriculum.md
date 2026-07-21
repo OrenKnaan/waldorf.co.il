@@ -1,5 +1,5 @@
 ---
-title: "תוכנית לימודים — כיתות ט'–י\"ב"
+title: "תוכנית לימודים — כיתות ט'–י״ב"
 slug: "highschool-curriculum"
 section: "תיכונים"
 parent: "highschool"
