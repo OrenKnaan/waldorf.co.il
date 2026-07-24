@@ -97,6 +97,11 @@ export const RESPONSIVE_CSS = `
     .stat .lbl{font-size:.76rem}
     .carousel .track>*,.carousel .track .ecard{width:min(270px,74vw)}
     .form{grid-template-columns:1fr}
+    /* wide tables still scroll sideways — show the bar so that's discoverable */
+    .table-wrap{padding-bottom:6px;scrollbar-width:thin}
+    .table-wrap::-webkit-scrollbar{height:6px}
+    .table-wrap::-webkit-scrollbar-track{background:var(--beige);border-radius:3px}
+    .table-wrap::-webkit-scrollbar-thumb{background:var(--tan);border-radius:3px}
   }
 
   @media (max-width:560px){
@@ -110,14 +115,17 @@ export const RESPONSIVE_CSS = `
     .art-hero .cap span{font-size:.72rem}
     .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
     .grid .ecard .thumb{height:150px}
-    .stat-row{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
-    .stat .num{font-size:1.6rem}
+    .stat-row{gap:8px}
+    .stat{padding:14px 6px}
+    .stat .num{font-size:1.5rem}
+    .stat .lbl{font-size:.72rem}
     .gallery{gap:8px}
     .gallery .tile .play svg{width:36px;height:36px}
     .person{padding:14px;gap:11px}
     .avatar{width:46px;height:46px;font-size:1.05rem}
     table{font-size:.86rem}
     th,td{padding:8px 10px}
+    th{white-space:normal}
     .tab-btn{padding:7px 14px;font-size:.8rem}
     .btn{padding:9px 16px;font-size:.86rem}
     blockquote{padding:11px 13px}
@@ -133,7 +141,9 @@ export const RESPONSIVE_CSS = `
     section.card{padding:14px 12px}
     .art-hero{height:150px}
     .art-hero .cap{max-width:60%}
-    .stat-row{grid-template-columns:1fr 1fr}
+    .stat{padding:12px 4px}
+    .stat .num{font-size:1.3rem}
+    .stat .lbl{font-size:.68rem}
     .field input,.field select,.field textarea{font-size:16px}
   }
 `;
