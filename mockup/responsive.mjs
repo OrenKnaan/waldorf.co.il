@@ -5,8 +5,10 @@
 // Behaviour, in short:
 //   > 720px  — the top nav stays on exactly one row. Two compaction steps
 //              (1000px / 860px) shrink the link padding and font so the six
-//              top-level items keep fitting; a wider nav (e.g. the generator's
-//              full NAV_STRUCTURE) scrolls sideways rather than wrapping.
+//              top-level items keep fitting. The nav is deliberately NOT a
+//              scroll container: any overflow value other than `visible` makes
+//              it clip the absolutely-positioned hover dropdowns (which are its
+//              descendants), so they'd open but stay invisible.
 //   <= 720px — the nav collapses into a hamburger drawer, and its dropdowns
 //              become tap-to-open accordions (hover is useless on touch).
 //   <= 560px / <= 400px — progressive tightening of the content components.
@@ -22,10 +24,10 @@ export const RESPONSIVE_CSS = `
   body{overflow-wrap:break-word}
   img,svg,video{max-width:100%}
   .site-header{position:relative}
-  /* One row, always: shrink first (see the queries below), scroll only if a
-     nav is genuinely wider than the viewport. Never wrap. */
-  .primary-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
-  .primary-nav::-webkit-scrollbar{display:none}
+  /* One row, always: the shrink steps below keep the six items fitting. Do NOT
+     give this an overflow value other than visible — a scroll container clips
+     the absolutely-positioned hover dropdowns nested inside it. Never wrap. */
+  .primary-nav{flex-wrap:nowrap}
   .pagebanner{flex-wrap:wrap}
   .nav-toggle{display:none;position:absolute;inset-block-start:15px;inset-inline-start:16px;z-index:30;
     width:42px;height:42px;padding:0;border:none;background:transparent;cursor:pointer;
