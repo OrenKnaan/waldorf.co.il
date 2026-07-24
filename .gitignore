@@ -25,11 +25,16 @@ pnpm-debug.log*
 
 # local Claude Code config/skills - not part of the site
 /.claude/
+# Serena MCP project cache - not part of the site
+/.serena/
+
+# local working backups - not part of the site
+/mockup backup/
 
 # internal business docs (pricing proposals, contracts, private notes) -
 # not meant for the public repo
 /docs/
 /archive/
 /*.pdf
-/*.docx
+*.docx
 /Rav Messer API.txt

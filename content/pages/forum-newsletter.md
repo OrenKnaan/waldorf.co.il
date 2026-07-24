@@ -3,7 +3,7 @@ title: "איגרת תקופתית"
 slug: "forum-newsletter"
 section: "הפורום"
 parent: "forum"
-order: 3
+order: 4
 ---
 
 # איגרת תקופתית

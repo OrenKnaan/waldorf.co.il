@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
+<title>מערכת ניהול · ולדורף</title>
+<style>
+@font-face { font-family: 'Antropos Hebrew'; src: url(data:font/otf;base64,T1RUTwAJAIAAAwAQQ0ZGIFpSKogAAAQQAAA8/09TLzJRZOcBAAABAAAAAGBjbWFwLFtN5gAAAvgAAAD4aGVhZC9pyH0AAACcAAAANmhoZWEHFwICAAAA1AAAACRobXR4easLgAAAQRAAAAEIbWF4cABCUAAAAAD4AAAABm5hbWWCjZYLAAABYAAAAZVwb3N0AAMAAAAAA/AAAAAgAAEAAAACTM3QuSZdXw889QADA+gAAAAA5ogcPgAAAADmiBw+AC3+qgMUA6oAAAADAAIAAAAAAAAAAQAAA9T+UgAAA0EALgAsAxMAAQAAAAAAAAAAAAAAAAAAAEIAAFAAAEIAAAAEAdgBkAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAACAEAAAACAAAAAAAAAAA/Pz8/AEAAICCqA9T+UgAAA+gBuAAAAAAAAAAAAsECwQAAACAAAAAAAAwAlgABAAAAAAABAA8AAAABAAAAAAACAAcADwABAAAAAAADABwAFgABAAAAAAAEAA8AAAABAAAAAAAFAA0AMgABAAAAAAAGABYAPwADAAEECQABAB4AVQADAAEECQACAA4AcwADAAEECQADADgAgQADAAEECQAEAB4AVQADAAEECQAFABoAuQADAAEECQAGACwA00FudHJvcG9zIEhlYnJld1JlZ3VsYXJBbnRyb3Bvc0hlYnJldy1SZWd1bGFyOzIuMzAwVmVyc2lvbiAyLjMwMEFudHJvcG9zSGVicmV3LVJlZ3VsYXIAQQBuAHQAcgBvAHAAbwBzACAASABlAGIAcgBlAHcAUgBlAGcAdQBsAGEAcgBBAG4AdAByAG8AcABvAHMASABlAGIAcgBlAHcALQBSAGUAZwB1AGwAYQByADsAMgAuADMAMAAwAFYAZQByAHMAaQBvAG4AIAAyAC4AMwAwADAAQQBuAHQAcgBvAHAAbwBzAEgAZQBiAHIAZQB3AC0AUgBlAGcAdQBsAGEAcgAAAAAAAAIAAAADAAAAFAADAAEAAAAUAAQA5AAAABwAEAADAAwAJgAqACwALgAwADkAPABAAF4AfgXqIB0gqv//AAAAIAAoACwALgAwADEAOgA+AFsAewXQIBwgqv//AAD//wAUABH/9v/sAAAAAAAAAAAAAAAA34AAAQAcAAAAAAAAAAAAAAAeACIAJgAsADIAZgAAAAAAAQAwACsALgAtACwAMwA6ADsAPgA9ADwAMQA0ADgANQAyADYAOQA3AEEAFwAWABUAFAATABIAEQAQAA8ADgAbAA0ADAAYAAsAGQAKAAkACAAcAAcAGgAGAAUABAADAAIAKwAvAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAQCAAEBAQ9BbnRyb3Bvc0hlYnJldwABAQEd+FsC+FsD+BgEuPvq+aj6PgX5JA+LHDz/EvkrEQBBAgABAAgADwAWAB0AJAArADIAOQBAAEcATgBVAFwAYwBqAHEAeAB/AIYAjQCUAJsAogCpALAAtwC+AMUAzADTANoA4QDoAO8A9gD9AQQBCwESARkBIAEnAS4BNQE8AUMBSgFRAVgBXwFmAW0BdAF7AYIBiQGQAZcBngGlAawBswG6AcEB0HVuaTA1RUF1bmkwNUU5dW5pMDVFOHVuaTA1RTd1bmkwNUU2dW5pMDVFNHVuaTA1RTJ1bmkwNUUxdW5pMDVFMHVuaTA1REV1bmkwNURDdW5pMDVEQnVuaTA1RDl1bmkwNUQ4dW5pMDVEN3VuaTA1RDZ1bmkwNUQ1dW5pMDVENHVuaTA1RDN1bmkwNUQydW5pMDVEMXVuaTA1RDB1bmkwNUREdW5pMDVERnVuaTA1RTV1bmkwNURBdW5pMDVFM3VuaTAwMzF1bmkwMDMydW5pMDAzM3VuaTAwMzR1bmkwMDM1dW5pMDAzNnVuaTAwMzd1bmkwMDM4dW5pMDAzOXVuaTAwMzB1bmkwMDI4dW5pMDAyOXVuaTAwMkF1bmkyMEFBdW5pMjAxQ3VuaTAwMjV1bmkwMDI0dW5pMDAyM3VuaTIwMUR1bmkwMDIxdW5pMDA0MHVuaTAwNUV1bmkwMDI2dW5pMDA1QnVuaTAwNUR1bmkwMDdCdW5pMDA3RHVuaTAwNUN1bmkwMDdDdW5pMDAzQXVuaTAwM0J1bmkwMDNGdW5pMDAzRXVuaTAwM0N1bmkwMDJFdW5pMDAyQ3VuaTAwN0VBbnRyb3BvcyBIZWJyZXcAAAEAAQABhz8AQgIAAQAEAAcBAQKjA0QEaQYUB1oIdAm9CocL+QzhDawOFg9JEAsQxhFOEhESxROqFHoWEBbnF1oYoRkdGg8ahRsoHGAdWh5GHyof+CD/Ifoi2iNvJAYlBiY4JyspBypp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jJeRGpV2B3+Bi4qKH2r7MRWMiIcsioaJhoSNf5eBlYmOipeIpJSlm5iXlI2MjYYIyPuTFZeEjIqTdY9/jIWKf4hugnt4gn2Fh46Nm4yTjKWMowixjI2WkBuLkIiIkR8O+KT3efiuFYiFgm6HeYd5flqJhomGh4tliHSJeIiKiomIhnmEcgh0hoyKrxucm4uKjR+NjouKjR+Pi4dngB+FeIZ6iogIiIiHiYoeiol5iXcbcol/iomJCIiIg2mCGoeKiImJHoWGjIWSiAiJj5qKnBubmoqJjR+PiYuKekgIiYSGeod9g2+KhpCJjorRko2NjIyNlI2XjZaQn4+Xj5iQnI2UlKyJiq+KCLGKiI+AYnhFgmmNh42GmYuYkJGNmI2VjZaMlY6MjI2NjZGMkYyRjZaNkwiNko6ajZWOlo6ZjZIIjZKMk44ajo2Pj48ekJCOi62NoIyejY2MCI6MjI+OGpGQoJCgHpuQiotjG3h5jI2JH4iNjJCTp4+ekJ2Mj42Wko2ujJ+MmIyNjY2NjpKLkoySjpOMjQiOjoyTlRqcbAd1gYyNiR+JjY+dlrcIlK2Sqo4akIuLZ2eLi4SHHomHiYaIGomJhImFHomFh3mGeoBehnuHiQiKiX+KfRtuho2Vjx+Njo6YjpeOl5KjkZwIv5yNhl4bZYuLhIcf3vtoFYyKgmCDbgiGfWyKBXp8i4yKH4qNjJKOlY2Uj5yOlZKpjI6ajJuMq4qNiQgO+AT3Cfj3FYiHgXyAfHtzhH12YIeBi2aQiQiNjImJiY6EjoQfkH6ijAW4jZiQjpeMjo+XjpYIk6SKkn6XgZOLi5CZkZyLipumkZeSl4uOjZOHjneNg4yBjYiNgZCHi4WDCPcVdhVya4aDgnp6a4Z0kHGNgY6AjYgIfZWJi7Ebs4eIspkflaaLlICZhZSJkIyPjZSoyI+NCIyMjI6OGpGGjXCSHoeMiIyKjQiMioiMhxuGhoZ0eR8O9133GvjIFYiKeIl4ighWh5GSURpxjHCMhh6Nho1rjGqMao5ijHsIjHuNbngaeIx5jIkejYiRi6+Sl42XjoyMjYyNoY2okvcTjr2OpQiMm42spBq3jIuLgxuHhYqJiB9P/FgVeIOJioIahoqFiYceh4OKc46KjYqOgo6BkXWIjLeTp5CSjoySjI2NlY2UjpqLjYaeiJeHloqNiI5ykX+KCIiC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hI2OqXd0qx6UhaV4onuieqx0nH8IYsOgfZEbj4+Qn5UfkpmRmIwajIyOjYwejY2NkI8akYmOgpEeQ7v7A96PGo6RkKSdHsi0m5ahmpiUn5mWkwifmYuLlhqQipCKioSWmYQepX6Li4EbhYaKiYofDvdk2fcCFXmFi4qFegiJg4iFiooIioqKhIEaf4yHjokejYyIiYiOhI6DH5F/i4uVjI+Mm4yZjZmNl4yNjYyMkJSQlY+UkJaNj46Rio2EnYaXhZeIjwiThouLdht7goqGgB8O94Hl7RV/Z4t9lnwIj4WPhIkahnxugHoehoOEf4iFiIWHhYqKg4eVhJ6IkIqSiY6JCJGHoIqPGoyTmJWYHpWZl52QkwiWnpyukBqNjY6NjR6Qj4qSgbQIg6o/i4NxBQ74KfP33xWJiYWIhYh8hYiJf3kIgoaFhIobiYp2iY4fjJCBgJEfkX+Rgo2KCI6JnpSTko2MkY+RjZuSn4mkfpeGmoWSiJOJlIiOiZOHtIqNj4yMk46VjgibkYyLl56SlZSXj48Ik5KNkoYbioiPkYgfg5t8oIaMiYuEh4OGhIWChYaJf4Z0i32ReZJjnYiNh49OioeHCA4AAlgAAAFAAAADQQAuAzMALgI8AC4CzQAuAqEALgJgAC4CqQAuAnYALgHWAC4C6gAuAjwALgIQAC4BIAAuAnYALgJRAC4B1gAuARkALgImAC4CNAAuAcAALgItAC4CQwAuAqoALgFKAC4C1gAuAmQALgJ+AC4BIAAuAbIALgHAAC4B8wAuAbkALgHdAC4BsgAuAc8ALgHWAC4B8wAuASgALgEgAC4BowAuAowALgFwAC4CZwAuAbIALgIQAC4BcAAuAMkALgJZAC4BsgAuAjQALgEKAC4BAwAuAT0ALgE9AC4BaQAuAKwALgD8AC4A2AAuAXcALgGcAC4BnAAuANAALgDtAC4BlQAu) format('opentype'); font-display: swap; }
+:root{
+  --cream:#FAF6F0; --beige:#F0E8DC; --paper:#FFFFFF; --sink:#F4EEE4;
+  --tan:#C4A882; --tan-dark:#A88B69; --brown:#6B4F35; --brown-dark:#3D2B1F;
+  --ink:#3D2B1F; --muted:#7A6555; --line:#E7DECE;
+  --ok:#5E7D52; --ok-bg:#E7EEDF; --warn:#B7791F; --warn-bg:#F6E8C8;
+  --crit:#A5533F; --crit-bg:#F1DED7; --info:#5E93A8; --info-bg:#DDEBEF;
+  --shadow:0 2px 12px rgba(61,43,31,.08); --shadow-lg:0 12px 34px rgba(61,43,31,.16);
+  --r:9px; --r-lg:16px; --r-pill:999px;
+  --font-head:'Antropos Hebrew','Frank Ruhl Libre','Arial Hebrew',serif;
+  --font-body:'Assistant','Segoe UI','Arial Hebrew',Arial,sans-serif;
+  --sidebar:linear-gradient(200deg,#4A3623,#2F2114);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --cream:#1F1710; --beige:#2A2019; --paper:#2C221A; --sink:#251C15;
+    --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#120C07;
+    --ink:#F2E7D8; --muted:#B39C84; --line:#3A2D21;
+    --ok:#9DC08A; --ok-bg:#26301F; --warn:#E0B65E; --warn-bg:#352a12;
+    --crit:#D89079; --crit-bg:#35211a; --info:#8FC0CF; --info-bg:#16292f;
+    --shadow:0 2px 12px rgba(0,0,0,.4); --shadow-lg:0 14px 36px rgba(0,0,0,.5);
+    --sidebar:linear-gradient(200deg,#241A11,#140D07);
+  }
+}
+:root[data-theme="light"]{
+  --cream:#FAF6F0; --beige:#F0E8DC; --paper:#FFFFFF; --sink:#F4EEE4;
+  --tan:#C4A882; --tan-dark:#A88B69; --brown:#6B4F35; --brown-dark:#3D2B1F;
+  --ink:#3D2B1F; --muted:#7A6555; --line:#E7DECE;
+  --ok:#5E7D52; --ok-bg:#E7EEDF; --warn:#B7791F; --warn-bg:#F6E8C8;
+  --crit:#A5533F; --crit-bg:#F1DED7; --info:#5E93A8; --info-bg:#DDEBEF;
+  --shadow:0 2px 12px rgba(61,43,31,.08); --shadow-lg:0 12px 34px rgba(61,43,31,.16);
+  --sidebar:linear-gradient(200deg,#4A3623,#2F2114);
+}
+:root[data-theme="dark"]{
+  --cream:#1F1710; --beige:#2A2019; --paper:#2C221A; --sink:#251C15;
+  --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#120C07;
+  --ink:#F2E7D8; --muted:#B39C84; --line:#3A2D21;
+  --ok:#9DC08A; --ok-bg:#26301F; --warn:#E0B65E; --warn-bg:#352a12;
+  --crit:#D89079; --crit-bg:#35211a; --info:#8FC0CF; --info-bg:#16292f;
+  --shadow:0 2px 12px rgba(0,0,0,.4); --shadow-lg:0 14px 36px rgba(0,0,0,.5);
+  --sidebar:linear-gradient(200deg,#241A11,#140D07);
+}
+*{box-sizing:border-box}
+#app{
+  direction:rtl; font-family:var(--font-body); color:var(--ink);
+  min-height:100vh; line-height:1.6;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+h1,h2,h3{font-family:var(--font-head);font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2.5px solid var(--tan-dark);outline-offset:2px;border-radius:4px}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ===== login ===== */
+.login-screen{
+  min-height:100vh;display:grid;place-items:center;padding:24px;
+  background:
+    radial-gradient(90% 60% at 12% 0%,color-mix(in oklab,var(--tan) 34%,transparent),transparent 60%),
+    radial-gradient(80% 55% at 92% 8%,color-mix(in oklab,var(--info) 20%,transparent),transparent 60%),
+    linear-gradient(180deg,var(--beige),var(--cream));
+}
+.login-card{
+  width:100%;max-width:392px;background:var(--paper);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg);border-top:3px solid var(--tan);padding:34px 32px 26px;
+}
+.emblem{width:52px;height:52px;display:block;margin-bottom:16px}
+.login-card h1{font-size:1.5rem;color:var(--brown-dark);margin-bottom:2px}
+.login-card .sub{color:var(--muted);font-size:.9rem;margin:0 0 22px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:.82rem;font-weight:600;color:var(--brown-dark)}
+.field input{
+  font-family:inherit;font-size:.95rem;color:var(--ink);background:var(--sink);
+  border:1.5px solid var(--line);border-radius:var(--r);padding:11px 13px;transition:.15s;
+}
+.field input:focus{outline:none;border-color:var(--tan);box-shadow:0 0 0 3px color-mix(in oklab,var(--tan) 40%,transparent);background:var(--paper)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:600;
+  font-size:.92rem;padding:11px 18px;border-radius:var(--r-pill);border:1.5px solid transparent;
+  text-decoration:none;transition:.15s;white-space:nowrap;
+}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--brown);color:#FBF6EE;width:100%;margin-top:4px}
+.btn-primary:hover{background:color-mix(in oklab,var(--brown) 86%,#000)}
+:root[data-theme="dark"] .btn-primary{color:#1a120a}
+.btn-ghost{background:transparent;color:var(--brown);border-color:var(--tan)}
+.btn-ghost:hover{background:var(--beige)}
+.btn-sm{padding:7px 13px;font-size:.82rem}
+.notice{
+  display:flex;gap:8px;align-items:flex-start;margin:18px 0 2px;padding:9px 12px;
+  background:var(--warn-bg);color:var(--warn);border-radius:var(--r);font-size:.8rem;line-height:1.45;
+}
+.notice svg{width:15px;height:15px;flex:none;margin-top:2px}
+
+/* ===== dashboard shell ===== */
+.dash{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.sidebar{background:var(--sidebar);color:#EFE4D4;display:flex;flex-direction:column;padding:20px 0}
+.side-brand{display:flex;align-items:center;gap:11px;padding:2px 22px 20px}
+.side-brand .emblem{width:38px;height:38px;margin:0}
+.side-brand b{font-family:var(--font-head);font-size:1.02rem;line-height:1.15;color:#fff}
+.side-brand span{font-size:.7rem;color:var(--tan);letter-spacing:.06em}
+.side-sec{font-size:.68rem;letter-spacing:.13em;color:rgba(255,255,255,.42);padding:14px 24px 6px;font-weight:600}
+.nav-link{
+  display:flex;align-items:center;gap:11px;padding:10px 22px;color:rgba(255,255,255,.78);
+  font-size:.9rem;background:none;border:none;width:100%;text-align:start;
+  border-inline-start:3px solid transparent;transition:.15s;
+}
+.nav-link svg{width:17px;height:17px;flex:none;opacity:.85}
+.nav-link .count{margin-inline-start:auto;font-size:.72rem;background:rgba(255,255,255,.14);padding:1px 8px;border-radius:var(--r-pill);color:#fff}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-link.active{color:#fff;background:rgba(196,168,130,.18);border-inline-start-color:var(--tan)}
+.side-foot{margin-top:auto;padding:16px 22px 0}
+
+.main{display:flex;flex-direction:column;background:
+  radial-gradient(70% 40% at 100% 0%,color-mix(in oklab,var(--tan) 12%,transparent),transparent 60%),
+  var(--cream);min-width:0}
+.topbar{
+  display:flex;align-items:center;gap:14px;padding:14px 26px;background:var(--paper);
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;
+}
+.topbar h1{font-size:1.28rem;color:var(--brown-dark)}
+.topbar .grow{flex:1}
+.search{display:flex;align-items:center;gap:8px;background:var(--sink);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:7px 14px;color:var(--muted);min-width:210px}
+.search svg{width:15px;height:15px;flex:none}
+.search input{border:none;background:none;outline:none;font-family:inherit;font-size:.86rem;color:var(--ink);width:100%}
+.icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--paper);color:var(--brown)}
+.icon-btn:hover{background:var(--beige)}
+.icon-btn svg{width:18px;height:18px}
+.user{display:flex;align-items:center;gap:9px}
+.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-head);font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,var(--tan),var(--brown))}
+.user .who{font-size:.82rem;line-height:1.2}
+.user .who b{color:var(--brown-dark)}
+.user .who span{color:var(--muted);font-size:.72rem}
+
+.content{padding:24px 26px 48px;max-width:1080px;width:100%}
+.view[hidden]{display:none}
+.crumb{font-size:.78rem;color:var(--muted);margin-bottom:14px}
+
+/* stats */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
+.stat .lbl{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:7px}
+.stat .lbl svg{width:15px;height:15px;color:var(--tan-dark)}
+.stat .num{font-family:var(--font-head);font-size:2.05rem;font-weight:700;color:var(--brown-dark);line-height:1.1}
+.stat .delta{font-size:.75rem;font-weight:600}
+.stat .delta.up{color:var(--ok)} .stat .delta.flat{color:var(--muted)}
+.stat .spark{position:absolute;inset-inline-end:12px;bottom:12px;width:66px;height:26px;opacity:.9}
+
+/* panels + tables */
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.panel-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line)}
+.panel-head h2{font-size:1.06rem;color:var(--brown-dark)}
+.panel-head .grow{flex:1}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:.78rem;color:var(--muted);background:var(--sink);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:5px 12px}
+.chip.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+:root[data-theme="dark"] .chip.on{color:#1a120a}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:start;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+th{background:var(--sink);color:var(--brown-dark);font-family:var(--font-head);font-weight:700;font-size:.78rem;letter-spacing:.02em;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--beige)}
+td .title{color:var(--brown-dark);font-weight:600;white-space:normal}
+td.muted{color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:var(--r-pill);white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.crit{background:var(--crit-bg);color:var(--crit)}
+.pill.info{background:var(--info-bg);color:var(--info)}
+.pill.neutral{background:var(--beige);color:var(--muted)}
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+.act{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;border:1px solid transparent;background:none;color:var(--muted)}
+.act:hover{background:var(--sink);color:var(--brown)}
+.act.danger:hover{background:var(--crit-bg);color:var(--crit)}
+.act svg{width:16px;height:16px}
+.ph{display:inline-block;background:var(--beige);border:1px dashed var(--tan-dark);color:var(--muted);font-size:.82em;padding:1px 9px;border-radius:var(--r-pill)}
+
+.two-col{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+.activity{display:flex;flex-direction:column;gap:2px;padding:8px 6px}
+.act-item{display:flex;gap:12px;padding:11px 14px;border-radius:var(--r)}
+.act-item:hover{background:var(--sink)}
+.act-dot{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--beige);color:var(--brown)}
+.act-dot svg{width:15px;height:15px}
+.act-item .t{font-size:.86rem;color:var(--ink)}
+.act-item .t b{color:var(--brown-dark)}
+.act-item .when{font-size:.74rem;color:var(--muted)}
+
+.empty-hint{color:var(--muted);font-size:.86rem;padding:16px 20px}
+@media (max-width:880px){
+  .dash{grid-template-columns:1fr}
+  .sidebar{flex-direction:row;overflow-x:auto;padding:8px}
+  .side-sec,.side-foot,.side-brand span{display:none}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+  .search{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body style="margin:0">
+<div id="app">
+<div id="dash" class="dash">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#C4A882"/><path d="M16 6c-6 3-8 8-8 13 5-1 9-5 10-13-1 0-1 0-2 0z" fill="#3D2B1F"/></svg>
+        <div><b>מערכת הניהול</b><br><span>ולדורף · פורום ארצי</span></div>
+      </div>
+      <button class="nav-link active" data-view="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>לוח בקרה</button>
+      <div class="side-sec">תוכן</div>
+      <button class="nav-link" data-view="events">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>אירועים<span class="count">4</span></button>
+      <button class="nav-link" data-view="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>הודעות</button>
+      <button class="nav-link" data-view="inst">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count">37</span></button>
+      <button class="nav-link" data-view="lib">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count">128</span></button>
+      <button class="nav-link" data-view="media">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</button>
+      <div class="side-sec">קהילה</div>
+      <button class="nav-link" data-view="people">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</button>
+      <button class="nav-link" data-view="nl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר<span class="count">642</span></button>
+      <div class="side-foot">
+        <button class="nav-link" data-view="set">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.6h.1A1.6 1.6 0 0 0 9 1.1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 15 2.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1A1.6 1.6 0 0 0 22.9 9H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>הגדרות</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <h1 id="page-title">לוח בקרה</h1>
+        <div class="grow"></div>
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input placeholder="חיפוש תוכן…" aria-label="חיפוש"></div>
+        <button class="icon-btn" id="themeBtn" aria-label="החלפת ערכת צבעים" title="מצב יום/לילה">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+        </button>
+        <div class="user">
+          <div class="avatar">ג</div>
+          <div class="who"><b>גלעד לוי</b><br><span>מנהל־על</span></div>
+        </div>
+        <a class="icon-btn" id="logoutBtn" href="./admin.html" aria-label="יציאה" title="יציאה">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M14 17l5-5-5-5M19 12H7"/></svg>
+        </a>
+      </header>
+
+      <div class="content">
+        <!-- HOME -->
+        <section class="view" data-view="home">
+          <p class="crumb">סקירה כללית · עודכן לפני 4 דקות</p>
+          <div class="stat-row">
+            <div class="stat">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>אירועים קרובים</div>
+              <div class="num tnum">4</div><div class="delta up">+2 החודש</div>
+              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,20 13,17 26,18 39,10 52,12 66,5" fill="none" stroke="var(--ok)" stroke-width="2"/></svg>
+            </div>
+            <div class="stat">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21V8l7-4 7 4v13"/></svg>מוסדות רשומים</div>
+              <div class="num tnum">37</div><div class="delta up">+1 השבוע</div>
+              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,22 16,20 33,15 49,14 66,9" fill="none" stroke="var(--tan-dark)" stroke-width="2"/></svg>
+            </div>
+            <div class="stat">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5"/></svg>פריטים בספרייה</div>
+              <div class="num tnum">128</div><div class="delta up">+9 החודש</div>
+              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,21 13,19 26,14 39,15 52,8 66,6" fill="none" stroke="var(--info)" stroke-width="2"/></svg>
+            </div>
+            <div class="stat">
+              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>מנויים לניוזלטר</div>
+              <div class="num tnum">642</div><div class="delta up">+18 החודש</div>
+              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,23 16,18 33,16 49,11 66,7" fill="none" stroke="var(--brown)" stroke-width="2"/></svg>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head"><h2>אירועים קרובים</h2><div class="grow"></div><button class="btn btn-ghost btn-sm" data-goto="events">כל האירועים</button></div>
+              <div class="table-wrap"><table>
+                <thead><tr><th>תאריך</th><th>כותרת</th><th>מיקום</th><th>סטטוס</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td class="muted tnum">15 בנוב׳</td><td class="title">כנס המורים הארצי תשפ״ו</td><td class="muted"><span class="ph">מיקום</span></td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td></tr>
+                  <tr><td class="muted tnum">22 בנוב׳</td><td class="title">כנס גננות ולדורף</td><td class="muted"><span class="ph">מיקום</span></td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td></tr>
+                  <tr><td class="muted tnum">5 בדצמ׳</td><td class="title">סדנת הכשרת מורים — מתמטיקה</td><td class="muted"><span class="ph">מיקום</span></td><td><span class="pill warn">טיוטה</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td></tr>
+                  <tr><td class="muted tnum">18 בינו׳</td><td class="title">יום עיון להורים</td><td class="muted"><span class="ph">מיקום</span></td><td><span class="pill info">מתוזמן</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>פעילות אחרונה</h2></div>
+              <div class="activity">
+                <div class="act-item"><div class="act-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="t"><b>אגרת החורף</b> פורסמה</div><div class="when">היום, 09:24 · גלעד</div></div></div>
+                <div class="act-item"><div class="act-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div><div><div class="t">מוסד חדש נוסף — <b>גן ״הפעמון״</b></div><div class="when">אתמול, 16:10 · רותם</div></div></div>
+                <div class="act-item"><div class="act-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div><div><div class="t">עודכן <b>יום עיון להורים</b></div><div class="when">אתמול, 11:02 · גלעד</div></div></div>
+                <div class="act-item"><div class="act-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5"/></svg></div><div><div class="t">3 חומרי הוראה נוספו לספרייה</div><div class="when">21 בנוב׳ · מערכת</div></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EVENTS -->
+        <section class="view" data-view="events" hidden>
+          <p class="crumb">ניהול לוח האירועים והכנסים</p>
+          <div class="panel">
+            <div class="panel-head">
+              <h2>אירועים</h2>
+              <div class="tools"><span class="chip on">הכול</span><span class="chip">מפורסם</span><span class="chip">טיוטה</span><span class="chip">הסתיים</span></div>
+              <div class="grow"></div>
+              <button class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>אירוע חדש</button>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>תאריך</th><th>כותרת</th><th>מיקום</th><th>שעות</th><th>סטטוס</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="muted tnum">15 בנוב׳ 2025</td><td class="title">כנס המורים הארצי תשפ״ו</td><td class="muted"><span class="ph">מיקום</span></td><td class="muted tnum">09:00–17:00</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">22 בנוב׳ 2025</td><td class="title">כנס גננות ולדורף</td><td class="muted"><span class="ph">מיקום</span></td><td class="muted tnum">08:30–15:00</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">5 בדצמ׳ 2025</td><td class="title">סדנת הכשרת מורים — מתמטיקה</td><td class="muted"><span class="ph">מיקום</span></td><td class="muted tnum">10:00–16:00</td><td><span class="pill warn">טיוטה</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">18 בינו׳ 2026</td><td class="title">יום עיון להורים</td><td class="muted"><span class="ph">מיקום</span></td><td class="muted tnum">09:00–13:00</td><td><span class="pill info">מתוזמן</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">12 בספט׳ 2025</td><td class="title">פתיחת שנת הלימודים</td><td class="muted">—</td><td class="muted tnum">—</td><td><span class="pill neutral">הסתיים</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <!-- NEWS -->
+        <section class="view" data-view="news" hidden>
+          <p class="crumb">הודעות ועדכונים לקהילה</p>
+          <div class="panel">
+            <div class="panel-head"><h2>הודעות</h2><div class="grow"></div><button class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>הודעה חדשה</button></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>תאריך</th><th>כותרת</th><th>מדור</th><th>סטטוס</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="muted tnum">דצמ׳ 2025</td><td class="title">אגרת החורף של הפורום יצאה לאור</td><td class="muted">איגרת</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">נוב׳ 2025</td><td class="title">רשימת המוסדות עודכנה לתשפ״ו</td><td class="muted">מוסדות</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted tnum">ספט׳ 2025</td><td class="title">ברכות לפתיחת שנת הלימודים</td><td class="muted">כללי</td><td><span class="pill neutral">בארכיון</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <!-- INSTITUTIONS -->
+        <section class="view" data-view="inst" hidden>
+          <p class="crumb">מאגר גני הילדים ובתי הספר</p>
+          <div class="panel">
+            <div class="panel-head">
+              <h2>מוסדות חינוך</h2>
+              <div class="tools"><span class="chip on">הכול</span><span class="chip">גנים</span><span class="chip">יסודי</span><span class="chip">תיכון</span></div>
+              <div class="grow"></div>
+              <button class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>מוסד חדש</button>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>שם המוסד</th><th>יישוב</th><th>שלב</th><th>סטטוס</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="title">גן ולדורף ״האלון״</td><td class="muted">הרדוף</td><td class="muted">גן</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="title">בית ספר ולדורף כפר תבור</td><td class="muted">כפר תבור</td><td class="muted">יסודי</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="title">תיכון ולדורף הרדוף</td><td class="muted">הרדוף</td><td class="muted">תיכון</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="title">גן ״הפעמון״</td><td class="muted">מודיעין</td><td class="muted">גן</td><td><span class="pill warn">ממתין לאישור</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <!-- LIBRARY -->
+        <section class="view" data-view="lib" hidden>
+          <p class="crumb">מאמרים, ספרים וחומרי הוראה</p>
+          <div class="panel">
+            <div class="panel-head"><h2>ספריית תוכן</h2><div class="grow"></div><button class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>פריט חדש</button></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>סוג</th><th>כותרת</th><th>קטגוריה</th><th>סטטוס</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="muted">מאמר</td><td class="title">המזג בגיל הרך</td><td class="muted">פדגוגיה</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted">ספר</td><td class="title">חינוך האדם</td><td class="muted">תיאוריה</td><td><span class="pill ok">מפורסם</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+                <tr><td class="muted">חומר הוראה</td><td class="title">יחידת לימוד — גיאומטריה כיתה ה׳</td><td class="muted">יסודי</td><td><span class="pill warn">טיוטה</span></td><td><div class="row-actions"><button class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <!-- Simple placeholders for the rest -->
+        <section class="view" data-view="media" hidden><div class="panel"><div class="panel-head"><h2>מדיה</h2></div><p class="empty-hint">ניהול גלריות תמונות וסרטונים — המסך ייבנה בשלב הבא.</p></div></section>
+        <section class="view" data-view="people" hidden><div class="panel"><div class="panel-head"><h2>נציגי פורום</h2></div><p class="empty-hint">ניהול חברי הפורום, תפקידים וקבוצות עבודה — המסך ייבנה בשלב הבא.</p></div></section>
+        <section class="view" data-view="nl" hidden><div class="panel"><div class="panel-head"><h2>ניוזלטר</h2></div><p class="empty-hint">ניהול רשימות תפוצה ודיוור — יתחבר לשירות הדיוור שייבחר (סעיף 10 ב־PRD).</p></div></section>
+        <section class="view" data-view="set" hidden><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p></div></section>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var root=document.documentElement; root.setAttribute('dir','rtl');
+  var TITLES={home:'לוח בקרה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
+  function navTo(view,btn){
+    document.querySelectorAll('#dash .view').forEach(function(v){v.hidden=v.getAttribute('data-view')!==view;});
+    document.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active');});
+    if(btn)btn.classList.add('active');
+    var t=document.getElementById('page-title'); if(TITLES[view])t.textContent=TITLES[view];
+    var c=document.querySelector('.content'); if(c)c.scrollIntoView({block:'start'});
+  }
+  function toggleTheme(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur)cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var next=cur==='dark'?'light':'dark'; root.setAttribute('data-theme',next);
+    var moon='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
+    var sun='<path d="M21 12.8A8 8 0 1 1 11.2 3a6.3 6.3 0 0 0 9.8 9.8z"/>';
+    var i=document.getElementById('themeIcon'); if(i)i.innerHTML=next==='dark'?sun:moon;
+  }
+  var th=document.getElementById('themeBtn'); if(th)th.addEventListener('click',toggleTheme);
+  document.querySelectorAll('.nav-link[data-view]').forEach(function(b){ b.addEventListener('click',function(){navTo(b.getAttribute('data-view'),b);}); });
+  document.querySelectorAll('[data-goto]').forEach(function(b){ b.addEventListener('click',function(){var v=b.getAttribute('data-goto'); navTo(v,document.querySelector('.nav-link[data-view="'+v+'"]'));}); });
+})();
+</script>
+</body>
+</html>

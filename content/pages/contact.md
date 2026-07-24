@@ -2,7 +2,7 @@
 title: "צור קשר"
 slug: "contact"
 section: "צור קשר"
-order: 27
+order: 37
 ---
 
 # צור קשר
@@ -15,9 +15,9 @@ order: 27
 
 ## פרטי התקשרות
 
-- ✉️ info@waldorf.org.il
-- 📞 0XX-XXXXXXX
-- 📍 [כתובת הפורום]
+- :mail: info@waldorf.org.il
+- :phone: 0XX-XXXXXXX
+- :pin: [כתובת הפורום]
 
 ## שעות פעילות
 
@@ -26,6 +26,6 @@ order: 27
 
 ## עקבו אחרינו
 
-- 📘 Facebook — [קישור]
-- 📸 Instagram — [קישור]
-- 🎬 YouTube — [קישור]
+- :facebook: Facebook — [קישור]
+- :instagram: Instagram — [קישור]
+- :youtube: YouTube — [קישור]

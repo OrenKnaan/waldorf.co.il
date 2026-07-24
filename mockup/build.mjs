@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { RESPONSIVE_CSS, NAV_TOGGLE_HTML, NAV_TOGGLE_JS, VIEWPORT_META } from './responsive.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const contentDir = join(__dirname, '..', 'content', 'pages');
@@ -214,7 +215,7 @@ function topAncestor(slug) {
 
 function renderNav(currentSlug) {
   const topSlug = topAncestor(currentSlug);
-  let html = '<div class="primary-nav">\n';
+  let html = '<div class="primary-nav" id="primary-nav">\n';
   for (const entry of NAV_STRUCTURE) {
     const hasChildren = Boolean(entry.children && entry.children.length);
     const isActive = entry.slug
@@ -311,6 +312,7 @@ function shell({ title, section, status, slug, navHtml, bodyHtml }) {
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+${VIEWPORT_META}
 ${FAVICON}
 <title>${title} — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -455,16 +457,18 @@ ${titleFontFace}  :root {
   a { color: var(--brown); }
 
   footer.site-footer { text-align: center; padding: 30px 24px 50px; color: var(--text-muted); font-size: 0.8rem; }
-</style>
+${RESPONSIVE_CSS}</style>
 </head>
 <body>
 <header class="site-header">
+${NAV_TOGGLE_HTML}
   <div class="brand-row">
     <p class="brand-name">הפורום הארצי לחינוך ולדורף</p>
     <p class="brand-tagline">מוקאפ תוכן</p>
   </div>
   <nav>${navHtml}</nav>
 </header>
+${NAV_TOGGLE_JS}
 <main>
   <nav class="pagebanner" aria-label="breadcrumb">
     ${renderBreadcrumb(slug)}
