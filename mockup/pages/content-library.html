@@ -1,10 +1,10 @@
-<!-- @dsCard group="גני ילדים" -->
+<!-- @dsCard group="ספריית תוכן" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>גני ילדים — מוקאפ</title>
+<title>ספריית תוכן — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -202,8 +202,8 @@
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "גני ילדים",
-      "item": "./kinder.html"
+      "name": "ספריית תוכן",
+      "item": "./content-library.html"
     }
   ]
 }
@@ -263,46 +263,64 @@
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">גני ילדים</span>
+<span class="crumb current" aria-current="page">ספריית תוכן</span>
 </span>
   </nav>
   <div class="art-hero"><div class="bg" style="background-image:url('data:image/jpeg;base64,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')"></div><div class="frame"><img src="data:image/jpeg;base64,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" alt="הפנינה בצדף"></div><div class="cap"><b>הפנינה בצדף</b><span>אור עולה מן המעמקים — ציור ולדורף</span></div></div>
-  <h1>גני ילדים</h1>
-<p>חינוך ולדורף לגיל הרך — גנים ברחבי ישראל.</p>
+  <h1>ספריית תוכן</h1>
+<p>מאגר מרכזי של מאמרים, המלצות קריאה, חומרי הוראה וטפסים לשימוש קהילת ולדורף.</p>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 <section class="card">
-<h2>עקרונות כלליים של גן ילדים ולדורף</h2>
-<p>מרגע לידתם ועד גיל שנתיים, שלוש רוכשים הילדים את האיכויות האנושיות העיקריות של האדם: תנועות בסיסיות של הגוף והגפיים, הזדקפות, הליכה וריצה, דיבור בסיסי ויכולת חשיבה מסוימת. מכאן ועד לגיל בית הספר עומד לפניהם זמן משמעותי של אימון ושכלול של יכולותיהם אלו, ותוך כדי כך הכרת העולם אליו נולדו ורכישת הכלים הראשוניים להתמצאות חברתית. בשנים הראשונות לחייהם הילדים עדיין מכוונים בראש וראשונה אל עבר ההתפתחות הגופנית-פיזית במובנה הרחב ביותר. האדם יוצר בשנים אלו מעין בסיס ותשתית גופנית לכל חייו בהמשך. מכאן המשמעות העצומה של שנים אלו בהתפתחותו.</p>
-<p>מה שבגיל מאוחר יותר, ובודאי בבגרות, יהיה אך ורק רושם נפשי או רוחני, הנו בגיל זה עדיין רושם גופני-פיזי. הרשמים השונים: רשמי החושים החיצוניים, ההתרשמויות הנפשיות שסובבות את הילד, המחשבות והרעיונות שהאנשים סביבו חושבים, כל אלה ועוד נטבעים עמוק בגופניות ומשאירים שם את חותמם. הילדים אמנם אינם חותם סביבתם בלבד – מבחינה רוחנית הם מביאים אתם נשמה אינדיבידואלית, ייחודית עם איכויות רק לה – אולם זהו הגיל בו הסביבה במובנה הרחב ביותר: הסביבה חומרית, כוחות הטבע, רגשות, מחשבות והלכי נפש של אנשים ועוד, הופכת להיות, לטוב ולרע, לחלק מישותם, לחלק מגופניותם.</p>
-<p>כיוון שמכלול ישותם של הילדים בשנים הראשונות לחייהם מכוון לצמיחה, גדילה, טיפוח של הגוף וכל הקשור בכך, נבנות ומתפתחות שאר האיכויות האנושיות מתוך קשרן לגופניות. היכולות הקוגניטיביות וכוחות הרגש והמוסר עדיין קשורים לגמרי לגופניות, נשענים עליה ונבנים מתוכה. ככל שהגוף, התנועה, חווית המרחב והחושים יתפתחו בצורה ההרמונית והשלמה ביותר, כך יתפתחו אחר-כך שאר היכולות וכושרי האדם לצורתם היפה ביותר.</p>
-<p>הערוץ העיקרי לתפיסת העולם ולהפנמתו בגיל זה נעשה בעיקר על ידי חיקוי. החיקוי נובע מכך שישותם של הילדים בשלב זה עדיין מאוחדת עם העולם שסביבה. אנו כמבוגרים מבדילים עצמנו מהעולם, מנותקים ממנו במידה רבה ולכן גם עצמאיים וחופשיים יותר ביחסינו אליו. לא כך הילד הרך. הוא נמצא במובן מסוים לא פחות "בחוץ" מאשר "בפנים". הוא אחד עם האנשים סביבו, עם הטבע, עם המתרחש בבית וכיו"ב. תהליך הניתוק מכל אלה ארוך וממושך, קשור לבניית עצמאותו הפנימית ויתרחש בכמה שלבים במועד מאוחר יותר. הילדה בגיל זה לא יכולה שלא לחקות את סביבתה, שכן היא כאמור פשוט מאוחדת איתה.</p>
-<p>דיבורים, מחשבות, הסברים וכל תהליך של למידה וחינוך שנעשה בגיל זה בצורה שכלתנית ורציונאלית אינו מדבר כלל אל הילדים, עובר במקרה הטוב לידם או מעליהם ומונע, במקרה הפחות טוב, את התפתחותם של הכוחות שעליהם לפתח. השכלתנות "מקררת" את כוחות הילדים, עוצרת את כוחות החיים והתנועה ופועלת נגד כוחותיהם הטבעיים. כוחות טבעיים אלו הם כוחות של חיים, תנועה, פעילות, חום וסימפטיה והתמזגות עם כל המתרחש סביב.</p>
-<p>על מנת לעבוד עם כוחות אלה עלינו ליצור סביב הילדים ועמם אווירה של פעילות, תנועה, משחק מלא דמיון והוויה יצירתית וזורמת. העשייה ולא הדיבורים עומדת במרכז גן ילדים ולדורף. על הילד לחוות ולראות סביבו מציאות של עבודה, עשייה ופעילות, כך שיוכל לחקות באופן חיצוני ופנימי פעילות זו. מכאן שהאווירה בגן ובבית ההורים צריכה לעמוד בסימן של פעילות ועשייה. מה שהילדים לומדים ומפנימים בגיל זה אינו ידע מופשט על העולם, ובודאי שלא דברים שיכינו אותו לבית הספר, אלא את הצד הפעיל, הזורם, החי והמתהווה של העולם סביבם.</p>
-<p>מכאן שהמאמץ בחינוך ולדורף בתקופה זו עומד בעיקר על טיפוח צדדיו הגופניים של הילד, וזאת במובן הרחב ביותר: חוויות החושים, תנועה, שיווי המשקל, יכולות החיקוי הגופני וכל מה שקשור לחוויה הגופנית. אלה, זוכים להתייחסות הרצינית, העקבית והממושכת ביותר. בגן העובד ברוח חינוך ולדורף שמים את הדגש קודם כל על חינוך זה של צדדיו הגופניים-פיזיים של הילדים. במשחק, בשיר, באומנויות השונות, ביצירה ובחיקוי, בחוויות חושים מגוונות מנסים לחזק ולעודד איכויות אלה. הילדים קודם כל עושים. בחיקוי ומשחק של עבודות האדם נבנה בצורה היפה וההרמונית ביותר מערך גופם ונפשם של הילדים הרכים.</p>
-<p>מהדברים האמורים לעיל מובן שהאיכויות שעלולות למנוע ולהפריע להתפתחותם של ילדים בגיל הצעיר הנן אלו שמביאות אותם באורח פנימי וחיצוני לידי עצירה, לידי פסיביות פנימית, ל"קירור" של כוחותיהם הפנימיים. אלו הם, בראש ובראשונה, מכשירי המדיה השונים והמשחקים האלקטרוניים לסוגיהם, שמהותם הפנימית היא שהם פועלים, יוצרים ועושים ואילו הילדים יושבים, בוהים ואינם עושים דבר. כך מתדלדלים כוחותיהם הפנימיים, חושיהם נעשים חד צדדיים ויכולת החיקוי המופלאה והטבעית בה ניחנו אינה מקבלת עידוד ועשויה להתנוון.</p>
-<p>בגנים ברוח חינוך ולדורף אין לכן מדיה, מחשבים ומשחקים אלקטרונים. הדגש הוא תמיד על מוחשיות, קשר אישי, פעילות גופנית ומשחק חופשי מלא דמיון. כמו כן מטרת הגן אינה להכין את הילדים ללימודים בבית ספר וללמדם מושגים שכלתניים. אלו צריכים להילמד רק באופן חופשי, מתוך החיים עצמם ובהתאם לרצון הילדים עצמם. מטרת הגן היא הגן עצמו ובמסגרתו התפתחות השלמה וההרמונית ביותר של הילדים בשלב בו הם נמצאים.</p>
-</section>
-<section class="card">
-<h2>גן ילדים ולדורף – המעשה החינוכי</h2>
-<p>מטרת גן הילדים היא לעודד ולטפח יכולות וכשרים מגוונים ושונים, כך שיהוו בסיס להמשך החיים. הפעילויות משקפות את תחומי העניין, הצרכים ושלבי ההתפתחות של הילד. הסביבה המקיפה את הילד בנויה כך שתוכל לטפח הן למידה אישית והן למידה חברתית.</p>
-<p>בשנים הראשונות לחייהם לומדים ומפנימים הילדים את העולם סביבם בעיקר דרך עיבוד תחושתי-תנועתי. בשנים אלו מרכז הכובד ההתפתחותי קשור להתפתחות הסנסו-מוטורית. האינטגרציה החושית-מוטורית, שבאה לידי ביטוי בהליכה, דיבור ומשחק מהווה את הבסיס לאינטגרציה מורכבת יותר שהכרחית לחשיבה מורכבת, לאוריינות והתנהגות מתואמת לסביבה.</p>
-<p>הלימוד נעשה דרך דוגמה, פעילות, עשייה ומשחק במקום דרך הוראה ישירה. מושם דגש על פעילות ועבודה וליווי של תהליכים ארוכים אותם ניתן ללוות לאורך תקופה. למשל, "מן הזרע אל הלחם". בתהליך זה נזרע חיטה ונגדל אותה לאורך השנה עד הקציר, טחינת החיטה ואפיית הלחם. מתוך הכרה בתפקידו החיוני של משחק חופשי ומלא דמיון בשלבי ההתפתחות בשנים הראשונות לחיים, יש לו מקום נכבד בהוויית הגן. דרך המשחק הילד מתרגל מצבי חיים שונים, פתרון בעיות, עיבוד של תכנים רגשיים ועוד.</p>
-<p>דגש רב מושם על דפוסים סדירים של פעילויות החוזרות שוב ושוב בריתמוסים דומים, הן בכל יום, הן בכל שבוע והן בהתבוננות שנתית. דפוס מחזורי משתקף בנושאי עבודה הקשורים למשל לעונות השנה.</p>
-<p>חיקוי של פעילויות ומעשים בעלי משמעות והגיון הוא האמצעי העיקרי של תהליכי הלמידה בגן ברוח חינוך ולדורף. מכאן שהמבוגרים בגן מלמדים בדרך של חיקוי ודוגמה. הילד לומד עבור החיים מן החיים (רכישת שפת האם למשל מתרחשת בעיקר באמצעות חיקוי) והילדים לוקחים דוגמה להתנהגותם ממה שמתרחש סביבם. פעילויות של מבוגרים מגרות תגובות ישירות אצל הילדים הצעירים והגננים מבצעים את משימותיהם היומיומיות כך שיהיו ראויים לחיקוי.</p>
-<p>הגן הוא קהילה של "עושים" בעבודות בעלות משמעות: באפיית לחם, בהכנת הארוחה, בניקיון, במלאכות יד פשוטות, בעבודת האדמה, בהכנת שימורים ועוד. עזרה מצד הילדים מתקבלת בברכה אבל לא דורשים אותה. פעילות הגננות יכולה לתת השראה לילדים להיות פעילים עצמאית, למצוא את מצבי הלמידה שלהם תוך משחק. ילדים תופסים כל דבר שהמבוגרים עושים והוא נרשם אצלם בזיכרון. הגננים מודעים להשפעתם המוסרית על הילד ועל פיתוח הרגלים טובים דרך החיקוי. הגן מאפשר מגוון של פעילויות המתאימות לחיקוי שמתרחשות במהלך יום הלימודים.</p>
-<p>עבודה עם קצב קבוע (רתמוס) ועם חזרות הנה עקרון חינוך חשוב. ילדים זקוקים לביטחון שבהמשכיות, ואירועים סדירים וחוזרים על עצמם מעצבים את שנת הלימודים, את סדר השבוע ואת מהלך היום. בפעילויות עונתיות חוגגים את מחזורי השנה: הסתיו בגן הילדים יכול להיות תקופה לאסיף, למסיק זיתים והכנתם, להכנת שימורים, והאביב – תקופה לשתילה, לעיבוד האדמה ולהכנת הלחם משיבולים. "פינת עונות" בחלל המרכזי או בסביבה הרחבה יותר משקף את עולם הטבע המשתנה לכל אורך השנה. כך גם הנושאים של שירים, סיפורים ופואמות משתנים עם חילופי העונות. זאת ועוד, לכל שבוע יש קצב סדיר משלו, של פעילויות חוזרות ונשנות, כלומר יום אפייה, יום ציור, יום גינון וכיו"ב.</p>
-<p>לכל יום יש קצבים משלו והם קטנים יותר ותומכים בפעילויות היום. קצבים יומיים אלה עוזרים לילד להרגיש ביטחון ולדעת למה לצפות. היום בנוי כך שיש קצב משתנה – עם תקופות של התכווצות ותקופות של התרחבות – וכך מספקים איזון בין תקופות פעילות לתקופות מנוחה. בפרקטיקה, יתכן שפירושו של דבר יהיה שאחרי זמן למשחק יצירתי וחופשי יבוא משך זמן מרוכז יותר במעגל, או שאחרי פעילות חוץ נמרצת יבוא סיפור שקט. יש חילופים ריתמיים בין "זמן הילד" (משחק יצירתי, זמן בחוץ) וזמן הגננת (פעילות מונחה בדקלום, שירה, נגינה או יצירה או סיפור). עבודה עם קצב עוזרת לילדים לחיות עם שינוי, למצוא את מקומם בעולם ולהתחיל להבין את העבר, את ההווה ואת העתיד. היא מספקת בסיס חשוב מאוד להבנת הזמן, מה התרחש לפנים ומה עומד לבוא לאחר מכן, ועוזרת לילדת להתייחס לעולם הטבע ולעולם בני האדם. תשומת לב לקצב ולרתמוסים מטפחת התפתחות בריאה ולימים מובילה לחיים מאוזנים.</p>
-<p>חזרה גם היא ממלאת תפקיד חשוב בביסוס ההמשכיות ובהתפתחות הבריאה של הזיכרון. זיכרונם של הילדים מתחזק באמצעות חוויות חוזרות ונשנות; הילדים זוכרים פעילויות יומיות, שבועיות ושנתיות בגן ולעתים קרובות מצפים להם בלהיטות בפעם השנייה שהן מתרחשות. דוגמא נוספת, לא מספרים סיפור רק פעם אחת אלא פעמים רבות: החזרה נותנת לילדים הזדמנות להכיר את החומר ולהעמיק את יחסם עמו.</p>
-</section>
-<section class="card">
-<h2>תת-נושאים בקבוצה זו</h2>
+<div class="tabs" data-group="0">
+<div class="tab-buttons" role="tablist">
+<button type="button" class="tab-btn active" data-target="tab-0-0">עבודות ומאמרים</button>
+<button type="button" class="tab-btn" data-target="tab-0-1">חומרי הוראה</button>
+<button type="button" class="tab-btn" data-target="tab-0-2">טפסים להורדה</button>
+</div>
+<div class="tab-panel active" id="tab-0-0">
+<p>להלן עבודות ומאמרים על חינוך ולדורף. העבודות ברובן הן:</p>
 <ul>
-<li>רשימת גני ילדים</li>
-<li>מעגל הגנים הארצי</li>
+<li>עבודות סמינריוניות שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
+<li>עבודות לתואר שני של אנשים שונים מתוך ומחוץ לחינוך ולדורף.</li>
+<li>עבודות סיום הכשרות לא אקדמיות לחינוך ולדורף או עבודות שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
 </ul>
+<blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> הערת מבנה: רצוי לאחד את "עבודות" ו"מאמרים" לתפריט אחד, ולעצב את הרשימה כך שיוצגו כמה שיותר פריטים במשבצות קטנות (שם המאמר/עבודה + שורת תיאור), ולא כטור אנכי ארוך.</blockquote>
+<h3 class="sub">ספרים מומלצים</h3>
+<ul>
+<li><span class="ph">שם ספר</span> — <span class="ph">מחבר</span> — <span class="ph">קישור לרכישה</span></li>
+<li><span class="ph">שם ספר</span> — <span class="ph">מחבר</span> — <span class="ph">קישור לרכישה</span></li>
+<li><span class="ph">שם ספר</span> — <span class="ph">מחבר</span> — <span class="ph">קישור לרכישה</span></li>
+</ul>
+<h3 class="sub">מאמרים ועבודות גמר</h3>
+<ul>
+<li><span class="ph">כותרת מאמר</span> — <span class="ph">מחבר</span> — <span class="ph">קובץ PDF</span></li>
+<li><span class="ph">כותרת מאמר</span> — <span class="ph">מחבר</span> — <span class="ph">קובץ PDF</span></li>
+</ul>
+<p><span class="ph">תוכן: רשימה מלאה ובפועל של ספרים/מאמרים מומלצים לקבל מהפורום</span></p>
+</div>
+<div class="tab-panel" id="tab-0-1">
+<p>חומרים לשימוש מורים וגננות — סיפורים, דפי עבודה, מצגות ורשימות קריאה, לפי שכבת גיל.</p>
+<ul>
+<li>סיפורים, שירים ודקלומים — <span class="ph">תוכן: קבצים בפועל</span></li>
+<li>דפי עבודה להדפסה — <span class="ph">תוכן: קבצים בפועל</span></li>
+<li>מצגות ותמונות להוראה — <span class="ph">תוכן: קבצים בפועל</span></li>
+<li>חומרי העשרה לתיכון — <span class="ph">תוכן: קבצים בפועל</span></li>
+</ul>
+</div>
+<div class="tab-panel" id="tab-0-2">
+<p>מאגר טפסים מרכזי — טפסי הרשמה, בקשות ואישורים נפוצים במוסדות ולדורף.</p>
+<ul>
+<li>טופס הרשמה למוסד — <span class="ph">קובץ PDF</span></li>
+<li>בקשת מלגה/הנחה — <span class="ph">קובץ PDF</span></li>
+<li>אישור בריאות/חיסונים — <span class="ph">קובץ PDF</span></li>
+<li>טופס ויתור סודיות (למקרי אירוע) — <span class="ph">קובץ PDF</span></li>
+</ul>
+<p><span class="ph">תוכן: רשימת טפסים בפועל לקבל מהפורום</span></p>
+</div>
+</div>
 </section>
 
-  </main>
+</main>
 <footer class="site-footer">מוקאפ פנימי — הפורום הארצי לחינוך ולדורף</footer>
 <script>
 document.addEventListener('click', function (e) {
