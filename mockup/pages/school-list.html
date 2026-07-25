@@ -81,7 +81,8 @@
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
-  li{margin-bottom:8px;display:flex;align-items:flex-start;gap:6px}
+  li{margin-bottom:8px}
+  li:has(>.icon-inline){display:flex;align-items:flex-start;gap:6px}
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
@@ -175,6 +176,8 @@
       radial-gradient(60% 70% at 35% 65%, color-mix(in oklab,var(--wash-gold) 26%,transparent), transparent 70%),
       radial-gradient(90% 90% at 50% 20%, color-mix(in oklab,var(--wash-sky) 22%,transparent), transparent 75%),
       var(--beige)}
+  .map-frame iframe{filter:saturate(.55) brightness(1.06) contrast(.96)}
+  .map-frame .map-tint{position:absolute;inset:0;background:var(--tan);mix-blend-mode:color;opacity:.4;pointer-events:none}
   .map-frame .pin{position:absolute;width:15px;height:15px;transform:translate(50%,-50%);cursor:pointer}
   .map-frame .pin::before{content:"";position:absolute;inset:0;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--brown);box-shadow:0 2px 5px rgba(0,0,0,.3)}
   .map-frame .pin.kg::before{background:oklch(0.62 0.11 150)}
@@ -414,7 +417,7 @@
 <blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> הרשימה הבאה (40 בתי ספר) מבוססת על מאגר המוסדות של "אנתרופוסופיה בישראל" (antro.co.il) — האתר הישן של הפורום עצמו לא החזיק רשימה בנויה. המקור אינו כולל כתובת מדויקת או טווח כיתות לכל מוסד; שדות אלו יושלמו מול בתי הספר עצמם בהטמעה הסופית של הווידג'ט (טבלת institutions ב-D1, PRD סעיף 4).</blockquote>
 
 <div class="chip-row"><span class="chip active">הכל</span><span class="chip">יסודי</span><span class="chip">תיכון</span><span class="chip">מרכז</span><span class="chip">צפון</span><span class="chip">דרום</span></div>
-<div class="map-frame" style="min-height:300px;margin-bottom:18px"><iframe src="https://www.google.com/maps/d/embed?mid=1pEEHXSNNtFLCU3E1VjPcG15OEeP4w3o" style="position:relative;width:100%;height:480px;border:0" loading="lazy" title="מפת בתי ספר ולדורף בישראל"></iframe></div>
+<div class="map-frame" style="min-height:300px;margin-bottom:18px"><iframe src="https://www.google.com/maps/d/embed?mid=1pEEHXSNNtFLCU3E1VjPcG15OEeP4w3o" style="position:relative;width:100%;height:480px;border:0" loading="lazy" title="מפת בתי ספר ולדורף בישראל"></iframe><div class="map-tint" aria-hidden="true"></div></div>
 <p style="font-size:.85rem;color:var(--brown-dark);margin:-10px 0 18px">מקור: מפת "אנתרופוסופיה בישראל" (<a href="https://antro.co.il/study/schools_map.html">antro.co.il</a>) · עדכון אחרון במקור: 9/1/2023</p>
 <div class="table-wrap"><table>
 <thead><tr>
