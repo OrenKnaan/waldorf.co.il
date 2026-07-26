@@ -3,6 +3,25 @@
 (function () {
   'use strict';
 
+  /* ---------- JSON-LD: כתובות יחסיות -> מוחלטות בזמן ריצה ----------
+     גוגל דורש כתובת מלאה ב-item של BreadcrumbList. המוקאפ מתפרסם היום
+     בכתובת אחת והאתר יעלה בסופו של דבר בכתובת אחרת, ולכן אין לקבע דומיין
+     בקוד — הדפדפן (וגם ה-renderer של גוגל) משלים אותו מכתובת העמוד. */
+  try {
+    document.querySelectorAll('script[type="application/ld+json"]').forEach(function (node) {
+      var data = JSON.parse(node.textContent);
+      if (!data || data['@type'] !== 'BreadcrumbList' || !Array.isArray(data.itemListElement)) return;
+      var touched = false;
+      data.itemListElement.forEach(function (li) {
+        if (typeof li.item === 'string' && !/^[a-z][a-z0-9+.-]*:/i.test(li.item)) {
+          li.item = new URL(li.item, location.href).href;
+          touched = true;
+        }
+      });
+      if (touched) node.textContent = JSON.stringify(data);
+    });
+  } catch (e) { /* לא קריטי — שאר העמוד ממשיך לעבוד */ }
+
   var banner = document.querySelector('main .pagebanner');
   if (!banner) return;
   var crumbs = banner.querySelector('.crumbs');
