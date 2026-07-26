@@ -92,9 +92,10 @@
     '.dyn-chip.demo{background:color-mix(in oklab,var(--wash-sky) 26%,var(--white));color:var(--brown-dark)}',
     '.dyn-contact{font-size:.82rem;color:var(--text-muted)}',
     '.dyn-event{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}',
-    '.dyn-event .date-badge{flex:0 0 74px;text-align:center;background:var(--brown);color:#fff;border-radius:13px;padding:10px 6px}',
-    '.dyn-event .date-badge b{display:block;font-family:var(--font-head);font-size:1.7rem;font-weight:700;line-height:1.05}',
-    '.dyn-event .date-badge span{font-size:.76rem}',
+    /* רקע בהיר — הגוון החום שמור לכפתורים */
+    '.dyn-event .date-badge{flex:0 0 74px;text-align:center;background:color-mix(in oklab,var(--wash-gold) 26%,var(--white));color:var(--brown-dark);border:1px solid color-mix(in oklab,var(--tan) 50%,transparent);border-radius:13px;padding:10px 6px}',
+    '.dyn-event .date-badge b{display:block;font-family:var(--font-head);font-size:1.7rem;font-weight:700;line-height:1.05;color:var(--brown)}',
+    '.dyn-event .date-badge span{font-size:.76rem;color:var(--text-muted)}',
     '.dyn-event.past{opacity:.62}',
     '.dyn-event .body{flex:1;min-width:220px}',
     '.dyn-btn{display:inline-block;font-family:var(--font-body);font-size:.85rem;font-weight:600;color:#fff;background:var(--brown);border:none;border-radius:var(--radius-pill);padding:8px 20px;cursor:pointer;text-decoration:none}',
