@@ -205,9 +205,9 @@
   function boardWidget(mount, cfg) {
     var state = { q: '', cat: '', region: '' };
     var toolbar = el('div', { class: 'dyn-toolbar' }, [
-      el('input', { type: 'search', placeholder: 'חיפוש חופשי…', 'aria-label': 'חיפוש', oninput: function (e) { state.q = e.target.value.trim(); draw(); } }),
-      sel('כל הקטגוריות', cfg.categories, function (v) { state.cat = v; draw(); }),
-      sel('כל האזורים', cfg.regions, function (v) { state.region = v; draw(); })
+      el('input', { type: 'search', placeholder: cfg.searchPlaceholder || 'חיפוש חופשי…', 'aria-label': 'חיפוש', oninput: function (e) { state.q = e.target.value.trim(); draw(); } }),
+      (cfg.categories && cfg.categories.length) ? sel('כל הקטגוריות', cfg.categories, function (v) { state.cat = v; draw(); }) : null,
+      (cfg.regions && cfg.regions.length) ? sel('כל האזורים', cfg.regions, function (v) { state.region = v; draw(); }) : null
     ]);
     function sel(allLabel, opts, onCh) {
       var s = el('select', { 'aria-label': allLabel, onchange: function (e) { onCh(e.target.value); } },
@@ -221,14 +221,16 @@
     mount.appendChild(form);
     mount.appendChild(list);
 
+    var catField = cfg.categoryField || 'category';
     function matches(it) {
-      var hay = [it.title, it.role, it.institution, it.description, it.region, it.category].join(' ').toLowerCase();
+      var hay = [it.title, it.role, it.institution, it.description, it.summary, it.region, it[catField]].join(' ').toLowerCase();
       return (!state.q || hay.indexOf(state.q.toLowerCase()) !== -1) &&
-             (!state.cat || it.category === state.cat) &&
+             (!state.cat || it[catField] === state.cat) &&
              (!state.region || it.region === state.region);
     }
     function draw() {
       var items = publicItems(cfg.collection).filter(matches);
+      if (cfg.sortByDateDesc) items.sort(function (a, b) { return (a.date || '') < (b.date || '') ? 1 : -1; });
       list.textContent = '';
       if (!items.length) { list.appendChild(emptyBox(cfg.emptyText)); return; }
       items.forEach(function (it) {
@@ -236,19 +238,20 @@
           el('h3', { text: it.title || it.role }),
           el('div', { class: 'dyn-meta' }, [
             it.institution ? chip(it.institution) : null,
-            chip(it.category, 'cat'),
+            it[catField] ? chip(it[catField], 'cat') : null,
             it.region ? chip(it.region) : null,
             it.scope ? chip(it.scope) : null,
             it.date ? chip(fmtDate(it.date)) : null,
             pendChip(it), demoChip(it)
           ]),
-          it.description ? el('p', { text: it.description }) : null,
-          it.contact ? el('p', { class: 'dyn-contact', text: 'יצירת קשר: ' + it.contact }) : null
+          (it.description || it.summary) ? el('p', { text: it.description || it.summary }) : null,
+          it.contact ? el('p', { class: 'dyn-contact', text: 'יצירת קשר: ' + it.contact }) : null,
+          it.link ? el('a', { class: 'dyn-btn ghost', href: it.link, text: 'לקריאה' }) : null
         ]));
       });
     }
     function submitForm(cfg2, after) {
-      var msg = el('span', { class: 'ok-msg', text: 'המודעה נשלחה ותוצג לאחר אישור מנהל.', hidden: '' });
+      var msg = el('span', { class: 'ok-msg', text: cfg2.okText || 'המודעה נשלחה ותוצג לאחר אישור מנהל.', hidden: '' });
       var inputs = {};
       var fields = cfg2.fields.map(function (f) {
         var input = f.type === 'textarea' ? el('textarea', { name: f.name })
@@ -430,6 +433,33 @@
     });
   }
 
+  /* תקצירים לעמוד הבית: כמה פריטים אחרונים/קרובים + כפתור לעמוד המלא */
+  function renderHighlights(mount, opts) {
+    if (!mount) return;
+    mount.textContent = '';
+    var items = opts.items();
+    if (!items.length) {
+      mount.appendChild(emptyBox(opts.emptyText));
+    } else {
+      items.slice(0, opts.limit || 3).forEach(function (it) { mount.appendChild(opts.card(it)); });
+    }
+    mount.appendChild(el('div', { class: 'btn-row', style: 'margin-top:14px' }, [
+      el('a', { class: 'btn btn-ghost btn-sm', href: opts.href, text: opts.linkText })
+    ]));
+  }
+
+  function upcomingEvents() {
+    var today = todayISO();
+    return WStore.get('events')
+      .filter(function (e) { return e.status === 'published' && e.date >= today; })
+      .sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  }
+  function approvedNews() {
+    return WStore.get('news')
+      .filter(function (n) { return n.status === undefined || n.status === 'approved'; })
+      .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  }
+
   window.WStore = WStore;
   window.WDyn = {
     injectCSS: injectCSS,
@@ -442,6 +472,11 @@
     renderPodcast: renderPodcast,
     renderMap: renderMap,
     applyAbout: applyAbout,
+    renderHighlights: renderHighlights,
+    upcomingEvents: upcomingEvents,
+    approvedNews: approvedNews,
+    eventCard: eventCard,
+    chip: chip,
     fmtDate: fmtDate,
     el: el,
     todayISO: todayISO

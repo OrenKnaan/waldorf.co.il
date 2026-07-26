@@ -160,29 +160,39 @@
     { name: 'title', label: 'כותרת' },
     { name: 'date', label: 'תאריך', type: 'date' },
     { name: 'section', label: 'מדור', type: 'select', options: ['מאמרים', 'מודעות ופרסומים', 'איגרת', 'מוסדות', 'כללי'] },
+    { name: 'contact', label: 'שם ופרטי קשר של המפרסם' },
     { name: 'link', label: 'קישור (לא חובה)' },
-    { name: 'summary', label: 'תקציר', type: 'textarea', wide: true }
+    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'approved', t: 'מפורסם' }, { v: 'pending', t: 'ממתין לאישור' }] },
+    { name: 'summary', label: 'תוכן ההודעה', type: 'textarea', wide: true }
   ];
   function renderNewsAdmin() {
     var section = $('.view[data-view="news"] .panel');
-    var t = makeTable(['תאריך', 'כותרת', 'מדור', '']);
+    var t = makeTable(['תאריך', 'כותרת', 'מדור', 'סטטוס', '']);
     section.querySelector('.table-wrap').replaceWith(t.wrap);
     section.querySelector('.btn-primary').addEventListener('click', function () {
-      openForm(section, NEWS_FIELDS, { date: WDyn.todayISO() }, function (out) { WStore.add('news', out); refreshAll(); });
+      openForm(section, NEWS_FIELDS, { date: WDyn.todayISO(), status: 'approved' }, function (out) { WStore.add('news', out); refreshAll(); });
     });
     function draw() {
-      var items = WStore.get('news').slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+      var items = WStore.get('news').slice().sort(function (a, b) {
+        var ap = a.status === 'pending' ? 0 : 1, bp = b.status === 'pending' ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        return a.date < b.date ? 1 : -1;
+      });
       t.tbody.textContent = '';
-      if (!items.length) return emptyRow(t.tbody, 4, 'אין הודעות');
+      if (!items.length) return emptyRow(t.tbody, 5, 'אין הודעות');
       items.forEach(function (n) {
+        var actions = [];
+        if (n.status === 'pending') {
+          actions.push(actBtn('ok', 'אישור ופרסום', function () { WStore.update('news', n.id, { status: 'approved' }); refreshAll(); }));
+        }
+        actions.push(actBtn('edit', 'עריכה', function () { openForm(section, NEWS_FIELDS, n, function (out) { WStore.update('news', n.id, out); refreshAll(); }); }));
+        actions.push(actBtn('del', 'מחיקה', function () { WStore.remove('news', n.id); refreshAll(); }));
         t.tbody.appendChild(el('tr', {}, [
           td(fmtDate(n.date), 'muted tnum'),
           titleCell(n.title, n.demo),
           td(n.section, 'muted'),
-          td(el('div', { class: 'row-actions' }, [
-            actBtn('edit', 'עריכה', function () { openForm(section, NEWS_FIELDS, n, function (out) { WStore.update('news', n.id, out); refreshAll(); }); }),
-            actBtn('del', 'מחיקה', function () { WStore.remove('news', n.id); refreshAll(); })
-          ]))
+          td(statusPill(n.status || 'approved')),
+          td(el('div', { class: 'row-actions' }, actions))
         ]));
       });
     }
@@ -295,6 +305,8 @@
 
   /* =============== מודרציה: לוח קהילתי + לוח משרות =============== */
   var MOD_PANELS = [
+    { col: 'news', title: 'הודעות (לוח פתוח לציבור)', cols: ['תאריך', 'כותרת', 'מדור', 'מפרסם', 'סטטוס', ''],
+      row: function (it) { return [td(fmtDate(it.date), 'muted tnum'), titleCell(it.title, it.demo), td(it.section || '—', 'muted'), td(it.contact || '—', 'muted'), td(statusPill(it.status || 'approved'))]; } },
     { col: 'board', title: 'לוח קהילתי', cols: ['תאריך', 'כותרת', 'קטגוריה', 'אזור', 'סטטוס', ''],
       row: function (it) { return [td(fmtDate(it.date), 'muted tnum'), titleCell(it.title, it.demo), td(it.category || '—', 'muted'), td(it.region || '—', 'muted'), td(statusPill(it.status))]; } },
     { col: 'jobs', title: 'לוח משרות', cols: ['תאריך', 'תפקיד', 'מוסד', 'קטגוריה', 'סטטוס', ''],
@@ -421,7 +433,7 @@
     var today = WDyn.todayISO();
     var upcoming = WStore.get('events').filter(function (e) { return e.status === 'published' && e.date >= today; }).length;
     var libTotal = WStore.get('library').length + WStore.get('teaching').length + WStore.get('forms').length;
-    var pending = WStore.get('board').concat(WStore.get('jobs')).filter(function (i) { return i.status === 'pending'; }).length;
+    var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs')).filter(function (i) { return i.status === 'pending'; }).length;
     var evCount = $('.nav-link[data-view="events"] .count'); if (evCount) evCount.textContent = String(WStore.get('events').length);
     var libCount = $('.nav-link[data-view="lib"] .count'); if (libCount) libCount.textContent = String(libTotal);
     var modCount = $('#modCount'); if (modCount) { modCount.textContent = String(pending); modCount.style.background = pending ? 'var(--warn)' : ''; }
