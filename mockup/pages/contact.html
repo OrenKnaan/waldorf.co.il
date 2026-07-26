@@ -37,6 +37,8 @@
     box-shadow:var(--shadow);}
   .brand-row{max-width:960px;margin:0 auto;padding:20px 24px 8px}
   .brand-name{color:var(--brown-dark);font-family:var(--font-head);font-weight:700;font-size:1.45rem;letter-spacing:.02em;margin:0}
+  .brand-link{display:inline-block;text-decoration:none;color:inherit}
+  .brand-link:hover .brand-name{color:var(--brown)}
   .brand-tagline{color:var(--tan-dark);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;margin:3px 0 0}
   .primary-nav{display:flex;flex-wrap:wrap;gap:2px;max-width:960px;margin:0 auto;padding:0 16px}
   .nav-item{position:relative}
@@ -343,7 +345,7 @@
 <header class="site-header">
   <button type="button" class="nav-toggle" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="primary-nav"><span class="bars" aria-hidden="true"></span></button>
   <div class="brand-row">
-    <p class="brand-name">הפורום הארצי לחינוך ולדורף</p>
+    <a class="brand-link" href="./home.html"><p class="brand-name">הפורום הארצי לחינוך ולדורף</p></a>
     <p class="brand-tagline">מוקאפ תוכן</p>
   </div>
   <nav><div class="primary-nav" id="primary-nav">
@@ -444,5 +446,6 @@ document.addEventListener('click', function (e) {
   if (target) target.classList.add('active');
 });
 </script>
+<script src="./breadcrumb.js" defer></script>
 </body>
 </html>
