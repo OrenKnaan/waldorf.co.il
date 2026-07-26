@@ -428,26 +428,17 @@
 <li>עבודות סיום הכשרות לא אקדמיות לחינוך ולדורף או עבודות שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
 </ul>
 <blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> הערת מבנה (מהמסמך "טקסטים לאתר מחודש"): רצוי לאחד את "עבודות" ו"מאמרים" לתפריט אחד, ולעצב את הרשימה כך שיוצגו כמה שיותר פריטים במשבצות קטנות (שם המאמר/עבודה + שורת תיאור), ולא כטור אנכי ארוך.</blockquote>
-<h3 class="sub">מאמרים לדוגמה (מהאתר הישן)</h3>
-<ul>
-<li>איך נולדת תקופה? — הצצה אל מאחורי הקלעים של עבודת מחנך ולדורף</li>
-<li>"זה היה בחברות" — מדריך למחנך להתמודדות עם אלימות ומשחקי נערים בגיל המצווה</li>
-<li>ימי מונדיאל: מה בין כדורגל ובין חינוך ולדורף?</li>
-</ul>
-<p><span class="ph">תוכן: רשימה מלאה ובפועל של ספרים/מאמרים/עבודות מומלצים לקבל מהפורום</span></p>
+<h3 class="sub">המאגר</h3>
+<div id="dyn-library"></div>
+<p style="font-size:.82rem;color:var(--text-muted)">המאמרים — כותרים אמיתיים מהאתר הישן; הרשימה המלאה והקבצים מנוהלים דרך ממשק הניהול.</p>
 </div>
 <div class="tab-panel" id="tab-0-2">
-<p>חומרים לשימוש מורים וגננות — סיפורים, דפי עבודה, מצגות ורשימות קריאה, לפי שכבת גיל.</p>
-<ul>
-<li>סיפורים, שירים ודקלומים — <span class="ph">תוכן: קבצים בפועל</span></li>
-<li>דפי עבודה להדפסה — <span class="ph">תוכן: קבצים בפועל</span></li>
-<li>מצגות ותמונות להוראה — <span class="ph">תוכן: קבצים בפועל</span></li>
-<li>חומרי העשרה לתיכון — <span class="ph">תוכן: קבצים בפועל</span></li>
-</ul>
+<p>חומרים לשימוש מורים וגננות — סיפורים, דפי עבודה, מצגות ורשימות קריאה, לפי שכבת גיל. הקבצים בפועל יעלו דרך ממשק הניהול.</p>
+<div id="dyn-teaching"></div>
 </div>
 <div class="tab-panel" id="tab-0-3">
-<p>מאגר טפסים מרכזי — טפסי הרשמה, בקשות ואישורים נפוצים במוסדות ולדורף.</p>
-<p><span class="ph">תוכן: רשימת טפסים בפועל לקבל מהפורום — לא אותרו טפסים מקבילים באתר הישן</span></p>
+<p>מאגר טפסים מרכזי — טפסי הרשמה, בקשות ואישורים נפוצים במוסדות ולדורף. לא אותרו טפסים באתר הישן — הרשומות שלהלן הן הדגמה, והמאגר ינוהל דרך ממשק הניהול.</p>
+<div id="dyn-forms"></div>
 </div>
 </div>
 </section>
@@ -465,6 +456,14 @@ document.addEventListener('click', function (e) {
   var target = group.querySelector('#' + btn.dataset.target);
   if (target) target.classList.add('active');
 });
+</script>
+<script src="./data.js"></script>
+<script src="./dynamic.js"></script>
+<script>
+WDyn.injectCSS();
+WDyn.renderSearchableList(document.getElementById('dyn-library'),'library','חיפוש מאמר או עבודה…');
+WDyn.renderGroupedTeaching(document.getElementById('dyn-teaching'));
+WDyn.renderSearchableList(document.getElementById('dyn-forms'),'forms','חיפוש טופס…');
 </script>
 </body>
 </html>

@@ -404,11 +404,14 @@
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 <section class="card">
 <h2>מבוא</h2>
+<div id="about-intro">
 <p>הפורום הארצי לחינוך ולדורף פועל כארגון גג של פעילויות ברוח חינוך ולדורף בארץ ישראל. הוא מאגד בתוכו את הגנים, בתי הספר היסודיים, בתי ספר תיכוניים והכשרות המורים ברוח חינוך ולדורף. הפורום הארצי מתנהל כחברה לא מטרות רווח (חל"צ) ורואה את מטרתו העיקרית בחיזוק, טיפוח וקידום חינוך ולדורף במישור הארצי. בין השאר מקדם הפורום את שיתוף הפעולה בין בתי הספר, הגנים ומוסדות להכשרת מורים במישורי העבודה השונים וכן את התקשורת בינם לבין עצמם. כמו כן עוסק הפורום הארצי בשאלות רבות הקשורות ליסוד וליווי של בתי ספר ולדורף חדשים, בעבודה מול משרד החינוך בשאלות הקשורות לכל בתי הספר ובשאלות של הכשרת מורים והעמקת היסודות של חינוך ולדורף בארץ.</p>
 <p>הפורום שואף לשאת את קהילת חינוך ולדורף בישראל, לפתח ולקדם את חינוך ולדורף בארץ ולהיות מעורב במערכת החינוך, בממשקים עם קהילות שונות ובכלל החברה הישראלית. הפורום מבקש ליצור מרחב שיאפשר ליוזמות לפעול באופן חופשי וליצור מארג שמאפשר לכל אדם לצמוח ולהיות במיטבו, תוך שמירה על הדדיות ואחריות משותפת.</p>
+</div>
 </section>
 <section class="card">
 <h2>פעילויות שוטפות של הפורום הארצי</h2>
+<div id="about-activities">
 <ul>
 <li>ארגון כנסים ארציים לכל המחנכים העוסקים בעבודה פעילה בגנים ובבתי ספר ולדורף.</li>
 <li>השתלמויות הכשרה נוספת והעמקה בשאלות של חינוך ולדורף עבור גננים ומורים עובדים.</li>
@@ -419,14 +422,18 @@
 <li>עידוד וטיפוח של יוזמות, פרויקטים ומפעלים שונים ברמה הארצית (אולימפיאדה, כנסים לתלמידים ועוד).</li>
 <li>ארגון ותמיכה בהשתלמויות ארציות למורים ולגננות העובדים בחינוך ולדורף.</li>
 </ul>
+</div>
 </section>
 <section class="card">
 <h2>קבלת בתי ספר לארגון</h2>
+<div id="about-admission">
 <p>בית ספר ולדורף מתקבל לארגון הפורום הארצי לאחר שחבר מוריו מודיע על כוונת בית הספר להיות בית ספר ולדורף, לאחר שהוא עומד בקריטריונים של בית ספר ולדורף (ראו אמות המידה לבתי ספר ולדורף) ולאחר חמש שנים של ליווי מטעם הפורום הארצי.</p>
+</div>
 </section>
 <section class="card">
 <h2>לוח אירועים, כנסים והשתלמויות</h2>
-<p><span class="ph">תוכן: לוח אירועי הפורום — מקושר לעמוד "הודעות ואירועים"; לא אותרו אירועים פעילים בעמוד המקביל באתר הישן בעת הסריקה</span></p>
+<div id="dyn-next-event" aria-live="polite"></div>
+<p><a href="./news.html">לכל האירועים וההודעות ←</a></p>
 </section>
 <section class="card">
 <h2>יצירת קשר</h2>
@@ -455,6 +462,29 @@ document.addEventListener('click', function (e) {
   var target = group.querySelector('#' + btn.dataset.target);
   if (target) target.classList.add('active');
 });
+</script>
+<script src="./data.js"></script>
+<script src="./dynamic.js"></script>
+<script>
+WDyn.injectCSS();
+WDyn.applyAbout({intro:'#about-intro',activities:'#about-activities',admission:'#about-admission'});
+(function(){
+  var m=document.getElementById('dyn-next-event'); if(!m) return;
+  var today=WDyn.todayISO();
+  var up=WStore.get('events').filter(function(e){return e.status==='published'&&e.date>=today;})
+    .sort(function(a,b){return a.date<b.date?-1:1;});
+  if(!up.length){ m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'})); return; }
+  var e=up[0];
+  m.appendChild(WDyn.el('div',{class:'dyn-item'},[
+    WDyn.el('h3',{text:e.title}),
+    WDyn.el('div',{class:'dyn-meta'},[
+      WDyn.el('span',{class:'dyn-chip',text:WDyn.fmtDate(e.date)}),
+      e.location?WDyn.el('span',{class:'dyn-chip',text:e.location}):null,
+      e.demo?WDyn.el('span',{class:'dyn-chip demo',text:'רשומת הדגמה'}):null
+    ]),
+    e.description?WDyn.el('p',{text:e.description}):null
+  ]));
+})();
 </script>
 </body>
 </html>

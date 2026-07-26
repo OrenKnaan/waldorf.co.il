@@ -228,9 +228,13 @@ td.muted{color:var(--muted)}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count">128</span></button>
       <button class="nav-link" data-view="media">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</button>
+      <button class="nav-link" data-view="about">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>אודות הפורום</button>
       <div class="side-sec">קהילה</div>
       <button class="nav-link" data-view="people">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</button>
+      <button class="nav-link" data-view="mod">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>מודרציה — לוחות<span class="count" id="modCount">0</span></button>
       <button class="nav-link" data-view="nl">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר<span class="count">642</span></button>
       <div class="side-foot">
@@ -386,10 +390,22 @@ td.muted{color:var(--muted)}
         </section>
 
         <!-- Simple placeholders for the rest -->
-        <section class="view" data-view="media" hidden><div class="panel"><div class="panel-head"><h2>מדיה</h2></div><p class="empty-hint">ניהול גלריות תמונות וסרטונים — המסך ייבנה בשלב הבא.</p></div></section>
+        <section class="view" data-view="media" hidden>
+          <p class="crumb">גלריית סרטונים ופרקי פודקאסט</p>
+          <div id="mediaAdmin"></div>
+        </section>
+        <section class="view" data-view="mod" hidden>
+          <p class="crumb">אישור מודעות ומשרות שהוגשו מהטפסים הציבוריים</p>
+          <div id="modAdmin"></div>
+        </section>
+        <section class="view" data-view="about" hidden>
+          <p class="crumb">עריכת דף התוכן "אודות הפורום" (מתאים לעדכון עצמאי)</p>
+          <div id="aboutAdmin"></div>
+        </section>
         <section class="view" data-view="people" hidden><div class="panel"><div class="panel-head"><h2>נציגי פורום</h2></div><p class="empty-hint">ניהול חברי הפורום, תפקידים וקבוצות עבודה — המסך ייבנה בשלב הבא.</p></div></section>
         <section class="view" data-view="nl" hidden><div class="panel"><div class="panel-head"><h2>ניוזלטר</h2></div><p class="empty-hint">ניהול רשימות תפוצה ודיוור — יתחבר לשירות הדיוור שייבחר (סעיף 10 ב־PRD).</p></div></section>
-        <section class="view" data-view="set" hidden><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p></div></section>
+        <section class="view" data-view="set" hidden><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p>
+        <div style="padding:0 20px 18px"><button class="btn btn-ghost btn-sm" id="resetDemo" style="width:auto">איפוס נתוני ההדגמה (מוחק עריכות מקומיות)</button></div></div></section>
       </div>
     </div>
   </div>
@@ -397,7 +413,7 @@ td.muted{color:var(--muted)}
 <script>
 (function(){
   var root=document.documentElement; root.setAttribute('dir','rtl');
-  var TITLES={home:'לוח בקרה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
+  var TITLES={home:'לוח בקרה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
   function navTo(view,btn){
     document.querySelectorAll('#dash .view').forEach(function(v){v.hidden=v.getAttribute('data-view')!==view;});
     document.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active');});
@@ -418,5 +434,8 @@ td.muted{color:var(--muted)}
   document.querySelectorAll('[data-goto]').forEach(function(b){ b.addEventListener('click',function(){var v=b.getAttribute('data-goto'); navTo(v,document.querySelector('.nav-link[data-view="'+v+'"]'));}); });
 })();
 </script>
+<script src="./pages/data.js"></script>
+<script src="./pages/dynamic.js"></script>
+<script src="./admin-app.js"></script>
 </body>
 </html>
