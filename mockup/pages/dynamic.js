@@ -85,7 +85,7 @@
     '.dyn-item{background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-lg);padding:14px 18px;margin:0 0 12px;box-shadow:var(--shadow)}',
     '.dyn-item h3{margin:0 0 4px;font-family:var(--font-head);font-size:1.05rem;color:var(--brown-dark)}',
     '.dyn-item p{margin:4px 0;font-size:.9rem}',
-    '.dyn-meta{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;font-size:.76rem}',
+    '.dyn-meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;font-size:.76rem;justify-content:flex-end}',
     '.dyn-chip{background:var(--beige);color:var(--brown);border-radius:var(--radius-pill);padding:2px 11px;font-weight:500}',
     '.dyn-chip.cat{background:color-mix(in oklab,var(--wash-gold) 34%,var(--white));color:var(--brown-dark)}',
     '.dyn-chip.pend{background:#F3DDA7;color:var(--brown-dark);font-weight:600}',
@@ -158,13 +158,13 @@
   function eventCard(ev, past) {
     var body = el('div', { class: 'body' }, [
       el('h3', { text: ev.title }),
+      ev.description ? el('p', { text: ev.description }) : null,
+      (!past && ev.registerUrl) ? el('a', { class: 'dyn-btn', href: ev.registerUrl, target: '_blank', rel: 'noopener', text: 'להרשמה (טופס גוגל)' }) : null,
       el('div', { class: 'dyn-meta' }, [
         ev.location ? chip(ev.location) : null,
         ev.time ? chip(ev.time) : null,
         demoChip(ev)
-      ]),
-      ev.description ? el('p', { text: ev.description }) : null,
-      (!past && ev.registerUrl) ? el('a', { class: 'dyn-btn', href: ev.registerUrl, target: '_blank', rel: 'noopener', text: 'להרשמה (טופס גוגל)' }) : null
+      ])
     ]);
     return el('div', { class: 'dyn-item dyn-event' + (past ? ' past' : '') }, [
       el('div', { class: 'date-badge' }, [
@@ -194,10 +194,10 @@
     if (!items.length) { mount.appendChild(emptyBox('אין הודעות כרגע.')); return; }
     items.forEach(function (n) {
       mount.appendChild(el('div', { class: 'dyn-item' }, [
-        el('div', { class: 'dyn-meta' }, [chip(fmtDate(n.date)), chip(n.section, 'cat'), demoChip(n)]),
         el('h3', { text: n.title }),
         n.summary ? el('p', { text: n.summary }) : null,
-        n.link ? el('a', { class: 'dyn-btn ghost', href: n.link, text: 'לקריאה' }) : null
+        n.link ? el('a', { class: 'dyn-btn ghost', href: n.link, text: 'לקריאה' }) : null,
+        el('div', { class: 'dyn-meta' }, [chip(fmtDate(n.date)), chip(n.section, 'cat'), demoChip(n)])
       ]));
     });
   }
@@ -237,6 +237,9 @@
       items.forEach(function (it) {
         list.appendChild(el('div', { class: 'dyn-item' }, [
           el('h3', { text: it.title || it.role }),
+          (it.description || it.summary) ? el('p', { text: it.description || it.summary }) : null,
+          it.contact ? el('p', { class: 'dyn-contact', text: 'יצירת קשר: ' + it.contact }) : null,
+          it.link ? el('a', { class: 'dyn-btn ghost', href: it.link, text: 'לקריאה' }) : null,
           el('div', { class: 'dyn-meta' }, [
             it.institution ? chip(it.institution) : null,
             it[catField] ? chip(it[catField], 'cat') : null,
@@ -244,10 +247,7 @@
             it.scope ? chip(it.scope) : null,
             it.date ? chip(fmtDate(it.date)) : null,
             pendChip(it), demoChip(it)
-          ]),
-          (it.description || it.summary) ? el('p', { text: it.description || it.summary }) : null,
-          it.contact ? el('p', { class: 'dyn-contact', text: 'יצירת קשר: ' + it.contact }) : null,
-          it.link ? el('a', { class: 'dyn-btn ghost', href: it.link, text: 'לקריאה' }) : null
+          ])
         ]));
       });
     }
@@ -365,8 +365,8 @@
     eps.forEach(function (p) {
       var body = el('div', { class: 'body', style: 'flex:1;min-width:200px' }, [
         el('h3', { text: 'פרק ' + p.num + ' · ' + p.title }),
-        el('div', { class: 'dyn-meta' }, [chip(fmtDate(p.date)), p.duration ? chip(p.duration) : null, demoChip(p)]),
-        p.description ? el('p', { text: p.description }) : null
+        p.description ? el('p', { text: p.description }) : null,
+        el('div', { class: 'dyn-meta' }, [chip(fmtDate(p.date)), p.duration ? chip(p.duration) : null, demoChip(p)])
       ]);
       if (p.url) {
         var audio = el('audio', { controls: '', preload: 'none', style: 'width:100%;margin-top:6px' });

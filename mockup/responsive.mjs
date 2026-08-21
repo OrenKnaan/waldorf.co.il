@@ -94,7 +94,7 @@ export const RESPONSIVE_CSS = `
     .grid.cols-3{grid-template-columns:repeat(2,1fr)}
     .gallery{grid-template-columns:repeat(2,1fr)}
     .stat-row{gap:10px}
-    .stat{padding:16px 8px}
+    .stat{padding:18px 8px 14px}
     .stat .num{font-size:1.8rem}
     .stat .lbl{font-size:.76rem}
     .carousel .track>*,.carousel .track .ecard{width:min(270px,74vw)}
@@ -118,7 +118,7 @@ export const RESPONSIVE_CSS = `
     .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
     .grid .ecard .thumb{height:150px}
     .stat-row{gap:8px}
-    .stat{padding:14px 6px}
+    .stat{padding:16px 6px 12px}
     .stat .num{font-size:1.5rem}
     .stat .lbl{font-size:.72rem}
     .gallery{gap:8px}
@@ -143,7 +143,7 @@ export const RESPONSIVE_CSS = `
     section.card{padding:14px 12px}
     .art-hero{height:150px}
     .art-hero .cap{max-width:60%}
-    .stat{padding:12px 4px}
+    .stat{padding:14px 4px 10px}
     .stat .num{font-size:1.3rem}
     .stat .lbl{font-size:.68rem}
   }
