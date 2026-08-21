@@ -19,12 +19,15 @@ const pagesDir = join(dirname(fileURLToPath(import.meta.url)), 'pages');
 
 const START = '<!-- Cloudflare Web Analytics -->';
 const END = '<!-- End Cloudflare Web Analytics -->';
-// Matches the whole block including a leading newline, so removing it leaves
-// no blank line behind and re-running can't stack a second copy.
-const BLOCK_RE = /\n?<!-- Cloudflare Web Analytics -->[\s\S]*?<!-- End Cloudflare Web Analytics -->/;
+// Swallows the newlines on BOTH sides of the block. Consuming only the leading
+// one and re-adding it meant every run grew the file by a byte, so the patcher
+// never converged and every run showed up as a diff.
+const BLOCK_RE = /\n*<!-- Cloudflare Web Analytics -->[\s\S]*?<!-- End Cloudflare Web Analytics -->\n*/;
 
 const snippet = BEACON_TOKEN
-  ? `\n${START}\n<script defer src="https://static.cloudflareinsights.com/beacon.min.js" ` +
+  // Byte-for-byte the snippet Cloudflare hands out in the dashboard, token
+  // substituted. type="module" (not defer) is what they currently issue.
+  ? `${START}\n<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" ` +
     `data-cf-beacon='${JSON.stringify({ token: BEACON_TOKEN })}'></script>\n${END}`
   : '';
 
@@ -37,7 +40,10 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
 
   // Strip any existing block first, then re-add — that way a token change is
   // an update rather than a duplicate.
-  let next = had ? html.replace(BLOCK_RE, '') : html;
+  // Normalise to a single newline where the block was, then re-insert. Doing it
+  // in this order means a token change is an update, not a second copy, and a
+  // re-run with the same token is a genuine no-op.
+  let next = had ? html.replace(BLOCK_RE, '\n') : html;
   if (snippet) {
     if (!next.includes('</body>')) throw new Error(`${file}: no </body> to anchor the beacon to`);
     next = next.replace('</body>', `${snippet}\n</body>`);

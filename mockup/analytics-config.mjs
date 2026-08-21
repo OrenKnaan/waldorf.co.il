@@ -13,7 +13,7 @@
 // has no "delete my data" button, so clearing the pre-launch numbers means
 // deleting the Web Analytics site in the dashboard and creating a fresh one for
 // waldorf.co.il — then putting the new token here. See CLAUDE.md.
-export const BEACON_TOKEN = '';
+export const BEACON_TOKEN = 'e4ea3335f4ae4f55bacc328eb40c12c9';
 
 // The hostname the Web Analytics site is registered against. Cloudflare drops
 // beacons whose Referer host doesn't match (postfix match), so a mismatch here
