@@ -28,7 +28,7 @@ Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.js
 - A Cloudflare Pages project, Git-connected (build command `npm run build`, output directory `dist`), so every push to `main` deploys to production and every PR/branch gets an automatic preview URL.
 - **Pre-launch lockdown**: until the real domain cuts over, the site must stay off Google/AI crawlers and mostly private:
   - `public/robots.txt` disallows everything.
-  - Every page's `<head>` should carry `<meta name="robots" content="noindex, nofollow, noarchive">` (already on all 42 `mockup/pages/*.html` and on `src/pages/index.astro` — add it to any new page you create pre-launch).
+  - Every page's `<head>` should carry `<meta name="robots" content="noindex, nofollow, noarchive">` (already on all 43 `mockup/pages/*.html` and on `src/pages/index.astro` — add it to any new page you create pre-launch).
   - A Cloudflare Access (Zero Trust) login wall sits in front of the whole `*.pages.dev` deployment as the actual access control (robots/meta are just backup signals — well-behaved crawlers only, not a real barrier on their own).
   - **All three must be removed together at launch cutover**, at the same time the custom domain `waldorf.co.il` is attached to the Pages project and the old-site URL redirects (see below) go live.
 - The live site at waldorf.co.il is untouched throughout — the custom domain is only attached to the new Cloudflare Pages project on launch day, not before.
@@ -40,7 +40,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 **Crawler lockdown — remove all of it together, on cutover day, at the same time the custom domain goes live and the old-URL redirects are published.** Removing any one piece early exposes an unfinished site; leaving any piece in place after launch silently keeps the real site out of Google.
 
-1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 42 `mockup/pages/*.html` and in `src/pages/index.astro`.
+1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 43 `mockup/pages/*.html` and in `src/pages/index.astro`.
 2. `public/robots.txt` disallowing everything — **not created yet** (pointless on GitHub Pages, see Deployment above; add it when the Cloudflare Pages project exists, then remove at cutover).
 3. Cloudflare Access (Zero Trust) wall over `*.pages.dev` — **not set up yet**.
 
@@ -57,10 +57,23 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 **Placeholder content that must not ship:**
 
 11. Page titles all end in `— מוקאפ`; the header tagline is `מוקאפ תוכן` on 41 pages.
-12. 10 pages still contain `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
+12. 11 pages carry 30 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
 13. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
 
 (The generic Hebrew filler that used to be here — `[שם]`, `תוכן מלא יוכנס כאן` — is gone; it was replaced by real scraped copy. Only the specific gaps in 12–13 remain.)
+
+## Accessibility (WCAG 2.1 AA / ת"י 5568)
+
+This layer is **permanent** — it ports to production, unlike everything in the cutover inventory above.
+
+- `mockup/pages/accessibility.js` — the accessibility widget: a floating button plus a settings panel (text size, line/letter spacing, high contrast, monochrome, link/heading highlighting, readable font, big cursor, stop animations, reading guide). Preferences persist in `localStorage` under `waldorf-a11y-v1`. It also injects the skip-link styles, the `:focus-within` rule that makes the nav dropdowns keyboard-reachable, and the footer link styles.
+  Loaded from `<head>` **without `defer`, on purpose**: it applies saved preferences to `<html>` before first paint. Deferring it makes a visitor who chose 160% text watch the page render at 100% first. Don't "optimize" this into a deferred script.
+  The panel is styled in `px` with hard-coded colours rather than the site's design tokens, because it has to stay legible while the adjustments it controls are rewriting those tokens and the root font size.
+- `mockup/pages/accessibility-statement.html` — הצהרת נגישות. Israeli service-accessibility regulations require it to be reachable from every page (it is, from the footer and from the widget). Two `<span class="ph">` gaps in it need real answers before launch: the accessibility coordinator's name and contact details (mandatory), and the statement date, which should be set when a certified מורשה נגישות signs off.
+- `mockup/pages/tabs.js` — shared tab widget following the WAI-ARIA APG pattern (roles, roving tabindex, arrow/Home/End keys, RTL-aware arrow direction). Replaced a per-page inline click handler that left `role="tablist"` with no `role="tab"` children.
+- `mockup/patch-accessibility.mjs` — idempotent patcher wiring the layer into every page (script tag, skip link, `id`/`tabindex` on `<main>`, footer link, `tabindex` on the `<span>` nav triggers). Setting `ENABLED = false` and re-running strips it back out. Re-run it after adding a page.
+
+Verified with axe-core 4.13 at `wcag2a, wcag2aa, wcag21a, wcag21aa` across all 42 content pages: **0 violations**, both in the default state and with every adjustment switched on. When changing markup, re-check rather than assuming — the audit also caught and fixed pre-existing failures (unlabelled contact-form fields, `--tan-dark` at 3.2:1 used as small body text, and the broken tablists).
 
 ## Migration requirement (important, don't skip)
 
@@ -68,7 +81,7 @@ Before building the new site, the entire existing site at waldorf.co.il must be 
 
 ## Repo layout
 
-- `mockup/` — the current mockup: `mockup/pages/*.html` (44 static pages, one per section/topic) is what actually publishes to GitHub Pages (see Deployment above). Generated by `mockup/build.mjs` from `content/pages/*.md`; also has `admin.html`/`admin-dashboard.html`/`admin-app.js` (local-only admin tooling, not published) and `responsive.mjs`/`patch-*.mjs` helper scripts. This is the primary reference for site structure/navigation/copy placeholders right now.
+- `mockup/` — the current mockup: `mockup/pages/*.html` (43 static pages, one per section/topic) is what actually publishes to GitHub Pages (see Deployment above). Generated by `mockup/build.mjs` from `content/pages/*.md`; also has `admin.html`/`admin-dashboard.html`/`admin-app.js` (local-only admin tooling, not published) and `responsive.mjs`/`patch-*.mjs` helper scripts. This is the primary reference for site structure/navigation/copy placeholders right now.
 - `docs/PRD-forum-waldorf-site.md` — the authoritative PRD (Hebrew) for the production build: architecture, page inventory, D1 schema, accessibility/security/SEO requirements, external services, open questions. Read this before scoping any real implementation work.
 - `docs/` — also contains pricing proposal PDFs/DOCX (historical, for context only).
 - `archive/` — older drafts: a previous PRD, an earlier homepage mockup (`awaldorf-homepage.html`), a brand/design-system doc (`aWaldorf_UX_UI_Design_System.md`), and `brand-assets.md`/`global-styles.css`. **These use a different color palette than the current mockup** — treat archive contents as superseded reference material, not source of truth. When in doubt, `mockup/`'s current CSS reflects the current direction.
