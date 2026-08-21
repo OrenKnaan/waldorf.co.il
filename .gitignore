@@ -30,6 +30,9 @@ pnpm-debug.log*
 
 # local working backups - not part of the site
 /mockup backup/
+*.zip
+# scratch downloads (source art lands in mockup/assets/art/ once chosen)
+/temp/
 
 # internal business docs (pricing proposals, contracts, private notes) -
 # not meant for the public repo

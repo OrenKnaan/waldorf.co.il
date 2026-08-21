@@ -381,15 +381,13 @@
     table.stack-sm td[colspan]::before{content:none}
   }
 
-  /* ---- notch / home-indicator clearance ----
-     Only the floating button needs it: everything else is inside a viewport the
-     browser has already inset. Note there is no logical form of these variables
-     (no safe-area-inset-inline-start) — the physical ones are correct in RTL
-     too — and they stay 0 until the viewport meta opts in with viewport-fit=cover,
-     which is a decision for the Astro build, not this mockup. */
-  @media (max-width:720px){
-    .scroll-top-btn{inset-block-end:max(18px,env(safe-area-inset-bottom,0px))}
-  }
+  /* Notch / home-indicator clearance is handled where it belongs: scroll-top.js
+     injects its style block after this stylesheet, so it owns .scroll-top-btn
+     and a rule here would simply be overridden. Nothing else on the page is
+     edge-anchored — the browser has already inset the viewport. (There is no
+     logical form of these variables; the physical ones are correct in RTL too,
+     and they stay 0 until the viewport meta opts in with viewport-fit=cover,
+     which is a decision for the Astro build, not this mockup.) */
 
   /* ---- landscape phones: short viewports, not narrow ones ---- */
   @media (max-height:500px) and (orientation:landscape){
