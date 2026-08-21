@@ -210,8 +210,8 @@
      the absolutely-positioned hover dropdowns nested inside it. Never wrap. */
   .primary-nav{flex-wrap:nowrap}
   .pagebanner{flex-wrap:wrap}
-  .nav-toggle{display:none;position:absolute;inset-block-start:15px;inset-inline-start:16px;z-index:30;
-    width:42px;height:42px;padding:0;border:none;background:transparent;cursor:pointer;
+  .nav-toggle{display:none;position:absolute;inset-block-start:14px;inset-inline-start:16px;z-index:30;
+    width:44px;height:44px;padding:0;border:none;background:transparent;cursor:pointer;
     align-items:center;justify-content:center;border-radius:var(--radius)}
   .nav-toggle:hover{background:color-mix(in oklab,var(--tan) 22%,transparent)}
   .nav-toggle .bars{position:relative}
@@ -244,9 +244,9 @@
     .brand-tagline{font-size:.7rem;letter-spacing:.1em}
     .primary-nav{flex-direction:column;gap:0;padding:0 14px;overflow-x:visible;
       max-height:0;overflow-y:hidden;transition:max-height .3s ease}
-    .nav-open .primary-nav{max-height:78vh;overflow-y:auto;padding-bottom:12px}
+    .nav-open .primary-nav{max-height:78vh;overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
     .nav-item{width:100%}
-    .nav-link{justify-content:space-between;padding:13px 8px;font-size:.98rem;
+    .nav-link{justify-content:space-between;min-height:44px;padding:13px 8px;font-size:.98rem;
       border-bottom:1px solid var(--beige);border-radius:var(--radius)}
     .nav-link .icon-inline{width:15px;height:15px;transition:transform .2s}
     .nav-link:hover,.nav-link.active{border-bottom-color:var(--beige)}
@@ -256,7 +256,7 @@
     .dropdown{position:static;display:block;min-width:0;padding:0;border:none;border-radius:0;
       background:transparent;box-shadow:none;max-height:0;overflow:hidden;transition:max-height .28s ease}
     .nav-item.open>.dropdown{max-height:680px;padding:2px 0 10px}
-    .dropdown-link{padding:9px 18px;font-size:.9rem}
+    .dropdown-link{display:flex;align-items:center;min-height:44px;padding:10px 18px;font-size:.9rem}
     .dropdown-link:hover,.dropdown-link.active{background:transparent;color:var(--brown-dark);font-weight:600}
     .dropdown-head{padding:8px 18px 2px}
 
@@ -327,8 +327,100 @@
     .stat{padding:12px 4px}
     .stat .num{font-size:1.3rem}
     .stat .lbl{font-size:.68rem}
-    .field input,.field select,.field textarea{font-size:16px}
   }
+
+  /* ---- touch ergonomics ----
+     Applies by input device, not width: a 1024px tablet is still a finger. */
+  a,button,input,select,textarea,label,summary,[role="button"]{touch-action:manipulation}
+
+  @media (pointer:coarse){
+    /* 44x44 is the floor for anything you tap (Apple HIG / Material 48dp). */
+    .btn,.tab-btn,.chip,.dyn-btn,.nav-toggle{min-height:44px}
+    .btn-sm{min-height:44px}
+    .brand-link{display:inline-flex;align-items:center;min-height:44px}
+    /* Checkbox/radio keep their own box — stretching those looks broken. */
+    input:not([type=checkbox]):not([type=radio]),select{min-height:44px}
+    .site-footer a{display:inline-block;min-height:44px;line-height:44px}
+    /* Breadcrumbs sit in a compact sticky pill — grow the hit area but pull the
+       extra height back out of the layout so the bar itself stays slim. */
+    .pagebanner .crumb{display:inline-flex;align-items:center;min-height:44px;margin-block:-11px}
+    /* 8px minimum between adjacent targets so a near-miss isn't a wrong tap. */
+    .chip-row{gap:10px}
+    .btn-row{gap:12px}
+    /* Leaflet ships 30px zoom buttons; the map is ours, so size them for a finger. */
+    .leaflet-control-zoom a{width:44px !important;height:44px !important;line-height:44px !important}
+  }
+
+  /* Any control under 16px makes iOS Safari zoom the page on focus, and it
+     never zooms back out. Covers the filter/search inputs too, not just .field. */
+  /* Width alone misses a landscape iPad (1024px wide, still a touchscreen that
+     zooms on focus), so this keys on the pointer as well. */
+  @media (max-width:900px),(pointer:coarse){
+    /* !important because dynamic.js injects .dyn-toolbar/.dyn-form rules into
+       <head> at runtime, after this stylesheet, so order would otherwise win. */
+    input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px !important}
+    .field textarea{min-height:104px}
+  }
+
+  /* ---- data tables become cards on a phone ----
+     Marked up by patch-mobile-tables.mjs: 'stack-sm' on the table, 'data-label'
+     on every cell. A 5-column kindergarten row is unreadable in a 375px-wide
+     sideways scroller, so each row becomes its own labelled card instead. */
+  @media (max-width:560px){
+    .table-wrap:has(table.stack-sm){overflow-x:visible;padding-bottom:0}
+    table.stack-sm,table.stack-sm tbody,table.stack-sm tr,table.stack-sm td{display:block;width:auto}
+    /* The header row still exists for assistive tech, just not on screen. */
+    table.stack-sm thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    table.stack-sm tr{margin:0 0 10px;padding:12px 14px;background:var(--white);
+      border:1px solid var(--beige);border-radius:var(--radius)}
+    table.stack-sm tbody tr:nth-child(even){background:#FBF8F3}
+    table.stack-sm td{border:none;padding:3px 0;font-size:.9rem;
+      display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline}
+    table.stack-sm td::before{content:attr(data-label);font-family:var(--font-head);
+      font-weight:700;font-size:.74rem;color:var(--brown-dark);white-space:nowrap}
+    /* First cell is the record's name — it reads as the card's title. */
+    table.stack-sm td:first-child{display:block;margin-bottom:5px;padding-bottom:5px;
+      border-bottom:1px solid var(--beige);font-family:var(--font-head);
+      font-size:1.02rem;color:var(--brown-dark)}
+    table.stack-sm td:first-child::before{content:none}
+    /* "no results" spans all columns — it's a message, not a field. */
+    table.stack-sm td[colspan]{display:block}
+    table.stack-sm td[colspan]::before{content:none}
+  }
+
+  /* ---- notch / home-indicator clearance ----
+     Only the floating button needs it: everything else is inside a viewport the
+     browser has already inset. Note there is no logical form of these variables
+     (no safe-area-inset-inline-start) — the physical ones are correct in RTL
+     too — and they stay 0 until the viewport meta opts in with viewport-fit=cover,
+     which is a decision for the Astro build, not this mockup. */
+  @media (max-width:720px){
+    .scroll-top-btn{inset-block-end:max(18px,env(safe-area-inset-bottom,0px))}
+  }
+
+  /* ---- landscape phones: short viewports, not narrow ones ---- */
+  @media (max-height:500px) and (orientation:landscape){
+    .art-hero{height:150px}
+    .nav-open .primary-nav{max-height:62vh}
+  }
+
+  /* Newer mobile browsers: vh includes the retracting URL bar, dvh doesn't. */
+  @supports (height:100dvh){
+    .nav-open .primary-nav{max-height:78dvh}
+    @media (max-height:500px) and (orientation:landscape){
+      .nav-open .primary-nav{max-height:62dvh}
+    }
+  }
+
+  /* ---- motion & focus ---- */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+      transition-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+  /* The drawer and its accordions are keyboard- and switch-operable; without a
+     visible ring there is no way to tell where you are in them. */
+  :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
 </style>
 <script type="application/ld+json">
 {
@@ -442,7 +534,7 @@
 </div>
 <p class="kg-count" id="kgCount" aria-live="polite"></p>
 </div>
-<div class="table-wrap"><table>
+<div class="table-wrap"><table class="stack-sm">
 <thead><tr>
 <th>גן</th>
 <th>יישוב</th>
@@ -451,113 +543,113 @@
 <th>קשר</th>
 </tr></thead>
 <tbody>
-<tr><td>גן שירת מדבר</td><td>אילת</td><td>אילת, החורב 3</td><td>6-3</td><td>אתי קינה 052-6555485 · waldorf.edu.eilat@gmail.com · גשרון 415/2 אילת מיקוד 8856000</td></tr>
-<tr><td>גן פעמון</td><td>באר-שבע</td><td>דולצ'ין אריה 7</td><td>6.5-4.3</td><td>נטע ארז · מרדכי מקלף 24 · ת.ד 425 8410301 · netaerez@netvision.net.il · 08-6411669</td></tr>
-<tr><td>גן ענבל</td><td>באר-שבע</td><td>שטרית 12</td><td>6.5-4.3</td><td>netaerez@netvision.net.il · 08-6411669</td></tr>
-<tr><td>גן טלה</td><td>באר-שבע</td><td>בני אור 19 ב</td><td>4.2-2.8</td><td>netaerez@netvision.net.il · 08-6411669</td></tr>
-<tr><td>גן יונה</td><td>באר-שבע</td><td>בני אור 19 ב</td><td>4.2-2.8</td><td>netaerez@netvision.net.il · 08-6411669</td></tr>
-<tr><td>גן דולב</td><td>בית הלל</td><td>התאנה 196</td><td>4-2</td><td>רינה 052-2743111 · dolevnachal@gmail.com</td></tr>
-<tr><td>רימון</td><td>בית קשת</td><td>בית קשת</td><td>6-4</td><td>גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
-<tr><td>נח</td><td>בית קשת</td><td>—</td><td>4-3</td><td>גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
-<tr><td>פעוטון בוגר</td><td>בית קשת</td><td>—</td><td>3-2</td><td>גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
-<tr><td>פעוטון צעיר</td><td>בית קשת</td><td>—</td><td>2-1</td><td>גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
-<tr><td>בית חינוך יסמין · 3 גנים</td><td>בנימינה</td><td>הכרמל 10</td><td>2-3 · 3-4 · 4-6</td><td>חן 052-3802800 · ganim@yasmin-bga.org.il</td></tr>
-<tr><td>פעוטון ניסאן · גן דליה</td><td>בסמת טבעון · (חילף)</td><td>עמותת עין בוסתן, דו לשוני</td><td>3-1 · 6-3</td><td>ליאת: 054-4749550</td></tr>
-<tr><td>גן ליד הנחל</td><td>בצרה</td><td>בצרה</td><td>—</td><td>פנינה 050-3774499 050377449</td></tr>
-<tr><td>פלג</td><td>גבעת עדה</td><td>הגבעה פינת האורנים</td><td>3-1.6</td><td>שרון 052-447-6363 · צח 050-754-9754</td></tr>
-<tr><td>עמותת גפן</td><td>גבעת חיים איחוד</td><td>גבעת חיים איחוד</td><td>3-2 · 5-3</td><td>מאיה 0525831808 · נעמה 0586412346</td></tr>
-<tr><td>גן מבל</td><td>גבעתיים</td><td>כצנלסון 120 · (ככר נוח)</td><td>3-1</td><td>משפחתון ברוח אנתרופוסופית · 058-4409192,03-73164910</td></tr>
-<tr><td>מקום בלב</td><td>גבעתיים</td><td>ארלוזורוב 25</td><td>3.6-1.6</td><td>ריקי דרוקר 054-7724266 · Rikidruker41175@gmail.com</td></tr>
-<tr><td>גן תאנים</td><td>גדרה</td><td>גדרה</td><td>2-1</td><td>שירי ואהודי · ספירלה - חינוך לקיימות · spirala.education@gmail.com · 050-5787078 052-5930086</td></tr>
-<tr><td>גן צימוקים</td><td>גדרה</td><td>גדרה</td><td>3-2 ואילך</td><td>שירי ואהודי · spirala.education@gmail.com · 050-5787078 052-5930086</td></tr>
-<tr><td>גן פעמון</td><td>גן חיים</td><td>הרימון 9</td><td>5-2.5</td><td>יעלי 0528368906 · yael_feingold@hotmail.com</td></tr>
-<tr><td>גן ענן</td><td>הוד השרון</td><td>השח"ל</td><td>4-2.5</td><td>שירלי שקד · 09-7450642</td></tr>
-<tr><td>גן ענן</td><td>הוד השרון</td><td>השח"ל</td><td>6-4</td><td>שירלי שקד · 09-7450642</td></tr>
-<tr><td>גן מעגלים</td><td>הוד השרון</td><td>הגנים 25</td><td>4-1.5</td><td>ענבל 050-9676700</td></tr>
-<tr><td>גן תמרים</td><td>הוד השרון</td><td>משאבים 15</td><td>6-3</td><td>תמר 054-5457253</td></tr>
-<tr><td>גן שחר</td><td>הכפר הירוק</td><td>הגן של ירון ובתיה</td><td>3-1.5 · 5-3</td><td>בתיה 050-2324004 · ירון 050-2324005 · urim.rishum.ganim@gmail.com</td></tr>
-<tr><td>תות</td><td>הכפר הירוק</td><td>גני קרן אור · רמת השרון</td><td>11-24 ח'</td><td>קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803 · ganey.kerenor@gmail.com · גני קרן אור בפייסבוק</td></tr>
-<tr><td>שקד</td><td>הכפר הירוק</td><td>גני קרן אור · רמת השרון</td><td>3.04-2</td><td>קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
-<tr><td>גפן</td><td>הכפר הירוק</td><td>גני קרן אור · רמת השרון</td><td>;2.8 - 4.3</td><td>קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
-<tr><td>תאנה</td><td>הכפר הירוק</td><td>גני קרן אור · רמת השרון</td><td>&gt;6.3 – 3.5</td><td>קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
-<tr><td>גן חיים</td><td>הרדוף</td><td>—</td><td>6-3</td><td>יערה - 052-5899641, · יעל - 054-4715778</td></tr>
-<tr><td>גן דובי (Do-Be)</td><td>הרצליה</td><td>פנקס 52</td><td>3.5-1</td><td>Do.Be.gan@gmail.com · 054-4647987</td></tr>
-<tr><td>מעיין</td><td>זכרון יעקב</td><td>העבודה 21</td><td>3.5-1.10</td><td>שרון 052-447-6363 · צח 050-754-9754</td></tr>
-<tr><td>קרן אור אבן שמש</td><td>חיפה</td><td>העליה השניה 27, בת גלים</td><td>6-5 4-3</td><td>אנה 054-7604394</td></tr>
-<tr><td>גן סמדר</td><td>יבניאל</td><td>יבניאל</td><td>7-3</td><td>עפרית הראלי · ofrithareli@gmail.com</td></tr>
-<tr><td>בוסתן יאפא</td><td>יפו</td><td>ציונה תג'ר 24</td><td>—</td><td>03-518-6392 · orchard.of.abraham@gmail.com</td></tr>
-<tr><td>גן דבש</td><td>תעוז · (הרי יהודה)</td><td>טל שחר</td><td>2.5-1.5</td><td>צאלה: 054-5964473 · office@yechiel.org</td></tr>
-<tr><td>גן צוף</td><td>טל שחר</td><td>מתחם בית ספר יחיאל</td><td>6-3</td><td>צאלה: 054-5964473 · office@yechiel.org</td></tr>
-<tr><td>גן הנני</td><td>ינוב</td><td>מושב ינוב</td><td>הליכה-7</td><td>סימונה הורביץ · 054-3147725 · ganhineni@gmail.com</td></tr>
-<tr><td>כיתת הדביר · חינוך מרפא</td><td>ירושלים</td><td>רובוביץ 10 (ארמון הנציב)</td><td>6.5 +</td><td>—</td></tr>
-<tr><td>גן השמש · מירב וסנדרה</td><td>ירושלים</td><td>רח' רבי חנינא 3 (קטמון)</td><td>4.5-2.8</td><td>עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
-<tr><td>גן השמש · מיכל ויעל</td><td>ירושלים</td><td>רח' גלבר 20 (רמת דניה) · גן אנתרופוסופי עירוני</td><td>6-3.6</td><td>עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
-<tr><td>גן השמש · אלינור ורבקה</td><td>ירושלים</td><td>רח' המליץ 8 · (המושבה הגרמנית)</td><td>6-3.8</td><td>עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
-<tr><td>גן השמש · נעמה וסיגל</td><td>ירושלים</td><td>רח' המליץ 8 · (המושבה הגרמנית)</td><td>6-3.8</td><td>עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
-<tr><td>גן השמש · איריס ומיטל</td><td>ירושלים</td><td>אברהם שרון 19 (קריית יובל) · גן אנתרופוסופי עירוני</td><td>6-3.8</td><td>עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
-<tr><td>גן האור</td><td>ירושלים</td><td>אברהם שטרן 3. קרית יובל</td><td>4-2</td><td>שני 054-5220404 · ganhaor.antro@gmail.com</td></tr>
-<tr><td>גן מיתרים</td><td>כפר- סבא</td><td>רמז 9</td><td>6.5-4</td><td>—</td></tr>
-<tr><td>גפן / שקד</td><td>כרכור</td><td>הגליל 51</td><td>1-4.5</td><td>עמותת "מרחב אלומות" · אושרי 054-2407066 · Alumot.karkur@gmail.com</td></tr>
-<tr><td>ניצנים</td><td>כפר דניאל</td><td>—</td><td>6-3</td><td>גנאחר - באזור מודיעין (ע"ר) · 08-9750029 · info@antro.org.il</td></tr>
-<tr><td>גן אלון</td><td>לפיד</td><td>—</td><td>4.5-2.9</td><td>גנאחר - באזור מודיעין (ע"ר) · 08-9750029 · info@antro.org.il</td></tr>
-<tr><td>גן עודד</td><td>משגב</td><td>גן אזורי לישובי המועצה</td><td>6-3</td><td>גן - 04-980890, · דקלה -054-6769131 · איתן - 054-5458345</td></tr>
-<tr><td>גן סמדר</td><td>נס ציונה</td><td>משה סנה 8 · טירת שלום</td><td>4.3-2.8</td><td>עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
-<tr><td>גן מעיין</td><td>נס ציונה</td><td>משה סנה 8</td><td>4.3 - בי"ס</td><td>עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
-<tr><td>גן לילך</td><td>נס ציונה</td><td>דוד לנדא 18</td><td>4.3-2.8</td><td>עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
-<tr><td>גן אילן</td><td>נס ציונה</td><td>העוגן 14 · גבעת הצבר</td><td>4.3 - בי"ס</td><td>עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
-<tr><td>גן השדה</td><td>עמק חפר</td><td>מרכז אופק · מושב אלישיב, 42885</td><td>2-3</td><td>04-6251374 · info@merkazofek.co.il</td></tr>
-<tr><td>גן החורש</td><td>עמק חפר</td><td>אלישיב</td><td>3-4</td><td>04-6251374 · info@merkazofek.co.il</td></tr>
-<tr><td>גן העמק</td><td>עמק חפר</td><td>אלישיב</td><td>4-7</td><td>04-6251374 · info@merkazofek.co.il</td></tr>
-<tr><td>ארגמן</td><td>פרדס חנה</td><td>עמותת רימון · רח' היוגב 1, · מתחם בית הספר החקלאי</td><td>6.4-3.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>paz</td><td>פרדס חנה</td><td>מתחם בית הספר החקלאי</td><td>6.4-3.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>תכלת</td><td>פרדס חנה</td><td>מתחם בית הספר החקלאי</td><td>6.4-3.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>ענבר</td><td>פרדס חנה</td><td>מתחם בית הספר החקלאי</td><td>6.4-3.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>ברקת</td><td>פרדס חנה</td><td>מתחם בית הספר החקלאי</td><td>3.7-2.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>שני</td><td>פרדס חנה</td><td>מתחם בית הספר החקלאי</td><td>3.7-2.8</td><td>04-6380626 · rimon.office@gmail.com</td></tr>
-<tr><td>ורד במושבה</td><td>פתח תקווה</td><td>שיפר 12</td><td>4-0.7</td><td>ורד: 054-6228854 · vered.bamoshava@gmail.com</td></tr>
-<tr><td>ורד במושבה</td><td>פתח תקווה</td><td>שיפר 12 · 13</td><td>3-1</td><td>ורד: 054-6228854 · vered.bamoshava@gmail.com</td></tr>
-<tr><td>גן מעיין</td><td>פתח תקווה</td><td>שכונת אם המושבות</td><td>4-3</td><td>050-7659999 · www.pardesim.com</td></tr>
-<tr><td>גן ניגונים</td><td>פתח תקווה</td><td>שכונת אם המושבות</td><td>5-4</td><td>050-7659999 · www.pardesim.com</td></tr>
-<tr><td>גן בראשית</td><td>פתח תקווה</td><td>שכונת אם המושבות</td><td>5-6</td><td>050-7659999 · www.pardesim.com</td></tr>
-<tr><td>גן ספלולים</td><td>צופית</td><td>השדרה פינת הזית</td><td>4-2</td><td>יעל ירושלמי - 054-6807110 · yaely35@gmail.com · גן: 054-6807110</td></tr>
-<tr><td>גן ספלולים</td><td>צופית</td><td>השדרה פינת הזית</td><td>6-4</td><td>יעל ירושלמי - 054-6807110 · yaely35@gmail.com · גן: 054-6807110</td></tr>
-<tr><td>גן גינה</td><td>ציפורי</td><td>ליד ריש לקיש</td><td>7-4</td><td>—</td></tr>
-<tr><td>תלתן</td><td>ציפורי</td><td>ליד ריש לקיש</td><td>5-2</td><td>—</td></tr>
-<tr><td>גן ניגון</td><td>צלפון</td><td>מטה יהודה</td><td>4-2</td><td>יואלה 054-8019981</td></tr>
-<tr><td>משפחתון</td><td>קדימה</td><td>חנקין</td><td>24-5 · 'ח</td><td>יערה 054-4310165 · yaara.yogev@gmail.com</td></tr>
-<tr><td>גן פטריה</td><td>קדימה</td><td>מואב 4א</td><td>4-1.5</td><td>אריאל 0503200410 · עדי 0528984111</td></tr>
-<tr><td>גן גורים</td><td>קדרון</td><td>הדר 158</td><td>5-2</td><td>ענבר 054-4769067</td></tr>
-<tr><td>רימון</td><td>קריית אונו</td><td>הנשיא 15 · כניסה משד' יהודית</td><td>7-2</td><td>03-6356965, 050-6781608 · hagiami@gmail.com</td></tr>
-<tr><td>גן אלרואי</td><td>קריית טבעון</td><td>התשבי 12</td><td>—</td><td>דליה סתתי 054.7700410 · dalia_satati@walla.com</td></tr>
-<tr><td>גן לילך</td><td>קריית טבעון</td><td>התשבי 12</td><td>—</td><td>סמדר ספראי 052.6588282 · smadar_safrai@walla.com</td></tr>
-<tr><td>גן שקד</td><td>קריית טבעון</td><td>יהודה הנשיא 21</td><td>—</td><td>יפה מאיר 04.9930977 · yat@bezeqint.net</td></tr>
-<tr><td>גן אורים</td><td>קריית טבעון</td><td>השקמה 1</td><td>—</td><td>סמדר קדם 04.9930421 · smadkedem@gmail.com</td></tr>
-<tr><td>גן אלה</td><td>קריית טבעון</td><td>נרקיסים 44</td><td>—</td><td>נטע יובל · ו · פנינית ירושלמי · 052-5784380 · 052-4332050</td></tr>
-<tr><td>גן זמיר</td><td>קריית שמונה</td><td>הר צופים 8</td><td>—</td><td>עמותת הנחל · dolevnachal@gmail.com · מאיה- 053-3524212</td></tr>
-<tr><td>גן אביב</td><td>רחובות</td><td>פרשני 8</td><td>6-4.5</td><td>עמותת ראם · 077-7292641 · reem.antro@gmail.com</td></tr>
-<tr><td>גן כרם</td><td>רחובות</td><td>שיטה מלבינה 9</td><td>4.5-2.9</td><td>077-7292641 · reem.antro@gmail.com</td></tr>
-<tr><td>אלימלך (גלים/אלונים)</td><td>רמת-גן</td><td>אלימלך 7 · (ליד זומר)</td><td>4-2.9</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>יובלים</td><td>רמת-גן</td><td>עובדיה 3 (רמת חן)</td><td>4-2.9</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>תיבת נוח (אילן)</td><td>רמת-גן</td><td>הפודים 8</td><td>7-4</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>פלג</td><td>רמת-גן</td><td>אלימלך 7</td><td>7-4</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>המעיין</td><td>רמת-גן</td><td>עזריאל 16 (רמת חן)</td><td>7-4</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>יובלים</td><td>רמת-גן</td><td>עובדיה 3</td><td>4-2.9</td><td>03-6444966 · ganim@waldorf.org.il</td></tr>
-<tr><td>החייל 33 א'</td><td>רמת גן</td><td>ניצנים</td><td>3-0.5</td><td>050-6670474 · saritweb@gmail.com</td></tr>
-<tr><td>הגן של דניאל</td><td>רמת השרון</td><td>אלחריזי 1</td><td>6-3</td><td>077-5309171 · dalia9556@gmail.com</td></tr>
-<tr><td>פעוטון הגן של דניאל</td><td>רמת השרון</td><td>ירמיהו 36</td><td>3-2</td><td>03-5409528 · https://gandaniel.co.il/contact-as/</td></tr>
-<tr><td>הגן של שורילה</td><td>שבי ציון</td><td>רח' האלה</td><td>3-0.8</td><td>שרה 050-5344499 · sarahfrummer@gmail.com</td></tr>
-<tr><td>גן בלוט</td><td>שוהם</td><td>רחבת עדי 5</td><td>2.9 עד 4.5</td><td>08-9750029 · info@antro.org.il</td></tr>
-<tr><td>גן אצטרובל</td><td>שוהם</td><td>רחבת עדי 5</td><td>4.5+</td><td>08-9750029 · info@antro.org.il</td></tr>
-<tr><td>גן שקמה</td><td>שילת</td><td>סמטת הערבה 1</td><td>6.5-4.5</td><td>08-9750029 · info@antro.org.il</td></tr>
-<tr><td>גן ליברה</td><td>תל אביב</td><td>בוגרשוב</td><td>1.5-2.5 · 2.5-3</td><td>ונסה ויהב מנדל · 050-3542224 · hamandella@gmail.com</td></tr>
-<tr><td>גני אלי"ה · הגן-שלנו</td><td>תל אביב</td><td>דניאל 16, אהרונסון 14 · צפון יפו - בן דוסא 14 · שכונת שפירא - פוזילוב 6</td><td>3-2 · 3-5 · 5-7</td><td>054-2133163 / 050-7235061 · ganshelanu20@gmail.com</td></tr>
-<tr><td>גן גפן</td><td>תל אביב</td><td>קהילת לודג' 5</td><td>4-2</td><td>חי דיין 0508829106</td></tr>
-<tr><td>גן רימון</td><td>תל אביב</td><td>קהילת ורשה 1</td><td>6-4</td><td>חי דיין 0508829106</td></tr>
-<tr><td>הממלכה שלי</td><td>תל אביב</td><td>יהודה הלוי 73</td><td>3-2 · 5-3</td><td>שלי 050-2161262</td></tr>
-<tr><td>גן חברותא</td><td>תל אביב</td><td>מרגולין 6</td><td>6-4</td><td>דנה 054-5661018 · נעה 050-7778886 · ganhavruta@gmail.com</td></tr>
-<tr><td>גן פעמון</td><td>תעוז</td><td>עמותת יחיאל משק 16</td><td>3.5-2.5</td><td>צאלה: 054-5964473 · office@yechiel.org</td></tr>
-<tr><td>גן שיר</td><td>תעוז</td><td>עמותת יחיאל משק 16</td><td>6-3</td><td>צאלה: 054-5964473 · office@yechiel.org</td></tr>
-<tr><td>בריאה · – גני יער</td><td>תעוז</td><td>85</td><td>6-3</td><td>שובל 050-4746229 · Bendror13@gmail.com</td></tr>
+<tr><td data-label="גן">גן שירת מדבר</td><td data-label="יישוב">אילת</td><td data-label="כתובת">אילת, החורב 3</td><td data-label="גילאים">6-3</td><td data-label="קשר">אתי קינה 052-6555485 · waldorf.edu.eilat@gmail.com · גשרון 415/2 אילת מיקוד 8856000</td></tr>
+<tr><td data-label="גן">גן פעמון</td><td data-label="יישוב">באר-שבע</td><td data-label="כתובת">דולצ'ין אריה 7</td><td data-label="גילאים">6.5-4.3</td><td data-label="קשר">נטע ארז · מרדכי מקלף 24 · ת.ד 425 8410301 · netaerez@netvision.net.il · 08-6411669</td></tr>
+<tr><td data-label="גן">גן ענבל</td><td data-label="יישוב">באר-שבע</td><td data-label="כתובת">שטרית 12</td><td data-label="גילאים">6.5-4.3</td><td data-label="קשר">netaerez@netvision.net.il · 08-6411669</td></tr>
+<tr><td data-label="גן">גן טלה</td><td data-label="יישוב">באר-שבע</td><td data-label="כתובת">בני אור 19 ב</td><td data-label="גילאים">4.2-2.8</td><td data-label="קשר">netaerez@netvision.net.il · 08-6411669</td></tr>
+<tr><td data-label="גן">גן יונה</td><td data-label="יישוב">באר-שבע</td><td data-label="כתובת">בני אור 19 ב</td><td data-label="גילאים">4.2-2.8</td><td data-label="קשר">netaerez@netvision.net.il · 08-6411669</td></tr>
+<tr><td data-label="גן">גן דולב</td><td data-label="יישוב">בית הלל</td><td data-label="כתובת">התאנה 196</td><td data-label="גילאים">4-2</td><td data-label="קשר">רינה 052-2743111 · dolevnachal@gmail.com</td></tr>
+<tr><td data-label="גן">רימון</td><td data-label="יישוב">בית קשת</td><td data-label="כתובת">בית קשת</td><td data-label="גילאים">6-4</td><td data-label="קשר">גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
+<tr><td data-label="גן">נח</td><td data-label="יישוב">בית קשת</td><td data-label="כתובת">—</td><td data-label="גילאים">4-3</td><td data-label="קשר">גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
+<tr><td data-label="גן">פעוטון בוגר</td><td data-label="יישוב">בית קשת</td><td data-label="כתובת">—</td><td data-label="גילאים">3-2</td><td data-label="קשר">גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
+<tr><td data-label="גן">פעוטון צעיר</td><td data-label="יישוב">בית קשת</td><td data-label="כתובת">—</td><td data-label="גילאים">2-1</td><td data-label="קשר">גלית ארז · 054-4498929 · hetsvakeshet@gmail.com</td></tr>
+<tr><td data-label="גן">בית חינוך יסמין · 3 גנים</td><td data-label="יישוב">בנימינה</td><td data-label="כתובת">הכרמל 10</td><td data-label="גילאים">2-3 · 3-4 · 4-6</td><td data-label="קשר">חן 052-3802800 · ganim@yasmin-bga.org.il</td></tr>
+<tr><td data-label="גן">פעוטון ניסאן · גן דליה</td><td data-label="יישוב">בסמת טבעון · (חילף)</td><td data-label="כתובת">עמותת עין בוסתן, דו לשוני</td><td data-label="גילאים">3-1 · 6-3</td><td data-label="קשר">ליאת: 054-4749550</td></tr>
+<tr><td data-label="גן">גן ליד הנחל</td><td data-label="יישוב">בצרה</td><td data-label="כתובת">בצרה</td><td data-label="גילאים">—</td><td data-label="קשר">פנינה 050-3774499 050377449</td></tr>
+<tr><td data-label="גן">פלג</td><td data-label="יישוב">גבעת עדה</td><td data-label="כתובת">הגבעה פינת האורנים</td><td data-label="גילאים">3-1.6</td><td data-label="קשר">שרון 052-447-6363 · צח 050-754-9754</td></tr>
+<tr><td data-label="גן">עמותת גפן</td><td data-label="יישוב">גבעת חיים איחוד</td><td data-label="כתובת">גבעת חיים איחוד</td><td data-label="גילאים">3-2 · 5-3</td><td data-label="קשר">מאיה 0525831808 · נעמה 0586412346</td></tr>
+<tr><td data-label="גן">גן מבל</td><td data-label="יישוב">גבעתיים</td><td data-label="כתובת">כצנלסון 120 · (ככר נוח)</td><td data-label="גילאים">3-1</td><td data-label="קשר">משפחתון ברוח אנתרופוסופית · 058-4409192,03-73164910</td></tr>
+<tr><td data-label="גן">מקום בלב</td><td data-label="יישוב">גבעתיים</td><td data-label="כתובת">ארלוזורוב 25</td><td data-label="גילאים">3.6-1.6</td><td data-label="קשר">ריקי דרוקר 054-7724266 · Rikidruker41175@gmail.com</td></tr>
+<tr><td data-label="גן">גן תאנים</td><td data-label="יישוב">גדרה</td><td data-label="כתובת">גדרה</td><td data-label="גילאים">2-1</td><td data-label="קשר">שירי ואהודי · ספירלה - חינוך לקיימות · spirala.education@gmail.com · 050-5787078 052-5930086</td></tr>
+<tr><td data-label="גן">גן צימוקים</td><td data-label="יישוב">גדרה</td><td data-label="כתובת">גדרה</td><td data-label="גילאים">3-2 ואילך</td><td data-label="קשר">שירי ואהודי · spirala.education@gmail.com · 050-5787078 052-5930086</td></tr>
+<tr><td data-label="גן">גן פעמון</td><td data-label="יישוב">גן חיים</td><td data-label="כתובת">הרימון 9</td><td data-label="גילאים">5-2.5</td><td data-label="קשר">יעלי 0528368906 · yael_feingold@hotmail.com</td></tr>
+<tr><td data-label="גן">גן ענן</td><td data-label="יישוב">הוד השרון</td><td data-label="כתובת">השח"ל</td><td data-label="גילאים">4-2.5</td><td data-label="קשר">שירלי שקד · 09-7450642</td></tr>
+<tr><td data-label="גן">גן ענן</td><td data-label="יישוב">הוד השרון</td><td data-label="כתובת">השח"ל</td><td data-label="גילאים">6-4</td><td data-label="קשר">שירלי שקד · 09-7450642</td></tr>
+<tr><td data-label="גן">גן מעגלים</td><td data-label="יישוב">הוד השרון</td><td data-label="כתובת">הגנים 25</td><td data-label="גילאים">4-1.5</td><td data-label="קשר">ענבל 050-9676700</td></tr>
+<tr><td data-label="גן">גן תמרים</td><td data-label="יישוב">הוד השרון</td><td data-label="כתובת">משאבים 15</td><td data-label="גילאים">6-3</td><td data-label="קשר">תמר 054-5457253</td></tr>
+<tr><td data-label="גן">גן שחר</td><td data-label="יישוב">הכפר הירוק</td><td data-label="כתובת">הגן של ירון ובתיה</td><td data-label="גילאים">3-1.5 · 5-3</td><td data-label="קשר">בתיה 050-2324004 · ירון 050-2324005 · urim.rishum.ganim@gmail.com</td></tr>
+<tr><td data-label="גן">תות</td><td data-label="יישוב">הכפר הירוק</td><td data-label="כתובת">גני קרן אור · רמת השרון</td><td data-label="גילאים">11-24 ח'</td><td data-label="קשר">קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803 · ganey.kerenor@gmail.com · גני קרן אור בפייסבוק</td></tr>
+<tr><td data-label="גן">שקד</td><td data-label="יישוב">הכפר הירוק</td><td data-label="כתובת">גני קרן אור · רמת השרון</td><td data-label="גילאים">3.04-2</td><td data-label="קשר">קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
+<tr><td data-label="גן">גפן</td><td data-label="יישוב">הכפר הירוק</td><td data-label="כתובת">גני קרן אור · רמת השרון</td><td data-label="גילאים">;2.8 - 4.3</td><td data-label="קשר">קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
+<tr><td data-label="גן">תאנה</td><td data-label="יישוב">הכפר הירוק</td><td data-label="כתובת">גני קרן אור · רמת השרון</td><td data-label="גילאים">&gt;6.3 – 3.5</td><td data-label="קשר">קרן דוידוביץ 052-6561555 · משרד (לוואטסאפ) 050-7722803</td></tr>
+<tr><td data-label="גן">גן חיים</td><td data-label="יישוב">הרדוף</td><td data-label="כתובת">—</td><td data-label="גילאים">6-3</td><td data-label="קשר">יערה - 052-5899641, · יעל - 054-4715778</td></tr>
+<tr><td data-label="גן">גן דובי (Do-Be)</td><td data-label="יישוב">הרצליה</td><td data-label="כתובת">פנקס 52</td><td data-label="גילאים">3.5-1</td><td data-label="קשר">Do.Be.gan@gmail.com · 054-4647987</td></tr>
+<tr><td data-label="גן">מעיין</td><td data-label="יישוב">זכרון יעקב</td><td data-label="כתובת">העבודה 21</td><td data-label="גילאים">3.5-1.10</td><td data-label="קשר">שרון 052-447-6363 · צח 050-754-9754</td></tr>
+<tr><td data-label="גן">קרן אור אבן שמש</td><td data-label="יישוב">חיפה</td><td data-label="כתובת">העליה השניה 27, בת גלים</td><td data-label="גילאים">6-5 4-3</td><td data-label="קשר">אנה 054-7604394</td></tr>
+<tr><td data-label="גן">גן סמדר</td><td data-label="יישוב">יבניאל</td><td data-label="כתובת">יבניאל</td><td data-label="גילאים">7-3</td><td data-label="קשר">עפרית הראלי · ofrithareli@gmail.com</td></tr>
+<tr><td data-label="גן">בוסתן יאפא</td><td data-label="יישוב">יפו</td><td data-label="כתובת">ציונה תג'ר 24</td><td data-label="גילאים">—</td><td data-label="קשר">03-518-6392 · orchard.of.abraham@gmail.com</td></tr>
+<tr><td data-label="גן">גן דבש</td><td data-label="יישוב">תעוז · (הרי יהודה)</td><td data-label="כתובת">טל שחר</td><td data-label="גילאים">2.5-1.5</td><td data-label="קשר">צאלה: 054-5964473 · office@yechiel.org</td></tr>
+<tr><td data-label="גן">גן צוף</td><td data-label="יישוב">טל שחר</td><td data-label="כתובת">מתחם בית ספר יחיאל</td><td data-label="גילאים">6-3</td><td data-label="קשר">צאלה: 054-5964473 · office@yechiel.org</td></tr>
+<tr><td data-label="גן">גן הנני</td><td data-label="יישוב">ינוב</td><td data-label="כתובת">מושב ינוב</td><td data-label="גילאים">הליכה-7</td><td data-label="קשר">סימונה הורביץ · 054-3147725 · ganhineni@gmail.com</td></tr>
+<tr><td data-label="גן">כיתת הדביר · חינוך מרפא</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">רובוביץ 10 (ארמון הנציב)</td><td data-label="גילאים">6.5 +</td><td data-label="קשר">—</td></tr>
+<tr><td data-label="גן">גן השמש · מירב וסנדרה</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">רח' רבי חנינא 3 (קטמון)</td><td data-label="גילאים">4.5-2.8</td><td data-label="קשר">עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
+<tr><td data-label="גן">גן השמש · מיכל ויעל</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">רח' גלבר 20 (רמת דניה) · גן אנתרופוסופי עירוני</td><td data-label="גילאים">6-3.6</td><td data-label="קשר">עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
+<tr><td data-label="גן">גן השמש · אלינור ורבקה</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">רח' המליץ 8 · (המושבה הגרמנית)</td><td data-label="גילאים">6-3.8</td><td data-label="קשר">עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
+<tr><td data-label="גן">גן השמש · נעמה וסיגל</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">רח' המליץ 8 · (המושבה הגרמנית)</td><td data-label="גילאים">6-3.8</td><td data-label="קשר">עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
+<tr><td data-label="גן">גן השמש · איריס ומיטל</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">אברהם שרון 19 (קריית יובל) · גן אנתרופוסופי עירוני</td><td data-label="גילאים">6-3.8</td><td data-label="קשר">עמותת אדם · 072-2116627 · info@ganiadam.co.il</td></tr>
+<tr><td data-label="גן">גן האור</td><td data-label="יישוב">ירושלים</td><td data-label="כתובת">אברהם שטרן 3. קרית יובל</td><td data-label="גילאים">4-2</td><td data-label="קשר">שני 054-5220404 · ganhaor.antro@gmail.com</td></tr>
+<tr><td data-label="גן">גן מיתרים</td><td data-label="יישוב">כפר- סבא</td><td data-label="כתובת">רמז 9</td><td data-label="גילאים">6.5-4</td><td data-label="קשר">—</td></tr>
+<tr><td data-label="גן">גפן / שקד</td><td data-label="יישוב">כרכור</td><td data-label="כתובת">הגליל 51</td><td data-label="גילאים">1-4.5</td><td data-label="קשר">עמותת "מרחב אלומות" · אושרי 054-2407066 · Alumot.karkur@gmail.com</td></tr>
+<tr><td data-label="גן">ניצנים</td><td data-label="יישוב">כפר דניאל</td><td data-label="כתובת">—</td><td data-label="גילאים">6-3</td><td data-label="קשר">גנאחר - באזור מודיעין (ע"ר) · 08-9750029 · info@antro.org.il</td></tr>
+<tr><td data-label="גן">גן אלון</td><td data-label="יישוב">לפיד</td><td data-label="כתובת">—</td><td data-label="גילאים">4.5-2.9</td><td data-label="קשר">גנאחר - באזור מודיעין (ע"ר) · 08-9750029 · info@antro.org.il</td></tr>
+<tr><td data-label="גן">גן עודד</td><td data-label="יישוב">משגב</td><td data-label="כתובת">גן אזורי לישובי המועצה</td><td data-label="גילאים">6-3</td><td data-label="קשר">גן - 04-980890, · דקלה -054-6769131 · איתן - 054-5458345</td></tr>
+<tr><td data-label="גן">גן סמדר</td><td data-label="יישוב">נס ציונה</td><td data-label="כתובת">משה סנה 8 · טירת שלום</td><td data-label="גילאים">4.3-2.8</td><td data-label="קשר">עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
+<tr><td data-label="גן">גן מעיין</td><td data-label="יישוב">נס ציונה</td><td data-label="כתובת">משה סנה 8</td><td data-label="גילאים">4.3 - בי"ס</td><td data-label="קשר">עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
+<tr><td data-label="גן">גן לילך</td><td data-label="יישוב">נס ציונה</td><td data-label="כתובת">דוד לנדא 18</td><td data-label="גילאים">4.3-2.8</td><td data-label="קשר">עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
+<tr><td data-label="גן">גן אילן</td><td data-label="יישוב">נס ציונה</td><td data-label="כתובת">העוגן 14 · גבעת הצבר</td><td data-label="גילאים">4.3 - בי"ס</td><td data-label="קשר">עמותת דניאל · ganim@waldorfnz.org.il · ; 077-4503740</td></tr>
+<tr><td data-label="גן">גן השדה</td><td data-label="יישוב">עמק חפר</td><td data-label="כתובת">מרכז אופק · מושב אלישיב, 42885</td><td data-label="גילאים">2-3</td><td data-label="קשר">04-6251374 · info@merkazofek.co.il</td></tr>
+<tr><td data-label="גן">גן החורש</td><td data-label="יישוב">עמק חפר</td><td data-label="כתובת">אלישיב</td><td data-label="גילאים">3-4</td><td data-label="קשר">04-6251374 · info@merkazofek.co.il</td></tr>
+<tr><td data-label="גן">גן העמק</td><td data-label="יישוב">עמק חפר</td><td data-label="כתובת">אלישיב</td><td data-label="גילאים">4-7</td><td data-label="קשר">04-6251374 · info@merkazofek.co.il</td></tr>
+<tr><td data-label="גן">ארגמן</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">עמותת רימון · רח' היוגב 1, · מתחם בית הספר החקלאי</td><td data-label="גילאים">6.4-3.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">paz</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">מתחם בית הספר החקלאי</td><td data-label="גילאים">6.4-3.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">תכלת</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">מתחם בית הספר החקלאי</td><td data-label="גילאים">6.4-3.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">ענבר</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">מתחם בית הספר החקלאי</td><td data-label="גילאים">6.4-3.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">ברקת</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">מתחם בית הספר החקלאי</td><td data-label="גילאים">3.7-2.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">שני</td><td data-label="יישוב">פרדס חנה</td><td data-label="כתובת">מתחם בית הספר החקלאי</td><td data-label="גילאים">3.7-2.8</td><td data-label="קשר">04-6380626 · rimon.office@gmail.com</td></tr>
+<tr><td data-label="גן">ורד במושבה</td><td data-label="יישוב">פתח תקווה</td><td data-label="כתובת">שיפר 12</td><td data-label="גילאים">4-0.7</td><td data-label="קשר">ורד: 054-6228854 · vered.bamoshava@gmail.com</td></tr>
+<tr><td data-label="גן">ורד במושבה</td><td data-label="יישוב">פתח תקווה</td><td data-label="כתובת">שיפר 12 · 13</td><td data-label="גילאים">3-1</td><td data-label="קשר">ורד: 054-6228854 · vered.bamoshava@gmail.com</td></tr>
+<tr><td data-label="גן">גן מעיין</td><td data-label="יישוב">פתח תקווה</td><td data-label="כתובת">שכונת אם המושבות</td><td data-label="גילאים">4-3</td><td data-label="קשר">050-7659999 · www.pardesim.com</td></tr>
+<tr><td data-label="גן">גן ניגונים</td><td data-label="יישוב">פתח תקווה</td><td data-label="כתובת">שכונת אם המושבות</td><td data-label="גילאים">5-4</td><td data-label="קשר">050-7659999 · www.pardesim.com</td></tr>
+<tr><td data-label="גן">גן בראשית</td><td data-label="יישוב">פתח תקווה</td><td data-label="כתובת">שכונת אם המושבות</td><td data-label="גילאים">5-6</td><td data-label="קשר">050-7659999 · www.pardesim.com</td></tr>
+<tr><td data-label="גן">גן ספלולים</td><td data-label="יישוב">צופית</td><td data-label="כתובת">השדרה פינת הזית</td><td data-label="גילאים">4-2</td><td data-label="קשר">יעל ירושלמי - 054-6807110 · yaely35@gmail.com · גן: 054-6807110</td></tr>
+<tr><td data-label="גן">גן ספלולים</td><td data-label="יישוב">צופית</td><td data-label="כתובת">השדרה פינת הזית</td><td data-label="גילאים">6-4</td><td data-label="קשר">יעל ירושלמי - 054-6807110 · yaely35@gmail.com · גן: 054-6807110</td></tr>
+<tr><td data-label="גן">גן גינה</td><td data-label="יישוב">ציפורי</td><td data-label="כתובת">ליד ריש לקיש</td><td data-label="גילאים">7-4</td><td data-label="קשר">—</td></tr>
+<tr><td data-label="גן">תלתן</td><td data-label="יישוב">ציפורי</td><td data-label="כתובת">ליד ריש לקיש</td><td data-label="גילאים">5-2</td><td data-label="קשר">—</td></tr>
+<tr><td data-label="גן">גן ניגון</td><td data-label="יישוב">צלפון</td><td data-label="כתובת">מטה יהודה</td><td data-label="גילאים">4-2</td><td data-label="קשר">יואלה 054-8019981</td></tr>
+<tr><td data-label="גן">משפחתון</td><td data-label="יישוב">קדימה</td><td data-label="כתובת">חנקין</td><td data-label="גילאים">24-5 · 'ח</td><td data-label="קשר">יערה 054-4310165 · yaara.yogev@gmail.com</td></tr>
+<tr><td data-label="גן">גן פטריה</td><td data-label="יישוב">קדימה</td><td data-label="כתובת">מואב 4א</td><td data-label="גילאים">4-1.5</td><td data-label="קשר">אריאל 0503200410 · עדי 0528984111</td></tr>
+<tr><td data-label="גן">גן גורים</td><td data-label="יישוב">קדרון</td><td data-label="כתובת">הדר 158</td><td data-label="גילאים">5-2</td><td data-label="קשר">ענבר 054-4769067</td></tr>
+<tr><td data-label="גן">רימון</td><td data-label="יישוב">קריית אונו</td><td data-label="כתובת">הנשיא 15 · כניסה משד' יהודית</td><td data-label="גילאים">7-2</td><td data-label="קשר">03-6356965, 050-6781608 · hagiami@gmail.com</td></tr>
+<tr><td data-label="גן">גן אלרואי</td><td data-label="יישוב">קריית טבעון</td><td data-label="כתובת">התשבי 12</td><td data-label="גילאים">—</td><td data-label="קשר">דליה סתתי 054.7700410 · dalia_satati@walla.com</td></tr>
+<tr><td data-label="גן">גן לילך</td><td data-label="יישוב">קריית טבעון</td><td data-label="כתובת">התשבי 12</td><td data-label="גילאים">—</td><td data-label="קשר">סמדר ספראי 052.6588282 · smadar_safrai@walla.com</td></tr>
+<tr><td data-label="גן">גן שקד</td><td data-label="יישוב">קריית טבעון</td><td data-label="כתובת">יהודה הנשיא 21</td><td data-label="גילאים">—</td><td data-label="קשר">יפה מאיר 04.9930977 · yat@bezeqint.net</td></tr>
+<tr><td data-label="גן">גן אורים</td><td data-label="יישוב">קריית טבעון</td><td data-label="כתובת">השקמה 1</td><td data-label="גילאים">—</td><td data-label="קשר">סמדר קדם 04.9930421 · smadkedem@gmail.com</td></tr>
+<tr><td data-label="גן">גן אלה</td><td data-label="יישוב">קריית טבעון</td><td data-label="כתובת">נרקיסים 44</td><td data-label="גילאים">—</td><td data-label="קשר">נטע יובל · ו · פנינית ירושלמי · 052-5784380 · 052-4332050</td></tr>
+<tr><td data-label="גן">גן זמיר</td><td data-label="יישוב">קריית שמונה</td><td data-label="כתובת">הר צופים 8</td><td data-label="גילאים">—</td><td data-label="קשר">עמותת הנחל · dolevnachal@gmail.com · מאיה- 053-3524212</td></tr>
+<tr><td data-label="גן">גן אביב</td><td data-label="יישוב">רחובות</td><td data-label="כתובת">פרשני 8</td><td data-label="גילאים">6-4.5</td><td data-label="קשר">עמותת ראם · 077-7292641 · reem.antro@gmail.com</td></tr>
+<tr><td data-label="גן">גן כרם</td><td data-label="יישוב">רחובות</td><td data-label="כתובת">שיטה מלבינה 9</td><td data-label="גילאים">4.5-2.9</td><td data-label="קשר">077-7292641 · reem.antro@gmail.com</td></tr>
+<tr><td data-label="גן">אלימלך (גלים/אלונים)</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">אלימלך 7 · (ליד זומר)</td><td data-label="גילאים">4-2.9</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">יובלים</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">עובדיה 3 (רמת חן)</td><td data-label="גילאים">4-2.9</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">תיבת נוח (אילן)</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">הפודים 8</td><td data-label="גילאים">7-4</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">פלג</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">אלימלך 7</td><td data-label="גילאים">7-4</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">המעיין</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">עזריאל 16 (רמת חן)</td><td data-label="גילאים">7-4</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">יובלים</td><td data-label="יישוב">רמת-גן</td><td data-label="כתובת">עובדיה 3</td><td data-label="גילאים">4-2.9</td><td data-label="קשר">03-6444966 · ganim@waldorf.org.il</td></tr>
+<tr><td data-label="גן">החייל 33 א'</td><td data-label="יישוב">רמת גן</td><td data-label="כתובת">ניצנים</td><td data-label="גילאים">3-0.5</td><td data-label="קשר">050-6670474 · saritweb@gmail.com</td></tr>
+<tr><td data-label="גן">הגן של דניאל</td><td data-label="יישוב">רמת השרון</td><td data-label="כתובת">אלחריזי 1</td><td data-label="גילאים">6-3</td><td data-label="קשר">077-5309171 · dalia9556@gmail.com</td></tr>
+<tr><td data-label="גן">פעוטון הגן של דניאל</td><td data-label="יישוב">רמת השרון</td><td data-label="כתובת">ירמיהו 36</td><td data-label="גילאים">3-2</td><td data-label="קשר">03-5409528 · https://gandaniel.co.il/contact-as/</td></tr>
+<tr><td data-label="גן">הגן של שורילה</td><td data-label="יישוב">שבי ציון</td><td data-label="כתובת">רח' האלה</td><td data-label="גילאים">3-0.8</td><td data-label="קשר">שרה 050-5344499 · sarahfrummer@gmail.com</td></tr>
+<tr><td data-label="גן">גן בלוט</td><td data-label="יישוב">שוהם</td><td data-label="כתובת">רחבת עדי 5</td><td data-label="גילאים">2.9 עד 4.5</td><td data-label="קשר">08-9750029 · info@antro.org.il</td></tr>
+<tr><td data-label="גן">גן אצטרובל</td><td data-label="יישוב">שוהם</td><td data-label="כתובת">רחבת עדי 5</td><td data-label="גילאים">4.5+</td><td data-label="קשר">08-9750029 · info@antro.org.il</td></tr>
+<tr><td data-label="גן">גן שקמה</td><td data-label="יישוב">שילת</td><td data-label="כתובת">סמטת הערבה 1</td><td data-label="גילאים">6.5-4.5</td><td data-label="קשר">08-9750029 · info@antro.org.il</td></tr>
+<tr><td data-label="גן">גן ליברה</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">בוגרשוב</td><td data-label="גילאים">1.5-2.5 · 2.5-3</td><td data-label="קשר">ונסה ויהב מנדל · 050-3542224 · hamandella@gmail.com</td></tr>
+<tr><td data-label="גן">גני אלי"ה · הגן-שלנו</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">דניאל 16, אהרונסון 14 · צפון יפו - בן דוסא 14 · שכונת שפירא - פוזילוב 6</td><td data-label="גילאים">3-2 · 3-5 · 5-7</td><td data-label="קשר">054-2133163 / 050-7235061 · ganshelanu20@gmail.com</td></tr>
+<tr><td data-label="גן">גן גפן</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">קהילת לודג' 5</td><td data-label="גילאים">4-2</td><td data-label="קשר">חי דיין 0508829106</td></tr>
+<tr><td data-label="גן">גן רימון</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">קהילת ורשה 1</td><td data-label="גילאים">6-4</td><td data-label="קשר">חי דיין 0508829106</td></tr>
+<tr><td data-label="גן">הממלכה שלי</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">יהודה הלוי 73</td><td data-label="גילאים">3-2 · 5-3</td><td data-label="קשר">שלי 050-2161262</td></tr>
+<tr><td data-label="גן">גן חברותא</td><td data-label="יישוב">תל אביב</td><td data-label="כתובת">מרגולין 6</td><td data-label="גילאים">6-4</td><td data-label="קשר">דנה 054-5661018 · נעה 050-7778886 · ganhavruta@gmail.com</td></tr>
+<tr><td data-label="גן">גן פעמון</td><td data-label="יישוב">תעוז</td><td data-label="כתובת">עמותת יחיאל משק 16</td><td data-label="גילאים">3.5-2.5</td><td data-label="קשר">צאלה: 054-5964473 · office@yechiel.org</td></tr>
+<tr><td data-label="גן">גן שיר</td><td data-label="יישוב">תעוז</td><td data-label="כתובת">עמותת יחיאל משק 16</td><td data-label="גילאים">6-3</td><td data-label="קשר">צאלה: 054-5964473 · office@yechiel.org</td></tr>
+<tr><td data-label="גן">בריאה · – גני יער</td><td data-label="יישוב">תעוז</td><td data-label="כתובת">85</td><td data-label="גילאים">6-3</td><td data-label="קשר">שובל 050-4746229 · Bendror13@gmail.com</td></tr>
 </tbody></table></div>
 
 </section>

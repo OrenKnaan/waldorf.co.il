@@ -27,8 +27,23 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
   // 2) Responsive rules, appended to the page's inline stylesheet so they win
   //    over the base rules they override without needing !important. Re-running
   //    refreshes the block rather than stacking a second copy.
+  //
+  //    A page may follow the shared block with its own `/* ===== page overrides
+  //    ===== */` section for tweaks only that page needs (a component no other
+  //    page has). The rewrite stops at that marker, so those hand-written rules
+  //    survive a re-run — put per-page CSS there, never inside the shared block,
+  //    which is regenerated verbatim from responsive.mjs.
+  //    The trailing `\s*` matters: without it the match stops short of the
+  //    whitespace before the delimiter, so each run re-added the block's own
+  //    trailing newline and the file grew by a byte every time.
+  const sharedBlock = /\n\s*\/\* ===== responsive ===== \*\/[\s\S]*?\s*(?=\/\* ===== page overrides ===== \*\/|<\/style>)/;
   html = html.includes('/* ===== responsive =====')
-    ? html.replace(/\n\s*\/\* ===== responsive ===== \*\/[\s\S]*?<\/style>/, `\n${RESPONSIVE_CSS}</style>`)
+    ? html.replace(sharedBlock, (m, offset, str) =>
+        // Re-indent the page-overrides marker, whose own indentation the
+        // whitespace-consuming match above just swallowed.
+        (str.slice(offset + m.length).startsWith('/* ===== page overrides')
+          ? `\n${RESPONSIVE_CSS}  `
+          : `\n${RESPONSIVE_CSS}`))
     : html.replace('\n</style>', `\n${RESPONSIVE_CSS}</style>`);
 
   // 3) Hamburger button (absolutely positioned inside .site-header, so the

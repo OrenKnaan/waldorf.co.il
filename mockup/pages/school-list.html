@@ -212,8 +212,8 @@
      the absolutely-positioned hover dropdowns nested inside it. Never wrap. */
   .primary-nav{flex-wrap:nowrap}
   .pagebanner{flex-wrap:wrap}
-  .nav-toggle{display:none;position:absolute;inset-block-start:15px;inset-inline-start:16px;z-index:30;
-    width:42px;height:42px;padding:0;border:none;background:transparent;cursor:pointer;
+  .nav-toggle{display:none;position:absolute;inset-block-start:14px;inset-inline-start:16px;z-index:30;
+    width:44px;height:44px;padding:0;border:none;background:transparent;cursor:pointer;
     align-items:center;justify-content:center;border-radius:var(--radius)}
   .nav-toggle:hover{background:color-mix(in oklab,var(--tan) 22%,transparent)}
   .nav-toggle .bars{position:relative}
@@ -246,9 +246,9 @@
     .brand-tagline{font-size:.7rem;letter-spacing:.1em}
     .primary-nav{flex-direction:column;gap:0;padding:0 14px;overflow-x:visible;
       max-height:0;overflow-y:hidden;transition:max-height .3s ease}
-    .nav-open .primary-nav{max-height:78vh;overflow-y:auto;padding-bottom:12px}
+    .nav-open .primary-nav{max-height:78vh;overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
     .nav-item{width:100%}
-    .nav-link{justify-content:space-between;padding:13px 8px;font-size:.98rem;
+    .nav-link{justify-content:space-between;min-height:44px;padding:13px 8px;font-size:.98rem;
       border-bottom:1px solid var(--beige);border-radius:var(--radius)}
     .nav-link .icon-inline{width:15px;height:15px;transition:transform .2s}
     .nav-link:hover,.nav-link.active{border-bottom-color:var(--beige)}
@@ -258,7 +258,7 @@
     .dropdown{position:static;display:block;min-width:0;padding:0;border:none;border-radius:0;
       background:transparent;box-shadow:none;max-height:0;overflow:hidden;transition:max-height .28s ease}
     .nav-item.open>.dropdown{max-height:680px;padding:2px 0 10px}
-    .dropdown-link{padding:9px 18px;font-size:.9rem}
+    .dropdown-link{display:flex;align-items:center;min-height:44px;padding:10px 18px;font-size:.9rem}
     .dropdown-link:hover,.dropdown-link.active{background:transparent;color:var(--brown-dark);font-weight:600}
     .dropdown-head{padding:8px 18px 2px}
 
@@ -329,8 +329,100 @@
     .stat{padding:12px 4px}
     .stat .num{font-size:1.3rem}
     .stat .lbl{font-size:.68rem}
-    .field input,.field select,.field textarea{font-size:16px}
   }
+
+  /* ---- touch ergonomics ----
+     Applies by input device, not width: a 1024px tablet is still a finger. */
+  a,button,input,select,textarea,label,summary,[role="button"]{touch-action:manipulation}
+
+  @media (pointer:coarse){
+    /* 44x44 is the floor for anything you tap (Apple HIG / Material 48dp). */
+    .btn,.tab-btn,.chip,.dyn-btn,.nav-toggle{min-height:44px}
+    .btn-sm{min-height:44px}
+    .brand-link{display:inline-flex;align-items:center;min-height:44px}
+    /* Checkbox/radio keep their own box — stretching those looks broken. */
+    input:not([type=checkbox]):not([type=radio]),select{min-height:44px}
+    .site-footer a{display:inline-block;min-height:44px;line-height:44px}
+    /* Breadcrumbs sit in a compact sticky pill — grow the hit area but pull the
+       extra height back out of the layout so the bar itself stays slim. */
+    .pagebanner .crumb{display:inline-flex;align-items:center;min-height:44px;margin-block:-11px}
+    /* 8px minimum between adjacent targets so a near-miss isn't a wrong tap. */
+    .chip-row{gap:10px}
+    .btn-row{gap:12px}
+    /* Leaflet ships 30px zoom buttons; the map is ours, so size them for a finger. */
+    .leaflet-control-zoom a{width:44px !important;height:44px !important;line-height:44px !important}
+  }
+
+  /* Any control under 16px makes iOS Safari zoom the page on focus, and it
+     never zooms back out. Covers the filter/search inputs too, not just .field. */
+  /* Width alone misses a landscape iPad (1024px wide, still a touchscreen that
+     zooms on focus), so this keys on the pointer as well. */
+  @media (max-width:900px),(pointer:coarse){
+    /* !important because dynamic.js injects .dyn-toolbar/.dyn-form rules into
+       <head> at runtime, after this stylesheet, so order would otherwise win. */
+    input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px !important}
+    .field textarea{min-height:104px}
+  }
+
+  /* ---- data tables become cards on a phone ----
+     Marked up by patch-mobile-tables.mjs: 'stack-sm' on the table, 'data-label'
+     on every cell. A 5-column kindergarten row is unreadable in a 375px-wide
+     sideways scroller, so each row becomes its own labelled card instead. */
+  @media (max-width:560px){
+    .table-wrap:has(table.stack-sm){overflow-x:visible;padding-bottom:0}
+    table.stack-sm,table.stack-sm tbody,table.stack-sm tr,table.stack-sm td{display:block;width:auto}
+    /* The header row still exists for assistive tech, just not on screen. */
+    table.stack-sm thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    table.stack-sm tr{margin:0 0 10px;padding:12px 14px;background:var(--white);
+      border:1px solid var(--beige);border-radius:var(--radius)}
+    table.stack-sm tbody tr:nth-child(even){background:#FBF8F3}
+    table.stack-sm td{border:none;padding:3px 0;font-size:.9rem;
+      display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline}
+    table.stack-sm td::before{content:attr(data-label);font-family:var(--font-head);
+      font-weight:700;font-size:.74rem;color:var(--brown-dark);white-space:nowrap}
+    /* First cell is the record's name — it reads as the card's title. */
+    table.stack-sm td:first-child{display:block;margin-bottom:5px;padding-bottom:5px;
+      border-bottom:1px solid var(--beige);font-family:var(--font-head);
+      font-size:1.02rem;color:var(--brown-dark)}
+    table.stack-sm td:first-child::before{content:none}
+    /* "no results" spans all columns — it's a message, not a field. */
+    table.stack-sm td[colspan]{display:block}
+    table.stack-sm td[colspan]::before{content:none}
+  }
+
+  /* ---- notch / home-indicator clearance ----
+     Only the floating button needs it: everything else is inside a viewport the
+     browser has already inset. Note there is no logical form of these variables
+     (no safe-area-inset-inline-start) — the physical ones are correct in RTL
+     too — and they stay 0 until the viewport meta opts in with viewport-fit=cover,
+     which is a decision for the Astro build, not this mockup. */
+  @media (max-width:720px){
+    .scroll-top-btn{inset-block-end:max(18px,env(safe-area-inset-bottom,0px))}
+  }
+
+  /* ---- landscape phones: short viewports, not narrow ones ---- */
+  @media (max-height:500px) and (orientation:landscape){
+    .art-hero{height:150px}
+    .nav-open .primary-nav{max-height:62vh}
+  }
+
+  /* Newer mobile browsers: vh includes the retracting URL bar, dvh doesn't. */
+  @supports (height:100dvh){
+    .nav-open .primary-nav{max-height:78dvh}
+    @media (max-height:500px) and (orientation:landscape){
+      .nav-open .primary-nav{max-height:62dvh}
+    }
+  }
+
+  /* ---- motion & focus ---- */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+      transition-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+  /* The drawer and its accordions are keyboard- and switch-operable; without a
+     visible ring there is no way to tell where you are in them. */
+  :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
 </style>
 <script type="application/ld+json">
 {
@@ -442,53 +534,53 @@
 </div>
 <p class="kg-count" id="schCount" aria-live="polite"></p>
 </div>
-<div class="table-wrap"><table>
+<div class="table-wrap"><table class="stack-sm">
 <thead><tr>
 <th>בית ספר</th>
 <th>יישוב</th>
 <th>קשר</th>
 </tr></thead>
 <tbody>
-<tr><td>אופק</td><td>אלישיב</td><td>04-6251370 · info@merkazofek.co.il</td></tr>
-<tr><td>תיכון אופק</td><td>עין החורש</td><td>054-5333151 · info@merkazofek.co.il</td></tr>
-<tr><td>בית ספר קורצ'אק</td><td>באר שבע</td><td>08-6411669 · korchak.school@gmail.com</td></tr>
-<tr><td>תיכון קורצ'אק</td><td>באר שבע</td><td>08-6171909 · twkbeer7@gmail.com</td></tr>
-<tr><td>יסמין</td><td>בנימינה-גבעת עדה</td><td>058-4001204 · office@yasmin-bga.org.il</td></tr>
-<tr><td>במעלה ההר</td><td>בצת</td><td>04-9808441 · school@maalehahar.org</td></tr>
-<tr><td>בית חינוך לאה גולדברג</td><td>גבעתיים</td><td>03-6053485 · orit@leagoldberg.org</td></tr>
-<tr><td>תמר</td><td>הוד השרון</td><td>09-7658082 · tamar.w.office@gmail.com</td></tr>
-<tr><td>תיכון תמר</td><td>הוד השרון</td><td>09-7658082 · tamar.w.office@gmail.com</td></tr>
-<tr><td>אורים</td><td>הכפר הירוק</td><td>03-6440920, 03-6479361 · urim@urim-edu.co.il</td></tr>
-<tr><td>ענבר</td><td>הכפר הירוק</td><td>054-9076909 · admin@inbar-school.co.il</td></tr>
-<tr><td>הרדוף יסודי</td><td>הרדוף</td><td>04-9059300 · yesodiharduf@gmail.com</td></tr>
-<tr><td>הרדוף תיכון</td><td>הרדוף</td><td>04-9058712 · tichonharduf@gmail.com</td></tr>
-<tr><td>בית המעיין</td><td>חוקוק</td><td>04-6799807 · bethamaayan@gmail.com</td></tr>
-<tr><td>עלייה</td><td>חיפה</td><td>04-8522105 · batgalim.waldorf@gmail.com</td></tr>
-<tr><td>שקד</td><td>טבעון</td><td>04-993157504-9531132 · shaked.tivon@gmail.com</td></tr>
-<tr><td>תיכון שקד</td><td>טבעון</td><td>04-6042738 · tichonshaked@gmail.com</td></tr>
-<tr><td>יחיאל</td><td>טל שחר</td><td>08-8668563; 054-7711235 · waldorf.school@yechiel.org</td></tr>
-<tr><td>עודד</td><td>יודפת</td><td>04-980089104-9800890 · odedsch@013net.net</td></tr>
-<tr><td>תיכון עודד</td><td>יודפת</td><td>04-980089104-9800890 · oded-highschool@outlook.co.il</td></tr>
-<tr><td>הנני</td><td>ינוב - לב השרון · על אזורי</td><td>055-2517116 · Schoolhineni@gmail.com</td></tr>
-<tr><td>אדם</td><td>ירושלים</td><td>02-5667404/3 · koladam2@gmail.com</td></tr>
-<tr><td>תיכון אדם</td><td>ירושלים</td><td>guyfrz@gmail.com</td></tr>
-<tr><td>הדביר החדש</td><td>ירושלים</td><td>02-6730529 · hadvir@gmail.com</td></tr>
-<tr><td>קשת בגליל</td><td>כדורי</td><td>050-3071256 · hetzvakeshet@gmail.com</td></tr>
-<tr><td>שיבולים</td><td>נס ציונה</td><td>08-9167793/4 · noga6633@gmail.com</td></tr>
-<tr><td>תיכון שיבולים</td><td>נס ציונה</td><td>08-9167793/4 · noga6633@gmail.com</td></tr>
-<tr><td>בית חינוך במדבר</td><td>ספיר</td><td>08-6592298 · bamidbar.antro@gmail.com</td></tr>
-<tr><td>רימון</td><td>פרדס חנה-כרכור</td><td>04-6380626 · office@rimon-edu.org.il</td></tr>
-<tr><td>תיכון רימון</td><td>פרדס חנה-כרכור</td><td>04-6377556 · tichonrimon@gmail.com</td></tr>
-<tr><td>בית חינוך רון</td><td>פתח תקוה</td><td>050-7659999 · beitchinuchron@gmail.com</td></tr>
-<tr><td>בית מיתר</td><td>צופית</td><td>09-9585470 · beit.meitar.school@gmail.com</td></tr>
-<tr><td>מעיין</td><td>קיבוץ נען</td><td>074-7046333 · office@maayan-school.com</td></tr>
-<tr><td>בראשית</td><td>קריית אונו</td><td>03-6747248 · bereshit.school.ko@gmail.com</td></tr>
-<tr><td>שדמה</td><td>רחובות</td><td>077-7292641 · reem.antro@gmail.com</td></tr>
-<tr><td>זומר</td><td>רמת גן</td><td>03-6723409 · zomerschool.rg@gmail.com</td></tr>
-<tr><td>זומר תיכון</td><td>רמת גן</td><td>03-7585430 · waldorfhigh@gmail.com</td></tr>
-<tr><td>בית חינוך אלומות</td><td>שוהם / מ.א חבל מודיעין · על איזורי</td><td>03-6704463 · info.school@antro.org.il</td></tr>
-<tr><td>תמרת אל-זייתון</td><td>שפרעם</td><td>04-9869044 · waldorf.tamratalziton@gmail.com</td></tr>
-<tr><td>בית חינוך רעות</td><td>תל אביב</td><td>073-3842818 · reut@antro-tlv.org</td></tr>
+<tr><td data-label="בית ספר">אופק</td><td data-label="יישוב">אלישיב</td><td data-label="קשר">04-6251370 · info@merkazofek.co.il</td></tr>
+<tr><td data-label="בית ספר">תיכון אופק</td><td data-label="יישוב">עין החורש</td><td data-label="קשר">054-5333151 · info@merkazofek.co.il</td></tr>
+<tr><td data-label="בית ספר">בית ספר קורצ'אק</td><td data-label="יישוב">באר שבע</td><td data-label="קשר">08-6411669 · korchak.school@gmail.com</td></tr>
+<tr><td data-label="בית ספר">תיכון קורצ'אק</td><td data-label="יישוב">באר שבע</td><td data-label="קשר">08-6171909 · twkbeer7@gmail.com</td></tr>
+<tr><td data-label="בית ספר">יסמין</td><td data-label="יישוב">בנימינה-גבעת עדה</td><td data-label="קשר">058-4001204 · office@yasmin-bga.org.il</td></tr>
+<tr><td data-label="בית ספר">במעלה ההר</td><td data-label="יישוב">בצת</td><td data-label="קשר">04-9808441 · school@maalehahar.org</td></tr>
+<tr><td data-label="בית ספר">בית חינוך לאה גולדברג</td><td data-label="יישוב">גבעתיים</td><td data-label="קשר">03-6053485 · orit@leagoldberg.org</td></tr>
+<tr><td data-label="בית ספר">תמר</td><td data-label="יישוב">הוד השרון</td><td data-label="קשר">09-7658082 · tamar.w.office@gmail.com</td></tr>
+<tr><td data-label="בית ספר">תיכון תמר</td><td data-label="יישוב">הוד השרון</td><td data-label="קשר">09-7658082 · tamar.w.office@gmail.com</td></tr>
+<tr><td data-label="בית ספר">אורים</td><td data-label="יישוב">הכפר הירוק</td><td data-label="קשר">03-6440920, 03-6479361 · urim@urim-edu.co.il</td></tr>
+<tr><td data-label="בית ספר">ענבר</td><td data-label="יישוב">הכפר הירוק</td><td data-label="קשר">054-9076909 · admin@inbar-school.co.il</td></tr>
+<tr><td data-label="בית ספר">הרדוף יסודי</td><td data-label="יישוב">הרדוף</td><td data-label="קשר">04-9059300 · yesodiharduf@gmail.com</td></tr>
+<tr><td data-label="בית ספר">הרדוף תיכון</td><td data-label="יישוב">הרדוף</td><td data-label="קשר">04-9058712 · tichonharduf@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית המעיין</td><td data-label="יישוב">חוקוק</td><td data-label="קשר">04-6799807 · bethamaayan@gmail.com</td></tr>
+<tr><td data-label="בית ספר">עלייה</td><td data-label="יישוב">חיפה</td><td data-label="קשר">04-8522105 · batgalim.waldorf@gmail.com</td></tr>
+<tr><td data-label="בית ספר">שקד</td><td data-label="יישוב">טבעון</td><td data-label="קשר">04-993157504-9531132 · shaked.tivon@gmail.com</td></tr>
+<tr><td data-label="בית ספר">תיכון שקד</td><td data-label="יישוב">טבעון</td><td data-label="קשר">04-6042738 · tichonshaked@gmail.com</td></tr>
+<tr><td data-label="בית ספר">יחיאל</td><td data-label="יישוב">טל שחר</td><td data-label="קשר">08-8668563; 054-7711235 · waldorf.school@yechiel.org</td></tr>
+<tr><td data-label="בית ספר">עודד</td><td data-label="יישוב">יודפת</td><td data-label="קשר">04-980089104-9800890 · odedsch@013net.net</td></tr>
+<tr><td data-label="בית ספר">תיכון עודד</td><td data-label="יישוב">יודפת</td><td data-label="קשר">04-980089104-9800890 · oded-highschool@outlook.co.il</td></tr>
+<tr><td data-label="בית ספר">הנני</td><td data-label="יישוב">ינוב - לב השרון · על אזורי</td><td data-label="קשר">055-2517116 · Schoolhineni@gmail.com</td></tr>
+<tr><td data-label="בית ספר">אדם</td><td data-label="יישוב">ירושלים</td><td data-label="קשר">02-5667404/3 · koladam2@gmail.com</td></tr>
+<tr><td data-label="בית ספר">תיכון אדם</td><td data-label="יישוב">ירושלים</td><td data-label="קשר">guyfrz@gmail.com</td></tr>
+<tr><td data-label="בית ספר">הדביר החדש</td><td data-label="יישוב">ירושלים</td><td data-label="קשר">02-6730529 · hadvir@gmail.com</td></tr>
+<tr><td data-label="בית ספר">קשת בגליל</td><td data-label="יישוב">כדורי</td><td data-label="קשר">050-3071256 · hetzvakeshet@gmail.com</td></tr>
+<tr><td data-label="בית ספר">שיבולים</td><td data-label="יישוב">נס ציונה</td><td data-label="קשר">08-9167793/4 · noga6633@gmail.com</td></tr>
+<tr><td data-label="בית ספר">תיכון שיבולים</td><td data-label="יישוב">נס ציונה</td><td data-label="קשר">08-9167793/4 · noga6633@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית חינוך במדבר</td><td data-label="יישוב">ספיר</td><td data-label="קשר">08-6592298 · bamidbar.antro@gmail.com</td></tr>
+<tr><td data-label="בית ספר">רימון</td><td data-label="יישוב">פרדס חנה-כרכור</td><td data-label="קשר">04-6380626 · office@rimon-edu.org.il</td></tr>
+<tr><td data-label="בית ספר">תיכון רימון</td><td data-label="יישוב">פרדס חנה-כרכור</td><td data-label="קשר">04-6377556 · tichonrimon@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית חינוך רון</td><td data-label="יישוב">פתח תקוה</td><td data-label="קשר">050-7659999 · beitchinuchron@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית מיתר</td><td data-label="יישוב">צופית</td><td data-label="קשר">09-9585470 · beit.meitar.school@gmail.com</td></tr>
+<tr><td data-label="בית ספר">מעיין</td><td data-label="יישוב">קיבוץ נען</td><td data-label="קשר">074-7046333 · office@maayan-school.com</td></tr>
+<tr><td data-label="בית ספר">בראשית</td><td data-label="יישוב">קריית אונו</td><td data-label="קשר">03-6747248 · bereshit.school.ko@gmail.com</td></tr>
+<tr><td data-label="בית ספר">שדמה</td><td data-label="יישוב">רחובות</td><td data-label="קשר">077-7292641 · reem.antro@gmail.com</td></tr>
+<tr><td data-label="בית ספר">זומר</td><td data-label="יישוב">רמת גן</td><td data-label="קשר">03-6723409 · zomerschool.rg@gmail.com</td></tr>
+<tr><td data-label="בית ספר">זומר תיכון</td><td data-label="יישוב">רמת גן</td><td data-label="קשר">03-7585430 · waldorfhigh@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית חינוך אלומות</td><td data-label="יישוב">שוהם / מ.א חבל מודיעין · על איזורי</td><td data-label="קשר">03-6704463 · info.school@antro.org.il</td></tr>
+<tr><td data-label="בית ספר">תמרת אל-זייתון</td><td data-label="יישוב">שפרעם</td><td data-label="קשר">04-9869044 · waldorf.tamratalziton@gmail.com</td></tr>
+<tr><td data-label="בית ספר">בית חינוך רעות</td><td data-label="יישוב">תל אביב</td><td data-label="קשר">073-3842818 · reut@antro-tlv.org</td></tr>
 </tbody></table></div>
 
 </section>
