@@ -8,7 +8,7 @@ Redesign project for the Hebrew (RTL) institutional website of "הפורום ה�
 
 **Current state**: Astro scaffold is in place (`package.json`, `astro.config.mjs`, `src/pages/`), but `src/pages/index.astro` is currently just a placeholder ("האתר בבנייה" / site under construction). The real content mockup lives outside Astro entirely, under `mockup/` — see "Working with the mockup" below. Astro has not yet been wired up to the actual site content.
 
-**Target production architecture** (per `docs/PRD-forum-waldorf-site.md`): Astro (SSG) for static content pages + React islands for interactive widgets, deployed on Cloudflare Pages, backed by Cloudflare Workers (API), D1 (SQLite), R2 (file storage), and Cloudflare Access (admin auth). Only the Astro/Pages half exists so far — the Workers API, D1 schema, and R2 pieces are not yet scaffolded. Check before referencing specific files/routes from that part of the stack.
+**Target production architecture** (per `docs/PRD-forum-waldorf-site.md`): Astro (SSG) for static content pages + React islands for interactive widgets, deployed on Cloudflare Pages, backed by Cloudflare Workers (API), D1 (SQLite), R2 (file storage), and Cloudflare Access (admin auth). The Workers API and D1 schema now exist for content (`content-api/`, live at `waldorf-content-api.orenknaan.workers.dev`) and for analytics (`analytics-worker/`), but they serve the mockup, not an Astro build: Astro itself is still an empty scaffold, and R2 and Cloudflare Access are not set up. Check before referencing specific files/routes from that part of the stack.
 
 ## Commands
 
@@ -46,11 +46,11 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 **Mockup-only implementation that the production build replaces:**
 
-4. `mockup/pages/data.js` + `mockup/pages/dynamic.js` — the client-side stand-in for the Workers/D1 API: seed content plus a localStorage overlay (`WStore`, keys `waldorf-mockup-cms-v1` and `waldorf-mockup-mine-v1`). Real content lives in D1; the localStorage layer has no production equivalent.
-5. 22 invented seed records flagged `demo: true` in `data.js`, which render a "רשומת הדגמה" chip. These are not real forum content — do not migrate them.
+4. `mockup/pages/store.js` + `mockup/pages/dynamic.js`: `WStore` now reads the D1 content API at `https://waldorf-content-api.orenknaan.workers.dev/api/content` (Worker and migrations in `content-api/`). `mockup/pages/data.js` is **dead**: it is still on disk but no page loads it, so do not read it and do not treat it as the content source. The only thing still in localStorage is which noticeboard submissions came from this browser (`waldorf-mockup-mine-v1`), which is a per-device fact with no server-side identity.
+5. Invented seed records flagged `demo: true`, which render a "רשומת הדגמה" chip. They now live in D1 (seeded from `content-api/migrations/0002_seed.sql`), not in `data.js`. These are not real forum content, so do not migrate them.
 6. `mockup/pages/admin/` (`admin.html`, `admin-dashboard.html`, `admin-app.js`, `admin-analytics.js`) — admin UI against `WStore`. **Published** at `/admin/` since 2026-08-22, so it is publicly reachable with no authentication — the password box on `admin.html` is decorative, there is no auth logic behind it. That is tolerable only because `WStore` is localStorage-only: a stranger's edits change their own browser and nothing else, there is no shared state. The analytics view is the one part reading real data, and it needs `DASH_KEY` from localStorage, which strangers do not have (the Worker 401s without it). Production admin is a real app behind Cloudflare Access — **do not carry this arrangement over**. It lives under `pages/` in a subdirectory on purpose: every patcher globs `readdirSync(pagesDir)` non-recursively, so the admin never picks up the site nav CSS or the analytics beacon.
 7. `mockup/pages/breadcrumb.js` resolves the JSON-LD `item` URLs to absolute at runtime because the mockup and production sit on different origins. In Astro this belongs at **build time** via `Astro.site`, not in a client script — port it, don't copy it.
-8. `mockup/build.mjs`, `mockup/responsive.mjs`, `mockup/embed-assets.mjs`, `mockup/patch-*.mjs` — generator/patch scripts for the prototype only.
+8. `mockup/build.mjs`, `mockup/responsive.mjs`, `mockup/embed-assets.mjs`, `mockup/patch-*.mjs` — generator/patch scripts for the prototype only. So are `mockup/search-index.mjs` and `mockup/vendor-minisearch.mjs`, which exist because the mockup has no build step; the search behaviour they produce is permanent, the scripts are not. See "Global search" below.
 9. `.github/workflows/pages.yml` — publishes `mockup/pages/` to GitHub Pages. Decide explicitly whether to retire it or keep it as a design reference; if it stays, the GitHub Pages URL stays public.
 10. Cloudflare Web Analytics is pointed at the **mockup host** (`orenknaan.github.io`), token in `mockup/analytics-config.mjs`, injected by `mockup/patch-analytics.mjs`. Cloudflare has no "clear data" action, so at cutover: delete the Web Analytics site, create a fresh one for `waldorf.co.il`, put the new token in the config and the new site tag in `analytics-worker/wrangler.toml`, re-run the patcher. Pre-launch numbers vanish with the old site — which is the intent.
 
@@ -74,6 +74,29 @@ This layer is **permanent** — it ports to production, unlike everything in the
 - `mockup/patch-accessibility.mjs` — idempotent patcher wiring the layer into every page (script tag, skip link, `id`/`tabindex` on `<main>`, footer link, `tabindex` on the `<span>` nav triggers). Setting `ENABLED = false` and re-running strips it back out. Re-run it after adding a page.
 
 Verified with axe-core 4.13 at `wcag2a, wcag2aa, wcag21a, wcag21aa` across all 42 content pages: **0 violations**, both in the default state and with every adjustment switched on. When changing markup, re-check rather than assuming — the audit also caught and fixed pre-existing failures (unlabelled contact-form fields, `--tan-dark` at 3.2:1 used as small body text, and the broken tablists).
+
+## Global search
+
+Like the accessibility layer, this is **permanent**: the behaviour ports to production. The three mockup scripts that produce it do not; see below.
+
+A magnifying-glass button in the header opens a search field that suggests results as you type. The engine is **MiniSearch 7.2** (MIT), chosen over the alternatives for concrete reasons worth keeping: Fuse.js scores fuzzily with no inverted index or real prefix semantics, Lunr forces an English stemmer, and Pagefind wants a build step and per-platform binaries the mockup has no place for. Pagefind is still the obvious candidate for the Astro build, where a build step exists.
+
+- `mockup/pages/search.js`: the widget. Injects its own `<style>` and its own button, so no page markup carries it. Loaded **deferred**, unlike `accessibility.js`: it has nothing to apply before first paint. Without JavaScript no button appears at all, which is the honest outcome for a search that is entirely client-side.
+  - The engine and the index are fetched lazily, on first open (and prefetched on hover), so a visitor who never searches pays nothing.
+  - Follows the ARIA 1.2 combobox pattern: `aria-expanded`/`aria-activedescendant` on the input, options as direct children of the listbox, arrow/Home/End/Escape, focus returned to the button on close.
+  - Styled with the site's **design tokens**, deliberately unlike the accessibility panel. This is ordinary chrome, so it should follow the palette, and it picks up `html.a11y-contrast` for free. The one hand-written exception is the high-contrast rule that puts the panel's background back, because the a11y layer blanks every background inside `.site-header`.
+- **Hebrew needs two things** the default tokenizer does not do, both in `tokenize()`/`processTerm()`. Abbreviation marks are folded away rather than treated as word breaks, so `תשפ"ז` stays one token. Final letters are folded to their medial forms, or `גן` would never prefix-match `גנים`, the single most common Hebrew search there is. Niqqud is stripped too, so unpointed typing finds pointed text.
+- `mockup/pages/minisearch.min.js`: vendored ESM bundle, 18.5 KB (5.9 KB gzipped). Committed because GitHub Pages serves `mockup/pages/` verbatim with no install step. Regenerate with `node mockup/vendor-minisearch.mjs` after bumping the dependency; do not hand-edit.
+- `mockup/patch-search.mjs`: idempotent patcher, adding the script tag plus `id="sec-…"` on every `<h2>` so a result can link to the section it matched instead of the top of a long page. `ENABLED = false` strips both back out. Re-run it after adding a page.
+- `mockup/search-index.mjs`: builds `mockup/pages/search-index.json`. **Run it after the patcher**, which owns the anchors; this script reads the ids back out of the HTML rather than recomputing them, so the two can never disagree.
+  - Indexes *sections*, not pages: one document per page intro plus one per `<h2>` card. 127 documents, 213 KB raw / 57 KB gzipped.
+  - Reads the dynamic collections from the **D1 content API**, not from `data.js` (see the content layer note in the cutover list; `data.js` is dead). Needs the network; without it the page half is still written, with a warning and a non-zero exit.
+  - Deliberately **not** indexed: `<span class="ph">` notes (questions addressed to us, not copy for readers), the breadcrumb/header/footer, and art-hero image captions.
+  - The index is therefore a **snapshot**. An item published through the admin changes D1 immediately but stays unfindable until this script runs again. In Astro that wants to be a deploy-time step, or the search moves behind a Worker querying D1 per request.
+
+Verified in headless Chrome over CDP: 30 functional checks, and axe-core 4.13 at the same four WCAG tags across all 42 pages closed, four pages with live results, the no-results state, and every accessibility adjustment switched on: **0 violations**. Re-check rather than assuming; the audit caught `--tan-dark` used as small text here too, exactly as the accessibility section warns.
+
+**Known pre-existing failures, not caused by search** (confirmed by re-running axe with the whole search layer removed from the DOM): `kinder-list.html` has `scrollable-region-focusable` on `.table-wrap` and `color-contrast` on Leaflet's attribution control. These contradict the 0-violations claim above and are unfixed.
 
 ## Migration requirement (important, don't skip)
 

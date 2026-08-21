@@ -2,9 +2,12 @@
 //
 //   node mockup/search-index.mjs
 //
-// Reads every content page under mockup/pages/ plus the seed records in
-// data.js, and writes mockup/pages/search-index.json: a flat list of
-// documents that search.js feeds to MiniSearch in the browser.
+// Reads every content page under mockup/pages/, plus the dynamic collections
+// from the D1 content API, and writes mockup/pages/search-index.json: a flat
+// list of documents that search.js feeds to MiniSearch in the browser.
+//
+// Needs the network, for the API half. Without it the page half is still
+// written, with a warning and a non-zero exit.
 //
 // The index is a list of *sections*, not pages: a page contributes one document
 // for its intro (everything above the first <h2>) and one per <h2> card. That
@@ -24,9 +27,10 @@
 //     indexing them makes every page a hit for every nav label.
 //   - index.html, a meta-refresh stub with no <main>.
 //
-// In production this whole file is replaced: content lives in D1, so the index
-// is built from the database at deploy time (or the search runs as a Worker
-// query). The document shape below is what the Astro build should reproduce.
+// In the Astro build this script is replaced rather than ported: the pages are
+// generated there, so their text is in hand without parsing HTML back out, and
+// the D1 half wants to run at deploy time (or move behind a Worker that queries
+// D1 per request). The document shape below is what to reproduce.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -148,19 +152,33 @@ for (const file of pageFiles) {
   }
 }
 
-// ---- seed records from data.js -------------------------------------------
+// ---- dynamic records from the content API ---------------------------------
 //
 // The dynamic collections are rendered into their host pages by dynamic.js at
 // runtime, so they are not in the static HTML and the extractor above cannot
-// see them. Read them from the same seed file the pages read, and point each
-// record at the page that lists it. Records a visitor added through the admin
-// live only in their own localStorage and are not indexed; the mockup has no
-// build step to re-run when they change. In production every one of these is a
-// D1 row and gets indexed like any other content.
-const dataSrc = readFileSync(join(pagesDir, 'data.js'), 'utf8');
-const scope = { window: {} };
-new Function('window', dataSrc)(scope.window);
-const data = scope.window.WALDORF_DATA || {};
+// see them. Read them from the same place the pages read them, and point each
+// record at the page that lists it.
+//
+// That place is now D1, behind the content API, not the old data.js seed file:
+// store.js replaced WStore's guts and nothing loads data.js any more. Reading
+// the file would index records the site no longer serves.
+//
+// The consequence is that the index is a snapshot. An editor who publishes a
+// news item through the admin changes D1 immediately, but that item stays
+// unfindable until this script runs again. Acceptable while the index is a
+// committed file; in the Astro build it wants to be a deploy-time step, or the
+// search moves behind a Worker that queries D1 per request.
+const API = 'https://waldorf-content-api.orenknaan.workers.dev/api/content';
+
+let data = {};
+let apiError = null;
+try {
+  const res = await fetch(API, { signal: AbortSignal.timeout(20000) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  data = await res.json();
+} catch (err) {
+  apiError = err.message;
+}
 
 // Which page renders each collection, and how to read a record's fields. Keep
 // this in step with the WDyn.render* calls in the pages: a collection missing
@@ -178,8 +196,9 @@ const COLLECTIONS = [
   { key: 'podcast', file: 'media.html', label: 'פודקאסט', title: (r) => r.title, text: (r) => [r.description, r.date, r.duration].filter(Boolean).join(' · ') },
 ];
 
-// Only what a visitor can actually see on the page. A draft event or an
-// unmoderated board post is not public, so it must not be findable.
+// The API already returns only published/approved rows, so this is a second
+// lock rather than the first: a draft event or an unmoderated board post is not
+// on the page, and must not be findable through search either.
 const isPublic = (r) => !r.status || r.status === 'published' || r.status === 'approved';
 
 let recordCount = 0;
@@ -219,3 +238,12 @@ if (unanchored) {
   console.log('Run node mockup/patch-search.mjs first to give them anchors.');
 }
 if (skipped.length) console.log(`Skipped (no <main>): ${skipped.join(', ')}`);
+if (apiError) {
+  // Written anyway: 97 pages worth of index still beats none. But a search that
+  // silently stopped covering every event, job and article looks like a working
+  // search, so say so and fail the exit code rather than let it pass in CI.
+  console.error(`\nWARNING: the content API was unreachable (${apiError}).`);
+  console.error('The index holds page content only: no events, news, jobs, library or media records.');
+  console.error(`API: ${API}`);
+  process.exitCode = 1;
+}
