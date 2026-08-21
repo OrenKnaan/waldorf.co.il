@@ -12,6 +12,10 @@
   'use strict';
 
   var CFG_KEY = 'waldorf-analytics-cfg-v1';
+  // The deployed Worker. Not a secret — it refuses every request that doesn't
+  // carry DASH_KEY, which is why the key field is left blank to be filled in
+  // once and remembered locally rather than committed to a public repo.
+  var DEFAULT_WORKER_URL = 'https://waldorf-analytics.orenknaan.workers.dev';
   var TIP_KEY = 'waldorf-analytics-tips-v1';
 
   /* ---------- שמות דפים בעברית במקום כתובות ---------- */
@@ -263,7 +267,7 @@
   /* ---------- מסך ההגדרה הראשוני ---------- */
   function setupScreen(mount, onDone) {
     var c = cfg();
-    var url = el('input', { type: 'url', placeholder: 'https://waldorf-analytics.<שם>.workers.dev', value: c.workerUrl || '' });
+    var url = el('input', { type: 'url', placeholder: DEFAULT_WORKER_URL, value: c.workerUrl || DEFAULT_WORKER_URL });
     var key = el('input', { type: 'password', placeholder: 'מפתח גישה (אם הוגדר)', value: c.dashKey || '' });
     var msg = el('p', { class: 'an-empty' });
     var save = el('button', { class: 'btn btn-primary', type: 'button', text: 'שמירה ובדיקת חיבור' });
@@ -291,6 +295,7 @@
       var b = e.body || {};
       if (b.error === 'unauthorized') return 'מפתח הגישה שגוי.';
       if (b.error === 'site_tag_missing') return 'לא הוגדר עדיין אתר ב-Cloudflare Web Analytics.';
+      if (b.error === 'api_token_missing') return 'חסר מפתח ה-API בצד השרת. הריצו: wrangler secret put CF_API_TOKEN';
       if (b.error === 'graphql_error') return 'Cloudflare החזיר שגיאה: ' + [].concat(b.detail || []).join('; ');
       return 'שגיאה ' + e.status + ' (' + (b.error || 'לא ידוע') + ').';
     }

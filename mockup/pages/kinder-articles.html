@@ -189,7 +189,7 @@
   .person{display:flex;gap:14px;align-items:flex-start;background:var(--white);border:1px solid var(--beige);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
   .avatar{width:56px;height:56px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;color:var(--white);font-size:1.25rem;background:radial-gradient(circle at 34% 28%,color-mix(in oklab,var(--wash-gold) 70%,#fff),color-mix(in oklab,var(--wash-rose) 55%,var(--tan)))}
   .person h3{margin:0 0 2px;font-family:var(--font-head);font-size:1.02rem;color:var(--brown-dark)}
-  .person .role{font-size:.82rem;color:var(--tan-dark);font-weight:500}
+  .person .role{font-size:.82rem;color:var(--text-muted);font-weight:500}
   .person p{margin:6px 0 0;font-size:.86rem;color:var(--text-muted)}
 
   /* ===== responsive ===== */
@@ -538,18 +538,7 @@
 
 </main>
 <footer class="site-footer">מוקאפ פנימי — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script>
-document.addEventListener('click', function (e) {
-  var btn = e.target.closest('.tab-btn');
-  if (!btn) return;
-  var group = btn.closest('.tabs');
-  group.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
-  group.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
-  btn.classList.add('active');
-  var target = group.querySelector('#' + btn.dataset.target);
-  if (target) target.classList.add('active');
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>
 <!-- Cloudflare Web Analytics -->

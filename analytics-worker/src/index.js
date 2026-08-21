@@ -120,6 +120,10 @@ export default {
       if (given !== env.DASH_KEY) return json({ error: 'unauthorized' }, 401, origin);
     }
     if (!env.CF_SITE_TAG) return json({ error: 'site_tag_missing' }, 503, origin);
+    // Without this the fetch below sends `Bearer undefined` and Cloudflare
+    // answers with an opaque auth error, which reads as "the dashboard is
+    // broken" rather than "one secret has not been set yet".
+    if (!env.CF_API_TOKEN) return json({ error: 'api_token_missing' }, 503, origin);
 
     const days = Number(url.searchParams.get('days') || 7);
     if (!ALLOWED_DAYS.includes(days)) {

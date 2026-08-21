@@ -278,17 +278,20 @@
     '.a11y-step-btn:disabled{opacity:.4;cursor:default}',
     '.a11y-step-val{min-width:58px;text-align:center;font-size:13.5px;font-weight:600;color:#6B4F35}',
 
-    '.a11y-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-block-start:12px}',
-    '.a11y-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;',
-    '  min-height:78px;padding:10px 6px;border:1px solid #E2D6C4;border-radius:12px;background:#fff;',
+    '.a11y-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-block-start:12px}',
+    '.a11y-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;',
+    '  min-height:70px;padding:9px 6px;border:1px solid #E2D6C4;border-radius:12px;background:#fff;',
     '  color:#3D2B1F;font:inherit;font-size:12.5px;font-weight:500;text-align:center;cursor:pointer;',
     '  transition:background .12s ease,border-color .12s ease}',
     '.a11y-toggle:hover{background:#F0E8DC}',
     '.a11y-toggle[aria-pressed="true"]{background:#6B4F35;border-color:#3D2B1F;color:#fff}',
     '.a11y-toggle svg{width:22px;height:22px;flex:0 0 auto}',
 
+    // Sticky, because with eight toggles the panel scrolls on most screens and
+    // "reset" plus the statement link are exactly what a stuck user reaches for.
     '.a11y-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;',
-    '  padding:10px 16px 14px;border-block-start:1px solid #E2D6C4}',
+    '  padding:10px 16px 14px;border-block-start:1px solid #E2D6C4;position:sticky;',
+    '  inset-block-end:0;background:#FAF6F0;border-radius:0 0 18px 18px}',
     '.a11y-reset{border:1px solid #C4A882;border-radius:9px;background:#fff;color:#3D2B1F;font:inherit;',
     '  font-size:13.5px;font-weight:500;padding:9px 14px;cursor:pointer}',
     '.a11y-reset:hover{background:#F0E8DC}',

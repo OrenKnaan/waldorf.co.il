@@ -42,6 +42,13 @@ a caller-supplied query, so it cannot be used as a general Cloudflare API proxy.
 5. **Dashboard** — open the admin, go to "ניתוח תנועה", paste the Worker URL and
    the `DASH_KEY`. Stored in `localStorage`, asked once.
 
+## Deployed
+
+`https://waldorf-analytics.orenknaan.workers.dev` (account `c2e5883…`, subdomain
+`orenknaan`). `CF_SITE_TAG` is pinned to the `orenknaan.github.io` Web Analytics
+site — note the account contains another site (`retreator.com`), so any ad-hoc
+query must filter on `siteTag` or it reports the wrong website.
+
 ## Endpoints
 
 | Path | Purpose |
