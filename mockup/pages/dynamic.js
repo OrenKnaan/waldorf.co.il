@@ -1,54 +1,15 @@
 /* dynamic.js — שכבת הדינמיקה של המוקאפ.
-   WStore: קריאה/כתיבה של אוספי תוכן — seed מ-data.js עם overlay ב-localStorage,
-   כך שעריכות בממשק הניהול משתקפות מיד בעמודים הציבוריים (באותו דפדפן).
-   WDyn: רינדור הרכיבים הציבוריים. בייצור WStore יוחלף בקריאות API (Workers/D1). */
+   WStore: קריאה/כתיבה של אוספי תוכן — מגיע מ-store.js מול D1 (content API),
+   כך שעריכה בממשק הניהול משתקפת בעמודים הציבוריים לכל המבקרים, לא רק באותו דפדפן.
+   WDyn: רינדור הרכיבים הציבוריים. */
 (function () {
   'use strict';
-  var LS_KEY = 'waldorf-mockup-cms-v1';
-  var MINE_KEY = 'waldorf-mockup-mine-v1';
-  var SEED = window.WALDORF_DATA || {};
-
-  function readLS(key) {
-    try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; }
-  }
-  function writeLS(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* private mode */ }
-  }
-
-  var WStore = {
-    _all: function () { return readLS(LS_KEY) || {}; },
-    get: function (col) {
-      var all = this._all();
-      var v = Object.prototype.hasOwnProperty.call(all, col) ? all[col] : SEED[col];
-      return v == null ? (col === 'about' ? null : []) : JSON.parse(JSON.stringify(v));
-    },
-    set: function (col, val) {
-      var all = this._all();
-      all[col] = val;
-      writeLS(LS_KEY, all);
-    },
-    add: function (col, item) {
-      item.id = item.id || 'x' + Date.now().toString(36);
-      var arr = this.get(col);
-      arr.unshift(item);
-      this.set(col, arr);
-      return item;
-    },
-    update: function (col, id, patch) {
-      var arr = this.get(col);
-      arr.forEach(function (it) { if (it.id === id) Object.assign(it, patch); });
-      this.set(col, arr);
-    },
-    remove: function (col, id) {
-      this.set(col, this.get(col).filter(function (it) { return it.id !== id; }));
-    },
-    reset: function () { try { localStorage.removeItem(LS_KEY); localStorage.removeItem(MINE_KEY); } catch (e) {} },
-    markMine: function (id) {
-      var mine = readLS(MINE_KEY) || [];
-      mine.push(id); writeLS(MINE_KEY, mine);
-    },
-    isMine: function (id) { return (readLS(MINE_KEY) || []).indexOf(id) !== -1; }
-  };
+  /* WStore now lives in store.js and is backed by the D1 content API.
+     It used to be defined here over data.js + localStorage; that is exactly the
+     hardcoded layer this change removes. Renderers below read it through the
+     same synchronous get(), but only after WStore.ready has resolved — see the
+     deferral wrapper at the bottom of this file. */
+  var WStore = window.WStore;
 
   /* ---------- עוזרי DOM (ללא innerHTML לתוכן משתמש — מניעת XSS) ---------- */
   function el(tag, attrs, children) {
@@ -462,18 +423,39 @@
   }
 
   window.WStore = WStore;
+  /* Every renderer mounts into an element and returns nothing, so deferring one
+     is invisible to the caller: the 43 pages calling WDyn.renderX(mount, ...)
+     inline did not have to change. On failure the mount says so in Hebrew
+     rather than staying mysteriously empty. */
+  function deferred(fn) {
+    return function () {
+      var args = arguments, self = this;
+      var mount = args[0] instanceof HTMLElement ? args[0] : null;
+      return WStore.ready.then(function () {
+        return fn.apply(self, args);
+      }).catch(function (err) {
+        if (mount) {
+          mount.textContent = '';
+          mount.appendChild(el('div', { class: 'dyn-empty',
+            text: 'לא ניתן לטעון את התוכן כרגע. רעננו את הדף או נסו שוב בעוד רגע.' }));
+        }
+        if (window.console) console.error('WStore load failed', err);
+      });
+    };
+  }
+
   window.WDyn = {
     injectCSS: injectCSS,
-    renderEvents: renderEvents,
-    renderNews: renderNews,
-    boardWidget: boardWidget,
-    renderSearchableList: renderSearchableList,
-    renderGroupedTeaching: renderGroupedTeaching,
-    renderVideos: renderVideos,
-    renderPodcast: renderPodcast,
-    renderMap: renderMap,
-    applyAbout: applyAbout,
-    renderHighlights: renderHighlights,
+    renderEvents: deferred(renderEvents),
+    renderNews: deferred(renderNews),
+    boardWidget: deferred(boardWidget),
+    renderSearchableList: deferred(renderSearchableList),
+    renderGroupedTeaching: deferred(renderGroupedTeaching),
+    renderVideos: deferred(renderVideos),
+    renderPodcast: deferred(renderPodcast),
+    renderMap: deferred(renderMap),
+    applyAbout: deferred(applyAbout),
+    renderHighlights: deferred(renderHighlights),
     upcomingEvents: upcomingEvents,
     approvedNews: approvedNews,
     eventCard: eventCard,

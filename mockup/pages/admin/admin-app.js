@@ -1,6 +1,6 @@
 /* admin-app.js — חיווט ממשק הניהול של המוקאפ ל-WStore.
-   כל טבלה נטענת מאותו מאגר שמזין את העמודים הציבוריים (data.js + overlay ב-localStorage),
-   כך שהוספה/עריכה/אישור כאן משתקפים מיד בעמודים הציבוריים באותו דפדפן. */
+   כל טבלה נטענת מאותו מאגר שמזין את העמודים הציבוריים — בסיס נתונים D1 מאחורי
+   content API — כך שהוספה/עריכה/אישור כאן משתקפים בעמודים הציבוריים לכל המבקרים. */
 (function () {
   'use strict';
   var el = WDyn.el, fmtDate = WDyn.fmtDate;
@@ -470,21 +470,71 @@
   }
 
   /* =============== איתחול =============== */
-  renderEventsAdmin();
-  renderNewsAdmin();
-  renderLibAdmin();
-  renderMediaAdmin();
-  renderModAdmin();
-  renderAboutAdmin();
-  renderMapAdmin();
-  refreshCounts();
+  /* התוכן מגיע מ-D1 דרך ה-API, כלומר לא זמין באופן מיידי כמו קודם. כל הציור
+     ממתין ל-WStore.ready; ללא זה כל טבלה הייתה נטענת ריקה ומדווחת שגיאה. */
+  function boot() {
+    renderEventsAdmin();
+    renderNewsAdmin();
+    renderLibAdmin();
+    renderMediaAdmin();
+    renderModAdmin();
+    renderAboutAdmin();
+    renderMapAdmin();
+    refreshCounts();
+  }
+
+  function fail(err) {
+    var main = document.querySelector('.content') || document.body;
+    var box = el('div', { class: 'notice crit', style: 'margin:20px' }, [
+      el('b', { text: 'לא ניתן לטעון את התוכן מהמאגר. ' }),
+      el('span', { text: err && err.status === 401
+        ? 'נדרש מפתח ניהול — הזינו אותו במסך ההגדרות.'
+        : 'בדקו את החיבור לאינטרנט ונסו לרענן.' })
+    ]);
+    main.insertBefore(box, main.firstChild);
+  }
+
+  WStore.ready.then(boot).catch(fail);
+
+  /* כתיבה נכשלה בשרת — הקאש נטען מחדש, אז מציירים שוב כדי לא להשאיר על המסך
+     עריכה שלא נשמרה. */
+  WStore.onChange(function (err) {
+    if (!WStore.isLoaded()) return;
+    refreshAll();
+    if (err) fail(err);
+  });
+
+  /* מפתח הניהול — נשמר בדפדפן בלבד, לא בקוד (המאגר ציבורי ב-GitHub). */
+  (function wireAdminKey() {
+    var input = $('#adminKey'), save = $('#adminKeySave'), clear = $('#adminKeyClear'), msg = $('#adminKeyMsg');
+    if (!input || !save) return;
+    if (WStore.hasAdminKey()) { input.placeholder = '•••••••• (מפתח שמור)'; if (msg) msg.textContent = 'מחובר עם מפתח ניהול'; }
+    save.addEventListener('click', function () {
+      var v = input.value.trim();
+      if (!v) { if (msg) msg.textContent = 'לא הוזן מפתח'; return; }
+      if (msg) msg.textContent = 'בודק…';
+      WStore.setAdminKey(v).then(function () {
+        input.value = ''; input.placeholder = '•••••••• (מפתח שמור)';
+        if (msg) msg.textContent = 'המפתח נשמר — התוכן נטען מחדש';
+        refreshAll();
+      }).catch(function () {
+        WStore.setAdminKey('');
+        if (msg) msg.textContent = 'המפתח נדחה — בדקו שהעתקתם אותו במלואו';
+      });
+    });
+    if (clear) clear.addEventListener('click', function () {
+      WStore.setAdminKey('').then(function () {
+        input.value = ''; input.placeholder = 'הדביקו כאן את המפתח';
+        if (msg) msg.textContent = 'המפתח נמחק מהדפדפן'; refreshAll();
+      });
+    });
+  })();
 
   var reset = $('#resetDemo');
   if (reset) reset.addEventListener('click', function () {
-    WStore.reset();
-    location.reload();
+    WStore.reset().then(function () { location.reload(); });
   });
 
-  /* רענון כשחוזרים לטאב (אם הוגשו מודעות מטאב אחר) */
-  window.addEventListener('focus', refreshAll);
+  /* רענון כשחוזרים לטאב (אם נערך תוכן ממקום אחר) */
+  window.addEventListener('focus', function () { WStore.reload().catch(function () {}); });
 })();

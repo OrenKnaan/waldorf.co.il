@@ -98,12 +98,15 @@
 
     '.wsearch-form{display:flex;align-items:center;gap:8px;padding:10px 14px;',
     '  border-block-end:1px solid var(--beige,#EFE6D8)}',
-    '.wsearch-form .wsearch-glass{color:var(--tan-dark,#A88B69);flex:none}',
+    // --tan-dark reads at 3.2:1 on white, under the 3:1 floor for a meaningful
+    // graphic once antialiasing is allowed for, and under AA wherever it is
+    // used as small text (see .wsearch-hit-where). --text-muted throughout.
+    '.wsearch-form .wsearch-glass{color:var(--text-muted,#7A6555);flex:none}',
     '.wsearch-input{flex:1;min-width:0;border:0;background:transparent;padding:8px 2px;',
     '  font:inherit;font-family:var(--font-body,inherit);color:var(--text,#3D2B1F)}',
     '.wsearch-input::placeholder{color:var(--text-muted,#6F6257);opacity:1}',
     '.wsearch-input:focus{outline:none}',
-    '.wsearch-form:focus-within{box-shadow:inset 0 0 0 2px var(--wash-gold,#E8C877)}',
+    '.wsearch-form:focus-within{box-shadow:inset 0 0 0 2px var(--brown,#6B4F35)}',
     '.wsearch-close{flex:none;width:34px;height:34px;display:flex;align-items:center;',
     '  justify-content:center;padding:0;border:0;border-radius:var(--radius-pill,999px);',
     '  background:transparent;color:var(--text-muted,#6F6257);cursor:pointer}',
@@ -115,7 +118,7 @@
     '.wsearch-hit:hover,.wsearch-hit.is-active{background:var(--beige,#EFE6D8)}',
     '.wsearch-hit-title{display:block;font-family:var(--font-head,inherit);font-weight:700;',
     '  color:var(--brown-dark,#3D2B1F);font-size:.98rem}',
-    '.wsearch-hit-where{display:block;font-size:.75rem;color:var(--tan-dark,#8A7053);margin-block-start:1px}',
+    '.wsearch-hit-where{display:block;font-size:.75rem;color:var(--text-muted,#7A6555);margin-block-start:1px}',
     '.wsearch-hit-snip{display:block;font-size:.84rem;color:var(--text-muted,#6F6257);margin-block-start:3px}',
     '.wsearch-hit mark{background:color-mix(in oklab,var(--wash-gold,#E8C877) 55%,transparent);',
     '  color:inherit;border-radius:3px;padding:0 1px}',
@@ -334,9 +337,12 @@
     clearResults();
     var matcher = buildMatcher(terms);
 
-    results.forEach(function (r, i) {
+    results.forEach(function (r) {
       var doc = byId[r.id];
       if (!doc) return;
+      // Position in `hits`, not in `results`: a result whose document went
+      // missing is skipped, and the two would drift apart from there on.
+      var i = hits.length;
 
       // A real <a> so the result behaves like a link (middle-click, copy
       // address, status bar), carrying role="option" so assistive tech hears

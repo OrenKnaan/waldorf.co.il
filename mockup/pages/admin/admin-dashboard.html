@@ -476,7 +476,20 @@ td.muted{color:var(--muted)}
           <p class="crumb">כמה אנשים מבקרים באתר, מה הם קוראים ומאיפה הגיעו — מבוסס על Cloudflare Web Analytics</p>
           <div id="analyticsAdmin"></div>
         </section>
-        <section class="view" data-view="set" hidden><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p>
+        <section class="view" data-view="set" hidden>
+          <div class="panel">
+            <div class="panel-head"><h2>חיבור למאגר התוכן</h2></div>
+            <p class="empty-hint">התוכן נשמר במסד נתונים משותף. ללא מפתח ניהול ניתן לצפות בתוכן המפורסם בלבד — עריכה, אישור מודעות וצפייה בטיוטות דורשים מפתח.</p>
+            <div class="field" style="padding:0 20px 18px;max-width:480px">
+              <label for="adminKey">מפתח ניהול</label>
+              <input id="adminKey" type="password" autocomplete="off" placeholder="הדביקו כאן את המפתח">
+              <div style="display:flex;gap:10px;margin-top:10px">
+                <button class="btn btn-primary btn-sm" id="adminKeySave" type="button" style="width:auto">שמירה</button>
+                <button class="btn btn-ghost btn-sm" id="adminKeyClear" type="button">ניקוי</button>
+                <span id="adminKeyMsg" class="empty-hint" style="align-self:center"></span>
+              </div>
+            </div>
+          </div><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p>
         <div style="padding:0 20px 18px"><button class="btn btn-ghost btn-sm" id="resetDemo" style="width:auto">איפוס נתוני ההדגמה (מוחק עריכות מקומיות)</button></div></div></section>
       </div>
     </div>
@@ -506,7 +519,7 @@ td.muted{color:var(--muted)}
   document.querySelectorAll('[data-goto]').forEach(function(b){ b.addEventListener('click',function(){var v=b.getAttribute('data-goto'); navTo(v,document.querySelector('.nav-link[data-view="'+v+'"]'));}); });
 })();
 </script>
-<script src="../data.js"></script>
+<script src="../store.js"></script>
 <script src="../dynamic.js"></script>
 <script src="./admin-analytics.js"></script>
 <script src="./admin-app.js"></script>
