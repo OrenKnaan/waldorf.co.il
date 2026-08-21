@@ -41,3 +41,6 @@ pnpm-debug.log*
 /*.pdf
 *.docx
 /Rav Messer API.txt
+
+# wrangler build output
+/analytics-worker/.wrangler/

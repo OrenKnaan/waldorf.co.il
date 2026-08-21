@@ -205,6 +205,66 @@ td.muted{color:var(--muted)}
   .search{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* ===== ניתוח תנועה ===== */
+  .an-toolbar{display:flex;align-items:center;gap:10px;margin:0 0 8px;flex-wrap:wrap}
+  .an-range{font:inherit;font-size:.9rem;padding:9px 14px;border-radius:var(--r-pill);
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);min-height:40px}
+  .an-updated{color:var(--muted);font-size:.82rem;margin:0 0 16px}
+  .an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 20px}
+  .an-kpi{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:16px 18px;box-shadow:var(--shadow)}
+  .an-kpi-top{display:flex;align-items:center;gap:6px}
+  .an-kpi-lbl{font-size:.84rem;color:var(--muted);font-weight:600}
+  .an-kpi-num{font-size:2rem;font-weight:700;color:var(--brown-dark);line-height:1.15;margin-top:4px}
+  .an-kpi-sub{font-size:.78rem;color:var(--muted)}
+  .an-panel .panel-head{gap:6px}
+  .an-note{margin:12px 20px 0;color:var(--muted);font-size:.82rem}
+  .an-empty{margin:18px 20px;color:var(--muted);font-size:.9rem}
+  .an-chart-wrap{padding:16px 20px 6px}
+  .an-chart{width:100%;height:auto;display:block}
+  .an-chart-bar{fill:var(--tan)}
+  .an-chart-bar:hover{fill:var(--brown)}
+  .an-chart-lbl{fill:var(--muted);font-size:10px}
+  .an-bars{list-style:none;margin:0;padding:10px 20px 16px;display:grid;gap:9px}
+  .an-bars li{display:grid;grid-template-columns:minmax(90px,10.5rem) 1fr auto;align-items:center;gap:12px}
+  .an-bar-name{font-size:.88rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .an-bar-track{background:var(--sink);border-radius:var(--r-pill);height:11px;overflow:hidden}
+  .an-bar-fill{display:block;height:100%;background:var(--tan);border-radius:var(--r-pill)}
+  .an-bar-num{font-size:.86rem;color:var(--muted);font-weight:600;min-width:3.2rem;text-align:start}
+  .an-vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:16px 20px}
+  .an-vital{background:var(--sink);border-radius:var(--r-lg);padding:14px 16px}
+  .an-vital-val{font-size:1.5rem;font-weight:700;color:var(--brown-dark);margin:6px 0 8px}
+  .an-limits{margin:14px 20px 18px;padding-inline-start:20px;color:var(--muted);font-size:.88rem;display:grid;gap:6px}
+  .an-setup{padding:18px 20px;display:grid;gap:14px;max-width:520px}
+  .an-setup label{display:grid;gap:6px;font-size:.86rem;color:var(--muted);font-weight:600}
+  .an-setup input{font:inherit;font-size:16px;padding:11px 13px;border:1px solid var(--line);
+    border-radius:var(--r);background:var(--paper);color:var(--ink)}
+
+  /* הסברים */
+  .an-tip-wrap{position:relative;display:inline-flex}
+  .an-tip{width:18px;height:18px;padding:0;border:0;border-radius:50%;cursor:pointer;
+    background:var(--beige);color:var(--muted);font-size:.72rem;font-weight:700;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center}
+  .an-tip:hover,.an-tip:focus-visible{background:var(--tan);color:#fff}
+  .an-tip-bubble{position:absolute;inset-block-start:26px;inset-inline-start:-8px;z-index:40;
+    width:max-content;max-width:290px;background:var(--brown-dark);color:#FBF6EE;
+    font-size:.8rem;font-weight:400;line-height:1.5;padding:9px 12px;border-radius:10px;
+    box-shadow:var(--shadow-lg);opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none;text-align:start}
+  .an-tip-wrap.open .an-tip-bubble{opacity:1;visibility:visible;transform:translateY(0)}
+  .tips-off .an-tip-wrap{display:none}
+
+  @media (max-width:1000px){
+    .an-kpis{grid-template-columns:repeat(2,1fr)}
+    .an-vitals{grid-template-columns:1fr}
+  }
+  @media (max-width:620px){
+    .an-kpis{grid-template-columns:1fr}
+    .an-bars li{grid-template-columns:minmax(80px,8rem) 1fr auto;gap:8px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .an-tip-bubble{transition:none}
+  }
 </style>
 </head>
 <body style="margin:0">
@@ -230,6 +290,9 @@ td.muted{color:var(--muted)}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</button>
       <button class="nav-link" data-view="about">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>אודות הפורום</button>
+      <div class="side-sec">מדידה</div>
+      <button class="nav-link" data-view="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 21V10M11 21V4M16 21v-7M21 21v-4"/></svg>ניתוח תנועה</button>
       <div class="side-sec">קהילה</div>
       <button class="nav-link" data-view="people">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</button>
@@ -404,6 +467,10 @@ td.muted{color:var(--muted)}
         </section>
         <section class="view" data-view="people" hidden><div class="panel"><div class="panel-head"><h2>נציגי פורום</h2></div><p class="empty-hint">ניהול חברי הפורום, תפקידים וקבוצות עבודה — המסך ייבנה בשלב הבא.</p></div></section>
         <section class="view" data-view="nl" hidden><div class="panel"><div class="panel-head"><h2>ניוזלטר</h2></div><p class="empty-hint">ניהול רשימות תפוצה ודיוור — יתחבר לשירות הדיוור שייבחר (סעיף 10 ב־PRD).</p></div></section>
+        <section class="view" data-view="analytics" hidden>
+          <p class="crumb">כמה אנשים מבקרים באתר, מה הם קוראים ומאיפה הגיעו — מבוסס על Cloudflare Web Analytics</p>
+          <div id="analyticsAdmin"></div>
+        </section>
         <section class="view" data-view="set" hidden><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p>
         <div style="padding:0 20px 18px"><button class="btn btn-ghost btn-sm" id="resetDemo" style="width:auto">איפוס נתוני ההדגמה (מוחק עריכות מקומיות)</button></div></div></section>
       </div>
@@ -413,7 +480,7 @@ td.muted{color:var(--muted)}
 <script>
 (function(){
   var root=document.documentElement; root.setAttribute('dir','rtl');
-  var TITLES={home:'לוח בקרה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
+  var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
   function navTo(view,btn){
     document.querySelectorAll('#dash .view').forEach(function(v){v.hidden=v.getAttribute('data-view')!==view;});
     document.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active');});
@@ -436,6 +503,7 @@ td.muted{color:var(--muted)}
 </script>
 <script src="./pages/data.js"></script>
 <script src="./pages/dynamic.js"></script>
+<script src="./admin-analytics.js"></script>
 <script src="./admin-app.js"></script>
 </body>
 </html>

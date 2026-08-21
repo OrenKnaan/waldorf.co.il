@@ -1,0 +1,15 @@
+# Read-only proxy in front of Cloudflare's GraphQL Analytics API.
+#
+# It exists because the browser cannot call api.cloudflare.com directly — that
+# endpoint sends no CORS headers and 400s the preflight — and because reading
+# the data needs an API token that must never reach the client.
+name = "waldorf-analytics"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+[vars]
+# Neither of these is secret: the account id and the Web Analytics site tag are
+# identifiers, not credentials. The credential is CF_API_TOKEN, set with
+# `wrangler secret put` — see README.md.
+CF_ACCOUNT_ID = "c2e58837297984adaa4cd6141ecd72cd"
+CF_SITE_TAG = ""
