@@ -14,6 +14,7 @@
   --ink:#3D2B1F; --muted:#7A6555; --line:#E7DECE;
   --ok:#5E7D52; --ok-bg:#E7EEDF; --warn:#B7791F; --warn-bg:#F6E8C8;
   --crit:#A5533F; --crit-bg:#F1DED7; --info:#5E93A8; --info-bg:#DDEBEF;
+  --tip-bg:#3D2B1F;
   --shadow:0 2px 12px rgba(61,43,31,.08); --shadow-lg:0 12px 34px rgba(61,43,31,.16);
   --r:9px; --r-lg:16px; --r-pill:999px;
   --font-head:'Antropos Hebrew','Frank Ruhl Libre','Arial Hebrew',serif;
@@ -42,8 +43,12 @@
 }
 :root[data-theme="dark"]{
   --cream:#1F1710; --beige:#2A2019; --paper:#2C221A; --sink:#251C15;
-  --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#120C07;
+  --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#F2E7D8;
   --ink:#F2E7D8; --muted:#B39C84; --line:#3A2D21;
+  /* Kept dark on purpose: this is a surface colour, not text. It is what the
+     old --brown-dark value was actually being used for in the one place that
+     wanted a dark background, while every other use was heading text. */
+  --tip-bg:#120C07;
   --ok:#9DC08A; --ok-bg:#26301F; --warn:#E0B65E; --warn-bg:#352a12;
   --crit:#D89079; --crit-bg:#35211a; --info:#8FC0CF; --info-bg:#16292f;
   --shadow:0 2px 12px rgba(0,0,0,.4); --shadow-lg:0 14px 36px rgba(0,0,0,.5);
@@ -247,7 +252,7 @@ td.muted{color:var(--muted)}
     display:inline-flex;align-items:center;justify-content:center}
   .an-tip:hover,.an-tip:focus-visible{background:var(--tan);color:#fff}
   .an-tip-bubble{position:absolute;inset-block-start:26px;inset-inline-start:-8px;z-index:40;
-    width:max-content;max-width:290px;background:var(--brown-dark);color:#FBF6EE;
+    width:max-content;max-width:290px;background:var(--tip-bg);color:#FBF6EE;
     font-size:.8rem;font-weight:400;line-height:1.5;padding:9px 12px;border-radius:10px;
     box-shadow:var(--shadow-lg);opacity:0;visibility:hidden;transform:translateY(-4px);
     transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none;text-align:start}

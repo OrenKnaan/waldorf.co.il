@@ -1,0 +1,14 @@
+# Content API for the mockup: D1 in, JSON out.
+#
+# Replaces the hardcoded seed arrays that used to ship inside data.js and the
+# per-browser localStorage overlay that sat on top of them. Both the admin and
+# the public pages now read from here, so an edit in the admin is the same
+# record the site renders.
+name = "waldorf-content-api"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "waldorf-content"
+database_id = "a8bb8c4e-5f95-4c8b-a246-2d4cf8adcc86"
