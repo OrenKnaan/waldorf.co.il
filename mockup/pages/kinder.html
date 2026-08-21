@@ -432,8 +432,10 @@
   ]
 }
 </script>
+<script src="./accessibility.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#main-content">דילוג לתוכן המרכזי</a>
 <header class="site-header">
   <button type="button" class="nav-toggle" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="primary-nav"><span class="bars" aria-hidden="true"></span></button>
   <div class="brand-row">
@@ -449,12 +451,12 @@
 <a class="dropdown-link" href="./forum-workgroups.html">קבוצות עבודה</a>
 <a class="dropdown-link" href="./forum-newsletter.html">איגרת תקופתית</a>
 </div></div>
-<div class="nav-item"><span class="nav-link nav-label" data-nav="waldorf">חינוך ולדורף<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
+<div class="nav-item"><span class="nav-link nav-label" tabindex="0" data-nav="waldorf">חינוך ולדורף<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
 <div class="dropdown">
 <a class="dropdown-link" href="./waldorf-characteristics.html">אפיונים מרכזיים</a>
 <a class="dropdown-link" href="./waldorf-foundations.html">יסודות חינוך ולדורף</a>
 </div></div>
-<div class="nav-item"><span class="nav-link nav-label" data-nav="inst">מוסדות חינוך<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
+<div class="nav-item"><span class="nav-link nav-label" tabindex="0" data-nav="inst">מוסדות חינוך<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
 <div class="dropdown">
 <div class="dropdown-head">גני ילדים</div>
 <a class="dropdown-link" href="./kinder.html">אודות גני הילדים</a>
@@ -467,7 +469,7 @@
 <div class="dropdown-sep"></div>
 <a class="dropdown-link" href="./teacher-training.html">הכשרת מורים</a>
 </div></div>
-<div class="nav-item"><span class="nav-link nav-label" data-nav="resources">מידע ומשאבים<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
+<div class="nav-item"><span class="nav-link nav-label" tabindex="0" data-nav="resources">מידע ומשאבים<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5l7 7 7-7"/></svg></span>
 <div class="dropdown">
 <a class="dropdown-link" href="./news.html">הודעות</a>
 <a class="dropdown-link" href="./events.html">אירועים</a>
@@ -485,7 +487,7 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main>
+<main id="main-content" tabindex="-1">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
@@ -530,7 +532,7 @@
 </section>
 
   </main>
-<footer class="site-footer">מוקאפ פנימי — הפורום הארצי לחינוך ולדורף</footer>
+<footer class="site-footer">מוקאפ פנימי — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
 <script>
 document.addEventListener('click', function (e) {
   var btn = e.target.closest('.tab-btn');

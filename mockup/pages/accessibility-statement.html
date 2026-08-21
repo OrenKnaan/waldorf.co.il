@@ -1,4 +1,4 @@
-<!-- @dsCard group="בית הספר" -->
+<!-- @dsCard group="ראשי" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>מוזיקה — מוקאפ</title>
+<title>הצהרת נגישות — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -150,6 +150,18 @@
   .ecard h3{margin:0;font-family:var(--font-head);font-size:1.02rem;color:var(--brown-dark)}
   .ecard .meta{font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .ecard .meta .icon-inline{width:13px;height:13px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  /* ===== כרטיסי קישור אופקיים ===== */
+  .linkcards{display:flex;flex-direction:column;gap:12px;margin:6px 0 4px}
+  .linkcard{display:flex;align-items:center;gap:16px;background:var(--white);border:1px solid var(--beige);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:16px 18px;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .linkcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--tan)}
+  .linkcard .mark{flex:0 0 46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:color-mix(in oklab,var(--wash-gold) 30%,var(--white));color:var(--brown)}
+  .linkcard .mark svg{width:22px;height:22px}
+  .linkcard .body{flex:1;min-width:0}
+  .linkcard h3{margin:0 0 3px;font-family:var(--font-head);font-size:1.04rem;color:var(--brown-dark)}
+  .linkcard p{margin:0;font-size:.88rem;color:var(--text-muted);line-height:1.55}
+  .linkcard .host{display:inline-block;margin-top:5px;font-size:.78rem;color:var(--tan-dark);direction:ltr;unicode-bidi:isolate}
+  .linkcard .go{flex:0 0 auto}
   /* ===== chips / filters ===== */
   .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
   .chip{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:500;color:var(--brown);background:var(--beige);border-radius:var(--radius-pill);padding:6px 14px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
@@ -410,6 +422,15 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* Page-specific responsive tweaks. patch-responsive.mjs stops rewriting at the
+     marker above, so anything below here survives a re-run. */
+  @media (max-width:560px){
+    .linkcard{flex-wrap:wrap;gap:12px;padding:14px}
+    .linkcard .mark{flex-basis:38px;height:38px}
+    .linkcard .body{flex:1 1 100%;order:2}
+    .linkcard .go{order:3;margin-inline-start:auto}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -425,20 +446,8 @@
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "בית הספר",
-      "item": "./school.html"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "תוכניות לימודים",
-      "item": "./curriculum.html"
-    },
-    {
-      "@type": "ListItem",
-      "position": 4,
-      "name": "מוזיקה",
-      "item": "./curriculum-music.html"
+      "name": "הצהרת נגישות",
+      "item": "./accessibility-statement.html"
     }
   ]
 }
@@ -503,38 +512,82 @@
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./school.html">בית הספר</a>
-<span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./curriculum.html">תוכניות לימודים</a>
-<span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">מוזיקה</span>
+<span class="crumb current" aria-current="page">הצהרת נגישות</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('data:image/jpeg;base64,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')"></div><div class="frame"><img src="data:image/jpeg;base64,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" alt="כוחות היצירה"></div><div class="cap"><b>כוחות היצירה</b><span>רישום צורה בגווני הצומח — ולדורף</span></div></div>
-  <h1>מוזיקה</h1>
-<p>זמרה יומית וניגון בכלי פנטטוני מלווים את הגן והיסודי הצעיר, ומתפתחים בהדרגה לתזמורת, מקהלה ולימוד תיאוריה — המוזיקה נוכחת כמעט בכל יום לימודים.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <h1>הצהרת נגישות</h1>
+<p>הפורום הארצי לחינוך ולדורף רואה בהנגשת האתר חלק מהשירות שהוא נותן לציבור. אנו פועלים כדי שכל אדם יוכל לגלוש באתר בעצמאות, בבטחה ובנוחות, ובכלל זה אנשים עם מוגבלות.</p>
+
 <section class="card">
-<div class="tabs" data-group="14">
-<div class="tab-buttons" role="tablist">
-<button type="button" class="tab-btn active" data-target="tab-14-0">כיתות א'-ג'</button>
-<button type="button" class="tab-btn" data-target="tab-14-1">כיתות ד'-ו'</button>
-<button type="button" class="tab-btn" data-target="tab-14-2">כיתות ז'-ח'</button>
-<button type="button" class="tab-btn" data-target="tab-14-3">תיכון</button>
-</div>
-<div class="tab-panel active" id="tab-14-0">
-<p>אפשר לדבר על הצבעוניות הפנימית של הצלילים: חשוב שהילד יחווה, יאזין, ישיר וינגן באווירה נפשית מתאימה, באמצעות מוזיקה באווירת הקווינטט. נגינה בחליליות, בנבל לילדים או בלירות נעשית עם כל הכיתה, תחילה ביחס לשירים הנלמדים וללא תווים. "דקדוק" ראשון ביסוד המוזיקלי (תווים) מתחיל במהלך כיתה ג'.</p>
-</div>
-<div class="tab-panel" id="tab-14-1">
-<p>עובדים על "הדקדוק המוזיקלי": בהקשר לשיעור החשבון, בו מתרגלים חישוב בשברים בכיתה ד', מתחילים לצרף ערכי-זמן ללימוד סימני התווים. יחסי סולמות-הצלילים המשניים לסולם הראשי מובילים לעיבוד פרקטי של הקדנצה. בכיתה ו' מתורגל ההבדל בין מז'ור ומינור, ומתפתח מתוך השירה החד-קולית הקנון הרב-קולי עד לפוליפוניה פשוטה.</p>
-</div>
-<div class="tab-panel" id="tab-14-2">
-<p>הנגינה והזמרה עומדות כשוות ערך להאזנה, מתוך הדגש על ההדדיות. המוזיקה — בדומה לאוריתמיה — מעניקה בתקופה זו סיוע חברתי ותרפויטי, ומסייעת לגאול את הנער מהבדידות שהוא מתחיל לחוות. התלמידים מכירים מלחינים וסגנונות מוזיקליים שונים, ומפתחים הבנה להלחנה.</p>
-</div>
-<div class="tab-panel" id="tab-14-3">
-<p>תוכנית הלימודים בתיכון כוללת אימון והכשרה מתמשכים במוזיקה — שירה, נגינה, ולעיתים פרויקטים מוזיקליים שנתיים משותפים לכיתה כולה.</p>
-</div>
-</div>
+<h2>רמת הנגישות של האתר</h2>
+<p>האתר נבנה לפי התקן הישראלי ת"י 5568, "קווים מנחים לנגישות תכנים באינטרנט", ברמת התאמה <span lang="en" dir="ltr">AA</span>. התקן מבוסס על מסמך ההנחיות <span lang="en" dir="ltr">WCAG 2.1</span> של ארגון <span lang="en" dir="ltr">W3C</span>.</p>
+<p>ההנגשה בוצעה בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג-2013.</p>
+</section>
+
+<section class="card">
+<h2>מה הונגש באתר</h2>
+<ul>
+<li>מבנה סמנטי לכל עמוד: כותרות בהיררכיה תקינה ואזורי תוכן מסומנים, כדי שקורא מסך יוכל לנווט ביניהם.</li>
+<li>קישור "דילוג לתוכן המרכזי" בראש כל עמוד, הנחשף בלחיצת <span lang="en" dir="ltr">Tab</span> ראשונה ומאפשר לדלג על תפריט הניווט.</li>
+<li>ניווט מלא במקלדת, כולל פתיחת תפריטי המשנה, בלי צורך בעכבר.</li>
+<li>סימון פוקוס ברור ובעל ניגודיות מספקת לכל רכיב שניתן להגיע אליו במקלדת.</li>
+<li>טקסט חלופי לתמונות בעלות משמעות, וסימון תמונות דקורטיביות כך שקורא מסך ידלג עליהן.</li>
+<li>ניגודיות צבעים העומדת ביחס הנדרש בין טקסט לרקע, ואי-הסתמכות על צבע בלבד כדי להעביר מידע.</li>
+<li>שפת העמוד מוגדרת כעברית, וקטעים בשפה אחרת מסומנים בנפרד.</li>
+<li>תצוגה מותאמת לנייד ולטאבלט, ותמיכה בהגדלת התצוגה של הדפדפן עד 200% בלי אובדן תוכן.</li>
+<li>כיבוד העדפת המערכת להפחתת תנועה <span lang="en" dir="ltr">(prefers-reduced-motion)</span>.</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>תפריט הנגישות</h2>
+<p>בפינה התחתונה של כל עמוד מופיע כפתור נגישות. לחיצה עליו פותחת תפריט התאמות אישיות, וההעדפות שתבחרו נשמרות בדפדפן וממשיכות לחול גם במעבר בין עמודי האתר.</p>
+<p>ההתאמות הזמינות:</p>
+<ul>
+<li><strong>גודל טקסט</strong>: הגדלה של עד 160% מהגודל הרגיל.</li>
+<li><strong>ריווח שורות</strong> ו<strong>ריווח אותיות</strong>: שלוש רמות, שהראשונה בהן עומדת בערכי המינימום של דרישת ריווח הטקסט בתקן.</li>
+<li><strong>ניגודיות גבוהה</strong>: תצוגה בשחור-לבן בניגודיות מרבית.</li>
+<li><strong>גווני אפור</strong>: ביטול הצבע בעמוד.</li>
+<li><strong>הדגשת קישורים</strong>: קו תחתון בולט לכל קישור.</li>
+<li><strong>הדגשת כותרות</strong>: מסגרת סביב כותרות העמוד.</li>
+<li><strong>גופן קריא</strong>: החלפת גופני האתר בגופן פשוט ואחיד.</li>
+<li><strong>סמן גדול</strong>: הגדלת סמן העכבר.</li>
+<li><strong>עצירת אנימציות</strong>: ביטול תנועה ומעברים בעמוד.</li>
+<li><strong>סרגל קריאה</strong>: קו אופקי העוקב אחר הסמן ומסייע להתמקד בשורה.</li>
+</ul>
+<p>כפתור "איפוס הגדרות" שבתחתית התפריט מחזיר את כל ההתאמות למצבן הרגיל.</p>
+</section>
+
+<section class="card">
+<h2>ניווט באמצעות מקלדת</h2>
+<ul>
+<li><span lang="en" dir="ltr">Tab</span>: מעבר לרכיב הבא. <span lang="en" dir="ltr">Shift + Tab</span>: חזרה לרכיב הקודם.</li>
+<li><span lang="en" dir="ltr">Enter</span> או <span lang="en" dir="ltr">Space</span>: הפעלת קישור או כפתור.</li>
+<li><span lang="en" dir="ltr">Esc</span>: סגירת תפריט הנגישות וחזרה לכפתור שפתח אותו.</li>
+<li>לחיצת <span lang="en" dir="ltr">Tab</span> ראשונה בעמוד חושפת את הקישור "דילוג לתוכן המרכזי".</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>מגבלות ידועות</h2>
+<p>למרות מאמצינו, ייתכן שיימצאו באתר רכיבים או תכנים שטרם הונגשו במלואם. אנו ממשיכים לשפר את האתר באופן שוטף.</p>
+<ul>
+<li>מסמכים להורדה שהועלו על ידי גורמים חיצוניים אינם בהכרח נגישים. אם נתקלתם במסמך שאינכם יכולים לקרוא, פנו אלינו ונספק את תוכנו בפורמט נגיש.</li>
+<li>תכנים המוטמעים מאתרים חיצוניים, כגון סרטוני וידאו, כפופים לרמת הנגישות של השירות שממנו הם מוטמעים.</li>
+<li><span class="ph">לבדיקה: האם קיימים באתר סרטונים הדורשים כתוביות או תמלול, ומי אחראי להפקתם</span></li>
+</ul>
+</section>
+
+<section class="card">
+<h2>פנייה בנושא נגישות</h2>
+<p>נתקלתם בקושי, בתקלה או ברכיב שאינו נגיש? נשמח לשמוע. פנייתכם תסייע לנו לשפר את האתר עבור כלל המשתמשים. בפנייתכם ציינו את כתובת העמוד, את הרכיב שבו נתקלתם בקושי ואת סוג הדפדפן או הטכנולוגיה המסייעת שבה אתם משתמשים.</p>
+<p><strong>רכז הנגישות של הפורום:</strong> <span class="ph">שם, טלפון, כתובת דוא"ל וכתובת למשלוח דואר של רכז הנגישות. פרט חובה לפי תקנה 92 לתקנות שוויון זכויות, טרם התקבל מהפורום</span></p>
+<p>עד שיתמנה רכז נגישות ייעודי, ניתן לפנות אלינו דרך <a href="./contact.html">עמוד יצירת הקשר</a>.</p>
+</section>
+
+<section class="card">
+<h2>עדכון ההצהרה</h2>
+<p><span class="ph">תאריך: הצהרת הנגישות תעודכן במועד עליית האתר לאוויר, ולאחר בדיקת נגישות מלאה על ידי מורשה נגישות שירות. עד אז ההצהרה מתארת את מצב המוקאפ בלבד</span></p>
 </section>
 
 </main>

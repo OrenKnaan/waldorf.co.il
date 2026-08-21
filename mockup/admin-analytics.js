@@ -60,6 +60,25 @@
       "waldorf-foundations.html": "יסודות חינוך וולדורף"
   };
 
+  /* Cloudflare's countryName dimension returns an ISO code ("IL", "ID"), which
+     means nothing to a Hebrew reader. Covers the countries this site plausibly
+     sees; anything else falls through to the raw code rather than guessing. */
+  var COUNTRY_NAMES = {
+    IL: 'ישראל', US: 'ארצות הברית', GB: 'בריטניה', DE: 'גרמניה', FR: 'צרפת',
+    NL: 'הולנד', CH: 'שווייץ', AT: 'אוסטריה', BE: 'בלגיה', SE: 'שוודיה',
+    NO: 'נורווגיה', DK: 'דנמרק', FI: 'פינלנד', IT: 'איטליה', ES: 'ספרד',
+    PT: 'פורטוגל', PL: 'פולין', CZ: 'צ׳כיה', HU: 'הונגריה', RO: 'רומניה',
+    RU: 'רוסיה', UA: 'אוקראינה', CA: 'קנדה', AU: 'אוסטרליה', NZ: 'ניו זילנד',
+    BR: 'ברזיל', AR: 'ארגנטינה', MX: 'מקסיקו', ZA: 'דרום אפריקה',
+    IN: 'הודו', ID: 'אינדונזיה', TH: 'תאילנד', JP: 'יפן', CN: 'סין',
+    KR: 'קוריאה הדרומית', SG: 'סינגפור', TR: 'טורקיה', GR: 'יוון',
+    CY: 'קפריסין', IE: 'אירלנד', EE: 'אסטוניה', LV: 'לטביה', LT: 'ליטא'
+  };
+  function prettyCountry(code) {
+    if (!code) return 'לא ידוע';
+    return COUNTRY_NAMES[String(code).toUpperCase()] || code;
+  }
+
   function prettyPage(path) {
     if (!path) return 'לא ידוע';
     var file = String(path).split('?')[0].split('#')[0].replace(/\/+$/, '');
@@ -183,20 +202,39 @@
   }
 
   /* ---------- מדדי מהירות ---------- */
-  // ספי Google לחוויית משתמש. מוצגים כמילים, לא כמספרים גולמיים.
+  // ספי Google לחוויית משתמש, בmilliseconds. מוצגים כמילים, לא כמספרים גולמיים.
+  //
+  // חשוב: Cloudflare מחזירה את מדדי הזמן ב-MICROSECONDS, לא במילישניות. אתר
+  // מהיר עם LCP של 432ms חוזר מה-API כ-432000. חלוקה ב-1000 נותנת מילישניות.
+  // (התגלה בבדיקה מול נתונים אמיתיים — לפני התיקון הדאשבורד הציג "432 שניות".)
+  var US_PER_MS = 1000;
   var VITALS = [
-    { key: 'lcp', name: 'זמן טעינת התוכן הראשי', unit: 'ms', good: 2500, poor: 4000,
+    { key: 'lcp', name: 'זמן טעינת התוכן הראשי', time: true, good: 2500, poor: 4000,
       help: 'כמה זמן לוקח עד שהחלק המרכזי של הדף מופיע על המסך. מתחת ל-2.5 שניות נחשב טוב.' },
-    { key: 'inp', name: 'מהירות התגובה ללחיצה', unit: 'ms', good: 200, poor: 500,
-      help: 'כמה זמן עובר מרגע שגולש לוחץ ועד שהאתר מגיב. מתחת ל-0.2 שניות נחשב טוב.' },
-    { key: 'cls', name: 'יציבות העמוד', unit: '', good: 0.1, poor: 0.25,
+    { key: 'inp', name: 'מהירות התגובה ללחיצה', time: true, good: 200, poor: 500,
+      help: 'כמה זמן עובר מרגע שגולש לוחץ ועד שהאתר מגיב. מתחת ל-0.2 שניות נחשב טוב. נמדד רק כשגולשים באמת לוחצים על משהו.' },
+    { key: 'cls', name: 'יציבות העמוד', time: false, good: 0.1, poor: 0.25,
       help: 'עד כמה תוכן "קופץ" ומזיז את מה שקוראים בזמן הטעינה. ככל שהמספר נמוך יותר — יציב יותר.' }
   ];
-  function vitalTone(v, d) { return v == null ? 'neutral' : v <= d.good ? 'ok' : v <= d.poor ? 'warn' : 'crit'; }
+
+  /** ערך גולמי -> מילישניות (או כמות שהיא, ל-CLS שהוא יחס ולא זמן). */
+  function vitalMs(v, d) {
+    if (v == null) return null;
+    return d.time ? v / US_PER_MS : v;
+  }
+  function vitalTone(v, d) {
+    var ms = vitalMs(v, d);
+    // אפס במדד זמן = לא נמדדה אף אינטראקציה, לא "מהיר להפליא".
+    if (ms == null || (d.time && ms === 0)) return 'neutral';
+    return ms <= d.good ? 'ok' : ms <= d.poor ? 'warn' : 'crit';
+  }
   function vitalWord(t) { return { ok: 'טוב', warn: 'סביר', crit: 'דורש שיפור', neutral: 'אין מספיק נתונים' }[t]; }
   function vitalValue(v, d) {
-    if (v == null) return '—';
-    return d.unit === 'ms' ? (v / 1000).toFixed(2) + ' שנ׳' : Number(v).toFixed(3);
+    var ms = vitalMs(v, d);
+    if (ms == null || (d.time && ms === 0)) return '—';
+    if (!d.time) return Number(ms).toFixed(3);
+    // מתחת לשנייה נוח יותר לקרוא במילישניות
+    return ms < 1000 ? Math.round(ms) + ' אלפיות שנ׳' : (ms / 1000).toFixed(2) + ' שנ׳';
   }
 
   /* ---------- טעינת נתונים ---------- */
@@ -331,7 +369,7 @@
       barList(refs)));
 
     mount.appendChild(el('div', { class: 'two-col' }, [
-      panel('מדינות', 'מאיפה בעולם גולשים באתר.', barList(countries)),
+      panel('מדינות', 'מאיפה בעולם גולשים באתר.', barList(countries, prettyCountry)),
       panel('סוג מכשיר', 'מחשב שולחני, טלפון נייד או טאבלט. חשוב כדי לדעת עבור איזה מסך לתכנן.',
         barList(data.devices, function (n) {
           return { desktop: 'מחשב', mobile: 'טלפון נייד', tablet: 'טאבלט' }[n] || n || 'לא ידוע';

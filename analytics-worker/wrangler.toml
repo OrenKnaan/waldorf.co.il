@@ -12,4 +12,4 @@ compatibility_date = "2026-08-01"
 # identifiers, not credentials. The credential is CF_API_TOKEN, set with
 # `wrangler secret put` — see README.md.
 CF_ACCOUNT_ID = "c2e58837297984adaa4cd6141ecd72cd"
-CF_SITE_TAG = ""
+CF_SITE_TAG = "a6b825436d6b480e88be93fa3e66c703"
