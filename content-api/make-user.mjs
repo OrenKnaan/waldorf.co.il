@@ -1,7 +1,8 @@
-// Prints the SQL that creates one admin user, with a freshly salted password
-// hash. Nothing here touches the database.
+// Prints the SQL that creates an admin user, or resets an existing one's
+// password, with a freshly salted hash. Nothing here touches the database.
 //
 //   node content-api/make-user.mjs "אורן כנען" you@example.com super_admin
+//   node content-api/make-user.mjs --reset you@example.com
 //
 // Then run what it prints:
 //
@@ -51,9 +52,37 @@ function password(len = 18) {
   return out;
 }
 
-const [name, email, role = 'editor'] = process.argv.slice(2);
+const args = process.argv.slice(2);
+// Single-quoted SQL literals: double any quote inside the values.
+const q = (s) => String(s).replace(/'/g, "''");
+const pass = password();
+
+if (args[0] === '--reset') {
+  const email = args[1];
+  if (!email) {
+    console.error('usage: node content-api/make-user.mjs --reset email@example.com');
+    process.exit(2);
+  }
+  console.log(`\nNew password for ${email} (shown once, store it in a password manager):\n\n    ${pass}\n`);
+  console.log('SQL (both statements, in this order):\n');
+  console.log(
+    `UPDATE users SET password_hash='${q(await hash(pass))}', updated_at=strftime('%s','now') ` +
+    `WHERE email='${q(email)}';`,
+  );
+  // Any session minted with the old password stays valid until it is deleted,
+  // so a leaked credential is only truly retired once these are gone too.
+  console.log(
+    `DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email='${q(email)}');\n`,
+  );
+  console.log('Run them with:\n');
+  console.log('    npx wrangler d1 execute waldorf-content --remote --command "<paste one statement>"\n');
+  process.exit(0);
+}
+
+const [name, email, role = 'editor'] = args;
 if (!name || !email) {
   console.error('usage: node content-api/make-user.mjs "Full Name" email@example.com [super_admin|admin|editor]');
+  console.error('       node content-api/make-user.mjs --reset email@example.com');
   process.exit(2);
 }
 if (!['super_admin', 'admin', 'editor'].includes(role)) {
@@ -61,10 +90,7 @@ if (!['super_admin', 'admin', 'editor'].includes(role)) {
   process.exit(2);
 }
 
-const pass = password();
 const id = 'u-' + webcrypto.randomUUID().slice(0, 8);
-// Single-quoted SQL literals: double any quote inside the values.
-const q = (s) => String(s).replace(/'/g, "''");
 
 console.log(`\nPassword for ${email} (shown once, store it in a password manager):\n\n    ${pass}\n`);
 console.log('SQL:\n');
