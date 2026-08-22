@@ -125,8 +125,13 @@
     '  color:var(--brown-dark,#3D2B1F);font-size:.98rem}',
     '.wsearch-hit-where{display:block;font-size:.75rem;color:var(--text-muted,#7A6555);margin-block-start:1px}',
     '.wsearch-hit-snip{display:block;font-size:.84rem;color:var(--text-muted,#6F6257);margin-block-start:3px}',
+    // Not color:inherit. The snippet is --text-muted (#7A6555), and over the
+    // gold highlight that lands at 3.5:1 against #ddcdb2, under AA for 13px
+    // text; the title escaped only because it is already --brown-dark. Setting
+    // the dark token here fixes the snippet and makes a highlight read as
+    // emphasis rather than as a wash over faint text.
     '.wsearch-hit mark{background:color-mix(in oklab,var(--wash-gold,#E8C877) 55%,transparent);',
-    '  color:inherit;border-radius:3px;padding:0 1px}',
+    '  color:var(--brown-dark,#3D2B1F);border-radius:3px;padding:0 1px}',
     '.wsearch-demo{display:inline-block;margin-inline-start:6px;vertical-align:1px;font-family:var(--font-body,inherit);',
     '  font-size:.68rem;font-weight:500;padding:1px 8px;border-radius:var(--radius-pill,999px);',
     '  background:#F3DDA7;color:var(--brown-dark,#3D2B1F)}',
