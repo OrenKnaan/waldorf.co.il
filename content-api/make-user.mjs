@@ -6,7 +6,11 @@
 //
 // Then run what it prints:
 //
-//   npx wrangler d1 execute waldorf-content --remote --command "<the INSERT>"
+//   npx wrangler d1 execute waldorf-content --remote --command "<the SQL>"
+//
+// The password is printed on your terminal and nowhere else. Do not paste it
+// into an issue, a chat or a commit; the whole point of a reset is to stop
+// doing that.
 //
 // This exists so a credential never has to live in a migration. Migrations are
 // committed, this repository is public, and a password hash in a public file is
@@ -29,7 +33,7 @@ const ITERATIONS = 100000;
 
 const b64 = (buf) => Buffer.from(new Uint8Array(buf)).toString('base64');
 
-async function hash(password) {
+async function hashPassword(password) {
   const salt = getRandomValues(new Uint8Array(16));
   const key = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
   const bits = await subtle.deriveBits({ name: 'PBKDF2', salt, iterations: ITERATIONS, hash: 'SHA-256' }, key, 256);
@@ -52,37 +56,35 @@ function password(len = 18) {
   return out;
 }
 
-const args = process.argv.slice(2);
-// Single-quoted SQL literals: double any quote inside the values.
-const q = (s) => String(s).replace(/'/g, "''");
-const pass = password();
+const argv = process.argv.slice(2);
 
-if (args[0] === '--reset') {
-  const email = args[1];
-  if (!email) {
+// ---- reset: rotate the password on an account that already exists ----------
+if (argv[0] === '--reset') {
+  const target = argv[1];
+  if (!target) {
     console.error('usage: node content-api/make-user.mjs --reset email@example.com');
     process.exit(2);
   }
-  console.log(`\nNew password for ${email} (shown once, store it in a password manager):\n\n    ${pass}\n`);
-  console.log('SQL (both statements, in this order):\n');
+  const pass = password();
+  const h = await hashPassword(pass);
+  const e = String(target).replace(/'/g, "''");
+  console.log(`\nNew password for ${target} (shown once, store it in a password manager):\n\n    ${pass}\n`);
+  console.log('SQL, both statements matter:\n');
+  // Ending every existing session is half the reset. A leaked password may
+  // already have been used, and a bearer token outlives the password that
+  // minted it.
   console.log(
-    `UPDATE users SET password_hash='${q(await hash(pass))}', updated_at=strftime('%s','now') ` +
-    `WHERE email='${q(email)}';`,
+    `UPDATE users SET password_hash='${h}', updated_at=strftime('%s','now') WHERE email='${e}'; ` +
+    `DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email='${e}');\n`,
   );
-  // Any session minted with the old password stays valid until it is deleted,
-  // so a leaked credential is only truly retired once these are gone too.
-  console.log(
-    `DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email='${q(email)}');\n`,
-  );
-  console.log('Run them with:\n');
-  console.log('    npx wrangler d1 execute waldorf-content --remote --command "<paste one statement>"\n');
+  console.log('Run it with:\n');
+  console.log('    npx wrangler d1 execute waldorf-content --remote --command "<paste the SQL>"\n');
   process.exit(0);
 }
 
-const [name, email, role = 'editor'] = args;
+const [name, email, role = 'editor'] = argv;
 if (!name || !email) {
   console.error('usage: node content-api/make-user.mjs "Full Name" email@example.com [super_admin|admin|editor]');
-  console.error('       node content-api/make-user.mjs --reset email@example.com');
   process.exit(2);
 }
 if (!['super_admin', 'admin', 'editor'].includes(role)) {
@@ -90,13 +92,16 @@ if (!['super_admin', 'admin', 'editor'].includes(role)) {
   process.exit(2);
 }
 
+const pass = password();
 const id = 'u-' + webcrypto.randomUUID().slice(0, 8);
+// Single-quoted SQL literals: double any quote inside the values.
+const q = (s) => String(s).replace(/'/g, "''");
 
 console.log(`\nPassword for ${email} (shown once, store it in a password manager):\n\n    ${pass}\n`);
 console.log('SQL:\n');
 console.log(
   `INSERT INTO users (id,name,email,role,password_hash,active,created_at,updated_at) ` +
-  `VALUES ('${q(id)}','${q(name)}','${q(email)}','${q(role)}','${q(await hash(pass))}',1,` +
+  `VALUES ('${q(id)}','${q(name)}','${q(email)}','${q(role)}','${q(await hashPassword(pass))}',1,` +
   `strftime('%s','now'),strftime('%s','now'));\n`,
 );
 console.log('Run it with:\n');
