@@ -50,9 +50,10 @@ ALTER TABLE singletons ADD COLUMN draft_value TEXT;
 --
 --   node content-api/make-user.mjs "Full Name" you@example.com super_admin
 --
--- It prints the INSERT with a freshly salted hash; pipe it to wrangler:
---
---   npx wrangler d1 execute waldorf-content --remote --command "<the INSERT>"
+-- It writes the INSERT to a temp file and prints the wrangler command for it.
+-- Use the file, not --command: the hash contains '$', and a double-quoted shell
+-- argument expands '$100000' away, storing a corrupted hash that no password
+-- will ever match.
 --
 -- Note that git history still carries the hash this file used to hold. Rotating
 -- that account's password is what actually retires it; deleting the line only

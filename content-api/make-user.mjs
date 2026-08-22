@@ -4,9 +4,12 @@
 //   node content-api/make-user.mjs "אורן כנען" you@example.com super_admin
 //   node content-api/make-user.mjs --reset you@example.com
 //
-// Then run what it prints:
-//
-//   npx wrangler d1 execute waldorf-content --remote --command "<the SQL>"
+// It writes the SQL to a file in the system temp directory and prints the
+// wrangler command that runs it. Deliberately a file rather than --command:
+// the hash contains '$', and inside a double-quoted shell argument the shell
+// expands '$100000' to nothing, so pasting the SQL writes a corrupted hash and
+// locks the account out for good. A temp file also cannot be committed by
+// accident the way a file in the repo can.
 //
 // The password is printed on your terminal and nowhere else. Do not paste it
 // into an issue, a chat or a commit; the whole point of a reset is to stop
@@ -20,6 +23,9 @@
 // argument would land in shell history, and a human-chosen password is the
 // thing the throttle in the Worker is compensating for.
 import { webcrypto } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const { subtle } = webcrypto;
 // Bound, not destructured: getRandomValues throws ERR_INVALID_THIS when it is
@@ -69,16 +75,17 @@ if (argv[0] === '--reset') {
   const h = await hashPassword(pass);
   const e = String(target).replace(/'/g, "''");
   console.log(`\nNew password for ${target} (shown once, store it in a password manager):\n\n    ${pass}\n`);
-  console.log('SQL, both statements matter:\n');
   // Ending every existing session is half the reset. A leaked password may
   // already have been used, and a bearer token outlives the password that
   // minted it.
-  console.log(
-    `UPDATE users SET password_hash='${h}', updated_at=strftime('%s','now') WHERE email='${e}'; ` +
-    `DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email='${e}');\n`,
-  );
-  console.log('Run it with:\n');
-  console.log('    npx wrangler d1 execute waldorf-content --remote --command "<paste the SQL>"\n');
+  const sql =
+    `UPDATE users SET password_hash='${h}', updated_at=strftime('%s','now') WHERE email='${e}';\n` +
+    `DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email='${e}');\n`;
+  const file = join(tmpdir(), `waldorf-reset-${Date.now()}.sql`);
+  writeFileSync(file, sql, 'utf8');
+  console.log('Apply it with:\n');
+  console.log(`    npx wrangler d1 execute waldorf-content --remote --file=${file}\n`);
+  console.log(`Then delete it:\n\n    rm ${file}\n`);
   process.exit(0);
 }
 
@@ -98,11 +105,12 @@ const id = 'u-' + webcrypto.randomUUID().slice(0, 8);
 const q = (s) => String(s).replace(/'/g, "''");
 
 console.log(`\nPassword for ${email} (shown once, store it in a password manager):\n\n    ${pass}\n`);
-console.log('SQL:\n');
-console.log(
+const insert =
   `INSERT INTO users (id,name,email,role,password_hash,active,created_at,updated_at) ` +
   `VALUES ('${q(id)}','${q(name)}','${q(email)}','${q(role)}','${q(await hashPassword(pass))}',1,` +
-  `strftime('%s','now'),strftime('%s','now'));\n`,
-);
-console.log('Run it with:\n');
-console.log('    npx wrangler d1 execute waldorf-content --remote --command "<paste the INSERT>"\n');
+  `strftime('%s','now'),strftime('%s','now'));\n`;
+const outFile = join(tmpdir(), `waldorf-user-${Date.now()}.sql`);
+writeFileSync(outFile, insert, 'utf8');
+console.log('Apply it with:\n');
+console.log(`    npx wrangler d1 execute waldorf-content --remote --file=${outFile}\n`);
+console.log(`Then delete it:\n\n    rm ${outFile}\n`);
