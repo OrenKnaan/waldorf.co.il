@@ -21,15 +21,37 @@
 const GRAPHQL = 'https://api.cloudflare.com/client/v4/graphql';
 const ALLOWED_DAYS = [1, 7, 30, 90];
 
-const cors = (origin) => ({
-  // The admin page is opened from disk during the mockup phase, which sends
-  // `Origin: null`, so echoing the origin back is the only thing that works.
-  'Access-Control-Allow-Origin': origin || '*',
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
-  'Access-Control-Allow-Headers': 'content-type,x-dash-key',
-  'Access-Control-Max-Age': '86400',
-  Vary: 'Origin',
-});
+// Origins allowed to call this API from a browser. An allowlist, not a mirror:
+// reflecting whatever Origin arrives means any page on the web can script calls
+// against this API using a visitor's browser. Credentials are not sent
+// cross-origin here, so the old behaviour was not an account-takeover hole, but
+// it does hand out the whole surface for free.
+//
+// *.pages.dev is matched by pattern because Cloudflare Pages mints a new
+// hostname for every branch and PR preview, which is where this is heading.
+const ALLOWED_ORIGINS = [
+  'https://orenknaan.github.io',
+  'https://waldorf.co.il',
+  'https://www.waldorf.co.il',
+];
+const originAllowed = (o) =>
+  Boolean(o) && (
+    ALLOWED_ORIGINS.includes(o) ||
+    /^https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev$/.test(o) ||
+    /^https:\/\/[a-z0-9-]+\.pages\.dev$/.test(o) ||
+    /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o)
+  );
+
+const cors = (origin) => {
+  const h = {
+    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+    'Access-Control-Allow-Headers': 'content-type,x-dash-key',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  };
+  if (originAllowed(origin)) h['Access-Control-Allow-Origin'] = origin;
+  return h;
+};
 
 const json = (body, status, origin) =>
   new Response(JSON.stringify(body), {
@@ -115,9 +137,14 @@ export default {
     if (url.pathname === '/health') return json({ ok: true, siteConfigured: Boolean(env.CF_SITE_TAG) }, 200, origin);
     if (url.pathname !== '/api/analytics') return json({ error: 'not_found' }, 404, origin);
 
-    if (env.DASH_KEY) {
-      const given = request.headers.get('x-dash-key') || url.searchParams.get('key');
-      if (given !== env.DASH_KEY) return json({ error: 'unauthorized' }, 401, origin);
+    // Fail closed. `if (env.DASH_KEY)` meant that forgetting to set the secret
+    // published the forum's traffic figures to anyone who found the URL, and
+    // did it silently: the endpoint looked like it was working.
+    if (!env.DASH_KEY) return json({ error: 'dash_key_missing' }, 503, origin);
+    // Header only. A key in the query string is a secret written into browser
+    // history, Referer headers and every log line that records the URL.
+    if (request.headers.get('x-dash-key') !== env.DASH_KEY) {
+      return json({ error: 'unauthorized' }, 401, origin);
     }
     if (!env.CF_SITE_TAG) return json({ error: 'site_tag_missing' }, 503, origin);
     // Without this the fetch below sends `Bearer undefined` and Cloudflare

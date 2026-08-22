@@ -35,7 +35,7 @@ a caller-supplied query, so it cannot be used as a general Cloudflare API proxy.
 
    ```
    npx wrangler secret put CF_API_TOKEN   # Account Analytics: Read
-   npx wrangler secret put DASH_KEY       # any random string; omit to leave open
+   npx wrangler secret put DASH_KEY       # any random string; required, the Worker 503s without it
    npx wrangler deploy
    ```
 
@@ -56,7 +56,7 @@ query must filter on `siteTag` or it reports the wrong website.
 | `GET /health` | liveness + whether `CF_SITE_TAG` is configured |
 | `GET /api/analytics?days=1\|7\|30\|90` | the whole dashboard payload in one call |
 
-`DASH_KEY`, when set, is required as `x-dash-key` header or `?key=`.
+`DASH_KEY` is required, and only as the `x-dash-key` header. It is not read from the query string: a key in a URL ends up in browser history, `Referer` headers and logs. With the secret unset the Worker returns 503 rather than serving the figures openly.
 
 ## What Cloudflare Web Analytics does and does not collect
 

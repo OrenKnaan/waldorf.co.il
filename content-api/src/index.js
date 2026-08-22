@@ -54,6 +54,47 @@ const sha256hex = async (s) => {
 };
 const SESSION_DAYS = 14;
 
+/* ---------------- login throttling ---------------- */
+// Without this, /api/auth/login is an unlimited guessing oracle against an
+// address an attacker already knows. Five misses buys a fifteen-minute pause
+// for that (email, ip) pair; a success clears the counter immediately, so a
+// legitimate user who mistypes twice and then gets it right is never delayed.
+const MAX_FAILS = 5;
+const LOCK_SECONDS = 15 * 60;
+
+const clientIp = (request) =>
+  request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
+
+/** Seconds the caller must wait, or 0 if they may try now. */
+async function loginRetryAfter(env, email, ip) {
+  const row = await env.DB.prepare(
+    'SELECT fails, first_fail FROM login_attempts WHERE email = ? AND ip = ?',
+  ).bind(email, ip).first();
+  if (!row || row.fails < MAX_FAILS) return 0;
+  const elapsed = Math.floor(Date.now() / 1000) - row.first_fail;
+  if (elapsed >= LOCK_SECONDS) {
+    // Window expired: clear it so the next miss starts a fresh count.
+    await env.DB.prepare('DELETE FROM login_attempts WHERE email = ? AND ip = ?').bind(email, ip).run();
+    return 0;
+  }
+  return LOCK_SECONDS - elapsed;
+}
+
+async function noteLoginFailure(env, email, ip) {
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare(
+    `INSERT INTO login_attempts (email, ip, fails, first_fail, last_fail)
+     VALUES (?, ?, 1, ?, ?)
+     ON CONFLICT(email, ip) DO UPDATE SET
+       fails = CASE WHEN ? - first_fail >= ? THEN 1 ELSE fails + 1 END,
+       first_fail = CASE WHEN ? - first_fail >= ? THEN ? ELSE first_fail END,
+       last_fail = ?`,
+  ).bind(email, ip, now, now, now, LOCK_SECONDS, now, LOCK_SECONDS, now, now).run();
+}
+
+const clearLoginFailures = (env, email, ip) =>
+  env.DB.prepare('DELETE FROM login_attempts WHERE email = ? AND ip = ?').bind(email, ip).run();
+
 /** Resolves the caller: a session bearer token, or the ADMIN_KEY escape hatch. */
 async function whoami(request, env) {
   const auth = request.headers.get('authorization') || '';
@@ -99,19 +140,45 @@ const COLLECTIONS = {
 
 const SINGLETONS = ['about'];
 
-const cors = (origin) => ({
-  'Access-Control-Allow-Origin': origin || '*',
-  // PUT is here because the singleton draft/publish endpoints use it; a method
-  // missing from this list fails the preflight, which looks like an auth error
-  // in the UI rather than a CORS one.
-  'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-  // 'authorization' matters: session logins send a bearer token, and a header
-  // missing from this list makes the browser fail the preflight before the
-  // request is ever sent — which reads as "login is broken", not "CORS".
-  'Access-Control-Allow-Headers': 'content-type,x-admin-key,authorization',
-  'Access-Control-Max-Age': '86400',
-  Vary: 'Origin',
-});
+// Origins allowed to call this API from a browser. An allowlist, not a mirror:
+// reflecting whatever Origin arrives means any page on the web can script calls
+// against this API using a visitor's browser. Credentials are not sent
+// cross-origin here, so the old behaviour was not an account-takeover hole, but
+// it does hand out the whole surface for free.
+//
+// *.pages.dev is matched by pattern because Cloudflare Pages mints a new
+// hostname for every branch and PR preview, which is where this is heading.
+const ALLOWED_ORIGINS = [
+  'https://orenknaan.github.io',
+  'https://waldorf.co.il',
+  'https://www.waldorf.co.il',
+];
+const originAllowed = (o) =>
+  Boolean(o) && (
+    ALLOWED_ORIGINS.includes(o) ||
+    /^https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev$/.test(o) ||
+    /^https:\/\/[a-z0-9-]+\.pages\.dev$/.test(o) ||
+    /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o)
+  );
+
+const cors = (origin) => {
+  const h = {
+    // PUT is here because the singleton draft/publish endpoints use it; a method
+    // missing from this list fails the preflight, which looks like an auth error
+    // in the UI rather than a CORS one.
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    // 'authorization' matters: session logins send a bearer token, and a header
+    // missing from this list makes the browser fail the preflight before the
+    // request is ever sent, which reads as "login is broken", not "CORS".
+    'Access-Control-Allow-Headers': 'content-type,x-admin-key,authorization',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  };
+  // No header at all for anything else. A request with no Origin (curl, another
+  // Worker) is not subject to CORS and is unaffected.
+  if (originAllowed(origin)) h['Access-Control-Allow-Origin'] = origin;
+  return h;
+};
 const json = (body, status, origin) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', ...cors(origin) } });
 
@@ -172,12 +239,26 @@ export default {
       if (parts[2] === 'login' && request.method === 'POST') {
         const { email, password } = (await request.json().catch(() => ({}))) || {};
         if (!email || !password) return json({ error: 'missing_credentials' }, 400, origin);
+
+        const ip = clientIp(request);
+        const wait = await loginRetryAfter(env, email, ip);
+        if (wait) {
+          return new Response(JSON.stringify({ error: 'too_many_attempts', retryAfter: wait }), {
+            status: 429,
+            headers: { 'content-type': 'application/json; charset=utf-8', 'Retry-After': String(wait), ...cors(origin) },
+          });
+        }
+
         const row = await env.DB.prepare('SELECT * FROM users WHERE email = ? AND active = 1').bind(email).first();
         // Same answer either way, so the response cannot be used to enumerate
         // which addresses have accounts.
         if (!row || !(await verifyPassword(password, row.password_hash))) {
+          // Counted for unknown addresses too, or the throttle itself would
+          // answer the enumeration question the 401 refuses to.
+          await noteLoginFailure(env, email, ip);
           return json({ error: 'bad_credentials' }, 401, origin);
         }
+        await clearLoginFailures(env, email, ip);
         const token = crypto.randomUUID() + crypto.randomUUID().replace(/-/g, '');
         await env.DB.prepare(
           `INSERT INTO sessions (token_hash,user_id,created_at,expires_at)
@@ -206,6 +287,9 @@ export default {
       const uid = parts[2];
 
       if (request.method === 'GET' && !uid) {
+        // super_admin, like every other method here. Without this an editor
+        // could read the whole roster: names, addresses, roles, last-login.
+        if (!boss) return json({ error: 'forbidden' }, 403, origin);
         const { results } = await env.DB.prepare(
           'SELECT id,name,email,role,active,last_login,created_at FROM users ORDER BY created_at',
         ).all();
