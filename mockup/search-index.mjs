@@ -58,6 +58,12 @@ const stripNoise = (html) =>
     .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
     .replace(/<nav class="pagebanner"[\s\S]*?<\/nav>/i, ' ')
     .replace(/<span class="ph">[\s\S]*?<\/span>/gi, ' ')
+    // Visually-hidden headings exist to repair the outline for screen readers.
+    // They are not section titles, so they must not start a section: removing
+    // the whole element before the split leaves the content under them
+    // attributed to the real section that encloses it. Skipping the section
+    // instead threw that content away, which quietly emptied links.html.
+    .replace(/<h[1-6][^>]*\bclass="[^"]*\bsr-only\b[^>]*>[\s\S]*?<\/h[1-6]>/gi, ' ')
     // The art-hero caption is an image title and credit. It sits above the
     // page lede, so leaving it in makes every hero-bearing page open its
     // result snippet with "רישום צורה בגווני הצומח, ולדורף" instead of the

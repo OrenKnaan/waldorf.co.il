@@ -633,6 +633,15 @@
       return;
     }
     var boss = me.role === 'super_admin';
+    // The roster is super_admin-only on the server. Say so, rather than drawing
+    // a table whose only possible content is a 403.
+    if (!boss) {
+      host.appendChild(el('div', { class: 'panel' }, [
+        el('div', { class: 'panel-head' }, [el('h2', { text: 'משתמשי המערכת' })]),
+        el('p', { class: 'empty-hint', text: 'ניהול המשתמשים שמור למנהל־על. לשינוי הסיסמה שלכם פנו למנהל־על.' })
+      ]));
+      return;
+    }
 
     var panel = el('div', { class: 'panel' });
     var head = el('div', { class: 'panel-head' }, [

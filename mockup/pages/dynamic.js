@@ -39,7 +39,7 @@
   /* ---------- עיצוב הרכיבים (משתמש במשתני ה-CSS הקיימים של העמודים) ---------- */
   var CSS = [
     '.dyn-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}',
-    '.dyn-toolbar input[type=search],.dyn-toolbar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:8px 16px;min-width:0}',
+    '.dyn-toolbar input[type=search],.dyn-toolbar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic,999px);padding:8px 16px;min-width:0}',
     '.dyn-toolbar input[type=search]{flex:1;min-width:170px}',
     '.dyn-toolbar input[type=search]:focus,.dyn-toolbar select:focus{outline:none;border-color:var(--tan)}',
     '.dyn-empty{background:var(--beige);border-radius:var(--radius-lg);padding:22px;text-align:center;color:var(--text-muted);font-size:.92rem}',
@@ -47,7 +47,7 @@
     '.dyn-item h3{margin:0 0 4px;font-family:var(--font-head);font-size:1.05rem;color:var(--brown-dark)}',
     '.dyn-item p{margin:4px 0;font-size:.9rem}',
     '.dyn-meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;font-size:.76rem;justify-content:flex-end}',
-    '.dyn-chip{background:var(--beige);color:var(--brown);border-radius:var(--radius-pill);padding:2px 11px;font-weight:500}',
+    '.dyn-chip{background:var(--beige);color:var(--brown);border-radius:var(--radius-organic-sm,999px);padding:2px 11px;font-weight:500}',
     '.dyn-chip.cat{background:color-mix(in oklab,var(--wash-gold) 34%,var(--white));color:var(--brown-dark)}',
     '.dyn-chip.pend{background:#F3DDA7;color:var(--brown-dark);font-weight:600}',
     '.dyn-chip.demo{background:color-mix(in oklab,var(--wash-sky) 26%,var(--white));color:var(--brown-dark)}',
@@ -59,7 +59,7 @@
     '.dyn-event .date-badge span{font-size:.76rem;color:var(--text-muted)}',
     '.dyn-event.past{opacity:.62}',
     '.dyn-event .body{flex:1;min-width:220px}',
-    '.dyn-btn{display:inline-block;font-family:var(--font-body);font-size:.85rem;font-weight:600;color:#fff;background:var(--brown);border:none;border-radius:var(--radius-pill);padding:8px 20px;cursor:pointer;text-decoration:none}',
+    '.dyn-btn{display:inline-block;font-family:var(--font-body);font-size:.85rem;font-weight:600;color:#fff;background:var(--brown);border:none;border-radius:var(--radius-organic,999px);padding:8px 20px;cursor:pointer;text-decoration:none}',
     // These buttons are <a> elements, and the page stylesheet carries a bare
     // a:hover{color:var(--brown-dark)} that outranks .dyn-btn's own colour on
     // specificity (0,1,1 against 0,1,0). Without restating the colour here,
@@ -81,7 +81,7 @@
     '.dyn-form input:focus,.dyn-form select:focus,.dyn-form textarea:focus{outline:none;border-color:var(--tan)}',
     '.dyn-form textarea{min-height:74px;resize:vertical}',
     '.dyn-form .actions{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
-    '.dyn-form .ok-msg{color:var(--brown-dark);background:#E7EEDF;border-radius:var(--radius-pill);padding:6px 15px;font-size:.84rem;font-weight:600}',
+    '.dyn-form .ok-msg{color:var(--brown-dark);background:#E7EEDF;border-radius:var(--radius-organic,999px);padding:6px 15px;font-size:.84rem;font-weight:600}',
     '.dyn-note{font-size:.8rem;color:var(--text-muted);margin:2px 0 14px}',
     '.dyn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}',
     '.dyn-video{background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}',

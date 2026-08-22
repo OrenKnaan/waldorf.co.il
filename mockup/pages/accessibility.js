@@ -300,7 +300,10 @@
     '.a11y-stmt:hover{color:#3D2B1F}',
 
     '.a11y-root :is(button,a):focus-visible{outline:3px solid #6B4F35;outline-offset:2px}',
-    '.a11y-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;',
+    // .sr-only rides along: only 5 of the 43 pages defined it for themselves,
+    // so a heading added to fix an outline could not rely on it existing. This
+    // file is on every page, which makes it the one place the class is certain.
+    '.a11y-sr,.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;',
     '  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}',
 
     // מתחת ל-560px התפריט הופך ליריעה תחתונה ברוחב מלא, והכפתורים

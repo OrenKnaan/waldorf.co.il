@@ -14,7 +14,12 @@
 //      focus actually moves there rather than only the scroll position.
 //   4. A footer link to the accessibility statement, which Israeli service
 //      accessibility regulations require to be reachable from every page.
-//   5. tabindex on the <span> nav triggers. They have no page of their own, so
+//   5. aria-label on the main <nav>. Every page carries two nav landmarks, the
+//      menu and the breadcrumb, and only the breadcrumb was named. Two
+//      landmarks of the same role are told apart by their names, so an
+//      unnamed one leaves a screen-reader user choosing between "navigation"
+//      and "breadcrumb" with no idea which is the menu.
+//   6. tabindex on the <span> nav triggers. They have no page of their own, so
 //      build.mjs emits them as spans, which are not in the tab order at all,
 //      which left every dropdown link unreachable by keyboard (WCAG 2.1.1).
 //      The `.nav-item:focus-within > .dropdown` rule in accessibility.js is the
@@ -40,6 +45,7 @@ const FOOTER_LINK =
 const SCRIPT_RE = /\n?<script src="\.\/accessibility\.js"><\/script>/;
 const SKIP_RE = /\n?<a class="skip-link" href="#main-content">[^<]*<\/a>/;
 const FOOTER_RE = /<span class="footer-sep"[^>]*>[^<]*<\/span><a class="footer-a11y"[^>]*>[^<]*<\/a>/;
+const NAV_LABEL = ' aria-label="ניווט ראשי"';
 
 let changed = 0;
 let unchanged = 0;
@@ -63,7 +69,8 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(SKIP_RE, '')
     .replace(FOOTER_RE, '')
     .replace(/<main id="main-content" tabindex="-1">/g, '<main>')
-    .replace(/(<span class="nav-link nav-label")\s+tabindex="0"/g, '$1');
+    .replace(/(<span class="nav-link nav-label")\s+tabindex="0"/g, '$1')
+    .replace(/<nav aria-label="ניווט ראשי">(\s*<div class="primary-nav")/g, '<nav>$1');
 
   if (ENABLED) {
     if (!next.includes('</head>')) throw new Error(`${file}: no </head> to anchor the script to`);
@@ -78,6 +85,10 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     next = next.replace('</footer>', `${FOOTER_LINK}</footer>`);
 
     next = next.replace(/<span class="nav-link nav-label"/g, '<span class="nav-link nav-label" tabindex="0"');
+
+    // Anchored on the wrapper the menu actually lives in, so the breadcrumb
+    // <nav> (already labelled) is never touched.
+    next = next.replace(/<nav>(\s*<div class="primary-nav")/g, `<nav${NAV_LABEL}>$1`);
   }
 
   if (next === html) { unchanged += 1; continue; }

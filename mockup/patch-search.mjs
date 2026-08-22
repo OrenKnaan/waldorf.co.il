@@ -86,6 +86,10 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     const seen = new Map();
     next = next.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/g, (match, attrs, inner) => {
       if (/\sid=/.test(attrs)) return match;
+      // A visually-hidden heading exists to repair the outline for screen
+      // readers, not to name a place on the page. Anchoring a search result to
+      // one would send the visitor to a heading they cannot see.
+      if (/\bclass="[^"]*\bsr-only\b/.test(attrs)) return match;
       const text = headingText(inner);
       if (!text) return match;
       const base = sectionId(text);
