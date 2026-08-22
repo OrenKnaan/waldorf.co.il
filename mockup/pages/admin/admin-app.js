@@ -343,40 +343,133 @@
 
   /* =============== אודות הפורום =============== */
   var ABOUT_DEFAULT_HINT = 'ריק = יוצג הטקסט הקבוע של העמוד. שורות שמתחילות ב"- " יהפכו לרשימה.';
+  /* =============== אודות הפורום — טיוטה, פרסום, היסטוריה ושחזור =============== */
+  var ABOUT_SECTIONS = [['intro', 'מבוא'], ['activities', 'פעילויות שוטפות'], ['admission', 'קבלת בתי ספר לארגון']];
+
   function renderAboutAdmin() {
     var host = $('#aboutAdmin');
+    if (!host) return;
     host.textContent = '';
-    var about = WStore.get('about') || {};
-    var areas = {};
-    var panel = el('div', { class: 'panel' }, [
-      el('div', { class: 'panel-head' }, [el('h2', { text: 'תוכן העמוד' }), el('div', { class: 'grow' })]),
-      el('form', { class: 'aform', style: 'border-bottom:none' }, [
-        ['intro', 'מבוא'], ['activities', 'פעילויות שוטפות'], ['admission', 'קבלת בתי ספר לארגון']
-      ].map(function (pair) {
-        var ta = el('textarea', { style: 'min-height:110px' });
-        ta.value = about[pair[0]] || '';
-        areas[pair[0]] = ta;
-        return el('label', { class: 'wide' }, [document.createTextNode(pair[1]), ta]);
-      }).concat([
-        el('p', { class: 'empty-hint', style: 'padding:0;grid-column:1/-1', text: ABOUT_DEFAULT_HINT }),
-        el('div', { class: 'actions' }, [
-          el('button', { class: 'btn btn-primary btn-sm', type: 'submit', style: 'width:auto', text: 'שמירה ופרסום' }),
-          el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'שחזור ברירת המחדל', onclick: function () {
-            WStore.set('about', null);
-            renderAboutAdmin();
-          } })
-        ])
-      ]))
-    ]);
-    panel.querySelector('form').addEventListener('submit', function (e) {
-      e.preventDefault();
+    var areas = {}, statusPillEl, msgEl;
+
+    function values() {
       var out = {};
       Object.keys(areas).forEach(function (k) { if (areas[k].value.trim()) out[k] = areas[k].value.trim(); });
-      WStore.set('about', Object.keys(out).length ? out : null);
-      e.target.querySelector('.btn-primary').textContent = 'נשמר ✓';
-      setTimeout(function () { var b = panel.querySelector('.btn-primary'); if (b) b.textContent = 'שמירה ופרסום'; }, 1600);
-    });
+      return out;
+    }
+    function fill(obj) {
+      ABOUT_SECTIONS.forEach(function (p) { areas[p[0]].value = (obj && obj[p[0]]) || ''; });
+    }
+    function say(text, tone) {
+      if (!msgEl) return;
+      msgEl.textContent = text || '';
+      msgEl.className = 'empty-hint' + (tone ? ' ' + tone : '');
+    }
+
+    var editor = el('form', { class: 'aform', style: 'border-bottom:none' },
+      ABOUT_SECTIONS.map(function (pair) {
+        var ta = el('textarea', { style: 'min-height:110px' });
+        areas[pair[0]] = ta;
+        return el('label', { class: 'wide' }, [document.createTextNode(pair[1]), ta]);
+      }));
+    editor.addEventListener('submit', function (e) { e.preventDefault(); });
+
+    var btnDraft = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'שמירה כטיוטה' });
+    var btnPublish = el('button', { class: 'btn btn-primary btn-sm', type: 'button', style: 'width:auto', text: 'פרסום' });
+    var btnDiscard = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'ביטול הטיוטה' });
+    statusPillEl = el('span', { class: 'pill neutral', text: '—' });
+    msgEl = el('span', { class: 'empty-hint', style: 'align-self:center' });
+
+    var panel = el('div', { class: 'panel' }, [
+      el('div', { class: 'panel-head' }, [
+        el('h2', { text: 'תוכן העמוד' }), statusPillEl, el('div', { class: 'grow' })
+      ]),
+      editor,
+      el('div', { class: 'actions', style: 'padding:0 20px 18px;display:flex;gap:10px;flex-wrap:wrap' },
+         [btnPublish, btnDraft, btnDiscard, msgEl])
+    ]);
+    var historyPanel = el('div', { class: 'panel' }, [
+      el('div', { class: 'panel-head' }, [el('h2', { text: 'היסטוריית שינויים' }), el('div', { class: 'grow' })])
+    ]);
+    var historyBody = el('div');
+    historyPanel.appendChild(historyBody);
     host.appendChild(panel);
+    host.appendChild(historyPanel);
+
+    function refreshState() {
+      return WStore.aboutState().then(function (st) {
+        // A draft, if one exists, is what the editor should be working on —
+        // otherwise you would silently overwrite it with the published text.
+        fill(st.hasDraft ? st.draft : st.published);
+        statusPillEl.textContent = st.hasDraft ? 'יש טיוטה שלא פורסמה' : (st.published ? 'מפורסם' : 'לא נכתב עדיין');
+        statusPillEl.className = 'pill ' + (st.hasDraft ? 'warn' : st.published ? 'ok' : 'neutral');
+        btnDiscard.style.display = st.hasDraft ? '' : 'none';
+      });
+    }
+
+    function refreshHistory() {
+      historyBody.textContent = '';
+      return WStore.aboutVersions().then(function (list) {
+        historyBody.textContent = '';
+        if (!list.length) {
+          historyBody.appendChild(el('p', { class: 'empty-hint', text: 'טרם נשמרו גרסאות. כל שמירה או פרסום ייווספו כאן.' }));
+          return;
+        }
+        var t = makeTable(['מתי', 'סוג', 'מי', 'תחילת הטקסט', '']);
+        var tb = t.tbody;
+        list.forEach(function (v) {
+          var when = new Date(v.created_at * 1000);
+          var preview = ABOUT_SECTIONS.map(function (p) { return v.value && v.value[p[0]]; })
+            .filter(Boolean).join(' · ').slice(0, 60) || '(ריק)';
+          var restore = actBtn('edit', 'שחזור', function () {
+            if (!confirm('לשחזר את הגרסה הזו ולפרסם אותה? הגרסה הנוכחית תישמר בהיסטוריה.')) return;
+            WStore.restoreAbout(v.id).then(function () {
+              say('הגרסה שוחזרה ופורסמה', '');
+              return Promise.all([refreshState(), refreshHistory()]);
+            }).catch(function () { say('השחזור נכשל', 'crit'); });
+          });
+          tb.appendChild(el('tr', {}, [
+            td(when.toLocaleDateString('he-IL') + ' ' + when.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }), 'muted tnum'),
+            td(el('span', { class: 'pill ' + (v.status === 'published' ? 'ok' : 'neutral'),
+                            text: v.status === 'published' ? 'פורסם' : 'טיוטה' })),
+            td(v.author || '—', 'muted'),
+            td(v.note ? v.note + ' — ' + preview : preview, 'muted'),
+            td(el('div', { class: 'row-actions' }, [restore]))
+          ]));
+        });
+        historyBody.appendChild(t.wrap);
+      }).catch(function () {
+        historyBody.textContent = '';
+        historyBody.appendChild(el('p', { class: 'empty-hint', text: 'לא ניתן לטעון היסטוריה (נדרשת התחברות).' }));
+      });
+    }
+
+    btnDraft.addEventListener('click', function () {
+      say('שומר…');
+      WStore.saveAboutDraft(values()).then(function () {
+        say('נשמר כטיוטה — העמוד באתר לא השתנה');
+        return Promise.all([refreshState(), refreshHistory()]);
+      }).catch(function () { say('השמירה נכשלה — נדרשת התחברות', 'crit'); });
+    });
+    btnPublish.addEventListener('click', function () {
+      say('מפרסם…');
+      WStore.publishAbout(values()).then(function () {
+        say('פורסם — העמוד באתר עודכן');
+        return Promise.all([refreshState(), refreshHistory()]);
+      }).catch(function () { say('הפרסום נכשל — נדרשת התחברות', 'crit'); });
+    });
+    btnDiscard.addEventListener('click', function () {
+      if (!confirm('לבטל את הטיוטה ולחזור לגרסה המפורסמת?')) return;
+      WStore.discardAboutDraft().then(function () {
+        say('הטיוטה בוטלה');
+        return refreshState();
+      }).catch(function () { say('הפעולה נכשלה', 'crit'); });
+    });
+
+    refreshState().catch(function () {
+      say('לא ניתן לטעון את התוכן — נדרשת התחברות', 'crit');
+    });
+    refreshHistory();
   }
 
   /* =============== נקודות מפה (בתוך "מוסדות חינוך") =============== */
@@ -429,21 +522,33 @@
   }
 
   /* =============== לוח הבקרה: מונים + טבלת אירועים =============== */
+  /* כל מספר במסך הזה מגיע מהמאגר. מה שאין לו מקור אמיתי — לא מוצג כמספר. */
   function refreshCounts() {
     var today = WDyn.todayISO();
-    var upcoming = WStore.get('events').filter(function (e) { return e.status === 'published' && e.date >= today; }).length;
+    var events = WStore.get('events');
+    var upcoming = events.filter(function (e) { return e.status === 'published' && e.date >= today; }).length;
     var libTotal = WStore.get('library').length + WStore.get('teaching').length + WStore.get('forms').length;
-    var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs')).filter(function (i) { return i.status === 'pending'; }).length;
-    var evCount = $('.nav-link[data-view="events"] .count'); if (evCount) evCount.textContent = String(WStore.get('events').length);
+    var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs'))
+      .filter(function (i) { return i.status === 'pending'; }).length;
+    var institutions = WStore.get('mapPoints').length;
+
+    function setText(sel, val) { var n = $(sel); if (n) n.textContent = val; }
+    setText('#kpiEvents', String(upcoming));
+    setText('#kpiEventsSub', upcoming ? 'מתוך ' + events.length + ' אירועים במאגר' : 'אין אירועים עתידיים');
+    setText('#kpiPending', String(pending));
+    setText('#kpiPendingSub', pending ? 'ממתינות לאישור מנהל' : 'הכול מאושר');
+    setText('#kpiLibrary', String(libTotal));
+    setText('#kpiLibrarySub', 'מאמרים, חומרי הוראה וטפסים');
+    /* מנויי הניוזלטר מגיעים משירות דיוור שטרם חובר — נשאר "לא מחובר" */
+
+    var evCount = $('.nav-link[data-view="events"] .count'); if (evCount) evCount.textContent = String(events.length);
     var libCount = $('.nav-link[data-view="lib"] .count'); if (libCount) libCount.textContent = String(libTotal);
+    var instCount = $('.nav-link[data-view="inst"] .count'); if (instCount) instCount.textContent = String(institutions);
     var modCount = $('#modCount'); if (modCount) { modCount.textContent = String(pending); modCount.style.background = pending ? 'var(--warn)' : ''; }
-    var stats = document.querySelectorAll('.view[data-view="home"] .stat .num');
-    if (stats[0]) stats[0].textContent = String(upcoming);
-    if (stats[2]) stats[2].textContent = String(libTotal);
-    /* טבלת האירועים בלוח הבקרה */
+
     var homeTbody = $('.view[data-view="home"] tbody');
     if (homeTbody) {
-      var evs = WStore.get('events').filter(function (e) { return e.status === 'published' && e.date >= today; })
+      var evs = events.filter(function (e) { return e.status === 'published' && e.date >= today; })
         .sort(function (a, b) { return a.date < b.date ? -1 : 1; }).slice(0, 5);
       homeTbody.textContent = '';
       if (!evs.length) emptyRow(homeTbody, 5, 'אין אירועים קרובים');
@@ -457,6 +562,42 @@
         ]));
       });
     }
+    renderActivity();
+  }
+
+  /* פעילות אחרונה — נגזרת מחותמות הזמן במאגר, לא רשימה כתובה מראש. */
+  function renderActivity() {
+    var host = document.querySelector('.view[data-view="home"] .activity');
+    if (!host) return;
+    var LABEL = { events: 'אירוע', news: 'הודעה', board: 'מודעה', jobs: 'משרה', library: 'פריט בספרייה',
+                  teaching: 'חומר הוראה', forms: 'טופס', mapPoints: 'מוסד במפה', videos: 'סרטון', podcast: 'פרק פודקאסט' };
+    function ago(ts) {
+      var s = Math.max(0, Math.floor(Date.now() / 1000 - ts));
+      if (s < 90) return 'ממש עכשיו';
+      if (s < 3600) return 'לפני ' + Math.round(s / 60) + ' דק׳';
+      if (s < 86400) return 'לפני ' + Math.round(s / 3600) + ' שע׳';
+      return 'לפני ' + Math.round(s / 86400) + ' ימים';
+    }
+    WStore.activity().then(function (rows) {
+      host.textContent = '';
+      if (!rows.length) {
+        host.appendChild(el('p', { class: 'empty-hint', text: 'טרם בוצעו שינויים בתוכן.' }));
+        return;
+      }
+      rows.slice(0, 6).forEach(function (r) {
+        host.appendChild(el('div', { class: 'act-item' }, [
+          el('div', { class: 'act-dot' }),
+          el('div', { class: 't' }, [
+            el('b', { text: r.title || '(ללא כותרת)' }),
+            el('div', { class: 'when', text: (LABEL[r.collection] || r.collection) + ' · ' +
+              (r.isNew ? 'נוסף' : 'עודכן') + ' ' + ago(r.updatedAt) })
+          ])
+        ]));
+      });
+    }).catch(function () {
+      host.textContent = '';
+      host.appendChild(el('p', { class: 'empty-hint', text: 'היסטוריית הפעילות זמינה לאחר התחברות.' }));
+    });
   }
 
   function refreshAll() {
@@ -467,6 +608,130 @@
     MEDIA_PANELS.forEach(function (c) { if (c._draw) c._draw(); });
     MOD_PANELS.forEach(function (c) { if (c._draw) c._draw(); });
     if (renderMapAdmin.draw) renderMapAdmin.draw();
+  }
+
+
+  /* =============== נציגי פורום — משתמשי מערכת הניהול =============== */
+  var ROLE_NAMES = { super_admin: 'מנהל־על', admin: 'מנהל', editor: 'עורך' };
+  var ROLE_HELP = {
+    super_admin: 'הרשאה מלאה, כולל ניהול משתמשים',
+    admin: 'עריכת כל התוכן ואישור מודעות',
+    editor: 'עריכת תוכן בלבד'
+  };
+
+  function renderPeopleAdmin() {
+    var host = $('#peopleAdmin');
+    if (!host) return;
+    host.textContent = '';
+
+    var me = WStore.currentUser();
+    if (!me) {
+      host.appendChild(el('div', { class: 'panel' }, [
+        el('div', { class: 'panel-head' }, [el('h2', { text: 'נדרשת התחברות' })]),
+        el('p', { class: 'empty-hint', text: 'רשימת המשתמשים זמינה רק לאחר התחברות עם שם משתמש וסיסמה.' })
+      ]));
+      return;
+    }
+    var boss = me.role === 'super_admin';
+
+    var panel = el('div', { class: 'panel' });
+    var head = el('div', { class: 'panel-head' }, [
+      el('h2', { text: 'משתמשי המערכת' }), el('div', { class: 'grow' })
+    ]);
+    if (boss) {
+      var addBtn = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: '+ משתמש חדש' });
+      addBtn.addEventListener('click', function () { openUserForm(null); });
+      head.appendChild(addBtn);
+    }
+    panel.appendChild(head);
+
+    var t = makeTable(['שם', 'דוא"ל', 'תפקיד', 'כניסה אחרונה', '']);
+    var tbody = t.tbody;
+    panel.appendChild(t.wrap);
+    var formHost = el('div');
+    panel.appendChild(formHost);
+    host.appendChild(panel);
+
+    function fmtLogin(ts) {
+      if (!ts) return 'טרם התחבר';
+      var d = new Date(ts * 1000);
+      return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function draw() {
+      tbody.textContent = '';
+      WStore.users().then(function (list) {
+        tbody.textContent = '';
+        if (!list.length) { emptyRow(tbody, 5, 'אין משתמשים'); return; }
+        list.forEach(function (u) {
+          var actions = el('div', { class: 'row-actions' });
+          if (boss) {
+            actions.appendChild(actBtn('edit', 'עריכה', function () { openUserForm(u); }));
+            if (u.id !== me.id) {
+              actions.appendChild(actBtn('del', 'מחיקה', function () {
+                if (!confirm('למחוק את המשתמש "' + u.name + '"? הפעולה אינה הפיכה.')) return;
+                WStore.deleteUser(u.id).then(draw).catch(function (e) {
+                  alert(e && e.body && e.body.error === 'last_super_admin'
+                    ? 'לא ניתן למחוק את מנהל־העל האחרון.' : 'המחיקה נכשלה.');
+                });
+              }));
+            }
+          } else if (u.id === me.id) {
+            actions.appendChild(actBtn('edit', 'שינוי סיסמה', function () { openUserForm(u, true); }));
+          }
+          tbody.appendChild(el('tr', {}, [
+            titleCell(u.name + (u.id === me.id ? ' (אני)' : ''), false),
+            td(u.email, 'muted'),
+            td(el('span', { class: 'pill ' + (u.role === 'super_admin' ? 'ok' : 'neutral'),
+                            title: ROLE_HELP[u.role] || '', text: ROLE_NAMES[u.role] || u.role })),
+            td(fmtLogin(u.last_login), 'muted'),
+            td(actions)
+          ]));
+        });
+      }).catch(function () {
+        tbody.textContent = '';
+        emptyRow(tbody, 5, 'לא ניתן לטעון את רשימת המשתמשים');
+      });
+    }
+
+    /** passwordOnly: a non-super-admin editing their own account. */
+    function openUserForm(u, passwordOnly) {
+      formHost.textContent = '';
+      var isNew = !u;
+      var fields = [];
+      if (!passwordOnly) {
+        fields.push({ name: 'name', label: 'שם מלא', type: 'text', required: true });
+        fields.push({ name: 'email', label: 'דוא"ל', type: 'email', required: true });
+        fields.push({ name: 'role', label: 'תפקיד', type: 'select', options: [
+          { v: 'editor', t: ROLE_NAMES.editor }, { v: 'admin', t: ROLE_NAMES.admin }, { v: 'super_admin', t: ROLE_NAMES.super_admin }
+        ] });
+      }
+      fields.push({ name: 'password', label: isNew ? 'סיסמה' : 'סיסמה חדשה (השאירו ריק כדי לא לשנות)', type: 'password', required: isNew });
+
+      openForm(formHost, fields, u || { role: 'editor' }, function (vals) {
+        var patch = {};
+        Object.keys(vals).forEach(function (k) { if (vals[k] !== '' && vals[k] != null) patch[k] = vals[k]; });
+        var done = function () { formHost.textContent = ''; draw(); };
+        var oops = function (e) {
+          var code = e && e.body && e.body.error;
+          alert(code === 'email_taken' ? 'כתובת הדוא"ל כבר קיימת במערכת.'
+              : code === 'forbidden' ? 'אין לך הרשאה לפעולה הזו.'
+              : 'השמירה נכשלה.');
+        };
+        if (isNew) WStore.createUser(patch).then(done).catch(oops);
+        else WStore.updateUser(u.id, patch).then(function () {
+          // Changing a password ends that user's other sessions, including your own.
+          if (patch.password && u.id === me.id) {
+            alert('הסיסמה עודכנה. יש להתחבר מחדש.');
+            WStore.logout().then(function () { location.href = './admin.html'; });
+            return;
+          }
+          done();
+        }).catch(oops);
+      });
+    }
+
+    draw();
   }
 
   /* =============== איתחול =============== */
@@ -480,10 +745,14 @@
     renderModAdmin();
     renderAboutAdmin();
     renderMapAdmin();
+    renderPeopleAdmin();
     refreshCounts();
   }
 
   function fail(err) {
+    // Log it: a silent notice tells the operator something broke but not what,
+    // and this is the only place a boot failure surfaces.
+    if (window.console) console.error('admin boot failed:', err);
     var main = document.querySelector('.content') || document.body;
     var box = el('div', { class: 'notice crit', style: 'margin:20px' }, [
       el('b', { text: 'לא ניתן לטעון את התוכן מהמאגר. ' }),
@@ -503,6 +772,31 @@
     refreshAll();
     if (err) fail(err);
   });
+
+  /* מי מחובר + יציאה */
+  (function showUser() {
+    var u = WStore.currentUser();
+    var who = document.querySelector('.user .who b');
+    var role = document.querySelector('.user .who span');
+    if (u) {
+      if (who) who.textContent = u.name;
+      if (role) role.textContent = ROLE_NAMES[u.role] || u.role;
+      var av = document.querySelector('.user .avatar');
+      if (av) av.textContent = (u.name || '?').trim().charAt(0);
+    } else {
+      if (who) who.textContent = 'לא מחובר';
+      if (role) role.textContent = 'צפייה בלבד';
+    }
+    var out = document.querySelector('.topbar .icon-btn[title], .topbar a.icon-btn');
+    document.querySelectorAll('.topbar .icon-btn').forEach(function (b) {
+      if (/יציאה|logout/i.test(b.getAttribute('title') || b.getAttribute('aria-label') || '')) {
+        b.addEventListener('click', function (e) {
+          e.preventDefault();
+          WStore.logout().then(function () { location.href = './admin.html'; });
+        });
+      }
+    });
+  })();
 
   /* מפתח הניהול — נשמר בדפדפן בלבד, לא בקוד (המאגר ציבורי ב-GitHub). */
   (function wireAdminKey() {

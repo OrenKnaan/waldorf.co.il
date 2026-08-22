@@ -522,9 +522,84 @@
     window.setTimeout(function () { liveEl.textContent = msg; }, 60);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
-  } else {
+  /* ---------- טבלאות נגללות: גישה מהמקלדת ---------- */
+
+  // A .table-wrap that overflows is a scroll container holding no focusable
+  // element, so a keyboard user has no way to reach the columns past its edge
+  // (WCAG 2.1.1). Giving it tabindex="0" makes the container itself focusable,
+  // and the arrow keys then scroll it.
+  //
+  // Toggled from a measurement rather than baked into the markup, because
+  // whether it overflows depends on the viewport: the kindergarten table
+  // scrolls between roughly 561px and 670px, and outside that band it either
+  // fits or has already restacked into cards at 560px. An unconditional
+  // tabindex would put a tab stop on every table at every width, nearly always
+  // on nothing scrollable.
+  function tableLabel(el) {
+    var caption = el.querySelector('caption');
+    var section = el.closest ? el.closest('section,article') : null;
+    // The card's own heading first. Falling back to the page h1 matters on a
+    // single-table page like kinder-list, whose one <section class="card"> has
+    // no heading inside it at all: "טבלה נגללת: רשימת גני ילדים" beats a bare
+    // "טבלה נגללת", and beats it more when a page grows a second table.
+    var head = (section && section.querySelector('h2,h3')) || document.querySelector('main h1');
+    var name = ((caption && caption.textContent) || (head && head.textContent) || '')
+      .replace(/\s+/g, ' ').trim();
+    return name ? 'טבלה נגללת: ' + name : 'טבלה נגללת';
+  }
+
+  function syncScrollableTables() {
+    var wraps = document.querySelectorAll('.table-wrap');
+    for (var i = 0; i < wraps.length; i += 1) {
+      var el = wraps[i];
+      // A pixel of slack: sub-pixel layout leaves scrollWidth a hair over
+      // clientWidth on tables that visibly fit, which would otherwise flicker
+      // a tab stop in and out on every resize.
+      var scrolls = el.scrollWidth - el.clientWidth > 1;
+      if (scrolls === (el.getAttribute('tabindex') === '0')) continue;
+      if (scrolls) {
+        el.setAttribute('tabindex', '0');
+        // Named, because a focusable region announced as nothing at all is its
+        // own problem. The section heading keeps two tables on one page apart.
+        el.setAttribute('role', 'region');
+        el.setAttribute('aria-label', tableLabel(el));
+      } else {
+        el.removeAttribute('tabindex');
+        el.removeAttribute('role');
+        el.removeAttribute('aria-label');
+      }
+    }
+    return wraps;
+  }
+
+  // Module scope, not a local. A ResizeObserver whose only reference is a
+  // variable inside the function that created it is unreachable once that
+  // function returns, and Chrome collects it: the tables stopped picking up
+  // resizes a few navigations in, which looked like a flaky test rather than
+  // the leak-shaped bug it is.
+  var tableObserver = null;
+
+  function watchScrollableTables() {
+    var wraps = syncScrollableTables();
+    if (typeof ResizeObserver !== 'function') {
+      window.addEventListener('resize', syncScrollableTables);
+      return;
+    }
+    // Observing each wrapper catches both a viewport resize and a reflow from
+    // the text-size adjustments above, without a resize listener firing on
+    // every page whether or not it has a table.
+    tableObserver = new ResizeObserver(function () { syncScrollableTables(); });
+    for (var i = 0; i < wraps.length; i += 1) tableObserver.observe(wraps[i]);
+  }
+
+  function init() {
     build();
+    watchScrollableTables();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();

@@ -288,9 +288,9 @@ td.muted{color:var(--muted)}
       <button class="nav-link" data-view="news">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>הודעות</button>
       <button class="nav-link" data-view="inst">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count">37</span></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count"></span></button>
       <button class="nav-link" data-view="lib">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count">128</span></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count"></span></button>
       <button class="nav-link" data-view="media">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</button>
       <button class="nav-link" data-view="about">
@@ -304,7 +304,7 @@ td.muted{color:var(--muted)}
       <button class="nav-link" data-view="mod">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>מודרציה — לוחות<span class="count" id="modCount">0</span></button>
       <button class="nav-link" data-view="nl">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר<span class="count">642</span></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר</button>
       <div class="side-foot">
         <button class="nav-link" data-view="set">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.6h.1A1.6 1.6 0 0 0 9 1.1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 15 2.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1A1.6 1.6 0 0 0 22.9 9H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>הגדרות</button>
@@ -331,31 +331,14 @@ td.muted{color:var(--muted)}
       <div class="content">
         <!-- HOME -->
         <section class="view" data-view="home">
-          <p class="crumb">סקירה כללית · עודכן לפני 4 דקות</p>
+          <p class="crumb">סקירה כללית</p>
           <div class="stat-row">
-            <div class="stat">
-              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>אירועים קרובים</div>
-              <div class="num tnum">4</div><div class="delta up">+2 החודש</div>
-              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,20 13,17 26,18 39,10 52,12 66,5" fill="none" stroke="var(--ok)" stroke-width="2"/></svg>
-            </div>
-            <div class="stat">
-              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21V8l7-4 7 4v13"/></svg>מוסדות רשומים</div>
-              <div class="num tnum">37</div><div class="delta up">+1 השבוע</div>
-              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,22 16,20 33,15 49,14 66,9" fill="none" stroke="var(--tan-dark)" stroke-width="2"/></svg>
-            </div>
-            <div class="stat">
-              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5"/></svg>פריטים בספרייה</div>
-              <div class="num tnum">128</div><div class="delta up">+9 החודש</div>
-              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,21 13,19 26,14 39,15 52,8 66,6" fill="none" stroke="var(--info)" stroke-width="2"/></svg>
-            </div>
-            <div class="stat">
-              <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>מנויים לניוזלטר</div>
-              <div class="num tnum">642</div><div class="delta up">+18 החודש</div>
-              <svg class="spark" viewBox="0 0 66 26" preserveAspectRatio="none"><polyline points="0,23 16,18 33,16 49,11 66,7" fill="none" stroke="var(--brown)" stroke-width="2"/></svg>
-            </div>
+            <div class="stat"><div class="lbl">אירועים קרובים</div><div class="num" id="kpiEvents">—</div><div class="sub" id="kpiEventsSub">&nbsp;</div></div>
+            <div class="stat"><div class="lbl">מודעות ממתינות לאישור</div><div class="num" id="kpiPending">—</div><div class="sub" id="kpiPendingSub">&nbsp;</div></div>
+            <div class="stat"><div class="lbl">פריטים בספרייה</div><div class="num" id="kpiLibrary">—</div><div class="sub" id="kpiLibrarySub">&nbsp;</div></div>
+            <div class="stat"><div class="lbl">מנויים לניוזלטר</div><div class="num" id="kpiNewsletter" style="font-size:1.15rem">לא מחובר</div><div class="sub">אין שירות דיוור מחובר</div></div>
           </div>
-
-          <div class="two-col">
+        <div class="two-col">
             <div class="panel">
               <div class="panel-head"><h2>אירועים קרובים</h2><div class="grow"></div><button class="btn btn-ghost btn-sm" data-goto="events">כל האירועים</button></div>
               <div class="table-wrap"><table>
@@ -470,8 +453,18 @@ td.muted{color:var(--muted)}
           <p class="crumb">עריכת דף התוכן "אודות הפורום" (מתאים לעדכון עצמאי)</p>
           <div id="aboutAdmin"></div>
         </section>
-        <section class="view" data-view="people" hidden><div class="panel"><div class="panel-head"><h2>נציגי פורום</h2></div><p class="empty-hint">ניהול חברי הפורום, תפקידים וקבוצות עבודה — המסך ייבנה בשלב הבא.</p></div></section>
-        <section class="view" data-view="nl" hidden><div class="panel"><div class="panel-head"><h2>ניוזלטר</h2></div><p class="empty-hint">ניהול רשימות תפוצה ודיוור — יתחבר לשירות הדיוור שייבחר (סעיף 10 ב־PRD).</p></div></section>
+        <section class="view" data-view="people" hidden>
+          <p class="crumb">משתמשי מערכת הניהול — מי יכול להיכנס, לערוך ולאשר תוכן</p>
+          <div id="peopleAdmin"></div>
+        </section>
+        <section class="view" data-view="nl" hidden>
+          <p class="crumb">רשימת תפוצה ודיוור</p>
+          <div class="panel">
+            <div class="panel-head"><h2>שירות הדיוור</h2><span class="pill neutral">לא מחובר</span><div class="grow"></div></div>
+            <p class="empty-hint">טרם חובר שירות דיוור (רב מסר / שלח מסר / דומה). עד שיחובר אין מספר מנויים אמיתי להציג, ולכן לא מוצג כאן מספר כלל.</p>
+            <p class="empty-hint">אחרי החיבור יופיעו כאן מספר הנרשמים, קצב ההצטרפות ורשימת הגיליונות שנשלחו — נתונים מהשירות עצמו.</p>
+          </div>
+        </section>
         <section class="view" data-view="analytics" hidden>
           <p class="crumb">כמה אנשים מבקרים באתר, מה הם קוראים ומאיפה הגיעו — מבוסס על Cloudflare Web Analytics</p>
           <div id="analyticsAdmin"></div>

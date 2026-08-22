@@ -23,8 +23,9 @@
 
   var script = document.currentScript;
   var header = document.querySelector('.site-header');
-  var brandRow = header && header.querySelector('.brand-row');
-  if (!script || !header || !brandRow) return;
+  // The menu row, which the button becomes the last item of.
+  var nav = header && header.querySelector('.primary-nav');
+  if (!script || !header || !nav) return;
 
   // Resolve against this script rather than the document: it keeps working if
   // a page is ever served from a path other than the one holding the assets.
@@ -75,16 +76,20 @@
 
   var style = document.createElement('style');
   style.textContent = [
-    // Positioned against .brand-row rather than the header, so on a wide
-    // screen it lands at the edge of the 960px content column with the site
-    // name, instead of drifting out to the viewport edge on its own.
-    '.brand-row{position:relative}',
-    '.wsearch-btn{position:absolute;inset-block-start:12px;inset-inline-end:8px;z-index:25;',
-    '  width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;',
-    '  border:0;border-radius:var(--radius-pill,999px);background:transparent;color:var(--brown,#6B4F35);',
-    '  cursor:pointer;transition:background .15s ease,color .15s ease}',
+    // A flex item at the end of .primary-nav, so it sits on the menu row and
+    // inside the same 960px column as the links. margin-inline-start:auto is
+    // what pushes it past them to the inline-end.
+    //
+    // Borrows the nav links' own idiom rather than inventing one: transparent
+    // 3px bottom border that turns gold on hover, so it reads as the last item
+    // of the menu instead of a control parked next to it.
+    '.wsearch-btn{margin-inline-start:auto;flex:none;width:44px;min-height:44px;',
+    '  display:flex;align-items:center;justify-content:center;padding:0;',
+    '  border:0;border-block-end:3px solid transparent;background:transparent;',
+    '  color:var(--brown,#6B4F35);cursor:pointer;',
+    '  transition:color .2s,border-color .2s}',
     '.wsearch-btn:hover,.wsearch-btn[aria-expanded="true"]',
-    '  {background:color-mix(in oklab,var(--tan,#C4A882) 24%,transparent);color:var(--brown-dark,#3D2B1F)}',
+    '  {color:var(--brown-dark,#3D2B1F);border-block-end-color:var(--wash-gold,#E8C877)}',
 
     // Drops out of the header, clearing its 3px gradient border, and sits above
     // the nav dropdowns (z-index 20) without leaving the header's own context.
@@ -129,10 +134,18 @@
     '.wsearch-note b{color:var(--brown-dark,#3D2B1F);font-weight:600}',
 
     '@media (max-width:720px){',
-    '  .wsearch-btn{inset-block-start:6px;inset-inline-end:0}',
-    // Keep the brand text clear of the button at the narrowest widths; the
-    // hamburger already owns the opposite corner.
-    '  .brand-row{padding-inline-end:58px}',
+    // Below this width .primary-nav collapses to a max-height:0 drawer, so an
+    // item sitting in it is unreachable until the hamburger is tapped. Lift the
+    // button out to the header's own bar, in the corner the hamburger does not
+    // occupy. Its containing block is .site-header (position:relative), not the
+    // drawer, so the drawer's overflow does not clip it.
+    '  .wsearch-btn{position:absolute;inset-block-start:14px;inset-inline-end:10px;z-index:30;',
+    '    height:44px;border-block-end:0;border-radius:var(--radius,8px)}',
+    '  .wsearch-btn:hover,.wsearch-btn[aria-expanded="true"]',
+    '    {border-block-end-color:transparent;',
+    '     background:color-mix(in oklab,var(--tan,#C4A882) 22%,transparent)}',
+    // Keep the brand text clear of it; the hamburger already owns the far side.
+    '  .brand-row{padding-inline-end:60px}',
     '  .wsearch-inner{padding:0 8px}',
     '  .wsearch-panel{width:100%}',
     '}',
@@ -186,7 +199,7 @@
     '<p class="wsearch-note" role="status" aria-live="polite"></p>' +
     '</div></div>';
 
-  brandRow.appendChild(btn);
+  nav.appendChild(btn);
   header.appendChild(wrap);
 
   var form = wrap.querySelector('.wsearch-form');

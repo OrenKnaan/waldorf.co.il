@@ -21,7 +21,8 @@
   'use strict';
 
   var API = 'https://waldorf-content-api.orenknaan.workers.dev';
-  var KEY_ADMIN = 'waldorf-admin-key-v1';   // admin key, entered once per browser
+  var KEY_ADMIN = 'waldorf-admin-key-v1';   // fallback key, for tooling
+  var KEY_SESS  = 'waldorf-session-v1';     // login session: {token, user, expires}
   var MINE_KEY = 'waldorf-mockup-mine-v1';  // ids this browser submitted — genuinely per-device
 
   var cache = null;
@@ -31,8 +32,11 @@
   function writeLS(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
   function adminKey() { try { return localStorage.getItem(KEY_ADMIN) || ''; } catch (e) { return ''; } }
+  function session() { return readLS(KEY_SESS); }
   function headers(extra) {
     var h = extra || {};
+    var s = session();
+    if (s && s.token) h['authorization'] = 'Bearer ' + s.token;
     var k = adminKey();
     if (k) h['x-admin-key'] = k;
     return h;
@@ -73,6 +77,46 @@
     reload: reload,
     isLoaded: function () { return cache !== null; },
     onChange: function (fn) { listeners.push(fn); },
+
+    /* ---- login ---- */
+    currentUser: function () { var s = session(); return s ? s.user : null; },
+    isSignedIn: function () { return Boolean(session()); },
+    login: function (email, password) {
+      return req('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: email, password: password }) })
+        .then(function (r) {
+          writeLS(KEY_SESS, { token: r.token, user: r.user, savedAt: Date.now() });
+          return reload().then(function () { return r.user; });
+        });
+    },
+    logout: function () {
+      return req('/api/auth/logout', { method: 'POST' })
+        .catch(function () {})
+        .then(function () { try { localStorage.removeItem(KEY_SESS); } catch (e) {} return reload(); });
+    },
+
+    activity: function () { return req('/api/activity'); },
+
+    /* ---- users ---- */
+    users: function () { return req('/api/users'); },
+    createUser: function (u) { return req('/api/users', { method: 'POST', body: JSON.stringify(u) }); },
+    updateUser: function (id, patch) { return req('/api/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify(patch) }); },
+    deleteUser: function (id) { return req('/api/users/' + encodeURIComponent(id), { method: 'DELETE' }); },
+
+    /* ---- singleton drafts & history ---- */
+    aboutState: function () { return req('/api/singleton/about/draft'); },
+    aboutVersions: function () { return req('/api/singleton/about/versions'); },
+    saveAboutDraft: function (value, note) {
+      return req('/api/singleton/about/draft', { method: 'PUT', body: JSON.stringify({ value: value, note: note }) });
+    },
+    publishAbout: function (value, note) {
+      return req('/api/singleton/about', { method: 'PUT', body: JSON.stringify({ value: value, note: note }) })
+        .then(function (r) { if (cache) cache.about = r.value; emit(); return r; });
+    },
+    restoreAbout: function (versionId) {
+      return req('/api/singleton/about/restore', { method: 'POST', body: JSON.stringify({ versionId: versionId }) })
+        .then(function (r) { if (cache) cache.about = r.value; emit(); return r; });
+    },
+    discardAboutDraft: function () { return req('/api/singleton/about/draft', { method: 'DELETE' }); },
 
     hasAdminKey: function () { return Boolean(adminKey()); },
     setAdminKey: function (k) {

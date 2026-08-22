@@ -60,9 +60,16 @@
     '.dyn-event.past{opacity:.62}',
     '.dyn-event .body{flex:1;min-width:220px}',
     '.dyn-btn{display:inline-block;font-family:var(--font-body);font-size:.85rem;font-weight:600;color:#fff;background:var(--brown);border:none;border-radius:var(--radius-pill);padding:8px 20px;cursor:pointer;text-decoration:none}',
-    '.dyn-btn:hover{background:var(--brown-dark)}',
+    // These buttons are <a> elements, and the page stylesheet carries a bare
+    // a:hover{color:var(--brown-dark)} that outranks .dyn-btn's own colour on
+    // specificity (0,1,1 against 0,1,0). Without restating the colour here,
+    // hovering "להרשמה (טופס גוגל)" painted --brown-dark text onto a
+    // --brown-dark background: 1:1, the label vanished entirely. Restate it on
+    // every hover rule below rather than relying on what a:hover happens to be;
+    // .btn-primary in the page stylesheet already does the same.
+    '.dyn-btn:hover{background:var(--brown-dark);color:#fff}',
     '.dyn-btn.ghost{background:transparent;color:var(--brown);border:1.5px solid var(--tan)}',
-    '.dyn-btn.ghost:hover{background:var(--beige)}',
+    '.dyn-btn.ghost:hover{background:var(--beige);color:var(--brown-dark)}',
     'details.dyn-form{background:var(--beige);border-radius:var(--radius-lg);padding:0;margin:0 0 18px;overflow:hidden}',
     'details.dyn-form>summary{cursor:pointer;list-style:none;padding:13px 20px;font-weight:600;color:var(--brown-dark);display:flex;align-items:center;gap:8px}',
     'details.dyn-form>summary::before{content:"+";font-family:var(--font-head);font-size:1.2rem;color:var(--tan-dark)}',
@@ -89,6 +96,12 @@
     '.dyn-episode{display:flex;gap:14px;align-items:flex-start}',
     '.dyn-episode .num{flex:0 0 44px;height:44px;border-radius:50%;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),var(--beige);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--brown-dark)}',
     '.dyn-map{height:380px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);margin:0 0 8px;background:var(--beige)}',
+    // Leaflet's attribution credits Leaflet and OpenStreetMap as links inside a
+    // run of plain text, distinguished from it by colour alone: #0078a8 against
+    // #333 is 2.55:1, under the 3:1 that WCAG 1.4.1 asks for when colour is the
+    // only cue. Underlining them is the cue, so the ratio stops mattering. The
+    // stylesheet comes from unpkg, so the override has to live here.
+    '.dyn-map .leaflet-control-attribution a{text-decoration:underline}',
     '.dyn-lib-item{display:block;padding:10px 14px;border-inline-start:3px solid var(--tan);background:var(--white);border-radius:var(--radius);margin:0 0 9px;box-shadow:var(--shadow)}',
     '.dyn-lib-item b{color:var(--brown-dark)}',
     '.dyn-lib-item small{display:block;color:var(--text-muted);font-size:.82rem;margin-top:2px}',

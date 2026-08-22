@@ -210,7 +210,7 @@ td.muted{color:var(--muted)}
 <body style="margin:0">
 <div id="app">
 <section id="login" class="login-screen">
-    <div class="login-card">
+    <div class="login-card"><form id="loginForm" novalidate>
       <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#3D2B1F"/><path d="M16 6c-6 3-8 8-8 13 5-1 9-5 10-13-1 0-1 0-2 0z" fill="#C4A882"/></svg>
       <h1>מערכת ניהול התוכן</h1>
       <p class="sub">הפורום הארצי לחינוך ולדורף</p>
@@ -223,10 +223,8 @@ td.muted{color:var(--muted)}
           <label for="pw">סיסמה</label>
           <input id="pw" type="password" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <a class="btn btn-primary" href="./admin-dashboard.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
-          כניסה למערכת
-        </a>
+        <p id="loginMsg" class="empty-hint" style="min-height:1.2em;margin:6px 0 0"></p>
+        <button class="btn btn-primary" id="loginBtn" type="submit">כניסה למערכת</button>
       </div>
       <p class="notice">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
@@ -235,5 +233,37 @@ td.muted{color:var(--muted)}
     </div>
   </section>
 </div>
+
+<script src="../store.js"></script>
+<script>
+/* התחברות אמיתית מול ה-API. עד כה הכפתור היה קישור לדשבורד, כלומר לא הייתה
+   הזדהות כלל — וזה בעייתי במיוחד עכשיו כשהממשק פתוח לכל מי שיש לו הכתובת. */
+(function () {
+  var form = document.getElementById('loginForm');
+  var em = document.getElementById('em'), pw = document.getElementById('pw');
+  var btn = document.getElementById('loginBtn'), msg = document.getElementById('loginMsg');
+  if (!form || !btn) return;
+
+  if (window.WStore && WStore.isSignedIn()) location.replace('./admin-dashboard.html');
+
+  function submit(e) {
+    if (e) e.preventDefault();
+    var email = (em.value || '').trim(), pass = pw.value || '';
+    if (!email || !pass) { msg.textContent = 'יש להזין דוא"ל וסיסמה'; return; }
+    btn.disabled = true;
+    msg.textContent = 'מתחבר…';
+    WStore.login(email, pass).then(function (u) {
+      msg.textContent = 'שלום ' + u.name + ' — מעביר לממשק…';
+      location.href = './admin-dashboard.html';
+    }).catch(function (err) {
+      btn.disabled = false;
+      msg.textContent = (err && err.status === 401)
+        ? 'דוא"ל או סיסמה שגויים'
+        : 'ההתחברות נכשלה — בדקו את החיבור לאינטרנט';
+    });
+  }
+  form.addEventListener('submit', submit);
+})();
+</script>
 </body>
 </html>
