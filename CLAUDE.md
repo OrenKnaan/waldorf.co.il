@@ -48,6 +48,12 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 >
 > Verify by crawling the CSV's `old_path` column against the live site and asserting every response is a 301 to a 200. A spot check is not enough at this volume.
 
+> **The same day, carry the DNS across: `migration/dns-records.md`.**
+>
+> The zone is at livedns and so is the mailbox (`MX -> mail.waldorf.co.il`). Moving nameservers to Cloudflare means recreating every record, and Cloudflare's import scan builds its list from public queries, so anything that does not currently resolve is silently not imported. Export the zone file from livedns first and diff it after. Moving DNS does not require moving the mailbox: keep the MX pointing at livedns and mail is unaffected.
+>
+> That file also holds the four ActiveTrail authentication records (return-path CNAME, two DKIM CNAMEs, DMARC). As of 2026-08-24 **none of them resolve**, which does not block the signup but will put newsletter campaigns in spam folders once they start going out.
+
 **Crawler lockdown — remove all of it together, on cutover day, at the same time the custom domain goes live and the old-URL redirects are published.** Removing any one piece early exposes an unfinished site; leaving any piece in place after launch silently keeps the real site out of Google.
 
 1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 43 `mockup/pages/*.html` and in `src/pages/index.astro`.
