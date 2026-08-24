@@ -58,7 +58,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 **Placeholder content that must not ship:**
 
-11. Page titles all end in `— מוקאפ`; the header tagline is `מוקאפ תוכן` on 41 pages.
+11. Page titles all end in `— מוקאפ`, and the footer of all 42 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
 12. 11 pages carry 30 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
 13. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
 

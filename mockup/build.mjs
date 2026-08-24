@@ -464,7 +464,6 @@ ${RESPONSIVE_CSS}</style>
 ${NAV_TOGGLE_HTML}
   <div class="brand-row">
     <p class="brand-name">הפורום הארצי לחינוך ולדורף</p>
-    <p class="brand-tagline">מוקאפ תוכן</p>
   </div>
   <nav>${navHtml}</nav>
 </header>
@@ -476,7 +475,7 @@ ${NAV_TOGGLE_JS}
   </nav>
   ${bodyHtml}
 </main>
-<footer class="site-footer">מוקאפ פנימי — הפורום הארצי לחינוך ולדורף</footer>
+<footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף</footer>
 <script>
 document.addEventListener('click', function (e) {
   var btn = e.target.closest('.tab-btn');
