@@ -40,6 +40,14 @@ Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.js
 
 Everything below exists **only because this is a pre-launch mockup on GitHub Pages**. When the real site moves to Cloudflare Pages and `waldorf.co.il` is attached, each item has to be removed or replaced — not carried over. Inventory verified 2026-07-27; re-check counts before acting, they drift.
 
+> **On the day we migrate to Cloudflare, publish the redirects from `migration/url-map.csv` so nothing 404s.**
+>
+> The old site has 431 live URLs and every one of them is linked from somewhere we do not control: Google's index, school websites, Facebook posts, printed newsletters. The moment `waldorf.co.il` points at the new site, any path without a redirect is a 404, and a 404 loses both the visitor and the search ranking that URL had built up.
+>
+> Run `node migration/build-redirects.mjs --write` to generate `public/_redirects` (861 rules), and deploy it **in the same change** that attaches the custom domain. Before running it, do the two things `migration/README.md` lists: point `new_path` at the production routes if they are no longer the mockup's `.html` filenames, and answer the seven `review` rows. Afterwards, add the `www` to apex Redirect Rule on the zone, which `_redirects` cannot do, and decide what happens to `/wp-content/uploads/...`, which is every PDF and image the old site ever linked.
+>
+> Verify by crawling the CSV's `old_path` column against the live site and asserting every response is a 301 to a 200. A spot check is not enough at this volume.
+
 **Crawler lockdown — remove all of it together, on cutover day, at the same time the custom domain goes live and the old-URL redirects are published.** Removing any one piece early exposes an unfinished site; leaving any piece in place after launch silently keeps the real site out of Google.
 
 1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 43 `mockup/pages/*.html` and in `src/pages/index.astro`.
@@ -59,7 +67,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 **Placeholder content that must not ship:**
 
 11. Page titles all end in `— מוקאפ`, and the footer of all 42 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
-12. 11 pages carry 29 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
+12. 11 pages carry 26 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
 13. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
 
 (The generic Hebrew filler that used to be here — `[שם]`, `תוכן מלא יוכנס כאן` — is gone; it was replaced by real scraped copy. Only the specific gaps in 12–13 remain.)
