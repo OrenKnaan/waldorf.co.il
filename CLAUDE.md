@@ -59,7 +59,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 **Placeholder content that must not ship:**
 
 11. Page titles all end in `— מוקאפ`, and the footer of all 42 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
-12. 11 pages carry 30 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
+12. 11 pages carry 29 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
 13. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
 
 (The generic Hebrew filler that used to be here — `[שם]`, `תוכן מלא יוכנס כאן` — is gone; it was replaced by real scraped copy. Only the specific gaps in 12–13 remain.)
@@ -106,6 +106,19 @@ Two traps this feature hit, both worth knowing before touching button or highlig
 - Highlight and label colours have to be checked against the colour they land on, not the colour they were designed against. `--tan-dark` and `--text-muted` both failed AA once used as small text on the search results, in two separate rounds.
 
 **Scan at more than one viewport width.** Both of the violations that were sitting unfixed on `kinder-list.html` were invisible at 1280px: the table only overflows between roughly 561px and 670px, and the Leaflet rule only fires once the map control wraps. Scan with content settled, too; a scan that races the D1 fetch reports a page that is not the page a visitor sees.
+
+## Newsletter signup (ActiveTrail)
+
+Permanent, like the two layers above: the signup on `forum-newsletter.html` is real, not a placeholder.
+
+- `mockup/pages/newsletter.js` owns the behaviour and injects its own CSS; the form markup lives in the page. Deferred, and standalone rather than part of `store.js`, which this page does not load: `store.js` fetches every content collection the moment it runs and this page renders nothing from D1. The API base is therefore repeated in both files.
+- `POST /api/newsletter/subscribe` on the content API forwards to ActiveTrail. **The browser never calls ActiveTrail directly**, and no future page should: their API authenticates with one account-wide token that can read, edit and delete the entire contact list, so in a page script it is published to every visitor.
+- **The token is a Worker secret, never a file.** `npx wrangler secret put ACTIVETRAIL_TOKEN` from `content-api/`. `ACTIVETRAIL_GROUP_ID` and `ACTIVETRAIL_DOUBLE_OPTIN` are identifiers rather than credentials and sit in `wrangler.toml`. With the token or the group id unset the endpoint answers 503 and the form says the signup is not available yet, which is the state a fresh clone is in.
+- Double opt-in is on by default: ActiveTrail sends the confirmation mail and only subscribes an address once the link is clicked. That is what makes the list defensible under חוק התקשורת סעיף 30א, and it also means a typo or a signup with someone else's address never becomes a subscription.
+- Abuse controls, in order: a honeypot field (clipped, `aria-hidden`, `tabindex="-1"`) that answers exactly as a success does, then server-side address validation, then a per-IP throttle of 5 an hour from the `rate_limits` table (migration 0005). The table is keyed `(bucket, ip)` so the contact form can reuse it.
+- Upstream failures return a generic 502 and log the real reply, which can name the account. Never pass ActiveTrail's error body to the browser.
+
+Verified against the live ActiveTrail API with a deliberately invalid token: their 401 says specifically "invalid API Key", which confirms the path and the bare `Authorization` header (no `Bearer` prefix) are right. Also verified 405/400/429/503, the honeypot, and axe-core at the four WCAG tags at 375px, 600px and 1792px, in the default state and with an error showing: **0 violations**.
 
 ## Scanning for bugs and violations
 

@@ -516,8 +516,18 @@
   <h1>איגרת תקופתית</h1>
 <p>האיגרת של הפורום הארצי — ארכיון גיליונות.</p>
 <p>האיגרת מתפרסמת מספר פעמים בשנה ונשלחת לכל מנויי הרשימה.</p>
-<p><span class="ph">טופס: הצטרפות לרשימת התפוצה — שדה דוא"ל בלבד</span></p>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+<section class="card">
+<h2 id="sec-tys3o7">הצטרפות לרשימת התפוצה</h2>
+<p>השאירו כתובת דוא"ל ותקבלו את האיגרת עם פרסום כל גיליון. נשלח לכתובת הודעת אישור, וההרשמה תושלם רק אחרי הלחיצה על הקישור שבה.</p>
+<form class="form" id="nl-form" novalidate>
+<div class="field col-2"><label for="nl-email">כתובת דוא"ל <span class="req">*</span></label><input id="nl-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="name@example.com"></div>
+<div class="field col-2 nl-consent"><label for="nl-consent"><input id="nl-consent" name="consent" type="checkbox" required> אני מאשר/ת קבלת האיגרת התקופתית לכתובת הזו. אפשר להסיר את ההרשמה בכל עת, בקישור שבתחתית כל איגרת.</label></div>
+<div class="nl-hp" aria-hidden="true"><label for="nl-website">אתר</label><input id="nl-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+<div class="field col-2"><div class="btn-row"><button type="submit" class="btn btn-primary" id="nl-submit">הרשמה לאיגרת</button><span style="align-self:center;font-size:.78rem;color:var(--text-muted)">* שדות חובה</span></div></div>
+<p class="nl-status" id="nl-status" role="status" aria-live="polite"></p>
+</form>
+</section>
 <section class="card">
 <h2 id="sec-1635p79">ארכיון איגרות</h2>
 <blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> באתר הישן קיימת קטגוריית "אגרת", אך הפריטים שאותרו בה בסריקה היו ישנים (2015–2019) ולא מהווים ארכיון פעיל ומעודכן. אין להציג כאן תאריכים או מספרי גיליון מומצאים — הרשימה למטה תוחלף בתוכן אמיתי:</blockquote>
@@ -527,6 +537,7 @@
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
 <script src="./tabs.js" defer></script>
+<script src="./newsletter.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>
 <!-- Cloudflare Web Analytics -->

@@ -176,12 +176,29 @@ for (const file of pageFiles) {
 // search moves behind a Worker that queries D1 per request.
 const API = 'https://waldorf-content-api.orenknaan.workers.dev/api/content';
 
+// CONTENT_JSON=path reads the API's response from a file instead of the
+// network. It exists because node's fetch cannot always reach the Worker from
+// here while curl can (it picks a Cloudflare address that times out), and a run
+// that silently loses the network writes a smaller index over a complete one.
+// The escape hatch:
+//
+//   curl -s https://waldorf-content-api.orenknaan.workers.dev/api/content > /tmp/content.json
+//   CONTENT_JSON=/tmp/content.json node mockup/search-index.mjs
+//
+// The file must be the same shape the endpoint returns, so fetch it rather than
+// hand-writing it, and fetch it fresh: a stale copy indexes stale records.
+const localJson = process.env.CONTENT_JSON;
+
 let data = {};
 let apiError = null;
 try {
-  const res = await fetch(API, { signal: AbortSignal.timeout(20000) });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  data = await res.json();
+  if (localJson) {
+    data = JSON.parse(readFileSync(localJson, 'utf8'));
+  } else {
+    const res = await fetch(API, { signal: AbortSignal.timeout(20000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  }
 } catch (err) {
   apiError = err.message;
 }

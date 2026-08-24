@@ -17,6 +17,15 @@ pnpm-debug.log*
 .env
 .env.production
 
+# Wrangler's local secrets file. `wrangler dev` reads it instead of the real
+# Worker secrets, so it is where an API token ends up while testing. This repo
+# is public: committing one publishes it, and deleting it later does not.
+.dev.vars
+.dev.vars.*
+
+# `wrangler dev --local` state: the local D1 database and its caches.
+.wrangler/
+
 # macOS-specific files
 .DS_Store
 

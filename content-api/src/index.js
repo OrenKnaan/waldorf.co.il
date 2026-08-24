@@ -95,6 +95,51 @@ async function noteLoginFailure(env, email, ip) {
 const clearLoginFailures = (env, email, ip) =>
   env.DB.prepare('DELETE FROM login_attempts WHERE email = ? AND ip = ?').bind(email, ip).run();
 
+/* ---------------- generic per-IP throttle ---------------- */
+// For the public endpoints that have no account behind them, where the thing
+// worth limiting is the caller rather than the target. Counts one window per
+// (bucket, ip); see migrations/0005_rate_limits.sql.
+//
+// Returns the seconds the caller must wait, or 0 if the request may proceed,
+// counting the request when it may, so the caller needs no second call.
+async function rateLimit(env, bucket, ip, max, windowSeconds) {
+  const now = Math.floor(Date.now() / 1000);
+  const row = await env.DB.prepare(
+    'SELECT hits, window_start FROM rate_limits WHERE bucket = ? AND ip = ?',
+  ).bind(bucket, ip).first();
+  if (row && now - row.window_start < windowSeconds && row.hits >= max) {
+    return windowSeconds - (now - row.window_start);
+  }
+  await env.DB.prepare(
+    `INSERT INTO rate_limits (bucket, ip, hits, window_start)
+     VALUES (?, ?, 1, ?)
+     ON CONFLICT(bucket, ip) DO UPDATE SET
+       hits = CASE WHEN ? - window_start >= ? THEN 1 ELSE hits + 1 END,
+       window_start = CASE WHEN ? - window_start >= ? THEN ? ELSE window_start END`,
+  ).bind(bucket, ip, now, now, windowSeconds, now, windowSeconds, now).run();
+  return 0;
+}
+
+const tooMany = (wait, origin) =>
+  new Response(JSON.stringify({ error: 'too_many_attempts', retryAfter: wait }), {
+    status: 429,
+    headers: { 'content-type': 'application/json; charset=utf-8', 'Retry-After': String(wait), ...cors(origin) },
+  });
+
+/* ---------------- newsletter (ActiveTrail) ---------------- */
+// Five signups an hour from one address is far more than a person needs and far
+// less than a script wants. The window is per IP, so a school or an office
+// behind one NAT could in principle hit it; at this volume that is theoretical,
+// and the failure mode is a Hebrew "try again later", not a lost subscriber.
+const NEWSLETTER_MAX = 5;
+const NEWSLETTER_WINDOW = 60 * 60;
+const ACTIVETRAIL_BASE = 'https://webapi.mymarketing.co.il';
+
+// Deliberately loose. The only claim worth checking here is "this could be an
+// address"; whether it *is* one is settled by the confirmation mail, which is
+// the point of double opt-in. A stricter pattern rejects real addresses.
+const isEmail = (s) => s.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
+
 /** Resolves the caller: a session bearer token, or the ADMIN_KEY escape hatch. */
 async function whoami(request, env) {
   const auth = request.headers.get('authorization') || '';
@@ -233,6 +278,86 @@ export default {
       return json({ ok: true, db: 'waldorf-content', eventsRows: n.c, adminKeySet: Boolean(env.ADMIN_KEY) }, 200, origin);
     }
 
+
+    // ---- POST /api/newsletter/subscribe ----
+    //
+    // Public and unauthenticated, because it sits behind a signup form that
+    // anyone may use. It exists as a proxy rather than a direct call from the
+    // page because ActiveTrail authenticates with one account-wide token that
+    // can read, edit and delete the entire contact list: in a page script that
+    // token is published to every visitor. Here it is a Worker secret
+    // (ACTIVETRAIL_TOKEN) and never leaves the Worker.
+    if (parts[0] === 'api' && parts[1] === 'newsletter' && parts[2] === 'subscribe') {
+      if (request.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, origin);
+      const body = (await request.json().catch(() => ({}))) || {};
+
+      // Honeypot: a field positioned off-screen and hidden from assistive tech,
+      // so a human never fills it and a form-filling bot usually does. The
+      // answer is the same one a success gives, or the bot learns what tripped
+      // it and drops the field next time.
+      if (body.website) return json({ ok: true }, 200, origin);
+
+      const email = String(body.email || '').trim().toLowerCase();
+      if (!isEmail(email)) return json({ error: 'bad_email' }, 400, origin);
+
+      const ip = clientIp(request);
+      const wait = await rateLimit(env, 'newsletter', ip, NEWSLETTER_MAX, NEWSLETTER_WINDOW);
+      if (wait) return tooMany(wait, origin);
+
+      if (!env.ACTIVETRAIL_TOKEN || !env.ACTIVETRAIL_GROUP_ID) {
+        // Distinct from a failed call on purpose: this one is our
+        // misconfiguration, and the page says so rather than blaming the
+        // visitor's address. See wrangler.toml for what has to be set.
+        console.error('newsletter: ACTIVETRAIL_TOKEN or ACTIVETRAIL_GROUP_ID is not set');
+        return json({ error: 'not_configured' }, 503, origin);
+      }
+
+      // Double opt-in by default: ActiveTrail sends a confirmation mail and only
+      // adds the contact once the link is clicked. That is what makes the list
+      // defensible under the Israeli anti-spam rule (חוק התקשורת, סעיף 30א),
+      // which wants consent that can be evidenced, and it also means a typo or
+      // a malicious signup with somebody else's address never becomes a
+      // subscription. Set ACTIVETRAIL_DOUBLE_OPTIN="false" to add directly.
+      const doubleOptin = String(env.ACTIVETRAIL_DOUBLE_OPTIN || 'true') !== 'false';
+      const payload = {
+        email,
+        status: doubleOptin ? 'None' : 'Subscribe',
+        subscribe_ip: ip === 'unknown' ? undefined : ip,
+      };
+      if (doubleOptin) {
+        payload.double_optin = {
+          subject: 'אישור הרשמה לאיגרת הפורום הארצי לחינוך ולדורף',
+          message: 'קיבלנו בקשה לצרף את כתובת הדוא"ל הזו לרשימת התפוצה של האיגרת התקופתית של הפורום הארצי לחינוך ולדורף. כדי להשלים את ההרשמה יש לאשר בקישור שלמטה. אם לא ביקשתם להירשם, אפשר פשוט להתעלם מההודעה.',
+          confirmation_link_text: 'אישור ההרשמה לאיגרת',
+        };
+      }
+
+      let res;
+      try {
+        res = await fetch(`${ACTIVETRAIL_BASE}/api/groups/${encodeURIComponent(env.ACTIVETRAIL_GROUP_ID)}/members`, {
+          method: 'POST',
+          headers: {
+            // No 'Bearer' prefix: ActiveTrail takes the bare token as the value.
+            Authorization: env.ACTIVETRAIL_TOKEN,
+            'content-type': 'application/json',
+            accept: 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch (e) {
+        console.error('newsletter: ActiveTrail unreachable', String(e));
+        return json({ error: 'upstream_failed' }, 502, origin);
+      }
+
+      if (!res.ok) {
+        // Logged, not returned. Their body can carry account details, and the
+        // visitor can do nothing with a 403 from a service they never heard of.
+        const detail = await res.text().catch(() => '');
+        console.error('newsletter: ActiveTrail rejected', res.status, detail.slice(0, 300));
+        return json({ error: 'upstream_failed' }, 502, origin);
+      }
+      return json({ ok: true, doubleOptin }, 200, origin);
+    }
 
     // ---- auth ----
     if (parts[0] === 'api' && parts[1] === 'auth') {

@@ -12,3 +12,35 @@ compatibility_date = "2026-08-01"
 binding = "DB"
 database_name = "waldorf-content"
 database_id = "a8bb8c4e-5f95-4c8b-a246-2d4cf8adcc86"
+
+# ---------------------------------------------------------------------------
+# Newsletter (ActiveTrail / mymarketing.co.il)
+#
+# THE API TOKEN DOES NOT GO IN THIS FILE. This repository is public, so a token
+# committed here is a token published, and deleting it later does not unpublish
+# it: git history keeps serving it. ActiveTrail issues one account-wide token
+# that can read, edit and delete the whole contact list, so treat it the way you
+# would treat the account password.
+#
+# Set it once, from this directory, as an encrypted Worker secret:
+#
+#     npx wrangler secret put ACTIVETRAIL_TOKEN
+#
+# The command prompts for the value and does not echo it. It is stored encrypted
+# by Cloudflare, injected as env.ACTIVETRAIL_TOKEN at runtime, and cannot be
+# read back out of the dashboard afterwards. To rotate: run the same command
+# again with the new value, then revoke the old token in the ActiveTrail UI
+# under settings -> API apps.
+#
+# The two vars below are identifiers rather than credentials, so they belong in
+# the file. ACTIVETRAIL_GROUP_ID is the group new subscribers join: find it with
+# `GET /api/groups` on their API, or read it out of the group's URL in the
+# ActiveTrail UI under Contacts -> Groups. Until it is filled in, the endpoint
+# answers 503 and the form says the signup is not available yet.
+#
+# ACTIVETRAIL_DOUBLE_OPTIN left at "true" means ActiveTrail sends a confirmation
+# mail and only subscribes the address once the visitor clicks it. Set it to
+# "false" only if the forum decides it would rather subscribe people directly.
+[vars]
+ACTIVETRAIL_GROUP_ID = ""
+ACTIVETRAIL_DOUBLE_OPTIN = "true"
