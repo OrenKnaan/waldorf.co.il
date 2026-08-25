@@ -44,3 +44,9 @@ database_id = "a8bb8c4e-5f95-4c8b-a246-2d4cf8adcc86"
 [vars]
 ACTIVETRAIL_GROUP_ID = ""
 ACTIVETRAIL_DOUBLE_OPTIN = "true"
+
+# Where the admin is served from, used to build absolute set-password links.
+# Without it the Worker falls back to the caller's Origin, right from a browser
+# and empty from anything else, so a link minted by a script or destined for an
+# email comes out relative and unusable.
+ADMIN_BASE_URL = "https://orenknaan.github.io/waldorf.co.il"
