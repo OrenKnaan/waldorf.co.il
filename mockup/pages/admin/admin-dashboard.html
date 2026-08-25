@@ -98,13 +98,22 @@ button{font-family:inherit;cursor:pointer}
 .btn-primary{background:var(--brown);color:#FBF6EE;width:100%;margin-top:4px}
 .btn-primary:hover{background:color-mix(in oklab,var(--brown) 86%,#000)}
 :root[data-theme="dark"] .btn-primary{color:#1a120a}
+/* The same fix for the system setting, which is the state most people are
+   actually in. Dark mode redefines --brown to a light tan, so the near-white
+   label lands at 1.69:1 on its own button and all but disappears. Only the
+   explicit theme choice was covered. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{color:#1a120a}}
 .btn-ghost{background:transparent;color:var(--brown);border-color:var(--tan)}
 .btn-ghost:hover{background:var(--beige)}
 .btn-sm{padding:7px 13px;font-size:.82rem}
 .notice{
   display:flex;gap:8px;align-items:flex-start;margin:18px 0 2px;padding:9px 12px;
-  background:var(--warn-bg);color:var(--warn);border-radius:var(--r);font-size:.8rem;line-height:1.45;
+  /* Not var(--warn): amber on amber-tint is 2.99:1 at this size, under AA.
+     --warn itself is left alone; on the page background it passes. */
+  background:var(--warn-bg);color:#8A5A12;border-radius:var(--r);font-size:.8rem;line-height:1.45;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .notice{color:var(--warn)}}
+:root[data-theme="dark"] .notice{color:var(--warn)}
 .notice svg{width:15px;height:15px;flex:none;margin-top:2px}
 
 /* ===== dashboard shell ===== */
