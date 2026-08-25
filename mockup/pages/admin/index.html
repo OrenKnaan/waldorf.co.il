@@ -278,7 +278,8 @@ td.muted{color:var(--muted)}
 
   function say(text, tone) {
     msg.textContent = text || '';
-    msg.style.color = tone === 'bad' ? '#B4342B' : '';
+    // var(--crit), not a fixed red: the hard-coded one is 2.57:1 on the dark card.
+    msg.style.color = tone === 'bad' ? 'var(--crit)' : '';
   }
 
   function toEmailStep() {
