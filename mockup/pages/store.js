@@ -88,6 +88,24 @@
           return reload().then(function () { return r.user; });
         });
     },
+    // Step one of signing in: is there an account here, and can it be logged
+    // into yet? Answers 'has_password' | 'needs_password' | 'unknown'.
+    lookup: function (email) {
+      return req('/api/auth/lookup', { method: 'POST', body: JSON.stringify({ email: email }) })
+        .then(function (r) { return r.status; });
+    },
+    // Ask for a set-password link. Resolves either way: the server answers the
+    // same for a known and an unknown address on purpose, so there is nothing
+    // here to branch on except whether mail actually went out.
+    requestReset: function (email) {
+      return req('/api/auth/request-reset', { method: 'POST', body: JSON.stringify({ email: email }) });
+    },
+    setupToken: function (token) {
+      return req('/api/auth/setup-token?token=' + encodeURIComponent(token));
+    },
+    setPassword: function (token, password) {
+      return req('/api/auth/set-password', { method: 'POST', body: JSON.stringify({ token: token, password: password }) });
+    },
     logout: function () {
       return req('/api/auth/logout', { method: 'POST' })
         .catch(function () {})
@@ -101,6 +119,9 @@
     createUser: function (u) { return req('/api/users', { method: 'POST', body: JSON.stringify(u) }); },
     updateUser: function (id, patch) { return req('/api/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify(patch) }); },
     deleteUser: function (id) { return req('/api/users/' + encodeURIComponent(id), { method: 'DELETE' }); },
+    // Mint a set-password link for someone else. super_admin only, and the
+    // delivery path that works while no mail provider is configured.
+    inviteUser: function (id) { return req('/api/users/' + encodeURIComponent(id) + '/invite', { method: 'POST', body: '{}' }); },
 
     /* ---- singleton drafts & history ---- */
     aboutState: function () { return req('/api/singleton/about/draft'); },

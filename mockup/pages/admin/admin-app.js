@@ -654,7 +654,7 @@
     }
     panel.appendChild(head);
 
-    var t = makeTable(['שם', 'דוא"ל', 'תפקיד', 'כניסה אחרונה', '']);
+    var t = makeTable(['שם', 'דוא"ל', 'סטטוס', 'תפקיד', 'כניסה אחרונה', '']);
     var tbody = t.tbody;
     panel.appendChild(t.wrap);
     var formHost = el('div');
@@ -671,11 +671,17 @@
       tbody.textContent = '';
       WStore.users().then(function (list) {
         tbody.textContent = '';
-        if (!list.length) { emptyRow(tbody, 5, 'אין משתמשים'); return; }
+        if (!list.length) { emptyRow(tbody, 6, 'אין משתמשים'); return; }
         list.forEach(function (u) {
           var actions = el('div', { class: 'row-actions' });
           if (boss) {
             actions.appendChild(actBtn('edit', 'עריכה', function () { openUserForm(u); }));
+            // The delivery path that works while no mail provider is
+            // configured: mint the link here and hand it over.
+            actions.appendChild(actBtn('edit', u.hasPassword ? 'קישור לאיפוס' : 'קישור להגדרת סיסמה', function () {
+              WStore.inviteUser(u.id).then(function (r) { showInviteLink(formHost, u, r); })
+                .catch(function () { alert('יצירת הקישור נכשלה.'); });
+            }));
             if (u.id !== me.id) {
               actions.appendChild(actBtn('del', 'מחיקה', function () {
                 if (!confirm('למחוק את המשתמש "' + u.name + '"? הפעולה אינה הפיכה.')) return;
@@ -691,6 +697,11 @@
           tbody.appendChild(el('tr', {}, [
             titleCell(u.name + (u.id === me.id ? ' (אני)' : ''), false),
             td(u.email, 'muted'),
+            // An account with no password yet cannot be logged into at all, so
+            // say so plainly rather than leaving it looking active.
+            td(u.hasPassword
+              ? el('span', { class: 'pill neutral', text: 'פעיל' })
+              : el('span', { class: 'pill warn', title: 'טרם הוגדרה סיסמה — יש לשלוח קישור', text: 'ממתין להגדרת סיסמה' })),
             td(el('span', { class: 'pill ' + (u.role === 'super_admin' ? 'ok' : 'neutral'),
                             title: ROLE_HELP[u.role] || '', text: ROLE_NAMES[u.role] || u.role })),
             td(fmtLogin(u.last_login), 'muted'),
@@ -699,8 +710,46 @@
         });
       }).catch(function () {
         tbody.textContent = '';
-        emptyRow(tbody, 5, 'לא ניתן לטעון את רשימת המשתמשים');
+        emptyRow(tbody, 6, 'לא ניתן לטעון את רשימת המשתמשים');
       });
+    }
+
+    /* Shows a freshly minted set-password link, selected and ready to copy.
+       This is what stands in for an email until a mail provider exists: a
+       super_admin creates the link and sends it by whatever channel they
+       already use. The link is a credential for the few hours it lives, so it
+       is shown once, here, and never stored anywhere. */
+    function showInviteLink(host, u, r) {
+      host.textContent = '';
+      var box = el('div', { class: 'panel', style: 'padding:16px;margin-top:12px' });
+      box.appendChild(el('h3', { text: (r.kind === 'invite' ? 'קישור להגדרת סיסמה עבור ' : 'קישור לאיפוס סיסמה עבור ') + u.name }));
+      box.appendChild(el('p', { class: 'empty-hint', style: 'padding:6px 0',
+        text: r.mailed
+          ? 'הקישור נשלח בדוא"ל. אפשר גם להעתיק אותו מכאן.'
+          : 'טרם מוגדר שירות דוא"ל, ולכן הקישור לא נשלח. העתיקו ושלחו אותו למשתמש.' }));
+      var input = el('input', { type: 'text', readonly: 'readonly', value: r.link,
+        style: 'width:100%;font-family:monospace;font-size:.8rem;direction:ltr;padding:8px' });
+      box.appendChild(input);
+      var row = el('div', { class: 'btn-row', style: 'margin-top:10px;gap:8px' });
+      var copy = el('button', { class: 'btn btn-primary btn-sm', type: 'button', text: 'העתקת הקישור' });
+      copy.addEventListener('click', function () {
+        input.select();
+        var done = function () { copy.textContent = 'הועתק'; setTimeout(function () { copy.textContent = 'העתקת הקישור'; }, 1800); };
+        // execCommand is the fallback: navigator.clipboard needs a secure
+        // context, and the admin is opened over plain http often enough.
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(r.link).then(done, function () { try { document.execCommand('copy'); done(); } catch (e) {} });
+        } else { try { document.execCommand('copy'); done(); } catch (e) {} }
+      });
+      row.appendChild(copy);
+      var close = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'סגירה' });
+      close.addEventListener('click', function () { host.textContent = ''; });
+      row.appendChild(close);
+      box.appendChild(row);
+      box.appendChild(el('p', { class: 'empty-hint', style: 'padding:8px 0 0',
+        text: 'תקף ל-' + r.expiresInHours + ' שעות ולשימוש אחד. יצירת קישור חדש מבטלת את הקודם.' }));
+      host.appendChild(box);
+      input.select();
     }
 
     /** passwordOnly: a non-super-admin editing their own account. */
@@ -715,7 +764,11 @@
           { v: 'editor', t: ROLE_NAMES.editor }, { v: 'admin', t: ROLE_NAMES.admin }, { v: 'super_admin', t: ROLE_NAMES.super_admin }
         ] });
       }
-      fields.push({ name: 'password', label: isNew ? 'סיסמה' : 'סיסמה חדשה (השאירו ריק כדי לא לשנות)', type: 'password', required: isNew });
+      // Never required. A new user gets a link and chooses their own, so that
+      // nobody but them ever knows it; an existing one is only changed here by
+      // its owner. Left blank on create, the account is made without a password
+      // and the invite link comes back with the response.
+      fields.push({ name: 'password', label: isNew ? 'סיסמה (אפשר להשאיר ריק ולשלוח קישור)' : 'סיסמה חדשה (השאירו ריק כדי לא לשנות)', type: 'password', required: false });
 
       openForm(formHost, fields, u || { role: 'editor' }, function (vals) {
         var patch = {};
@@ -727,7 +780,20 @@
               : code === 'forbidden' ? 'אין לך הרשאה לפעולה הזו.'
               : 'השמירה נכשלה.');
         };
-        if (isNew) WStore.createUser(patch).then(done).catch(oops);
+        if (isNew) WStore.createUser(patch).then(function (created) {
+          draw();
+          // An account made without a password cannot be logged into until
+          // somebody delivers its link, so put the link on screen straight
+          // away rather than making the admin go find the row and ask again.
+          if (created && created.invite && !created.hasPassword) {
+            showInviteLink(formHost, created, {
+              link: created.invite.link, kind: 'invite',
+              mailed: created.invite.mailed, expiresInHours: created.invite.expiresInHours,
+            });
+          } else {
+            formHost.textContent = '';
+          }
+        }).catch(oops);
         else WStore.updateUser(u.id, patch).then(function () {
           // Changing a password ends that user's other sessions, including your own.
           if (patch.password && u.id === me.id) {
