@@ -54,6 +54,99 @@ const sha256hex = async (s) => {
 };
 const SESSION_DAYS = 14;
 
+/* ---------------- password setup links ---------------- */
+// An invite (a new account's first password) and a reset (an existing one's
+// replacement) are the same mechanism. Both mint a single-use token, hashed at
+// rest like a session token, because a leaked row must not be a usable
+// credential.
+const RESET_TTL_HOURS = { invite: 72, reset: 2 };
+
+// '' is how an account with no password yet is stored. It never parses as a
+// pbkdf2 string, so verifyPassword rejects every password against it, the empty
+// one included, without needing its own guard.
+const NO_PASSWORD = '';
+const hasPassword = (row) => Boolean(row && row.password_hash && row.password_hash !== NO_PASSWORD);
+
+async function mintSetupToken(env, userId, kind) {
+  const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+  const hours = RESET_TTL_HOURS[kind] || 2;
+  // Any earlier unused link for this user stops working: asking for a second
+  // reset should invalidate the first, or a stale mail stays live for days.
+  await env.DB.prepare('DELETE FROM password_resets WHERE user_id = ? AND used_at IS NULL').bind(userId).run();
+  await env.DB.prepare(
+    `INSERT INTO password_resets (token_hash,user_id,kind,created_at,expires_at)
+     VALUES (?,?,?,strftime('%s','now'),strftime('%s','now') + ?)`,
+  ).bind(await sha256hex(token), userId, kind, hours * 3600).run();
+  return token;
+}
+
+// Where the set-password page lives. ADMIN_BASE_URL wins; otherwise fall back
+// to the calling origin, which is right for both the GitHub Pages host now and
+// the real domain later, and wrong only for a request with no Origin, where
+// there is no browser to send anywhere.
+function setupLink(env, token, origin) {
+  const base = (env.ADMIN_BASE_URL || origin || '').replace(/\/+$/, '');
+  return `${base}/admin/set-password.html?token=${token}`;
+}
+
+/**
+ * Mails a set-password link. Returns whether it actually went anywhere.
+ *
+ * There is no mail provider configured for this project, so with no
+ * RESEND_API_KEY set this returns false and the caller tells the visitor to ask
+ * an administrator for the link. That is deliberately not a silent failure: a
+ * password flow that claims to have sent mail it never sent is worse than one
+ * that admits it cannot.
+ *
+ * Resend because it is one HTTPS call with no SDK, which is all a Worker can do
+ * without pulling in a runtime it does not have. Swapping it for another
+ * provider is this one function.
+ */
+async function sendSetupLink(env, email, token, kind, origin) {
+  if (!env.RESEND_API_KEY || !env.MAIL_FROM) return false;
+  const link = setupLink(env, token, origin);
+  const invite = kind === 'invite';
+  const subject = invite ? 'הזמנה למערכת הניהול של הפורום' : 'איפוס סיסמה למערכת הניהול';
+  const lead = invite
+    ? 'נפתח עבורך חשבון במערכת הניהול של הפורום הארצי לחינוך ולדורף. כדי להיכנס, בחרו סיסמה:'
+    : 'התקבלה בקשה לאיפוס הסיסמה שלכם במערכת הניהול. כדי לבחור סיסמה חדשה:';
+  const hours = RESET_TTL_HOURS[kind];
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: env.MAIL_FROM,
+        to: [email],
+        subject,
+        html:
+          `<div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;color:#3D2B1F">` +
+          `<p>${lead}</p>` +
+          `<p><a href="${link}" style="background:#6B4F35;color:#fff;padding:10px 22px;` +
+          `border-radius:999px;text-decoration:none;display:inline-block">בחירת סיסמה</a></p>` +
+          `<p style="font-size:13px;color:#7A6555">הקישור תקף ל-${hours} שעות ולשימוש אחד בלבד.` +
+          ` אם לא ביקשתם זאת, אפשר להתעלם מההודעה.</p></div>`,
+      }),
+    });
+    return res.ok;
+  } catch {
+    // A provider outage must not turn into a 500 on a password flow; the caller
+    // falls back to "ask an administrator".
+    return false;
+  }
+}
+
+/** The row behind a token, or null if it is unknown, spent or expired. */
+async function readSetupToken(env, token) {
+  if (!token) return null;
+  return env.DB.prepare(
+    `SELECT r.user_id, r.kind, u.name, u.email
+       FROM password_resets r JOIN users u ON u.id = r.user_id
+      WHERE r.token_hash = ? AND r.used_at IS NULL
+        AND r.expires_at > strftime('%s','now') AND u.active = 1`,
+  ).bind(await sha256hex(token)).first();
+}
+
 /* ---------------- login throttling ---------------- */
 // Without this, /api/auth/login is an unlimited guessing oracle against an
 // address an attacker already knows. Five misses buys a fifteen-minute pause
@@ -392,6 +485,81 @@ export default {
         await env.DB.prepare("UPDATE users SET last_login = strftime('%s','now') WHERE id = ?").bind(row.id).run();
         return json({ token, expiresInDays: SESSION_DAYS, user: { id: row.id, name: row.name, email: row.email, role: row.role } }, 200, origin);
       }
+      // Step one of the two-step sign-in: does this address have an account,
+      // and does it have a password yet?
+      //
+      // This deliberately gives up the enumeration protection the login
+      // response is careful to keep. There is no way to ask "should I show a
+      // password box or an invite notice" without answering "does this address
+      // exist". Throttled on the same counter as login so it cannot be used to
+      // sweep a list of addresses quickly.
+      if (parts[2] === 'lookup' && request.method === 'POST') {
+        const { email } = (await request.json().catch(() => ({}))) || {};
+        if (!email) return json({ error: 'missing_email' }, 400, origin);
+        const ip = clientIp(request);
+        const wait = await loginRetryAfter(env, email, ip);
+        if (wait) {
+          return new Response(JSON.stringify({ error: 'too_many_attempts', retryAfter: wait }), {
+            status: 429,
+            headers: { 'content-type': 'application/json; charset=utf-8', 'Retry-After': String(wait), ...cors(origin) },
+          });
+        }
+        const row = await env.DB.prepare('SELECT id, password_hash FROM users WHERE email = ? AND active = 1').bind(email).first();
+        if (!row) {
+          // Counted, so a scan of many addresses runs into the same wall a
+          // password guess does.
+          await noteLoginFailure(env, email, ip);
+          return json({ status: 'unknown' }, 200, origin);
+        }
+        return json({ status: hasPassword(row) ? 'has_password' : 'needs_password' }, 200, origin);
+      }
+
+      // Ask for a link, either to set a first password or to replace one.
+      // Always 200 with the same body: this one does not need to leak anything,
+      // so it does not.
+      if (parts[2] === 'request-reset' && request.method === 'POST') {
+        const { email } = (await request.json().catch(() => ({}))) || {};
+        if (!email) return json({ error: 'missing_email' }, 400, origin);
+        const row = await env.DB.prepare('SELECT id, password_hash FROM users WHERE email = ? AND active = 1').bind(email).first();
+        let delivered = false;
+        if (row) {
+          const token = await mintSetupToken(env, row.id, hasPassword(row) ? 'reset' : 'invite');
+          delivered = await sendSetupLink(env, email, token, hasPassword(row) ? 'reset' : 'invite', origin);
+        }
+        // `delivered:false` with a 200 tells the UI to say "if that address has
+        // an account, a link is on its way" and, when no mail provider is
+        // configured, to add that an administrator has to hand the link over.
+        return json({ ok: true, delivered }, 200, origin);
+      }
+
+      // Spend a token and set the password on it.
+      if (parts[2] === 'set-password' && request.method === 'POST') {
+        const { token, password } = (await request.json().catch(() => ({}))) || {};
+        if (!token || !password) return json({ error: 'missing_fields' }, 400, origin);
+        if (String(password).length < 10) return json({ error: 'password_too_short', minimum: 10 }, 400, origin);
+        const row = await readSetupToken(env, token);
+        if (!row) return json({ error: 'invalid_or_expired' }, 400, origin);
+        await env.DB.prepare('UPDATE users SET password_hash = ?, updated_at = strftime(\'%s\',\'now\') WHERE id = ?')
+          .bind(await hashPassword(password), row.user_id).run();
+        await env.DB.prepare("UPDATE password_resets SET used_at = strftime('%s','now') WHERE token_hash = ?")
+          .bind(await sha256hex(token)).run();
+        // Every session for this user ends: if the reset was because the
+        // password leaked, whoever holds a token from it is logged out too.
+        await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(row.user_id).run();
+        await env.DB.prepare('DELETE FROM login_attempts WHERE email = ?').bind(row.email).run();
+        return json({ ok: true, email: row.email }, 200, origin);
+      }
+
+      // What a link is for, so the page can say "set your password" or
+      // "choose a new password" and greet the right person. Reveals nothing an
+      // unexpired token does not already carry.
+      if (parts[2] === 'setup-token' && request.method === 'GET') {
+        const row = await readSetupToken(env, url.searchParams.get('token'));
+        return row
+          ? json({ valid: true, kind: row.kind, name: row.name, email: row.email }, 200, origin)
+          : json({ valid: false }, 200, origin);
+      }
+
       if (parts[2] === 'me' && request.method === 'GET') {
         return user ? json({ user }, 200, origin) : json({ error: 'unauthorized' }, 401, origin);
       }
@@ -416,24 +584,41 @@ export default {
         // could read the whole roster: names, addresses, roles, last-login.
         if (!boss) return json({ error: 'forbidden' }, 403, origin);
         const { results } = await env.DB.prepare(
-          'SELECT id,name,email,role,active,last_login,created_at FROM users ORDER BY created_at',
+          'SELECT id,name,email,role,active,last_login,created_at,password_hash FROM users ORDER BY created_at',
         ).all();
-        return json(results, 200, origin);
+        // hasPassword, never the hash itself. The admin needs to show which
+        // accounts are still waiting on their invite; it has no use for the
+        // material behind that answer.
+        return json(results.map(({ password_hash, ...u }) => ({ ...u, hasPassword: hasPassword({ password_hash }) })), 200, origin);
       }
       if (request.method === 'POST' && !uid) {
         if (!boss) return json({ error: 'forbidden' }, 403, origin);
         const body = (await request.json().catch(() => ({}))) || {};
-        if (!body.name || !body.email || !body.password) return json({ error: 'missing_fields' }, 400, origin);
+        if (!body.name || !body.email) return json({ error: 'missing_fields' }, 400, origin);
+        // No password is the normal way to create someone: they set their own
+        // through an invite link, so nobody else ever knows it. A password may
+        // still be passed, for seeding a first super_admin without mail.
+        const hash = body.password ? await hashPassword(body.password) : NO_PASSWORD;
         const id = 'u-' + crypto.randomUUID().slice(0, 8);
         try {
           await env.DB.prepare(
             `INSERT INTO users (id,name,email,role,password_hash,active,created_at,updated_at)
              VALUES (?,?,?,?,?,1,strftime('%s','now'),strftime('%s','now'))`,
-          ).bind(id, body.name, body.email, body.role || 'editor', await hashPassword(body.password)).run();
+          ).bind(id, body.name, body.email, body.role || 'editor', hash).run();
         } catch (e) {
           return json({ error: 'email_taken' }, 409, origin);
         }
-        return json({ id, name: body.name, email: body.email, role: body.role || 'editor', active: 1 }, 201, origin);
+        // An invite goes out straight away when mail is configured; when it is
+        // not, `invite.mailed` is false and the admin shows the link to hand
+        // over instead.
+        const kind = body.password ? 'reset' : 'invite';
+        const token = await mintSetupToken(env, id, kind);
+        const mailed = await sendSetupLink(env, body.email, token, kind, origin);
+        return json({
+          id, name: body.name, email: body.email, role: body.role || 'editor', active: 1,
+          hasPassword: Boolean(body.password),
+          invite: { link: setupLink(env, token, origin), mailed, expiresInHours: RESET_TTL_HOURS[kind] },
+        }, 201, origin);
       }
       if (request.method === 'PATCH' && uid) {
         const self = user.id === uid;
@@ -455,6 +640,20 @@ export default {
         const row = await env.DB.prepare('SELECT id,name,email,role,active,last_login FROM users WHERE id = ?').bind(uid).first();
         return json(row, 200, origin);
       }
+      // POST /api/users/:id/invite — mint a set-password link for someone else.
+      // The delivery path that works today: super_admin generates it and sends
+      // it by whatever channel they already use. Also the fallback when mail is
+      // configured but bouncing.
+      if (request.method === 'POST' && uid && parts[3] === 'invite') {
+        if (!boss) return json({ error: 'forbidden' }, 403, origin);
+        const target = await env.DB.prepare('SELECT id, email, password_hash FROM users WHERE id = ? AND active = 1').bind(uid).first();
+        if (!target) return json({ error: 'not_found' }, 404, origin);
+        const kind = hasPassword(target) ? 'reset' : 'invite';
+        const token = await mintSetupToken(env, target.id, kind);
+        const mailed = await sendSetupLink(env, target.email, token, kind, origin);
+        return json({ link: setupLink(env, token, origin), kind, mailed, expiresInHours: RESET_TTL_HOURS[kind] }, 200, origin);
+      }
+
       if (request.method === 'DELETE' && uid) {
         if (!boss) return json({ error: 'forbidden' }, 403, origin);
         if (uid === user.id) return json({ error: 'cannot_delete_self' }, 400, origin);

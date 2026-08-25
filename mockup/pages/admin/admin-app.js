@@ -732,7 +732,7 @@
           // Changing a password ends that user's other sessions, including your own.
           if (patch.password && u.id === me.id) {
             alert('הסיסמה עודכנה. יש להתחבר מחדש.');
-            WStore.logout().then(function () { location.href = './admin.html'; });
+            WStore.logout().then(function () { location.href = './'; });
             return;
           }
           done();
@@ -801,7 +801,7 @@
       if (/יציאה|logout/i.test(b.getAttribute('title') || b.getAttribute('aria-label') || '')) {
         b.addEventListener('click', function (e) {
           e.preventDefault();
-          WStore.logout().then(function () { location.href = './admin.html'; });
+          WStore.logout().then(function () { location.href = './'; });
         });
       }
     });
