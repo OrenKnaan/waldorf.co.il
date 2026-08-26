@@ -42,7 +42,7 @@ database_id = "a8bb8c4e-5f95-4c8b-a246-2d4cf8adcc86"
 # mail and only subscribes the address once the visitor clicks it. Set it to
 # "false" only if the forum decides it would rather subscribe people directly.
 [vars]
-ACTIVETRAIL_GROUP_ID = ""
+ACTIVETRAIL_GROUP_ID = "715085"
 ACTIVETRAIL_DOUBLE_OPTIN = "true"
 
 # Where the admin is served from, used to build absolute set-password links.
