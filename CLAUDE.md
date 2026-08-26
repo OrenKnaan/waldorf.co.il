@@ -30,7 +30,7 @@ Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.js
 - A Cloudflare Pages project, Git-connected (build command `npm run build`, output directory `dist`), so every push to `main` deploys to production and every PR/branch gets an automatic preview URL.
 - **Pre-launch lockdown**: until the real domain cuts over, the site must stay off Google/AI crawlers and mostly private:
   - `public/robots.txt` disallows everything.
-  - Every page's `<head>` should carry `<meta name="robots" content="noindex, nofollow, noarchive">` (already on all 43 `mockup/pages/*.html` and on `src/pages/index.astro` — add it to any new page you create pre-launch).
+  - Every page's `<head>` should carry `<meta name="robots" content="noindex, nofollow, noarchive">` (already on all 50 `mockup/pages/*.html` and on `src/pages/index.astro` — add it to any new page you create pre-launch).
   - A Cloudflare Access (Zero Trust) login wall sits in front of the whole `*.pages.dev` deployment as the actual access control (robots/meta are just backup signals — well-behaved crawlers only, not a real barrier on their own).
   - **All three must be removed together at launch cutover**, at the same time the custom domain `waldorf.co.il` is attached to the Pages project and the old-site URL redirects (see below) go live.
 - The live site at waldorf.co.il is untouched throughout — the custom domain is only attached to the new Cloudflare Pages project on launch day, not before.
@@ -56,7 +56,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 **Crawler lockdown — remove all of it together, on cutover day, at the same time the custom domain goes live and the old-URL redirects are published.** Removing any one piece early exposes an unfinished site; leaving any piece in place after launch silently keeps the real site out of Google.
 
-1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 43 `mockup/pages/*.html` and in `src/pages/index.astro`.
+1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 50 `mockup/pages/*.html` and in `src/pages/index.astro`.
 2. `public/robots.txt` disallowing everything — **not created yet** (pointless on GitHub Pages, see Deployment above; add it when the Cloudflare Pages project exists, then remove at cutover).
 3. Cloudflare Access (Zero Trust) wall over `*.pages.dev` — **not set up yet**.
 
@@ -70,11 +70,13 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 9. `.github/workflows/pages.yml` — publishes `mockup/pages/` to GitHub Pages. Decide explicitly whether to retire it or keep it as a design reference; if it stays, the GitHub Pages URL stays public.
 10. Cloudflare Web Analytics is pointed at the **mockup host** (`orenknaan.github.io`), token in `mockup/analytics-config.mjs`, injected by `mockup/patch-analytics.mjs`. Cloudflare has no "clear data" action, so at cutover: delete the Web Analytics site, create a fresh one for `waldorf.co.il`, put the new token in the config and the new site tag in `analytics-worker/wrangler.toml`, re-run the patcher. Pre-launch numbers vanish with the old site — which is the intent.
 
+11. **`חומר למיון` — the triage section.** Seven pages (`mockup/pages/sorting*.html`), a shared widget (`pages/sorting.js`), 364 content items under `pages/sorting-data/`, two generators (`mockup/sorting-content.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together — pages, data, generators, and the nav entry (`node mockup/patch-sorting-nav.mjs` with `ENABLED = false` strips the entry and its CSS from every page).
+
 **Placeholder content that must not ship:**
 
-11. Page titles all end in `— מוקאפ`, and the footer of all 42 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
-12. 11 pages carry 26 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
-13. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
+12. Page titles all end in `— מוקאפ`, and the footer of all 49 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
+13. 11 pages carry 26 `<span class="ph">` notes. These are open questions addressed to us and to the client, rendered as visible page text — not copy for readers. They flag genuinely missing information, e.g. `contact.html` has no office address, phone or opening hours (never published on the old site) and three unresolved `קישור` targets. Each one needs an answer, not deletion.
+14. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
 
 (The generic Hebrew filler that used to be here — `[שם]`, `תוכן מלא יוכנס כאן` — is gone; it was replaced by real scraped copy. Only the specific gaps in 12–13 remain.)
 
@@ -134,6 +136,76 @@ Permanent, like the two layers above: the signup on `forum-newsletter.html` is r
 
 Verified against the live ActiveTrail API with a deliberately invalid token: their 401 says specifically "invalid API Key", which confirms the path and the bare `Authorization` header (no `Bearer` prefix) are right. Also verified 405/400/429/503, the honeypot, and axe-core at the four WCAG tags at 375px, 600px and 1792px, in the default state and with an error showing: **0 violations**.
 
+## The triage section (חומר למיון)
+
+**Temporary**, unlike the three layers above — it is item 11 of the cutover inventory, and
+it comes out whole. It exists because the new site is a rewrite: its pages are shorter and
+better organised than the old ones, and in the process 364 items were left behind that
+nobody has decided about. The section is where that decision gets made, not a part of the
+site a reader is meant to browse.
+
+Nothing in it edits existing content. The generators only ever write `pages/sorting*.html`
+and `pages/sorting-data/`; the one change to the 42 existing pages is the 16-line nav entry
+`patch-sorting-nav.mjs` adds, which the same script removes.
+
+- `mockup/sorting-content.mjs` — pulls the content from the old site's **WordPress REST
+  API**, the same one `migration/README.md` documents, so the inventory is complete rather
+  than crawled. Writes `pages/sorting-data/index.json` (metadata for every item) and
+  `pages/sorting-data/items/<id>.html` (one sanitised body each, fetched only when opened).
+  Re-run it to refresh; the forum is still publishing, so the counts move.
+  - **What counts as missing.** All 331 posts, plus the structural pages whose text the new
+    site does not carry. That second judgement is measured, not guessed: eight-word shingles
+    of the old page are looked for across all the static pages and the D1 collections, and
+    anything above 50% coverage is treated as already migrated. Pages between 15% and 50%
+    are kept and flagged — the new site carries a shortened version, and the interesting
+    part is what was cut.
+  - **Sanitising.** Element ids are stripped (several bodies open on one page would collide),
+    inline handlers go, and every `<iframe>` becomes a plain link — nine third parties, one
+    of them a `javascript:` src. Two accessibility repairs happen here rather than in the
+    page: an `<img>` with no `alt` at all gets one naming the gap, and a link whose only
+    content is a decorative image is named from the file it points at. Both are failures in
+    the source HTML; fixing them downstream is not possible.
+- `mockup/sorting-pages.mjs` — generates the seven pages from `media.html`'s skeleton, so
+  they inherit the stylesheet, header, nav, footer, accessibility and search layers verbatim
+  instead of a second copy that drifts. It strips `store.js`/`dynamic.js` (this section reads
+  nothing from D1) **and the skeleton's own `WDyn` render calls**, which otherwise throw on
+  every page. It writes the `id="sec-…"` anchors itself, using the same FNV-1a hash
+  `patch-search.mjs` uses, so that patcher stays a no-op here.
+- `mockup/patch-sorting-nav.mjs` — the nav entry and its badge CSS, on every page.
+  `ENABLED = false` strips both back out. The badge rule is inserted **before** the
+  `/* ===== responsive ===== */` marker, which `patch-responsive.mjs` rewrites verbatim on
+  every run and would otherwise swallow.
+- `mockup/pages/sorting.js` — the widget: injects its own CSS (like `search.js`), renders the
+  list for whichever group `<main data-sorting-group>` names, buckets it, filters it, and
+  fetches an item's body on first open. Hebrew filtering folds niqqud, quote marks and final
+  letters, for the reason the search section gives.
+  - It re-implements the overflowing-table `tabindex` toggle from `accessibility.js` for the
+    tables it injects. That file observes only the wraps present when it initialises, and
+    these arrive when somebody opens an item — the alternative was exporting a re-scan hook
+    from a permanent file, which this section must not need. Keep the `ResizeObserver` at
+    module scope, exactly as the accessibility section warns.
+
+Two things to know before relying on it:
+
+- **Files and images still load from the old site.** Every `href` and `src` resolves against
+  `waldorf.co.il`, which is live today and will not be after cutover — 239 `/wp-content/`
+  URLs, 205 of them the old site's own files, and two thirds of those reached through
+  Jetpack's `i0.wp.com` proxy rather than directly. `migration/README.md` (section "Two
+  things the file deliberately does not cover", point 2) carries the counting command and
+  the consequence: **this pile has to be sorted before the domain moves, not after**, or
+  whatever the forum decides to keep has nowhere left to be copied from.
+- **The index is a snapshot**, like the search index. Something published on the old site
+  today does not appear until `sorting-content.mjs` runs again.
+
+Verified in headless Chrome over CDP: the seven pages render 364 items across 50 buckets with
+**no console errors**, item bodies load on demand, the filter narrows correctly, injected
+tables become focusable only while they actually overflow, and no page scrolls horizontally
+at 375px. 724 links, fragments and data references all resolve. axe-core 4.13 at
+`wcag2a, wcag2aa, wcag21a, wcag21aa` at 1280px, 600px and 375px, closed and with five items
+expanded, and again with every accessibility adjustment switched on: **0 violations**. Three
+real failures were found and fixed on the way — an alt-less image, an unnamed image link, and
+the injected tables.
+
 ## Scanning for bugs and violations
 
 There is no test suite and no linter in `package.json`, and adding one is not the point: the tools below are run on demand, from a sandbox outside the repo so `package-lock.json` is never touched. Installing a linter into this project is what broke CI once already (see the note in Commands).
@@ -148,8 +220,8 @@ Nine layers, in rough order of how much they find here:
 3. **Secrets.** Grep the tracked files for key/token/password patterns. The repo is public, so anything committed is published, and deleting it later does not unpublish it.
 4. **JS static analysis.** ESLint with correctness rules only, no style rules. Roughly 6,000 lines of vanilla JS across `mockup/pages/`, `mockup/*.mjs` and both Workers. It has found nothing but dead variables, which is a useful thing to know.
 5. **HTML validity.** `html-validate` over `mockup/pages/*.html`. This is what caught an unclosed `<form>` in the admin and 42 unnamed nav landmarks. Ignore its `doctype-style` rule: the repo is consistently `<!doctype html>`, and HTML5 defines the doctype as case-insensitive.
-6. **Link, anchor and asset integrity.** Walk every `href` and `src` in the 43 pages, resolve relative paths on disk, and check that each `#fragment` matches an `id` on the page it points at. Cheap, and it guards the search index's deep links.
-7. **Runtime health.** Drive Chrome over CDP across all 43 pages and collect console errors and failed requests. Filter the Cloudflare beacon, which cannot pass CORS from localhost and fails on every page.
+6. **Link, anchor and asset integrity.** Walk every `href` and `src` in the 50 pages, resolve relative paths on disk, and check that each `#fragment` matches an `id` on the page it points at. Cheap, and it guards the search index's deep links.
+7. **Runtime health.** Drive Chrome over CDP across all 50 pages and collect console errors and failed requests. Filter the Cloudflare beacon, which cannot pass CORS from localhost and fails on every page.
 8. **Accessibility.** axe-core, covered in its own section above.
 9. **Live endpoint probing.** Unauthenticated requests against the deployed API, checking that protected routes 401 and that an arbitrary `Origin` is not reflected.
 
@@ -170,7 +242,7 @@ Before building the new site, the entire existing site at waldorf.co.il must be 
 
 ## Repo layout
 
-- `mockup/` — the current mockup: `mockup/pages/*.html` (43 static pages, one per section/topic) is what actually publishes to GitHub Pages (see Deployment above). Generated by `mockup/build.mjs` from `content/pages/*.md`; also has `admin.html`/`admin-dashboard.html`/`admin-app.js` (local-only admin tooling, not published) and `responsive.mjs`/`patch-*.mjs` helper scripts. This is the primary reference for site structure/navigation/copy placeholders right now.
+- `mockup/` — the current mockup: `mockup/pages/*.html` (50 static pages, one per section/topic) is what actually publishes to GitHub Pages (see Deployment above). Generated by `mockup/build.mjs` from `content/pages/*.md`; also has `admin.html`/`admin-dashboard.html`/`admin-app.js` (local-only admin tooling, not published) and `responsive.mjs`/`patch-*.mjs` helper scripts. This is the primary reference for site structure/navigation/copy placeholders right now.
 - `docs/PRD-forum-waldorf-site.md` — the authoritative PRD (Hebrew) for the production build: architecture, page inventory, D1 schema, accessibility/security/SEO requirements, external services, open questions. Read this before scoping any real implementation work.
 - `docs/` — also contains pricing proposal PDFs/DOCX (historical, for context only).
 - `archive/` — older drafts: a previous PRD, an earlier homepage mockup (`awaldorf-homepage.html`), a brand/design-system doc (`aWaldorf_UX_UI_Design_System.md`), and `brand-assets.md`/`global-styles.css`. **These use a different color palette than the current mockup** — treat archive contents as superseded reference material, not source of truth. When in doubt, `mockup/`'s current CSS reflects the current direction.
@@ -180,7 +252,7 @@ Before building the new site, the entire existing site at waldorf.co.il must be 
 
 `mockup/build.mjs` generates `mockup/pages/*.html` from `content/pages/*.md` (re-run with `node mockup/build.mjs` after editing the markdown). By default it skips pages that already exist so hand-edits to the generated HTML aren't reverted — **do not run with `FORCE=1`**, that regenerates everything from the markdown template and overwrites any hand-polished pages.
 
-The generic Hebrew filler (`[שם]`, `תוכן מלא יוכנס כאן`) is **gone** — pages now carry real copy scraped from the old site and from the client's documents. What remains is narrower: `<span class="ph">` notes on 10 pages marking information nobody has yet (see "Launch cutover" above, item 11), pending answers from the client (Gilad, per the PRD's open questions in section 3.4).
+The generic Hebrew filler (`[שם]`, `תוכן מלא יוכנס כאן`) is **gone** — pages now carry real copy scraped from the old site and from the client's documents. What remains is narrower: `<span class="ph">` notes on 10 pages marking information nobody has yet (see "Launch cutover" above, item 12), pending answers from the client (Gilad, per the PRD's open questions in section 3.4).
 
 There is nothing to build, lint, or test yet — open any file under `mockup/pages/` directly in a browser to preview.
 

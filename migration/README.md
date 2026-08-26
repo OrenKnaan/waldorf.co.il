@@ -89,6 +89,28 @@ Two things the file deliberately does not cover:
    forum wants those to keep resolving, they need to be copied to R2 and mapped
    separately, which is its own task.
 
+   **That task now has a second consumer and a deadline.** The `חומר למיון` triage section
+   (`mockup/pages/sorting-data/`, added 2026-08-25) holds the 364 old-site items that have
+   no home on the new site, and their bodies reference **239 distinct `/wp-content/` URLs**,
+   205 of them the old site's own files. Count them with:
+
+       node -e 'const fs=require("fs"),d="mockup/pages/sorting-data/items/",u=new Set();
+       for(const f of fs.readdirSync(d))for(const m of fs.readFileSync(d+f,"utf8")
+         .matchAll(/(?:src|href)="([^"]+)"/g)){const x=m[1].split("?")[0];
+         if(x.includes("/wp-content/"))u.add(x)} console.log(u.size)'
+
+   Those references resolve only while the old site is up, which is until the moment the
+   domain is repointed. **So the sorting has to finish before cutover, not after**: whatever
+   the forum decides to keep needs its files pulled while there is still somewhere to pull
+   them from. That is a decision about 205 files, not about all of `/wp-content/uploads`,
+   which is a far larger set — so it is worth doing even if the general question stays open.
+
+   One wrinkle: only 71 of the 205 point at `waldorf.co.il` directly. The other 134 go
+   through `i0.wp.com`, Jetpack's image proxy, which fetches from the origin. When the
+   origin moves, the proxy has nothing to fetch. Do not treat its cache as a grace period —
+   resolve the URLs back to `waldorf.co.il/wp-content/...` before copying anything.
+
+
 ## Before this ships
 
 `new_path` currently holds the **mockup's filenames** (`/home.html`, `/school-list.html`),
