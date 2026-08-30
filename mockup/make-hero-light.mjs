@@ -1,6 +1,6 @@
-/* Builds mockup/pages/home-hero-light.html from home-hero.html.
+/* Builds mockup/pages/home-hero-light.html from home.html.
 
-   The light hero is the same page with a different skin: cream veils instead of
+   The light hero is the homepage with a different skin: cream veils instead of
    warm-black ones, and dark text instead of white. Keeping it as a generated
    file rather than a second hand-maintained copy is the same reasoning as
    sorting-pages.mjs - the hero is being iterated on, and a copy would silently
@@ -13,14 +13,14 @@
    pages and this file only ever adds. */
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const SRC = 'mockup/pages/home-hero.html';
+const SRC = 'mockup/pages/home.html';
 const OUT = 'mockup/pages/home-hero-light.html';
 
 let s = readFileSync(SRC, 'utf8');
 
 // ---- 1. mark the page -------------------------------------------------------
 s = s.replace('<body class="has-hero">', '<body class="has-hero has-hero-light">');
-s = s.replace('<title>דף הבית (גרסת הירו) — מוקאפ</title>',
+s = s.replace('<title>דף הבית — מוקאפ</title>',
               '<title>דף הבית (גרסת הירו הבהירה) — מוקאפ</title>');
 
 // ---- 2. the skin ------------------------------------------------------------
