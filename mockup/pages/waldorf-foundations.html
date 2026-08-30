@@ -138,7 +138,10 @@
   .btn-sm{padding:7px 15px;font-size:.82rem}
   .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
   /* ===== forms ===== */
-  .form{display:grid;gap:16px;grid-template-columns:1fr 1fr;margin:2px 0 4px}
+  /* Tracks are capped rather than 1fr: at full width a 1fr pair made the phone
+     field 838px and the message box 1692px. minmax(0,…) still shrinks below
+     the cap, so responsive.mjs's 720px single-column override still wins. */
+  .form{display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,420px));justify-content:start;margin:2px 0 4px}
   .field{display:flex;flex-direction:column;gap:6px}
   .field.col-2{grid-column:1/-1}
   .field label{font-size:.85rem;font-weight:500;color:var(--brown-dark)}

@@ -77,8 +77,8 @@
   var style = document.createElement('style');
   style.textContent = [
     // A flex item at the end of .primary-nav, so it sits on the menu row and
-    // inside the same 960px column as the links. margin-inline-start:auto is
-    // what pushes it past them to the inline-end.
+    // tracks the same full-width geometry as the links. margin-inline-start:auto
+    // is what pushes it past them to the inline-end.
     //
     // Borrows the nav links' own idiom rather than inventing one: transparent
     // 3px bottom border that turns gold on hover, so it reads as the last item
@@ -95,7 +95,11 @@
     // the nav dropdowns (z-index 20) without leaving the header's own context.
     '.wsearch{position:absolute;inset-block-start:calc(100% + 3px);inset-inline:0;z-index:60;display:none}',
     '.wsearch.is-open{display:block}',
-    '.wsearch-inner{max-width:960px;margin:0 auto;padding:0 16px;display:flex;justify-content:flex-end}',
+    // Shares .primary-nav's padding and no width cap, so the panel's inline-end
+    // edge lands under the button rather than in a centred column the button
+    // no longer sits in. Uncommenting main's max-width means uncommenting this
+    // one too, or the panel drifts away from its button again.
+    '.wsearch-inner{/* max-width:960px; */margin:0 auto;padding:0 16px;display:flex;justify-content:flex-end}',
     '.wsearch-panel{width:min(560px,100%);background:var(--white,#fff);',
     '  border-radius:0 0 var(--radius-lg,18px) var(--radius-lg,18px);',
     '  box-shadow:var(--shadow-lg,0 12px 34px rgba(0,0,0,.2));overflow:hidden;',
