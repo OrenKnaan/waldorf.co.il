@@ -238,7 +238,7 @@
        that keeps the darkening out of the way until the last moment.
        Making --sweep-max larger is always safe. Making it smaller is too: the
        text is carried by .hero-veil below, not by this. */
-    --sweep-max:.70;
+    --sweep-max:.55;
     --sweep-start:0%;
     --sweep-reach:386%}
 
@@ -293,8 +293,8 @@
      slide, so the text cannot be left to depend on it. Stops are tuned against
      sampled pixels of all five photographs, not by eye. */
   .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:
-    linear-gradient(to bottom,rgba(var(--hero-shade),.88) 0,rgba(var(--hero-shade),.60) 30%,rgba(var(--hero-shade),.08) 64%,rgba(var(--hero-shade),0) 100%),
-    linear-gradient(to top,rgba(var(--hero-shade),.94) 0,rgba(var(--hero-shade),.80) 34%,rgba(var(--hero-shade),.34) 66%,rgba(var(--hero-shade),0) 100%)}
+    linear-gradient(to bottom,rgba(var(--hero-shade),.78) 0,rgba(var(--hero-shade),.48) 28%,rgba(var(--hero-shade),.06) 60%,rgba(var(--hero-shade),0) 100%),
+    linear-gradient(to top,rgba(var(--hero-shade),.86) 0,rgba(var(--hero-shade),.66) 30%,rgba(var(--hero-shade),.20) 62%,rgba(var(--hero-shade),0) 100%)}
 
   /* The sweep: opaque at the top, clear at the bottom, and its clear point
      travels downward as the slide's time runs out, so the picture darkens from
@@ -372,10 +372,47 @@
     body.has-hero .site-header.nav-open .dropdown-link.active{color:#fff;background:transparent}
     body.has-hero .site-header.nav-open .dropdown-head{color:var(--wash-gold)}
     body.has-hero .site-header.nav-open .nav-link.active{color:#fff}
+    /* The paragraph wraps to five or six lines on a narrow screen where it takes
+       three on a wide one, so it reaches much further up into the thin part of
+       the veil - it measured 4.12:1 here against the 4.5 floor while desktop sat
+       at 5.61:1. The foot veil is deepened only at this width, so the wider
+       screens keep the more transparent setting. */
+    .hero-veil{background:
+      linear-gradient(to bottom,rgba(var(--hero-shade),.78) 0,rgba(var(--hero-shade),.48) 28%,rgba(var(--hero-shade),.06) 60%,rgba(var(--hero-shade),0) 100%),
+      linear-gradient(to top,rgba(var(--hero-shade),.90) 0,rgba(var(--hero-shade),.76) 38%,rgba(var(--hero-shade),.32) 70%,rgba(var(--hero-shade),0) 100%)}
     .hero-body{padding-block-start:clamp(96px,16vh,150px)}
     .hero-controls{padding-block-end:16px}
   }
   @media (prefers-reduced-motion:reduce){.hero-slide,.hero-btn,.hero-play,.hero-dot::after{transition:none}}
+  /* ===== higher-contrast page theme (home-hero and home-hero-light only) =====
+     The site's page background and its cards sit at #FAF6F0 and #FFFFFF, which
+     is 1.07:1 - the cards read as edgeless because there is almost nothing to
+     read. This drops the page onto a warmer, deeper sand and lifts the cards to
+     a warm off-white, then gives them a border that is actually visible.
+     New tokens rather than redefining --cream and --white: those two are
+     rewritten by the high-contrast accessibility mode, and overriding them on
+     <body> would win against it and quietly break that mode. */
+  body.has-hero{
+    --page-bg:#E9DFCE;        /* was --cream */
+    --surface:#FFFDF9;        /* cards, was --white */
+    --surface-edge:#A88B69;   /* = --tan-dark: 3.16:1 on the card, a real edge */
+    --rule:#CBB795;           /* hairlines inside a card */
+  }
+  body.has-hero{background:var(--page-bg)}
+  body.has-hero section.card{background:var(--surface);border:1px solid var(--surface-edge)}
+  body.has-hero .ecard{background:var(--surface);border:1px solid var(--surface-edge)}
+  body.has-hero .stat{background:radial-gradient(120% 130% at 28% 6%,color-mix(in oklab,var(--wash-gold) 34%,transparent),transparent 62%),var(--surface);
+    border:1px solid var(--surface-edge)}
+  body.has-hero main h2{border-bottom-color:var(--rule)}
+  /* --text-muted is 4.20:1 on the deeper background, under the 4.5 it needs as
+     small text; the footer sits directly on it. Darkened for these pages only.
+     The second line is not optional: high-contrast mode sets --text-muted on
+     <html>, and a value set on <body> shadows it for the whole page, which left
+     muted text as dark brown on black at 3.18:1. This is why the surface tokens
+     above are new names instead of redefinitions of --cream and --white. */
+  body.has-hero{--text-muted:#6B5A49}
+  html.a11y-contrast body.has-hero{--text-muted:#fff}
+
   /* ===== responsive ===== */
   body{overflow-wrap:break-word}
   img,svg,video{max-width:100%}

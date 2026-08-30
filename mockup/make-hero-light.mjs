@@ -34,6 +34,13 @@ const LIGHT = `
      so re-pointing it at the page's own cream flips all of them at once. */
   body.has-hero-light{--hero-shade:250,246,240}
   body.has-hero-light .hero-wrap{background:var(--cream)}
+  /* The foot veil is a little heavier than the dark skin's. The worst pixel for
+     white text is a bright one and for dark text a dark one, and three of the
+     five photographs are dim - so cream at the shared setting left the paragraph
+     at 4.60:1, a tenth above the floor. This buys it back. */
+  body.has-hero-light .hero-veil{background:
+    linear-gradient(to bottom,rgba(var(--hero-shade),.80) 0,rgba(var(--hero-shade),.52) 28%,rgba(var(--hero-shade),.08) 60%,rgba(var(--hero-shade),0) 100%),
+    linear-gradient(to top,rgba(var(--hero-shade),.90) 0,rgba(var(--hero-shade),.76) 32%,rgba(var(--hero-shade),.28) 64%,rgba(var(--hero-shade),0) 100%)}
 
   /* Header. The shadow is a light halo rather than a dark one: it is there to
      hold the letterforms apart from a busy photograph, so it has to be the
@@ -70,6 +77,12 @@ const LIGHT = `
   body.has-hero-light .hero-rail{background:rgba(61,43,31,.16)}
 
   @media (max-width:720px){
+    /* The base page deepens .hero-veil at this width for the taller wrapped
+       paragraph, but the light rule above is a class more specific and would
+       win, so the narrow case has to be restated here as well. */
+    body.has-hero-light .hero-veil{background:
+      linear-gradient(to bottom,rgba(var(--hero-shade),.80) 0,rgba(var(--hero-shade),.52) 28%,rgba(var(--hero-shade),.08) 60%,rgba(var(--hero-shade),0) 100%),
+      linear-gradient(to top,rgba(var(--hero-shade),.94) 0,rgba(var(--hero-shade),.84) 40%,rgba(var(--hero-shade),.40) 72%,rgba(var(--hero-shade),0) 100%)}
     body.has-hero-light .site-header.nav-open{background:var(--cream)}
     body.has-hero-light .site-header.nav-open .nav-link,
     body.has-hero-light .site-header.nav-open .nav-link.active{color:var(--brown-dark)}
