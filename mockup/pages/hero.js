@@ -34,9 +34,8 @@
   var timer = null;
   var railStart = 0;
   var paused = false;     // the visitor pressed pause
-  var pointerIn = false;  // the pointer is over the hero
-  var keyboardIn = false; // keyboard focus is inside it
-  function held() { return pointerIn || keyboardIn; }
+  var keyboardIn = false; // keyboard focus is inside the hero
+  function held() { return keyboardIn; }
 
   /* ---------- respect the motion preferences ---------- */
 
@@ -116,10 +115,30 @@
   // stood instead of snapping back.
   function resetRail() { railStart = performance.now(); }
 
+  // The veil descends on the same clock, so the picture darkens as the slide
+  // runs out and is at its darkest the moment before the change. It is a
+  // gradient stop rather than a transform, so it is repainted at about 15fps
+  // instead of 60: over six seconds the step is invisible, and a full-viewport
+  // gradient is not something to re-rasterise on every frame.
+  var lastSweep = -1;
+  var lastFrame = 0;
   function paintRail(now) {
-    if (rail) {
-      var done = running() ? Math.min(1, (now - railStart) / DWELL) : 0;
-      rail.style.transform = 'scaleX(' + done + ')';
+    // While the clock is not running - paused, held, or the tab in the
+    // background - the start marker is dragged along with the frame so the
+    // elapsed time stops growing. The rail and the veil hold where they stood
+    // rather than rewinding to nothing, which is what a stopped clock should
+    // look like. Resuming calls restart() and begins a fresh dwell.
+    if (!running() && lastFrame) railStart += now - lastFrame;
+    lastFrame = now;
+    var done = Math.min(1, (now - railStart) / DWELL);
+    if (rail) rail.style.transform = 'scaleX(' + done + ')';
+    // Eased, unlike the rail. Linear darkening spends most of a slide's life
+    // dim; the cue is meant to say "about to change", so it stays out of the
+    // way and then arrives quickly over the last second or so.
+    var stepped = Math.round(Math.pow(done, 2.4) * 90) / 90;
+    if (stepped !== lastSweep) {
+      lastSweep = stepped;
+      root.style.setProperty('--sweep', String(stepped));
     }
     window.requestAnimationFrame(paintRail);
   }
@@ -149,16 +168,14 @@
 
   playBtn.addEventListener('click', function () { setPaused(!paused); });
 
-  // Hovering or tabbing into the hero holds the current slide, so a visitor
-  // reading the copy or reaching for a button is not interrupted by a change
-  // underneath them. This is a hold, not the pause button's state.
+  // Tabbing into the hero holds the current slide: a keyboard visitor working
+  // through the buttons should not have the ground move under them. Hovering
+  // deliberately does not - the timer runs on with the pointer over the hero.
   //
-  // The keyboard half tests :focus-visible rather than focus. Clicking a dot
-  // leaves focus sitting on that dot, and holding on plain focus meant one click
-  // stopped the slideshow for good - the visitor asked to see a slide, not to
-  // end the sequence. A tab into the hero still holds it.
-  root.addEventListener('pointerenter', function () { pointerIn = true; });
-  root.addEventListener('pointerleave', function () { pointerIn = false; resetRail(); });
+  // The test is :focus-visible rather than focus. Clicking a dot leaves focus
+  // sitting on that dot, and holding on plain focus meant one click stopped the
+  // slideshow for good - the visitor asked to see a slide, not to end the
+  // sequence.
   root.addEventListener('focusin', function (e) {
     keyboardIn = !!(e.target.matches && e.target.matches(':focus-visible'));
   });

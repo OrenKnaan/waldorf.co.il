@@ -217,15 +217,29 @@
      48 pages are untouched and merging back into home.html is a copy of this
      block, the markup and the two script lines. Sits above the responsive
      marker on purpose: patch-responsive.mjs rewrites everything below it. */
-  body.has-hero{--hero-shade:27,18,10;--hero-bleed:24px}
-  /* Mirrors main's padding-inline so the hero bleeds to the window edge and
-     no further. A fixed -24px overshot at every narrow breakpoint and scrolled
-     the document sideways. 100vw is not usable here: it counts the scrollbar.
-     If responsive.mjs ever changes main's padding, these four must follow. */
-  @media (max-width:720px){body.has-hero{--hero-bleed:18px}}
-  @media (max-width:560px){body.has-hero{--hero-bleed:14px}}
-  @media (max-width:400px){body.has-hero{--hero-bleed:12px}}
-  body.has-hero main{padding-block-start:0}
+  /* One gutter token drives both main's padding and the hero's bleed, so the
+     hero always reaches the window edge and never past it. It replaces four
+     hard-coded breakpoints that had to be kept in step with responsive.mjs by
+     hand. 100vw is not usable for the bleed: it counts the scrollbar. */
+  body.has-hero{--hero-shade:27,18,10;--gutter:clamp(20px,3.4vw,72px);--hero-bleed:var(--gutter)}
+
+  /* Wider gutters and looser vertical rhythm now that the page runs edge to
+     edge: at 1600px the old 24px gutter and 16px gaps left the content feeling
+     packed against the window. Scoped to this page while it is a trial. */
+  body.has-hero main{padding:0 var(--gutter) clamp(76px,7vh,120px)}
+  body.has-hero section.card{padding:clamp(22px,2vw,40px) clamp(24px,2.4vw,48px);
+    margin:0 0 clamp(20px,2.2vw,36px)}
+  body.has-hero .grid{gap:clamp(18px,1.8vw,32px)}
+  body.has-hero .stat-row{gap:clamp(16px,1.8vw,32px);margin:0 0 clamp(20px,2.2vw,36px)}
+  body.has-hero .stat{padding:clamp(26px,2.4vw,42px) 18px clamp(20px,2vw,32px)}
+  body.has-hero main h2{margin:0 0 clamp(16px,1.4vw,24px);padding-bottom:clamp(11px,1vw,16px)}
+  body.has-hero main>p,body.has-hero .card p{margin:0 0 clamp(13px,1.1vw,18px)}
+  body.has-hero .ecard .body{padding:clamp(16px,1.4vw,24px) clamp(16px,1.5vw,26px);gap:9px}
+
+  /* The thumbnails are 414x256. A fixed 128px slot cropped them to a 4.5:1
+     letterbox once the cards grew to ~580px wide, so the picture is given its
+     own ratio and the card follows it. */
+  body.has-hero .grid .ecard .thumb{aspect-ratio:414/256;height:auto}
 
   /* The header is lifted out of flow so the photo runs behind it. No positioned
      ancestor is needed - it pins to the document origin - but body is made a
@@ -245,8 +259,8 @@
   body.has-hero .wsearch-btn:hover,body.has-hero .wsearch-btn[aria-expanded="true"]{color:#fff;border-block-end-color:var(--wash-gold)}
 
   .hero-wrap{position:relative;isolation:isolate;display:flex;flex-direction:column;
-    margin-inline:calc(-1 * var(--hero-bleed));margin-block-end:34px;min-height:min(88vh,760px);
-    overflow:hidden;background:#2A1D12}
+    margin-inline:calc(-1 * var(--hero-bleed));margin-block-end:clamp(40px,5vh,84px);
+    min-height:100vh;min-height:100svh;overflow:hidden;background:#2A1D12}
   .hero-media{position:absolute;inset:0;z-index:0}
   .hero-slide{position:absolute;inset:0;background-image:var(--img);background-size:cover;
     background-position:50% 50%;opacity:0;transform:scale(1.035);
@@ -254,24 +268,31 @@
   .hero-slide.is-active{opacity:1;transform:none}
   @media (min-width:1101px){.hero-slide{background-image:var(--img-lg)}}
 
-  /* Two veils, warm black rather than neutral so the photographs stay warm: one
-     under the nav, one under the copy, plus a flat wash binding them. The stops
-     are tuned against sampled pixels of all five photographs, not by eye. */
+  /* Two static veils, warm black rather than neutral so the photographs stay
+     warm: one under the nav, one under the copy. These are the contrast floor -
+     the sweep below is ambient and reaches nearly nothing at the start of a
+     slide, so the text cannot be left to depend on it. Stops are tuned against
+     sampled pixels of all five photographs, not by eye. */
   .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:
     linear-gradient(to bottom,rgba(var(--hero-shade),.88) 0,rgba(var(--hero-shade),.60) 30%,rgba(var(--hero-shade),.08) 64%,rgba(var(--hero-shade),0) 100%),
-    linear-gradient(to top,rgba(var(--hero-shade),.92) 0,rgba(var(--hero-shade),.70) 26%,rgba(var(--hero-shade),.16) 58%,rgba(var(--hero-shade),0) 100%),
-    linear-gradient(rgba(var(--hero-shade),.18),rgba(var(--hero-shade),.18))}
+    linear-gradient(to top,rgba(var(--hero-shade),.92) 0,rgba(var(--hero-shade),.70) 26%,rgba(var(--hero-shade),.16) 58%,rgba(var(--hero-shade),0) 100%)}
+
+  /* The sweep: opaque at the top, clear at the bottom, and its clear point
+     travels downward as the slide's time runs out, so the picture darkens from
+     the top and is at its darkest the moment before the change. --sweep is set
+     by hero.js from the same clock as the rail; at 0 the dark reaches only the
+     top 14%, which is why the veils above still carry the text. */
+  .hero-sweep{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(var(--hero-shade),.88) 0%,
+      rgba(var(--hero-shade),0) calc(14% + var(--sweep,0) * 386%))}
+  .hero-wrap.is-static .hero-sweep{display:none}
 
   .hero-body{position:relative;z-index:2;margin-block-start:auto;
     padding-block:clamp(140px,20vh,200px) clamp(20px,4vh,34px);
     padding-inline:clamp(20px,4vw,64px)}
   .hero-title{font-family:var(--font-head);font-weight:700;color:#fff;
-    font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.08;margin:0 0 14px;
+    font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.08;margin:0 0 clamp(20px,2.4vh,34px);
     text-shadow:0 2px 18px rgba(0,0,0,.45)}
-  /* A hero line has to stay readable even though the band is full width, so the
-     subtitle keeps a measure. This is the copy's own limit, not the page column. */
-  .hero-sub{color:#fff;font-size:clamp(1rem,1.45vw,1.26rem);line-height:1.62;
-    margin:0 0 26px;max-width:46ch;text-shadow:0 1px 12px rgba(0,0,0,.55)}
   .hero-cta{display:flex;flex-wrap:wrap;gap:12px}
   .hero-btn{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;
     font-family:var(--font-body);font-weight:500;font-size:1rem;text-decoration:none;
@@ -324,7 +345,6 @@
     body.has-hero .site-header.nav-open .dropdown-link.active{color:#fff;background:transparent}
     body.has-hero .site-header.nav-open .dropdown-head{color:var(--wash-gold)}
     body.has-hero .site-header.nav-open .nav-link.active{color:#fff}
-    .hero-wrap{min-height:min(74vh,580px)}
     .hero-body{padding-block-start:clamp(96px,16vh,150px)}
     .hero-controls{padding-block-end:16px}
   }
@@ -637,10 +657,10 @@
       <div class="hero-slide" style="--img:url('./img/hero/hero-4-sm.webp');--img-lg:url('./img/hero/hero-4.webp')"></div>
       <div class="hero-slide" style="--img:url('./img/hero/hero-5-sm.webp');--img-lg:url('./img/hero/hero-5.webp')"></div>
     </div>
+    <div class="hero-sweep" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-body">
       <h1 class="hero-title">חינוך ולדורף בישראל</h1>
-      <p class="hero-sub">ארגון הגג של חינוך ולדורף בישראל — כ-150 גני ילדים, כ-40 בתי ספר יסודיים וכ-10 תיכונים.</p>
       <div class="hero-cta">
         <a class="hero-btn hero-btn-primary" href="./school-list.html">רשימת המוסדות</a>
         <a class="hero-btn hero-btn-ghost" href="./waldorf-characteristics.html">על חינוך ולדורף</a>

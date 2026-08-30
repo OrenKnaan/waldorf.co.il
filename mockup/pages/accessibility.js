@@ -247,10 +247,14 @@
     '  font-family:"Rubik","Segoe UI","Arial Hebrew",Arial,sans-serif;font-size:15px;line-height:1.5}',
     '.a11y-root *{box-sizing:border-box}',
 
-    '.a11y-fab{width:48px;height:48px;border-radius:999px;border:2px solid #FAF6F0;background:#3D2B1F;',
+    // Light at rest, darker on hover, matching .scroll-top-btn in the opposite
+    // corner - the two floating buttons now behave the same way round. Hex
+    // rather than tokens, like the rest of this file: the widget has to stay
+    // legible while the adjustments it controls are rewriting those tokens.
+    '.a11y-fab{width:48px;height:48px;border-radius:999px;border:2px solid #FAF6F0;background:#6B4F35;',
     '  color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;',
     '  box-shadow:0 10px 28px rgba(61,43,31,.34);transition:background .15s ease,transform .15s ease}',
-    '.a11y-fab:hover{background:#6B4F35;transform:translateY(-2px)}',
+    '.a11y-fab:hover{background:#3D2B1F;transform:translateY(-2px)}',
     '.a11y-fab:focus-visible{outline:3px solid #6B4F35;outline-offset:3px}',
 
     '.a11y-panel{position:absolute;inset-block-end:60px;inset-inline-start:0;width:320px;',
