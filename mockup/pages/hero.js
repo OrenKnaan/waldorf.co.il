@@ -52,6 +52,7 @@
   var playBtn = root.querySelector('.hero-play');
   var dotsWrap = root.querySelector('.hero-dots');
   var rail = root.querySelector('.hero-rail-fill');
+  var sweepEl = root.querySelector('.hero-sweep');
 
   var dots = slides.map(function (slide, i) {
     var b = document.createElement('button');
@@ -160,13 +161,23 @@
       rail.style.opacity = fading ? String(Math.max(0, 1 - out)) : '1';
     }
 
-    // Rising, eased so the darkening stays out of the way and then arrives over
-    // the last moment; falling linearly across the cross-fade. Written every
-    // frame at full precision: quantising it moved the gradient's soft edge in
-    // visible steps.
-    var sweep = fading
-      ? Math.max(0, 1 - out)
-      : Math.pow(elapsed / DWELL, SWEEP_EASE);
+    // Rising across the dwell, eased so the darkening stays out of the way and
+    // then arrives over the last moment. Written every frame at full precision:
+    // quantising it moved the gradient's soft edge in visible steps.
+    //
+    // Across the cross-fade it does not travel back. Winding the gradient up
+    // the picture was a second movement laid over the cross-fade, and the veil
+    // has no reason to go anywhere - so it holds where it ended and dissolves
+    // with the photograph it was covering. By the time the change has finished
+    // the veil is already gone, and the next slide starts from nothing.
+    var sweep;
+    if (fading) {
+      sweep = 1;
+      if (sweepEl) sweepEl.style.opacity = String(Math.max(0, 1 - out));
+    } else {
+      sweep = Math.pow(elapsed / DWELL, SWEEP_EASE);
+      if (sweepEl) sweepEl.style.opacity = '1';
+    }
     if (sweep !== lastSweep) {
       lastSweep = sweep;
       root.style.setProperty('--sweep', sweep.toFixed(6));

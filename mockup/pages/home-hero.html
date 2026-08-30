@@ -227,7 +227,9 @@
        --sweep-max    how dark it gets just before a slide changes (0 = off,
                       1 = solid). Was .88; .70 is the current, lighter setting.
        --sweep-start  how far down the picture the dark reaches at the start of
-                      a slide, before the clock has moved.
+                      a slide, before the clock has moved. 0 means a new slide
+                      begins with no veil at all, which is what lets the old one
+                      dissolve away without anything popping back in.
        --sweep-reach  how much further it travels over the slide's life. Bigger
                       means the whole picture ends up darker.
        --hero-shade   the colour, as R,G,B. Warm black, not neutral, so the
@@ -237,7 +239,7 @@
        Making --sweep-max larger is always safe. Making it smaller is too: the
        text is carried by .hero-veil below, not by this. */
     --sweep-max:.70;
-    --sweep-start:14%;
+    --sweep-start:0%;
     --sweep-reach:386%}
 
   /* Wider gutters and looser vertical rhythm now that the page runs edge to
