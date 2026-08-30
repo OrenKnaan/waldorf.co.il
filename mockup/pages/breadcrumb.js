@@ -39,6 +39,10 @@
     /* רקע רך מאחורי הפילול כדי שהתוכן לא יציץ בפינות המעוגלות */
     '.pagebanner.is-stuck::before{content:"";position:absolute;inset:-8px -12px -20px;z-index:-2;pointer-events:none;',
     '  background:linear-gradient(180deg,var(--cream) 56%,color-mix(in oklab,var(--cream) 55%,transparent) 82%,transparent)}',
+    /* הפילול נשאר לבן: פסאודו שלילי נצבע מעל רקע האלמנט עצמו, ולכן הרקע
+       הלבן מצויר שוב מעל הרך ומתחת לטקסט */
+    '.pagebanner.is-stuck::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;',
+    '  border-radius:inherit;background:var(--white)}',
     'main h2,main h3{scroll-margin-top:84px}',
     '.crumb-sections{display:contents}',
     '.crumb-sec{max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
