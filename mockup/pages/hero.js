@@ -35,8 +35,6 @@
   var SWEEP_EASE = 2.4; // >1 delays the darkening; 1 makes it linear
 
   var index = 0;
-  var timer = null;
-  var railStart = 0;
   var paused = false;     // the visitor pressed pause
   var keyboardIn = false; // keyboard focus is inside the hero
   function held() { return keyboardIn; }
@@ -107,65 +105,74 @@
     index = next;
 
     if (fromUser) restart();
-    else resetRail();
   }
 
   function advance() { goTo((index + 1) % slides.length, false); }
 
-  /* ---------- the wash rail ---------- */
-
-  // Fills from the inline-start edge (the right, in RTL) across the dwell. It is
-  // driven by rAF rather than a CSS animation so that pausing leaves it where it
-  // stood instead of snapping back.
-  function resetRail() { railStart = performance.now(); }
-
-  // The veil descends on the same clock, so the picture darkens as the slide
-  // runs out and is at its darkest the moment before the change. It is a
-  // gradient stop rather than a transform, so it is repainted at about 15fps
-  // instead of 60: over six seconds the step is invisible, and a full-viewport
-  // gradient is not something to re-rasterise on every frame.
-  var lastSweep = -1;
-  var lastFrame = 0;
-  function paintRail(now) {
-    // While the clock is not running - paused, held, or the tab in the
-    // background - the start marker is dragged along with the frame so the
-    // elapsed time stops growing. The rail and the veil hold where they stood
-    // rather than rewinding to nothing, which is what a stopped clock should
-    // look like. Resuming calls restart() and begins a fresh dwell.
-    if (!running() && lastFrame) railStart += now - lastFrame;
-    lastFrame = now;
-    var done = Math.min(1, (now - railStart) / DWELL);
-    if (rail) rail.style.transform = 'scaleX(' + done + ')';
-    // Eased, unlike the rail. Linear darkening spends most of a slide's life
-    // dim; the cue is meant to say "about to change", so it stays out of the
-    // way and then arrives quickly over the last second or so.
-    //
-    // Written every frame at full precision. Quantising it to 90 levels did
-    // save repaints, but one level moves the gradient's soft edge by about 4%
-    // of the hero, which reads as the veil stepping down the picture rather
-    // than sliding. Six decimal places is below the threshold of a visible
-    // change and the repaint is one gradient on one layer.
-    var eased = Math.pow(done, SWEEP_EASE);
-    if (eased !== lastSweep) {
-      lastSweep = eased;
-      root.style.setProperty('--sweep', eased.toFixed(6));
-    }
-    window.requestAnimationFrame(paintRail);
-  }
-
   /* ---------- the clock ---------- */
+
+  // One rAF loop drives the rail, the veil and the change itself, so the three
+  // can never disagree about where in a slide's life we are.
+  //
+  // A cycle is DWELL + FADE long rather than DWELL. The change fires partway
+  // through it, at DWELL, and the remaining FADE is the cross-fade: the veil
+  // keeps falling across it, so the incoming photograph arrives underneath the
+  // darkness and the darkness lifts off it. The veil used to be reset the
+  // instant the slide changed, which threw it off the picture in a single frame
+  // exactly when the eye was on it - that is the jump this replaces.
+
+  var cycleStart = 0;
+  var switched = false;   // has this cycle already changed the slide?
+  var lastFrame = 0;
+  var lastSweep = -1;
 
   function running() { return !paused && !held() && !motionOff() && !document.hidden; }
 
-  function tick() {
-    if (running()) advance();
-    timer = window.setTimeout(tick, DWELL);
+  function restart() {
+    cycleStart = window.performance.now();
+    switched = false;
   }
 
-  function restart() {
-    window.clearTimeout(timer);
-    resetRail();
-    timer = window.setTimeout(tick, DWELL);
+  function frame(now) {
+    var gap = lastFrame ? now - lastFrame : 0;
+    lastFrame = now;
+
+    // Drag the start marker along instead of letting elapsed grow, so a stopped
+    // clock holds where it stood rather than rewinding. A long gap means rAF was
+    // not running at all - a background tab - and is frozen through whatever the
+    // clock says, or the slideshow skips several slides the moment the visitor
+    // comes back to it.
+    if (gap > 500 || !running()) cycleStart += gap;
+
+    var elapsed = now - cycleStart;
+
+    if (!switched && elapsed >= DWELL) { switched = true; advance(); }
+    if (elapsed >= DWELL + FADE) { cycleStart = now; switched = false; elapsed = 0; }
+
+    var fading = elapsed > DWELL;
+    var out = fading ? (elapsed - DWELL) / FADE : 0;
+
+    if (rail) {
+      // The rail holds full through the cross-fade and fades out rather than
+      // snapping back to empty; it returns already empty for the new slide.
+      // Draining it would read as the slideshow running backwards.
+      rail.style.transform = 'scaleX(' + Math.min(1, elapsed / DWELL) + ')';
+      rail.style.opacity = fading ? String(Math.max(0, 1 - out)) : '1';
+    }
+
+    // Rising, eased so the darkening stays out of the way and then arrives over
+    // the last moment; falling linearly across the cross-fade. Written every
+    // frame at full precision: quantising it moved the gradient's soft edge in
+    // visible steps.
+    var sweep = fading
+      ? Math.max(0, 1 - out)
+      : Math.pow(elapsed / DWELL, SWEEP_EASE);
+    if (sweep !== lastSweep) {
+      lastSweep = sweep;
+      root.style.setProperty('--sweep', sweep.toFixed(6));
+    }
+
+    window.requestAnimationFrame(frame);
   }
 
   function setPaused(next) {
@@ -192,17 +199,11 @@
   root.addEventListener('focusout', function (e) {
     if (root.contains(e.relatedTarget)) return;
     keyboardIn = false;
-    resetRail();
-  });
-
-  document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) resetRail();
   });
 
   function syncMotion() {
     root.classList.toggle('is-static', motionOff());
-    if (motionOff()) { window.clearTimeout(timer); }
-    else { restart(); }
+    if (!motionOff()) restart();
   }
   mqMotion.addEventListener('change', syncMotion);
 
@@ -214,5 +215,6 @@
   controls.hidden = false;
   setPaused(false);
   syncMotion();
-  window.requestAnimationFrame(paintRail);
+  restart();
+  window.requestAnimationFrame(frame);
 })();
