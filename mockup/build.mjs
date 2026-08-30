@@ -336,7 +336,7 @@ ${titleFontFace}  :root {
 
   /* header / brand */
   .site-header { background: linear-gradient(135deg, var(--brown-dark), var(--brown)); }
-  .brand-row { max-width: 960px; margin: 0 auto; padding: 18px 24px 10px; }
+  .brand-row { /* max-width: 960px; */ margin: 0 auto; padding: 18px 24px 10px; }
   .brand-name {
     color: var(--white); font-family: var(--font-head); font-weight: 700; font-size: 1.3rem;
     letter-spacing: 0.02em; margin: 0;
@@ -344,7 +344,7 @@ ${titleFontFace}  :root {
   .brand-tagline { color: var(--tan); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 2px 0 0; }
 
   /* nav */
-  .primary-nav { display: flex; flex-wrap: wrap; gap: 2px; max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  .primary-nav { display: flex; flex-wrap: wrap; gap: 2px; /* max-width: 960px; */ margin: 0 auto; padding: 0 16px; }
   .nav-item { position: relative; }
   .nav-link {
     display: flex; align-items: center; gap: 4px; padding: 12px 12px; font-size: 0.85rem;
@@ -367,7 +367,7 @@ ${titleFontFace}  :root {
   }
   .dropdown-link:hover, .dropdown-link.active { background: var(--beige); color: var(--brown); }
 
-  main { max-width: 760px; margin: 0 auto; padding: 28px 24px 70px; }
+  main { /* max-width: 760px; */ margin: 0 auto; padding: 28px 24px 70px; }
 
   .pagebanner {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
@@ -393,7 +393,7 @@ ${titleFontFace}  :root {
     font-family: var(--font-head); color: var(--brown-dark); font-size: 2rem; font-weight: 700;
     margin: 0 0 10px; letter-spacing: 0.01em;
   }
-  main > p:first-of-type { font-size: 1.05rem; color: var(--text-muted); max-width: 60ch; }
+  main > p:first-of-type { font-size: 1.05rem; color: var(--text-muted); /* max-width: 60ch; */ }
 
   .divider { margin: 22px 0 8px; color: var(--tan); }
   .divider svg { width: 100%; height: 12px; display: block; }
