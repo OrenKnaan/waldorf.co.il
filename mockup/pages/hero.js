@@ -26,9 +26,13 @@
   var slides = [].slice.call(root.querySelectorAll('.hero-slide'));
   if (slides.length < 2) return;
 
+  /* ---------- knobs ---------- */
+  // The veil's colour and depth are CSS, in the hero block of the page; these
+  // are the timings. See the note above .hero-sweep in home-hero.html.
   var DWELL = 6000;     // how long a slide is held, ms
   var FADE = 1100;      // cross-fade duration, ms; must match the CSS transition
   var PUSH = -3;        // percent; negative = incoming enters from the left (RTL)
+  var SWEEP_EASE = 2.4; // >1 delays the darkening; 1 makes it linear
 
   var index = 0;
   var timer = null;
@@ -135,10 +139,16 @@
     // Eased, unlike the rail. Linear darkening spends most of a slide's life
     // dim; the cue is meant to say "about to change", so it stays out of the
     // way and then arrives quickly over the last second or so.
-    var stepped = Math.round(Math.pow(done, 2.4) * 90) / 90;
-    if (stepped !== lastSweep) {
-      lastSweep = stepped;
-      root.style.setProperty('--sweep', String(stepped));
+    //
+    // Written every frame at full precision. Quantising it to 90 levels did
+    // save repaints, but one level moves the gradient's soft edge by about 4%
+    // of the hero, which reads as the veil stepping down the picture rather
+    // than sliding. Six decimal places is below the threshold of a visible
+    // change and the repaint is one gradient on one layer.
+    var eased = Math.pow(done, SWEEP_EASE);
+    if (eased !== lastSweep) {
+      lastSweep = eased;
+      root.style.setProperty('--sweep', eased.toFixed(6));
     }
     window.requestAnimationFrame(paintRail);
   }

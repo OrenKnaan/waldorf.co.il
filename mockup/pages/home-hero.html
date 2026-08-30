@@ -221,7 +221,24 @@
      hero always reaches the window edge and never past it. It replaces four
      hard-coded breakpoints that had to be kept in step with responsive.mjs by
      hand. 100vw is not usable for the bleed: it counts the scrollbar. */
-  body.has-hero{--hero-shade:27,18,10;--gutter:clamp(20px,3.4vw,72px);--hero-bleed:var(--gutter)}
+  body.has-hero{--hero-shade:27,18,10;--gutter:clamp(20px,3.4vw,72px);--hero-bleed:var(--gutter);
+
+    /* ---- the four knobs for the darkening veil; change them here ----
+       --sweep-max    how dark it gets just before a slide changes (0 = off,
+                      1 = solid). Was .88; .70 is the current, lighter setting.
+       --sweep-start  how far down the picture the dark reaches at the start of
+                      a slide, before the clock has moved.
+       --sweep-reach  how much further it travels over the slide's life. Bigger
+                      means the whole picture ends up darker.
+       --hero-shade   the colour, as R,G,B. Warm black, not neutral, so the
+                      photographs do not go grey as they dim.
+       The speed lives in hero.js: DWELL is the six seconds, SWEEP_EASE the 2.4
+       that keeps the darkening out of the way until the last moment.
+       Making --sweep-max larger is always safe. Making it smaller is too: the
+       text is carried by .hero-veil below, not by this. */
+    --sweep-max:.70;
+    --sweep-start:14%;
+    --sweep-reach:386%}
 
   /* Wider gutters and looser vertical rhythm now that the page runs edge to
      edge: at 1600px the old 24px gutter and 16px gaps left the content feeling
@@ -283,8 +300,8 @@
      by hero.js from the same clock as the rail; at 0 the dark reaches only the
      top 14%, which is why the veils above still carry the text. */
   .hero-sweep{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to bottom,rgba(var(--hero-shade),.88) 0%,
-      rgba(var(--hero-shade),0) calc(14% + var(--sweep,0) * 386%))}
+    background:linear-gradient(to bottom,rgba(var(--hero-shade),var(--sweep-max)) 0%,
+      rgba(var(--hero-shade),0) calc(var(--sweep-start) + var(--sweep,0) * var(--sweep-reach)))}
   .hero-wrap.is-static .hero-sweep{display:none}
 
   .hero-body{position:relative;z-index:2;margin-block-start:auto;
