@@ -28,130 +28,119 @@
   var main = document.querySelector('main');
   if (!header || !nav || !main) return;
 
-  var RAIL_W = 224;       // px
+  var RAIL_W = 232;       // px
   var LEAVE_GRACE = 220;  // ms the panel survives the pointer leaving
 
   /* ---------- styles ---------- */
 
   var style = document.createElement('style');
   style.textContent = [
-    ':root{--fsb-w:' + RAIL_W + 'px}',
+    // The rail is a card in a column of its own: 24px in from the window, the
+    // card, then 24px before the content starts.
+    ':root{--fsb-w:' + RAIL_W + 'px;--fsb-gap:24px}',
 
-    // inset-inline-end is the left edge on this page. Logical rather than
-    // physical so the component still reads correctly if it is ever lifted into
-    // an LTR context, where it would sit on the right.
-    '.fsb{position:fixed;inset-block-start:0;inset-block-end:0;inset-inline-end:0;',
-    '  width:var(--fsb-w);z-index:45;display:flex;align-items:center;',
-    '  pointer-events:none;opacity:0;visibility:hidden;',
-    '  transition:opacity .24s ease,transform .24s ease,visibility .24s ease}',
-    '.fsb.is-up{opacity:1;transform:none;visibility:visible;pointer-events:auto}',
-    // In RTL a positive translateX moves toward the physical right, so the rail
-    // arrives from off the left edge with a negative one.
-    '.fsb{transform:translateX(-18px)}',
+    '.fsb{position:fixed;inset-block:0;inset-inline-end:0;z-index:45;',
+    '  width:calc(var(--fsb-w) + var(--fsb-gap));',
+    '  padding-inline-end:var(--fsb-gap);padding-block-start:var(--fsb-gap);',
+    '  display:none;align-items:flex-start;pointer-events:none}',
+    '.fsb.is-on{display:flex;pointer-events:auto}',
 
-    // The page gives the rail its own column rather than sliding underneath it.
-    // Both properties are longhand: main carries a padding shorthand on every
-    // page and would otherwise win the inline-end edge back.
-    'body.fsb-active main,body.fsb-active .site-footer',
-    '  {padding-inline-end:calc(var(--fsb-w) + 30px)}',
-    'main,.site-footer{transition:padding-inline-end .24s ease}',
+    // The page keeps a column clear rather than letting the rail sit on top of
+    // it. Longhand, because main and the footer both carry a padding shorthand
+    // and would otherwise take the edge back.
+    'body.fsb-static main,body.fsb-static .site-footer',
+    '  {padding-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
+    // The header is the one of the three with a background of its own - a
+    // gradient and a 3px wash border - so it is narrowed rather than padded.
+    // Padding would have left both running the full width behind the rail.
+    'body.fsb-static .site-header{margin-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
+    // The rail carries the whole menu, so the header's copy of it would be a
+    // second set of the same links. The brand row stays.
+    'body.fsb-static .site-header > nav{display:none}',
+    // .scroll-top-btn is fixed to this same corner and would land on the rail.
+    'body.fsb-static .scroll-top-btn{inset-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
 
-    /* ---- the rail ---- */
-    // Flush to the edge, with the same four washes the site runs under its
-    // header - the rail is standing in for that header, so it wears its stripe.
-    // border-image and border-radius do not combine, which is why the rail is a
-    // slab and the panels are the things with rounded corners.
-    '.fsb-rail{position:relative;width:100%;padding:16px 0;',
-    '  background:linear-gradient(180deg,var(--surface,#FFFDF9) 0%,',
-    '    color-mix(in oklab,var(--beige,#F0E8DC) 46%,var(--surface,#FFFDF9)) 100%);',
-    '  border-style:solid;border-width:0 0 0 3px;',
-    '  border-image:linear-gradient(180deg,var(--wash-rose),var(--wash-gold),var(--wash-sage),var(--wash-sky)) 1;',
-    '  box-shadow:-14px 0 34px rgba(61,43,31,.13)}',
+    /* ---- the rail: the site's card, in a column ---- */
+    '.fsb-rail{width:100%;background:var(--white);border:1px solid var(--tan-dark);',
+    '  border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:10px 0}',
     '.fsb-list{list-style:none;margin:0;padding:0}',
-    '.fsb-item{position:relative;padding:0 8px}',
+    '.fsb-item{position:relative}',
 
-    '.fsb-link{display:flex;align-items:center;gap:9px;width:100%;',
-    '  min-height:44px;padding:11px 14px;border:0;background:transparent;',
-    '  font-family:var(--font-head,inherit);font-size:.97rem;font-weight:500;',
-    '  color:var(--brown,#6B4F35);text-align:start;text-decoration:none;cursor:pointer;',
-    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
-    '  transition:background .16s,color .16s}',
+    // Matches .nav-link in the header: same face, size, weight and colour, with
+    // the gold moved from an underline to the inline-start edge, which is the
+    // one a vertical menu has.
+    '.fsb-link{display:flex;align-items:center;gap:6px;width:100%;min-height:44px;',
+    '  padding:12px 20px;border:0;background:transparent;',
+    '  font-family:var(--font-body,inherit);font-size:.94rem;font-weight:500;',
+    '  color:var(--brown);text-align:start;text-decoration:none;cursor:pointer;',
+    '  border-inline-start:3px solid transparent;',
+    '  transition:background .15s,color .15s,border-color .15s}',
     '.fsb-link:hover,.fsb-item.is-open>.fsb-link',
-    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
-    // The page you are on is stated, not merely tinted: a filled wash marker.
-    '.fsb-link.is-current{color:var(--brown-dark,#3D2B1F);font-weight:600}',
-    '.fsb-link.is-current::before{content:"";width:7px;height:7px;flex:none;',
-    '  border-radius:50%;background:var(--wash-gold,#E8C877);',
-    '  box-shadow:0 0 0 3px color-mix(in oklab,var(--wash-gold,#E8C877) 30%,transparent)}',
+    '  {background:var(--beige);color:var(--brown-dark);border-inline-start-color:var(--wash-gold)}',
+    '.fsb-link.is-current{color:var(--brown-dark);font-weight:600;',
+    '  border-inline-start-color:var(--wash-gold);',
+    '  background:color-mix(in oklab,var(--tan) 20%,transparent)}',
     '.fsb-link .fsb-caret{margin-inline-start:auto;width:13px;height:13px;flex:none;',
-    '  opacity:.55;transition:transform .16s,opacity .16s}',
-    '.fsb-item.is-open>.fsb-link .fsb-caret{transform:rotate(-90deg);opacity:1}',
-    '.fsb-badge{font-size:.66rem;font-weight:500;padding:2px 8px;',
-    '  border-radius:var(--radius-pill,999px);background:#F3DDA7;color:var(--brown-dark,#3D2B1F)}',
+    '  transition:transform .2s}',
+    '.fsb-item.is-open>.fsb-link .fsb-caret{transform:rotate(90deg)}',
+    '.fsb-badge{font-size:.72rem;font-weight:600;padding:3px 10px;',
+    '  border-radius:var(--radius-organic-sm);background:#F3DDA7;color:var(--brown-dark)}',
 
-    /* ---- the panel ---- */
-    // inset-inline-end:100% maps to left:100% in RTL, which is the edge the rail
-    // is pinned to, so the panel opens across the page rather than off-screen.
+    /* ---- the panel: the site's own dropdown, turned sideways ---- */
+    // Same white, same shadow, same 252px floor, same 8px padding. The 3px gold
+    // moves from the top edge to the edge facing the rail, which in RTL is the
+    // inline-end one, so it still marks the side the panel came from.
     '.fsb-panel{position:absolute;inset-inline-end:100%;inset-block-start:-10px;',
-    '  min-width:268px;max-width:330px;display:none;',
-    '  background:linear-gradient(165deg,var(--surface,#FFFDF9) 0%,',
-    '    color-mix(in oklab,var(--beige,#F0E8DC) 34%,var(--surface,#FFFDF9)) 100%);',
-    '  border:1px solid var(--tan-dark,#A88B69);',
-    '  border-radius:var(--radius-organic,22px 44px 20px 40px / 40px 20px 46px 22px);',
-    '  box-shadow:0 16px 40px rgba(61,43,31,.2);padding:12px 10px;margin-inline-end:14px}',
-    '.fsb-item.is-open>.fsb-panel{display:block;animation:fsb-in .16s ease both}',
-    '@keyframes fsb-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}',
-    // The gap the pointer has to cross is part of the panel's hit area, or
-    // reaching a link inside it becomes a race.
+    '  min-width:252px;max-width:320px;display:none;background:var(--white);',
+    '  box-shadow:var(--shadow-lg);border-radius:var(--radius-lg);',
+    '  border-inline-end:3px solid var(--wash-gold);',
+    '  padding:8px 0;margin-inline-end:10px;z-index:20}',
+    '.fsb-item.is-open>.fsb-panel{display:block}',
+    // The gap the pointer crosses belongs to the panel, or reaching a link
+    // inside it becomes a race.
     '.fsb-panel::after{content:"";position:absolute;inset-block:0;',
-    '  inset-inline-start:100%;width:16px}',
-    '.fsb-panel a{display:block;padding:9px 15px;font-size:.9rem;',
-    '  color:var(--text-muted,#6B5A49);text-decoration:none;',
-    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
-    '  transition:background .16s,color .16s}',
-    '.fsb-panel a:hover{background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
-    '.fsb-panel a.is-current{color:var(--brown-dark,#3D2B1F);font-weight:600}',
-    '.fsb-panel .fsb-head{padding:10px 15px 4px;font-family:var(--font-head,inherit);',
-    '  font-size:.71rem;letter-spacing:.09em;color:var(--tan-dark,#A88B69)}',
-    '.fsb-panel .fsb-sep{height:1px;margin:8px 15px;',
-    '  background:linear-gradient(90deg,transparent,var(--tan,#C4A882),transparent)}',
+    '  inset-inline-start:100%;width:13px}',
+    '.fsb-panel a{display:block;padding:9px 22px;font-size:.9rem;',
+    '  color:var(--text-muted);text-decoration:none;transition:background .15s,color .15s}',
+    '.fsb-panel a:hover,.fsb-panel a.is-current{background:var(--beige);color:var(--brown-dark)}',
+    // --brown, not the --tan-dark the site's own .dropdown-head uses: that is
+    // 3.14:1 on the card at 11.5px, under the 4.5 small text needs. It goes
+    // unreported in the header because a closed dropdown is display:none and
+    // axe does not measure what it cannot see - the same colours are sitting
+    // in .dropdown-head on all 50 pages.
+    '.fsb-panel .fsb-head{padding:9px 22px 3px;font-family:var(--font-head);',
+    '  font-size:.72rem;letter-spacing:.08em;color:var(--brown)}',
+    '.fsb-panel .fsb-sep{height:1px;background:var(--beige);margin:6px 0}',
 
-    /* ---- the search, while it is living in the rail ---- */
-    '.fsb-search .wsearch-btn{margin:0;width:100%;justify-content:flex-start;',
-    '  gap:9px;padding:11px 14px;min-height:44px;border-block-end:0;',
-    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
-    '  font-family:var(--font-head,inherit);color:var(--brown,#6B4F35)}',
-    '.fsb-search .wsearch-btn::after{content:"חיפוש";font-size:.97rem;font-weight:500}',
+    /* ---- the search, living in the rail ---- */
+    '.fsb-search .wsearch-btn{margin:0;width:100%;justify-content:flex-start;gap:6px;',
+    '  padding:12px 20px;min-height:44px;border-block-end:0;',
+    '  border-inline-start:3px solid transparent;color:var(--brown)}',
+    '.fsb-search .wsearch-btn::after{content:"חיפוש";font-family:var(--font-body,inherit);',
+    '  font-size:.94rem;font-weight:500}',
     '.fsb-search .wsearch-btn:hover,.fsb-search .wsearch-btn[aria-expanded="true"]',
-    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
+    '  {background:var(--beige);color:var(--brown-dark);border-inline-start-color:var(--wash-gold)}',
     '.fsb-search .wsearch{position:absolute;inset-inline-end:100%;inset-block-start:-10px;',
-    '  inset-inline-start:auto;width:min(430px,calc(100vw - var(--fsb-w) - 48px));',
-    '  margin-inline-end:14px}',
+    '  inset-inline-start:auto;width:min(430px,calc(100vw - var(--fsb-w) - 90px));',
+    '  margin-inline-end:10px}',
     '.fsb-search .wsearch-inner{max-width:none;padding:0;justify-content:flex-start}',
-    '.fsb-search .wsearch-panel{width:100%;border:1px solid var(--tan-dark,#A88B69);',
-    '  border-radius:var(--radius-organic,22px 44px 20px 40px / 40px 20px 46px 22px)}',
+    '.fsb-search .wsearch-panel{width:100%;border-radius:var(--radius-lg);',
+    '  border-inline-end:3px solid var(--wash-gold)}',
 
-    // The rail overlaps the content at narrow widths and the header's own
-    // hamburger is a better answer there, so it simply does not appear.
-    '@media (max-width:900px){.fsb{display:none}',
-    '  body.fsb-active main,body.fsb-active .site-footer{padding-inline-end:inherit}}',
-    '@media (prefers-reduced-motion:reduce){.fsb,main,.site-footer{transition:none}',
-    '  .fsb-item.is-open>.fsb-panel{animation:none}}',
+    '@media (prefers-reduced-motion:reduce){.fsb-link,.fsb-caret,.fsb-panel a{transition:none}}',
 
     // The rail hangs off <body>, outside main/.site-header/.site-footer, so the
     // sweeping overrides in accessibility.js do not reach it and every rule it
     // needs has to be written here. Skipping this left the badge's hard-coded
     // #F3DDA7 fill under text the mode had turned white: 1.33:1.
     'html.a11y-contrast .fsb-rail,html.a11y-contrast .fsb-panel',
-    '  {background:#000!important;border:1px solid #fff!important;box-shadow:none!important;',
-    '   border-image:none!important}',
+    '  {background:#000!important;border:1px solid #fff!important;box-shadow:none!important}',
     'html.a11y-contrast .fsb-link,html.a11y-contrast .fsb-head',
     '  {background:transparent!important;color:#fff!important}',
     'html.a11y-contrast .fsb-panel a{color:#FFE14D!important;background:transparent!important;',
     '  text-decoration:underline!important}',
     'html.a11y-contrast .fsb-badge{background:#000!important;color:#FFE14D!important;',
     '  border:1px solid #FFE14D!important}',
-    'html.a11y-contrast .fsb-link.is-current::before{background:#FFE14D!important;box-shadow:none!important}',
     'html.a11y-contrast .fsb-panel .fsb-sep{background:#fff!important}',
     'html.a11y-contrast .fsb-link:hover,html.a11y-contrast .fsb-item.is-open>.fsb-link,',
     'html.a11y-contrast .fsb-panel a:hover{outline:2px solid #FFE14D!important}',
@@ -348,40 +337,24 @@
 
   /* ---------- appear once the header has gone ---------- */
 
-  var up = false;
-  function setUp(next) {
-    if (next === up) return;
-    up = next;
-    wrap.classList.toggle('is-up', up);
-    document.body.classList.toggle('fsb-active', up);
-    if (!up) closeAll(null);
-    adoptSearch(up);
+  // The rail no longer waits for a scroll. Above the breakpoint it simply is the
+  // navigation, and the header's horizontal copy of the same menu is hidden -
+  // two sets of the same seven links, one of them permanently on screen, would
+  // be a redundancy rather than a convenience. Below it the rail would sit on
+  // the content, so it goes away and the header menu and its hamburger return.
+  var mq = window.matchMedia('(min-width:901px)');
+  var on = null;
+
+  function apply() {
+    var next = mq.matches;
+    if (next === on) return;
+    on = next;
+    wrap.classList.toggle('is-on', on);
+    document.body.classList.toggle('fsb-static', on);
+    if (!on) closeAll(null);
+    adoptSearch(on);
   }
 
-  // The header is the thing that has to leave, so watch the header rather than
-  // guessing a scroll offset - it is a different height on every breakpoint and
-  // taller again while the mobile drawer is open.
-  function headerGone() { return header.getBoundingClientRect().bottom <= 0; }
-  function sync() { setUp(headerGone()); }
-
-  // Three sources, all reading the live geometry rather than trusting an event's
-  // payload. The observer on its own left the rail down in roughly one page load
-  // in six: its callbacks, like rAF, can be withheld while a tab is not being
-  // rendered, and a scroll inside that window leaves no crossing to catch up on.
-  // The scroll listener is the one that always fires; the observer covers the
-  // header changing height without a scroll, which is what the mobile drawer
-  // does; visibilitychange covers coming back to a backgrounded tab.
-  var ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(function () { ticking = false; sync(); });
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
-  document.addEventListener('visibilitychange', sync);
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(sync, { threshold: 0 }).observe(header);
-  }
-  sync();
+  mq.addEventListener('change', apply);
+  apply();
 })();
