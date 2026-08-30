@@ -28,104 +28,131 @@
   var main = document.querySelector('main');
   if (!header || !nav || !main) return;
 
-  var RAIL_W = 208;       // px
+  var RAIL_W = 224;       // px
   var LEAVE_GRACE = 220;  // ms the panel survives the pointer leaving
 
   /* ---------- styles ---------- */
 
   var style = document.createElement('style');
   style.textContent = [
+    ':root{--fsb-w:' + RAIL_W + 'px}',
+
     // inset-inline-end is the left edge on this page. Logical rather than
     // physical so the component still reads correctly if it is ever lifted into
     // an LTR context, where it would sit on the right.
     '.fsb{position:fixed;inset-block-start:0;inset-block-end:0;inset-inline-end:0;',
-    '  width:' + RAIL_W + 'px;z-index:45;display:flex;align-items:center;',
+    '  width:var(--fsb-w);z-index:45;display:flex;align-items:center;',
     '  pointer-events:none;opacity:0;visibility:hidden;',
-    '  transform:translateX(calc(-1 * var(--fsb-slide,12px)));',
-    '  transition:opacity .22s ease,transform .22s ease,visibility .22s ease}',
-    '.fsb.is-up{opacity:1;visibility:visible;transform:none;pointer-events:auto}',
-    // In RTL, translateX(-n) moves an element toward its inline-start, i.e. to
-    // the right. The rail sits at the left edge, so it should arrive from the
-    // left, which is the positive direction here.
-    'html[dir="rtl"] .fsb{transform:translateX(var(--fsb-slide,12px))}',
-    'html[dir="rtl"] .fsb.is-up{transform:none}',
+    '  transition:opacity .24s ease,transform .24s ease,visibility .24s ease}',
+    '.fsb.is-up{opacity:1;transform:none;visibility:visible;pointer-events:auto}',
+    // In RTL a positive translateX moves toward the physical right, so the rail
+    // arrives from off the left edge with a negative one.
+    '.fsb{transform:translateX(-18px)}',
 
-    '.fsb-rail{width:100%;background:var(--surface,#FFFDF9);',
-    '  border-inline-start:1px solid var(--tan-dark,#A88B69);',
-    '  box-shadow:var(--shadow-lg,0 12px 34px rgba(61,43,31,.14));',
-    // No overflow on the rail. Setting overflow-y makes overflow-x compute to
-    // auto as well - the spec does not allow visible on one axis only - and the
-    // panels, which live inside the rail and reach out past its edge, were being
-    // clipped away entirely. Eight items fit any viewport the rail appears on.
-    '  padding:10px 0}',
+    // The page gives the rail its own column rather than sliding underneath it.
+    // Both properties are longhand: main carries a padding shorthand on every
+    // page and would otherwise win the inline-end edge back.
+    'body.fsb-active main,body.fsb-active .site-footer',
+    '  {padding-inline-end:calc(var(--fsb-w) + 30px)}',
+    'main,.site-footer{transition:padding-inline-end .24s ease}',
+
+    /* ---- the rail ---- */
+    // Flush to the edge, with the same four washes the site runs under its
+    // header - the rail is standing in for that header, so it wears its stripe.
+    // border-image and border-radius do not combine, which is why the rail is a
+    // slab and the panels are the things with rounded corners.
+    '.fsb-rail{position:relative;width:100%;padding:16px 0;',
+    '  background:linear-gradient(180deg,var(--surface,#FFFDF9) 0%,',
+    '    color-mix(in oklab,var(--beige,#F0E8DC) 46%,var(--surface,#FFFDF9)) 100%);',
+    '  border-style:solid;border-width:0 0 0 3px;',
+    '  border-image:linear-gradient(180deg,var(--wash-rose),var(--wash-gold),var(--wash-sage),var(--wash-sky)) 1;',
+    '  box-shadow:-14px 0 34px rgba(61,43,31,.13)}',
     '.fsb-list{list-style:none;margin:0;padding:0}',
-    '.fsb-item{position:relative}',
+    '.fsb-item{position:relative;padding:0 8px}',
 
-    '.fsb-link{display:flex;align-items:center;gap:8px;width:100%;',
-    '  min-height:44px;padding:10px 18px;border:0;background:transparent;',
-    '  font-family:var(--font-body,inherit);font-size:.94rem;font-weight:500;',
+    '.fsb-link{display:flex;align-items:center;gap:9px;width:100%;',
+    '  min-height:44px;padding:11px 14px;border:0;background:transparent;',
+    '  font-family:var(--font-head,inherit);font-size:.97rem;font-weight:500;',
     '  color:var(--brown,#6B4F35);text-align:start;text-decoration:none;cursor:pointer;',
-    '  border-inline-end:3px solid transparent;transition:background .15s,color .15s,border-color .15s}',
-    '.fsb-link:hover,.fsb-item.is-open>.fsb-link,.fsb-link.is-current',
-    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F);',
-    '   border-inline-end-color:var(--wash-gold,#E8C877)}',
+    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
+    '  transition:background .16s,color .16s}',
+    '.fsb-link:hover,.fsb-item.is-open>.fsb-link',
+    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
+    // The page you are on is stated, not merely tinted: a filled wash marker.
+    '.fsb-link.is-current{color:var(--brown-dark,#3D2B1F);font-weight:600}',
+    '.fsb-link.is-current::before{content:"";width:7px;height:7px;flex:none;',
+    '  border-radius:50%;background:var(--wash-gold,#E8C877);',
+    '  box-shadow:0 0 0 3px color-mix(in oklab,var(--wash-gold,#E8C877) 30%,transparent)}',
     '.fsb-link .fsb-caret{margin-inline-start:auto;width:13px;height:13px;flex:none;',
-    '  transition:transform .15s}',
-    '.fsb-item.is-open>.fsb-link .fsb-caret{transform:rotate(-90deg)}',
-    '.fsb-badge{font-size:.68rem;font-weight:500;padding:1px 8px;',
+    '  opacity:.55;transition:transform .16s,opacity .16s}',
+    '.fsb-item.is-open>.fsb-link .fsb-caret{transform:rotate(-90deg);opacity:1}',
+    '.fsb-badge{font-size:.66rem;font-weight:500;padding:2px 8px;',
     '  border-radius:var(--radius-pill,999px);background:#F3DDA7;color:var(--brown-dark,#3D2B1F)}',
 
-    // The panel opens alongside the rail, toward the page. inset-inline-end:100%
-    // maps to left:100% in RTL, which is the edge the rail is pinned to.
-    '.fsb-panel{position:absolute;inset-inline-end:100%;inset-block-start:-8px;',
-    '  min-width:260px;max-width:320px;display:none;',
-    '  background:var(--surface,#FFFDF9);border:1px solid var(--tan-dark,#A88B69);',
-    '  border-radius:var(--radius,8px);box-shadow:var(--shadow-lg,0 12px 34px rgba(61,43,31,.14));',
-    '  padding:8px 0;margin-inline-end:8px}',
-    '.fsb-item.is-open>.fsb-panel{display:block}',
-    // A pointer crossing the 8px gap must not count as leaving; the bridge is
-    // the panel's own hit area extended back to the rail.
+    /* ---- the panel ---- */
+    // inset-inline-end:100% maps to left:100% in RTL, which is the edge the rail
+    // is pinned to, so the panel opens across the page rather than off-screen.
+    '.fsb-panel{position:absolute;inset-inline-end:100%;inset-block-start:-10px;',
+    '  min-width:268px;max-width:330px;display:none;',
+    '  background:linear-gradient(165deg,var(--surface,#FFFDF9) 0%,',
+    '    color-mix(in oklab,var(--beige,#F0E8DC) 34%,var(--surface,#FFFDF9)) 100%);',
+    '  border:1px solid var(--tan-dark,#A88B69);',
+    '  border-radius:var(--radius-organic,22px 44px 20px 40px / 40px 20px 46px 22px);',
+    '  box-shadow:0 16px 40px rgba(61,43,31,.2);padding:12px 10px;margin-inline-end:14px}',
+    '.fsb-item.is-open>.fsb-panel{display:block;animation:fsb-in .16s ease both}',
+    '@keyframes fsb-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}',
+    // The gap the pointer has to cross is part of the panel's hit area, or
+    // reaching a link inside it becomes a race.
     '.fsb-panel::after{content:"";position:absolute;inset-block:0;',
-    '  inset-inline-start:100%;width:10px}',
-    '.fsb-panel a{display:block;padding:9px 18px;font-size:.9rem;',
-    '  color:var(--text-muted,#6B5A49);text-decoration:none}',
-    '.fsb-panel a:hover,.fsb-panel a.is-current{background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
-    '.fsb-panel .fsb-head{padding:9px 18px 3px;font-family:var(--font-head,inherit);',
-    '  font-size:.72rem;letter-spacing:.08em;color:var(--tan-dark,#A88B69)}',
-    '.fsb-panel .fsb-sep{height:1px;background:var(--beige,#F0E8DC);margin:6px 0}',
+    '  inset-inline-start:100%;width:16px}',
+    '.fsb-panel a{display:block;padding:9px 15px;font-size:.9rem;',
+    '  color:var(--text-muted,#6B5A49);text-decoration:none;',
+    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
+    '  transition:background .16s,color .16s}',
+    '.fsb-panel a:hover{background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
+    '.fsb-panel a.is-current{color:var(--brown-dark,#3D2B1F);font-weight:600}',
+    '.fsb-panel .fsb-head{padding:10px 15px 4px;font-family:var(--font-head,inherit);',
+    '  font-size:.71rem;letter-spacing:.09em;color:var(--tan-dark,#A88B69)}',
+    '.fsb-panel .fsb-sep{height:1px;margin:8px 15px;',
+    '  background:linear-gradient(90deg,transparent,var(--tan,#C4A882),transparent)}',
 
-    // The real search button and panel, while they are living in the rail.
+    /* ---- the search, while it is living in the rail ---- */
     '.fsb-search .wsearch-btn{margin:0;width:100%;justify-content:flex-start;',
-    '  gap:8px;padding:10px 18px;min-height:44px;border-block-end:0;',
-    '  border-inline-end:3px solid transparent;color:var(--brown,#6B4F35)}',
-    '.fsb-search .wsearch-btn::after{content:"חיפוש";font-family:var(--font-body,inherit);',
-    '  font-size:.94rem;font-weight:500}',
+    '  gap:9px;padding:11px 14px;min-height:44px;border-block-end:0;',
+    '  border-radius:var(--radius-organic-sm,11px 21px 10px 19px / 19px 10px 22px 11px);',
+    '  font-family:var(--font-head,inherit);color:var(--brown,#6B4F35)}',
+    '.fsb-search .wsearch-btn::after{content:"חיפוש";font-size:.97rem;font-weight:500}',
     '.fsb-search .wsearch-btn:hover,.fsb-search .wsearch-btn[aria-expanded="true"]',
-    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F);',
-    '   border-inline-end-color:var(--wash-gold,#E8C877)}',
-    '.fsb-search .wsearch{position:absolute;inset-inline-end:100%;inset-block-start:-8px;',
-    '  inset-inline-start:auto;width:min(420px,calc(100vw - ' + (RAIL_W + 32) + 'px));',
-    '  margin-inline-end:8px}',
+    '  {background:var(--beige,#F0E8DC);color:var(--brown-dark,#3D2B1F)}',
+    '.fsb-search .wsearch{position:absolute;inset-inline-end:100%;inset-block-start:-10px;',
+    '  inset-inline-start:auto;width:min(430px,calc(100vw - var(--fsb-w) - 48px));',
+    '  margin-inline-end:14px}',
     '.fsb-search .wsearch-inner{max-width:none;padding:0;justify-content:flex-start}',
-    '.fsb-search .wsearch-panel{width:100%;border-radius:var(--radius,8px);',
-    '  border:1px solid var(--tan-dark,#A88B69)}',
+    '.fsb-search .wsearch-panel{width:100%;border:1px solid var(--tan-dark,#A88B69);',
+    '  border-radius:var(--radius-organic,22px 44px 20px 40px / 40px 20px 46px 22px)}',
 
-    // The rail overlaps the page at narrow widths and the header's own hamburger
-    // is a better answer there, so it simply does not appear.
-    '@media (max-width:900px){.fsb{display:none}}',
-    '@media (prefers-reduced-motion:reduce){.fsb{transition:none}}',
-    // The rail hangs off <body>, not off main/.site-header/.site-footer, so the
+    // The rail overlaps the content at narrow widths and the header's own
+    // hamburger is a better answer there, so it simply does not appear.
+    '@media (max-width:900px){.fsb{display:none}',
+    '  body.fsb-active main,body.fsb-active .site-footer{padding-inline-end:inherit}}',
+    '@media (prefers-reduced-motion:reduce){.fsb,main,.site-footer{transition:none}',
+    '  .fsb-item.is-open>.fsb-panel{animation:none}}',
+
+    // The rail hangs off <body>, outside main/.site-header/.site-footer, so the
     // sweeping overrides in accessibility.js do not reach it and every rule it
     // needs has to be written here. Skipping this left the badge's hard-coded
     // #F3DDA7 fill under text the mode had turned white: 1.33:1.
     'html.a11y-contrast .fsb-rail,html.a11y-contrast .fsb-panel',
-    '  {background:#000!important;border:1px solid #fff!important;box-shadow:none!important}',
+    '  {background:#000!important;border:1px solid #fff!important;box-shadow:none!important;',
+    '   border-image:none!important}',
     'html.a11y-contrast .fsb-link,html.a11y-contrast .fsb-head',
     '  {background:transparent!important;color:#fff!important}',
     'html.a11y-contrast .fsb-panel a{color:#FFE14D!important;background:transparent!important;',
     '  text-decoration:underline!important}',
     'html.a11y-contrast .fsb-badge{background:#000!important;color:#FFE14D!important;',
     '  border:1px solid #FFE14D!important}',
+    'html.a11y-contrast .fsb-link.is-current::before{background:#FFE14D!important;box-shadow:none!important}',
+    'html.a11y-contrast .fsb-panel .fsb-sep{background:#fff!important}',
     'html.a11y-contrast .fsb-link:hover,html.a11y-contrast .fsb-item.is-open>.fsb-link,',
     'html.a11y-contrast .fsb-panel a:hover{outline:2px solid #FFE14D!important}',
   ].join('');
@@ -158,6 +185,15 @@
     return { text: (clone.textContent || '').trim(), badge: badgeText };
   }
 
+  // Nothing on this site marks the current page in the menu - .nav-link.active
+  // is styled but never set - so it is derived from the address instead of read
+  // off a class that is always absent.
+  var here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  function isHere(href) {
+    if (!href) return false;
+    return (href.split('/').pop() || '').split('#')[0].toLowerCase() === here;
+  }
+
   var items = [];
   [].forEach.call(nav.querySelectorAll(':scope > .nav-item'), function (navItem, i) {
     var navLink = navItem.querySelector('.nav-link');
@@ -174,7 +210,7 @@
       a.className = 'fsb-link';
       a.href = navLink.getAttribute('href') || '#';
       a.innerHTML = '<span>' + info.text + '</span>' + badge;
-      if (navLink.classList.contains('active')) a.classList.add('is-current');
+      if (isHere(a.getAttribute('href'))) a.classList.add('is-current');
       li.appendChild(a);
       list.appendChild(li);
       return;
@@ -196,7 +232,10 @@
         var link = document.createElement('a');
         link.href = node.getAttribute('href');
         link.textContent = node.textContent.trim();
-        if (node.classList.contains('active')) link.classList.add('is-current');
+        if (isHere(link.getAttribute('href'))) {
+          link.classList.add('is-current');
+          btn.classList.add('is-current');   // the section, as well as the page
+        }
         panel.appendChild(link);
       } else if (node.classList.contains('dropdown-head')) {
         var head = document.createElement('div');
@@ -314,6 +353,7 @@
     if (next === up) return;
     up = next;
     wrap.classList.toggle('is-up', up);
+    document.body.classList.toggle('fsb-active', up);
     if (!up) closeAll(null);
     adoptSearch(up);
   }
@@ -321,19 +361,27 @@
   // The header is the thing that has to leave, so watch the header rather than
   // guessing a scroll offset - it is a different height on every breakpoint and
   // taller again while the mobile drawer is open.
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      setUp(!entries[0].isIntersecting);
-    }, { threshold: 0 }).observe(header);
-  } else {
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(function () {
-        ticking = false;
-        setUp(window.pageYOffset > header.offsetHeight);
-      });
-    }, { passive: true });
+  function headerGone() { return header.getBoundingClientRect().bottom <= 0; }
+  function sync() { setUp(headerGone()); }
+
+  // Three sources, all reading the live geometry rather than trusting an event's
+  // payload. The observer on its own left the rail down in roughly one page load
+  // in six: its callbacks, like rAF, can be withheld while a tab is not being
+  // rendered, and a scroll inside that window leaves no crossing to catch up on.
+  // The scroll listener is the one that always fires; the observer covers the
+  // header changing height without a scroll, which is what the mobile drawer
+  // does; visibilitychange covers coming back to a backgrounded tab.
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { ticking = false; sync(); });
   }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  document.addEventListener('visibilitychange', sync);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(sync, { threshold: 0 }).observe(header);
+  }
+  sync();
 })();
