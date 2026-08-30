@@ -294,7 +294,7 @@
      sampled pixels of all five photographs, not by eye. */
   .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:
     linear-gradient(to bottom,rgba(var(--hero-shade),.88) 0,rgba(var(--hero-shade),.60) 30%,rgba(var(--hero-shade),.08) 64%,rgba(var(--hero-shade),0) 100%),
-    linear-gradient(to top,rgba(var(--hero-shade),.92) 0,rgba(var(--hero-shade),.70) 26%,rgba(var(--hero-shade),.16) 58%,rgba(var(--hero-shade),0) 100%)}
+    linear-gradient(to top,rgba(var(--hero-shade),.94) 0,rgba(var(--hero-shade),.80) 34%,rgba(var(--hero-shade),.34) 66%,rgba(var(--hero-shade),0) 100%)}
 
   /* The sweep: opaque at the top, clear at the bottom, and its clear point
      travels downward as the slide's time runs out, so the picture darkens from
@@ -309,9 +309,17 @@
   .hero-body{position:relative;z-index:2;margin-block-start:auto;
     padding-block:clamp(140px,20vh,200px) clamp(20px,4vh,34px);
     padding-inline:clamp(20px,4vw,64px)}
-  .hero-title{font-family:var(--font-head);font-weight:700;color:#fff;
-    font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.08;margin:0 0 clamp(20px,2.4vh,34px);
-    text-shadow:0 2px 18px rgba(0,0,0,.45)}
+  /* The heading is not shown but is not thrown away either: it is the page's
+     only h1, and dropping the element would leave the homepage with no h1 for
+     search engines or for anyone navigating by headings. */
+  .hero-title-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+    border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+  /* A 400-character paragraph needs a measure even on a full-bleed hero, or it
+     runs the width of the window and becomes unreadable. */
+  .hero-lede{color:#fff;font-size:clamp(1rem,1.3vw,1.22rem);line-height:1.75;
+    max-width:62ch;margin:0 0 clamp(22px,2.6vh,36px);
+    text-shadow:0 1px 14px rgba(0,0,0,.6)}
   .hero-cta{display:flex;flex-wrap:wrap;gap:12px}
   .hero-btn{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;
     font-family:var(--font-body);font-weight:500;font-size:1rem;text-decoration:none;
@@ -679,7 +687,8 @@
     <div class="hero-sweep" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-body">
-      <h1 class="hero-title">חינוך ולדורף בישראל</h1>
+      <h1 class="hero-title-sr">חינוך ולדורף בישראל</h1>
+      <p class="hero-lede">האתר נבנה בידי הפורום הארצי לחינוך ולדורף – ארגון הגג של חינוך ולדורף בישראל – כשירות לציבור של מחנכים, הורים ומתעניינים בחינוך ולדורף. באתר ניתן למצוא רקע רוחני, עיוני ומעשי על חינוך ולדורף, תוכניות לימודים של גנים ובתי ספר, דרכי הערכה, מאמרים, ספרים, חומרי למידה, הרצאות ופודקסטים, סרטונים ותמונות, קישורים ועוד.</p>
       <div class="hero-cta">
         <a class="hero-btn hero-btn-primary" href="./school-list.html">רשימת המוסדות</a>
         <a class="hero-btn hero-btn-ghost" href="./waldorf-characteristics.html">על חינוך ולדורף</a>
@@ -694,7 +703,6 @@
     </div>
     <div class="hero-rail" aria-hidden="true"><span class="hero-rail-fill"></span></div>
   </div>
-<p>האתר נבנה בידי הפורום הארצי לחינוך ולדורף – ארגון הגג של חינוך ולדורף בישראל – כשירות לציבור של מחנכים, הורים ומתעניינים בחינוך ולדורף. באתר ניתן למצוא רקע רוחני, עיוני ומעשי על חינוך ולדורף, תוכניות לימודים של גנים ובתי ספר, דרכי הערכה, מאמרים, ספרים, חומרי למידה, הרצאות ופודקסטים, סרטונים ותמונות, קישורים ועוד.</p>
 <div class="stat-row">
 <div class="stat"><div class="num">~150</div><div class="lbl">גני ילדים</div></div>
 <div class="stat"><div class="num">~40</div><div class="lbl">בתי ספר יסודיים</div></div>
