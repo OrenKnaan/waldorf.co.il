@@ -54,7 +54,7 @@
     // Sticky rather than scrolling away: the menu stays with you down a long
     // page, which is what it is for, and stops at the end of the column.
     '  .fsb.is-on{display:block;flex:0 0 var(--fsb-w);',
-    '    position:sticky;inset-block-start:var(--fsb-gap)}',
+    '    position:sticky;inset-block-start:var(--fsb-top,var(--fsb-gap))}',
     '}',
     // .scroll-top-btn is fixed to this corner of the window and would land on
     // the rail; it steps aside by the width of the column.
@@ -385,6 +385,25 @@
     adoptSearch(on);
   }
 
+  // Where it pins: one breadcrumb-height plus a gutter down from the top of the
+  // window, so the rail comes to rest exactly where it would sit if the
+  // breadcrumb bar were still above it. Measured off the element rather than
+  // written as a number, because that bar wraps to two lines on narrow screens
+  // and is a different height there.
+  var crumb = main.querySelector('.pagebanner');
+  function setStickyTop() {
+    var h = crumb ? crumb.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty('--fsb-top', Math.round(h) + 24 + 'px');
+  }
+
+  var resizing = false;
+  window.addEventListener('resize', function () {
+    if (resizing) return;
+    resizing = true;
+    window.requestAnimationFrame(function () { resizing = false; setStickyTop(); });
+  }, { passive: true });
+
   mq.addEventListener('change', apply);
+  setStickyTop();
   apply();
 })();
