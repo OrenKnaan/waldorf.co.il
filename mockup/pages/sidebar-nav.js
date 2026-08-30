@@ -39,26 +39,29 @@
     // card, then 24px before the content starts.
     ':root{--fsb-w:' + RAIL_W + 'px;--fsb-gap:24px}',
 
-    '.fsb{position:fixed;inset-block:0;inset-inline-end:0;z-index:45;',
-    '  width:calc(var(--fsb-w) + var(--fsb-gap));',
-    '  padding-inline-end:var(--fsb-gap);padding-block-start:var(--fsb-gap);',
-    '  display:none;align-items:flex-start;pointer-events:none}',
-    '.fsb.is-on{display:flex;pointer-events:auto}',
-
-    // The page keeps a column clear rather than letting the rail sit on top of
-    // it. Longhand, because main and the footer both carry a padding shorthand
-    // and would otherwise take the edge back.
-    'body.fsb-static main,body.fsb-static .site-footer',
-    '  {padding-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
-    // The header is the one of the three with a background of its own - a
-    // gradient and a 3px wash border - so it is narrowed rather than padded.
-    // Padding would have left both running the full width behind the rail.
-    'body.fsb-static .site-header{margin-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
+    // The rail is a column beside the text, not an overlay pinned to the window,
+    // so it lines up with the content it belongs to. Everything above the first
+    // card - header, breadcrumb, artwork, the h1 - and the footer below keep the
+    // full width, because the wrapper starts at the first card and ends at the
+    // last thing in main.
+    '.fsb-layout{display:block}',
+    '.fsb{display:none}',
+    '@media (min-width:901px){',
+    '  .fsb-layout{display:flex;align-items:flex-start;gap:var(--fsb-gap)}',
+    // min-width:0 or a long unbroken string in the text would refuse to shrink
+    // and push the rail off the side.
+    '  .fsb-col{flex:1 1 auto;min-width:0}',
+    // Sticky rather than scrolling away: the menu stays with you down a long
+    // page, which is what it is for, and stops at the end of the column.
+    '  .fsb.is-on{display:block;flex:0 0 var(--fsb-w);',
+    '    position:sticky;inset-block-start:var(--fsb-gap)}',
+    '}',
+    // .scroll-top-btn is fixed to this corner of the window and would land on
+    // the rail; it steps aside by the width of the column.
+    'body.fsb-static .scroll-top-btn{inset-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
     // The rail carries the whole menu, so the header's copy of it would be a
     // second set of the same links. The brand row stays.
     'body.fsb-static .site-header > nav{display:none}',
-    // .scroll-top-btn is fixed to this same corner and would land on the rail.
-    'body.fsb-static .scroll-top-btn{inset-inline-end:calc(var(--fsb-w) + var(--fsb-gap) * 2)}',
 
     /* ---- the rail: the site's card, in a column ---- */
     '.fsb-rail{width:100%;background:var(--white);border:1px solid var(--tan-dark);',
@@ -248,7 +251,34 @@
   var searchLi = document.createElement('li');
   searchLi.className = 'fsb-item fsb-search';
   list.appendChild(searchLi);
-  document.body.appendChild(wrap);
+
+  /* ---------- put the rail beside the text, not over it ---------- */
+
+  // The column starts at the first card. Everything before it - the breadcrumb,
+  // the artwork, the h1 - is left where it is and keeps the full width, which is
+  // what makes the header and those bands read as one full-width stack with the
+  // two-column body beneath.
+  var anchor = main.querySelector(':scope > section.card, :scope > .card');
+  if (!anchor) return;
+
+  var layout = document.createElement('div');
+  layout.className = 'fsb-layout';
+  var col = document.createElement('div');
+  col.className = 'fsb-col';
+  layout.appendChild(col);
+  main.insertBefore(layout, anchor);
+
+  // Everything from the anchor to the end of main moves into the column. The
+  // nodes are moved, not cloned, so anything store.js and dynamic.js are holding
+  // on to keeps working.
+  var node = layout.nextSibling;
+  while (node) {
+    var next = node.nextSibling;
+    col.appendChild(node);
+    node = next;
+  }
+  // Second child, so in RTL it lands on the left, where the reference has it.
+  layout.appendChild(wrap);
 
   /* ---------- opening and closing ---------- */
 
