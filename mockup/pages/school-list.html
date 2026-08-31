@@ -448,6 +448,22 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* Google My Maps is a cross-origin iframe, so its wheel handler is out of
+     reach from this side: nothing here can cancel a zoom the frame has already
+     swallowed. Keeping pointer events off the frame until someone asks for it
+     is the only lever we have, so a page scroll over the map stays a page
+     scroll. Keyboard use is untouched, pointer-events never gates key events. */
+  .map-frame>iframe{pointer-events:none}
+  .map-frame.map-live>iframe{pointer-events:auto}
+  .map-activate{position:absolute;inset:0;width:100%;z-index:2;
+    display:flex;align-items:center;justify-content:center;
+    border:0;background:transparent;cursor:pointer;font-family:inherit}
+  .map-activate>span{background:var(--white);color:var(--brown-dark);font-size:.9rem;
+    padding:9px 18px;border-radius:var(--radius-pill);box-shadow:var(--shadow);
+    opacity:0;transition:opacity .18s}
+  .map-frame:hover .map-activate>span,.map-activate:focus-visible>span{opacity:1}
+  .map-frame.map-live .map-activate{display:none}
 </style>
 <script type="application/ld+json">
 {
@@ -557,7 +573,7 @@
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div><section class="card">
 <blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> הרשימה הבאה (42 בתי ספר) מבוססת על מאגר המוסדות של "אנתרופוסופיה בישראל" (antro.co.il) — האתר הישן של הפורום עצמו לא החזיק רשימה בנויה. פרטי הקשר עודכנו מרשימות הקשר של הפורום (2026). מוצגים כאן טלפונים ומיילים רשמיים של המוסד בלבד — לא מספרים אישיים של מנהלים או מנהלנים. המקור אינו כולל כתובת מדויקת או טווח כיתות לכל מוסד; שדות אלו יושלמו מול בתי הספר עצמם בהטמעה הסופית של הווידג'ט (טבלת institutions ב-D1, PRD סעיף 4).</blockquote>
 
-<div class="map-frame" id="map" style="min-height:300px;margin-bottom:18px"><iframe src="https://www.google.com/maps/d/embed?mid=1pEEHXSNNtFLCU3E1VjPcG15OEeP4w3o" style="position:relative;width:100%;height:480px;border:0" loading="lazy" title="מפת בתי ספר ולדורף בישראל"></iframe><div class="map-tint" aria-hidden="true"></div></div>
+<div class="map-frame" id="map" style="min-height:300px;margin-bottom:18px"><iframe src="https://www.google.com/maps/d/embed?mid=1pEEHXSNNtFLCU3E1VjPcG15OEeP4w3o" style="position:relative;width:100%;height:480px;border:0" loading="lazy" title="מפת בתי ספר ולדורף בישראל"></iframe><div class="map-tint" aria-hidden="true"></div><button type="button" class="map-activate"><span>לחצו להפעלת המפה</span></button></div>
 <p style="font-size:.85rem;color:var(--brown-dark);margin:-10px 0 18px">מקור: מפת "אנתרופוסופיה בישראל" (<a href="https://antro.co.il/study/schools_map.html">antro.co.il</a>) · עדכון אחרון במקור: 9/1/2023</p>
 <div class="kg-filter">
 <label class="kg-search">
@@ -704,6 +720,24 @@
     });
   });
   draw();
+})();
+</script>
+<script>
+(function(){
+  var frame=document.querySelector('.map-frame');
+  if(!frame) return;
+  var btn=frame.querySelector('.map-activate');
+  var iframe=frame.querySelector('iframe');
+  if(!btn||!iframe) return;
+  // Live only while the pointer is on the map and someone asked for it. Leaving
+  // the frame arms it again, so the next scroll past the map cannot zoom it.
+  btn.addEventListener('click',function(){
+    frame.classList.add('map-live');
+    iframe.focus();
+  });
+  frame.addEventListener('mouseleave',function(){
+    frame.classList.remove('map-live');
+  });
 })();
 </script>
 <script src="./breadcrumb.js" defer></script>
