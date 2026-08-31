@@ -438,6 +438,29 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* The page used to end on three identical cards, each holding one thin line.
+     They do three different jobs — what is coming up, how to reach us, where to
+     go next — so they now read as three different things. */
+  .fx-eyebrow{margin:0 0 9px;font-size:.76rem;font-weight:600;letter-spacing:.07em;color:var(--brown)}
+  .fx-after{margin-top:14px}
+  .fx-contact{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 22px}
+  .fx-lead{margin:0 0 7px;font-size:.95rem}
+  /* .fx-mail:hover is (0,2,0) and beats the stylesheet's bare a:hover at (0,1,1),
+     which is the trap .dyn-btn fell into: an anchor that sets its own colour has
+     to restate it on hover or the generic rule repaints it. */
+  .fx-mail{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-head);
+    font-size:1.12rem;color:var(--brown-dark);text-decoration:none;
+    border-bottom:2px solid color-mix(in oklab,var(--tan) 65%,transparent);padding-bottom:2px}
+  .fx-mail:hover{color:var(--brown);border-bottom-color:var(--brown)}
+  .fx-tiles{margin-top:2px}
+  .fx-tile{display:flex;flex-direction:column;gap:6px;height:100%;
+    background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic-sm);
+    padding:15px 17px;text-decoration:none;transition:border-color .18s,transform .18s,box-shadow .18s}
+  .fx-tile:hover{border-color:var(--tan);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .fx-tile-name{font-family:var(--font-head);font-size:1.04rem;font-weight:700;color:var(--brown-dark)}
+  .fx-tile-sub{font-size:.85rem;line-height:1.55;color:var(--text-muted)}
+  .fx-tile-go{margin-top:auto;padding-top:6px;font-size:1.1rem;color:var(--brown)}
 </style>
 <script type="application/ld+json">
 {
@@ -568,20 +591,30 @@
 </section>
 <section class="card">
 <h2 id="sec-mb8yd6">לוח אירועים, כנסים והשתלמויות</h2>
+<p class="fx-eyebrow">האירוע הקרוב</p>
 <div id="dyn-next-event" aria-live="polite"></div>
-<p><a href="./events.html">לכל האירועים ←</a> · <a href="./news.html">ללוח ההודעות ←</a></p>
+<div class="btn-row fx-after">
+<a class="btn btn-primary btn-sm" href="./events.html">כל האירועים</a>
+<a class="btn btn-ghost btn-sm" href="./news.html">לוח ההודעות</a>
+</div>
 </section>
 <section class="card">
 <h2 id="sec-j8hbk7">יצירת קשר</h2>
-<p><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg> info@waldorf.co.il — <a href="./contact.html">קישור לעמוד "צור קשר"</a></p>
+<div class="fx-contact">
+<div>
+<p class="fx-lead">שאלה, הצעה או בקשה — נשמח לשמוע.</p>
+<a class="fx-mail" href="mailto:info@waldorf.co.il"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg>info@waldorf.co.il</a>
+</div>
+<a class="btn btn-primary" href="./contact.html">לעמוד יצירת קשר</a>
+</div>
 </section>
 <section class="card">
-<h2 id="sec-5lt7wz">ניווט מהיר בתת-העמודים</h2>
-<ul>
-<li><a href="./forum-roles.html">נציגי הפורום</a></li>
-<li><a href="./forum-workgroups.html">קבוצות עבודה</a></li>
-<li><a href="./forum-newsletter.html">איגרת תקופתית</a></li>
-</ul>
+<h2 id="sec-1002c91">עוד בפורום</h2>
+<div class="grid cols-3 fx-tiles">
+<a class="fx-tile" href="./forum-roles.html"><span class="fx-tile-name">נציגי הפורום</span><span class="fx-tile-sub">צוות הלב והוועדה הכלכלית — מי אחראי על מה, ואיך להגיע אליהם</span><span class="fx-tile-go" aria-hidden="true">←</span></a>
+<a class="fx-tile" href="./forum-workgroups.html"><span class="fx-tile-name">קבוצות עבודה</span><span class="fx-tile-sub">שתים עשרה קבוצות לפי שכבה ומקצוע, וטופס הצטרפות</span><span class="fx-tile-go" aria-hidden="true">←</span></a>
+<a class="fx-tile" href="./forum-newsletter.html"><span class="fx-tile-name">איגרת תקופתית</span><span class="fx-tile-sub">גיליונות קודמים והרשמה לרשימת התפוצה</span><span class="fx-tile-go" aria-hidden="true">←</span></a>
+</div>
 </section>
 
 
@@ -595,20 +628,26 @@ WDyn.injectCSS();
 WDyn.applyAbout({intro:'#about-intro',activities:'#about-activities',admission:'#about-admission'});
 (function(){
   var m=document.getElementById('dyn-next-event'); if(!m) return;
-  var today=WDyn.todayISO();
-  var up=WStore.get('events').filter(function(e){return e.status==='published'&&e.date>=today;})
-    .sort(function(a,b){return a.date<b.date?-1:1;});
-  if(!up.length){ m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'})); return; }
-  var e=up[0];
-  m.appendChild(WDyn.el('div',{class:'dyn-item'},[
-    WDyn.el('h3',{text:e.title}),
-    e.description?WDyn.el('p',{text:e.description}):null,
-    WDyn.el('div',{class:'dyn-meta'},[
-      WDyn.el('span',{class:'dyn-chip',text:WDyn.fmtDate(e.date)}),
-      e.location?WDyn.el('span',{class:'dyn-chip',text:e.location}):null,
-      e.demo?WDyn.el('span',{class:'dyn-chip demo',text:'רשומת הדגמה'}):null
-    ])
-  ]));
+  /* WStore.get() throws until the content API has answered, so this has to wait
+     on WStore.ready the way every WDyn renderer does through deferred(). Reading
+     it synchronously threw on load, which is why this box rendered nothing at
+     all — not the next event and not even the empty state. */
+  WStore.ready.then(function(){
+    var today=WDyn.todayISO();
+    var up=WStore.get('events').filter(function(e){return e.status==='published'&&e.date>=today;})
+      .sort(function(a,b){return a.date<b.date?-1:1;});
+    if(!up.length){
+      m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'}));
+      return;
+    }
+    /* The card events.html already renders, date badge and all, so one event
+       does not have two different appearances on two pages. */
+    m.appendChild(WDyn.eventCard(up[0]));
+  }).catch(function(err){
+    m.textContent='';
+    m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'לא ניתן לטעון את לוח האירועים כרגע. רעננו את הדף או נסו שוב בעוד רגע.'}));
+    if(window.console) console.error('next-event failed', err);
+  });
 })();
 </script>
 <script src="./breadcrumb.js" defer></script>
