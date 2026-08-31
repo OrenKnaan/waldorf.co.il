@@ -18,6 +18,8 @@ Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.js
 
 ## Deployment
 
+**Commit and push finished work to `main` without being asked.** Do not stage changes and wait for a go-ahead, and do not branch first. Pushing to `main` publishes `mockup/pages/` to the public GitHub Pages URL via `.github/workflows/pages.yml`, and that is the intended outcome: the site is an unlaunched mockup with no real users, so a bad push costs a follow-up commit and nothing else. Finish the verification the change calls for (see "Scanning for bugs and violations"), then commit and push.
+
 **Current actual state (verified 2026-07-26):**
 
 - GitHub repo: `OrenKnaan/waldorf.co.il` (public).
