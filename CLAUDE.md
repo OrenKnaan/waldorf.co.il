@@ -250,6 +250,16 @@ Before building the new site, the entire existing site at waldorf.co.il must be 
 - `archive/` — older drafts: a previous PRD, an earlier homepage mockup (`awaldorf-homepage.html`), a brand/design-system doc (`aWaldorf_UX_UI_Design_System.md`), and `brand-assets.md`/`global-styles.css`. **These use a different color palette than the current mockup** — treat archive contents as superseded reference material, not source of truth. When in doubt, `mockup/`'s current CSS reflects the current direction.
 - `Rav Messer API.txt` — OpenAPI spec for "Responder" (responder.co.il), an Israeli email marketing platform. Relevant to the PRD's still-undecided newsletter tool choice (section 10 of the PRD).
 
+## Adding a page to the mockup
+
+`mockup/pages/associations.html` (עמותות מפעילות) is the worked example. Two things about it are worth copying.
+
+**Clone a finished page, do not generate one.** It was built by taking `school-list.html`, swapping the `<title>`, the breadcrumb JSON-LD, the page-overrides CSS block and everything between `<main>` and `</main>`, and dropping the source page's own inline scripts. A clone inherits the skip link, `accessibility.js` (undeferred, in `<head>`), `search.js`, the breadcrumb and scroll-top scripts, the analytics beacon, the responsive block, the `noindex` meta and the nav verbatim, so the only patchers left to run are `patch-search.mjs` (for the `id="sec-…"` anchors) and then `search-index.mjs`.
+
+**`node mockup/patch-accessibility.mjs` currently crashes**, on `home-hero-light.html`: that file is a fragment with no `<body>`, and the patcher throws rather than skipping it, the way it already skips `index.html`. It crashes partway through, so it leaves the pages it had already reached rewritten and the rest untouched. Do not run it to "wire up" a new page until that is fixed; clone instead, and check the clone against its source with a grep for each of the tags listed above. Note also that the patcher wants to move `accessibility.js` after `search.js` on all 50 pages, which suggests it has not been run since search was added.
+
+Nav entries are patched in, never regenerated, for the reason `patch-sorting-nav.mjs` documents. `patch-associations-nav.mjs` is the smaller example: it adds one `dropdown-link` and teaches the inline nav script's group regex about the new filename, so the parent tab lights up. Both are reversible with `ENABLED = false`.
+
 ## Working with the mockup
 
 `mockup/build.mjs` generates `mockup/pages/*.html` from `content/pages/*.md` (re-run with `node mockup/build.mjs` after editing the markdown). By default it skips pages that already exist so hand-edits to the generated HTML aren't reverted — **do not run with `FORCE=1`**, that regenerates everything from the markdown template and overwrites any hand-polished pages.
