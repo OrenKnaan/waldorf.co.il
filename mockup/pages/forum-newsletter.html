@@ -448,6 +448,23 @@
   .card.card-form{max-width:908px;margin-inline:auto}
   .card.card-form>h2{text-align:center}
   .card.card-form .btn-row{justify-content:center}
+  /* The archive is a sequence, so it is an <ol>: the order is the information,
+     newest first. The date leads each row because that is what someone scanning
+     an archive reads first. */
+  .arch{list-style:none;margin:2px 0 0;padding:0}
+  .arch-item{display:grid;grid-template-columns:92px minmax(0,1fr);gap:4px 16px;
+    padding:13px 2px;border-top:1px solid var(--beige)}
+  .arch-item:first-child{border-top:0;padding-top:4px}
+  .arch-date{margin:0;font-family:var(--font-head);font-size:.9rem;color:var(--brown);white-space:nowrap}
+  .arch-title{margin:0;font-family:var(--font-head);font-size:1.02rem;font-weight:700;line-height:1.45}
+  /* (0,2,1) so it outranks the stylesheet's bare a:hover at (0,1,1). */
+  .arch-title a{color:var(--brown-dark);text-decoration:none;
+    border-bottom:1.5px solid color-mix(in oklab,var(--tan) 60%,transparent)}
+  .arch-title a:hover{color:var(--brown);border-bottom-color:var(--brown)}
+  .arch-ex{margin:5px 0 0;font-size:.86rem;line-height:1.6;color:var(--text-muted)}
+  @media (max-width:560px){
+    .arch-item{grid-template-columns:minmax(0,1fr);gap:2px}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -558,6 +575,54 @@
 <p>האיגרת של הפורום הארצי — ארכיון גיליונות.</p>
 <p>האיגרת מתפרסמת מספר פעמים בשנה ונשלחת לכל מנויי הרשימה.</p>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+<section class="card">
+<h2 id="sec-1635p79">ארכיון איגרות</h2>
+<blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> הרשימה מרכזת את כל מה שהאתר הישן סיווג תחת "אגרת — חינוך ולדורף בישראל", יחד עם פריטים שכותרתם פותחת ב"אגרת", מהחדש לישן. אלה השנים 2015–2020 ואין כאן ארכיון פעיל: לפריטים אין מספרי גיליון, וחלקם הודעות שסווגו כאגרת ולא גיליונות ממש. הקישורים מפנים לאתר הישן ויפסיקו לעבוד עם מעבר הדומיין.</blockquote>
+<ol class="arch">
+<li class="arch-item">
+<p class="arch-date"><time datetime="2020-03-15">15.3.2020</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/%d7%90%d7%92%d7%a8%d7%aa-%d7%9c%d7%a6%d7%95%d7%95%d7%aa%d7%99-%d7%94%d7%a0%d7%99%d7%94%d7%95%d7%9c/" target="_blank" rel="noopener">אגרת לצוותי הניהול<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+<p class="arch-ex">15.3.20 שלום לצוותי הניהול, התקופה הנוכחית מאתגרת את כולנו ואנו חווים במרחב המשותף התייחסויות, שאלות וחוסר ודאות גם במעגל צוותי…</p>
+</div>
+</li>
+<li class="arch-item">
+<p class="arch-date"><time datetime="2019-05-18">18.5.2019</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/%d7%9e%d7%9c%d7%91-%d7%90%d7%9c-%d7%9c%d7%91-%d7%a2%d7%93%d7%9b%d7%95%d7%9f-%d7%94%d7%a4%d7%95%d7%a8%d7%95%d7%9d-%d7%94%d7%90%d7%a8%d7%a6%d7%99-%d7%9c%d7%a7%d7%94%d7%99%d7%9c%d7%aa-%d7%95%d7%9c/" target="_blank" rel="noopener">מלב אל לב – עדכון הפורום הארצי לקהילת ולדורף, מאי 2019<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+<p class="arch-ex">אנו שואפים לשאת את קהילת חינוך ולדורף בישראל, לפתח ולקדם את חינוך ולדורף בישראל ולהיות מעורבים במערכת החינוך, בממשקים עם קהילות…</p>
+</div>
+</li>
+<li class="arch-item">
+<p class="arch-date"><time datetime="2017-08-08">8.8.2017</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/%d7%9c%d7%99%d7%95%d7%95%d7%99_%d7%99%d7%95%d7%96%d7%9e%d7%95%d7%aa_2017/" target="_blank" rel="noopener">אגרת: ליווי יוזמות ובתי ספר תשע"ז 2016 -2017<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+</div>
+</li>
+<li class="arch-item">
+<p class="arch-date"><time datetime="2017-01-16">16.1.2017</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/%d7%90%d7%92%d7%a8%d7%aa-%d7%9c%d7%a7%d7%94%d7%99%d7%9c%d7%aa-%d7%95%d7%9c%d7%93%d7%95%d7%a8%d7%a3-%d7%91%d7%a2%d7%a7%d7%91%d7%95%d7%aa-%d7%94%d7%94%d7%a1%d7%9b%d7%9d-%d7%a2%d7%9d-%d7%9e%d7%a9%d7%a8/" target="_blank" rel="noopener">אגרת לקהילת ולדורף – בעקבות ההסכם עם משרד החינוך<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+<p class="arch-ex">כתב: גלעד גולדשמידט, יו"ר הפורום הארצי לחינוך ולדורף 16.01.2017 לקהילת ולדורף שלום רב, שבוע שעבר אישרה מנכ"לית משרד החינוך, גברת…</p>
+</div>
+</li>
+<li class="arch-item">
+<p class="arch-date"><time datetime="2015-12-30">30.12.2015</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/%d7%9e%d7%a4%d7%92%d7%a9-%d7%a4%d7%95%d7%a8%d7%95%d7%9d-%d7%9e%d7%a9%d7%95%d7%aa%d7%a3-%d7%9c%d7%92%d7%a0%d7%99%d7%9d-%d7%91%d7%aa%d7%99-%d7%a1%d7%a4%d7%a8-%d7%a2%d7%9e%d7%95%d7%aa%d7%95%d7%aa/" target="_blank" rel="noopener">מפגש פורום משותף לגנים, בתי ספר ועמותות חינוך ולדורף<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+<p class="arch-ex">מפגש פורום משותף לגנים/ בתי ספר / עמותות חינוך ולדורף יתקיים ביום שישי 29.1.16 בבית ספר אורים בשעה 13:00: על סדר היום: סקירה קצרה…</p>
+</div>
+</li>
+<li class="arch-item">
+<p class="arch-date"><time datetime="2015-08-12">12.8.2015</time></p>
+<div class="arch-body">
+<h3 class="arch-title"><a href="https://www.waldorf.co.il/1/" target="_blank" rel="noopener">שודרג אתר חינוך ולדורף בישראל<span class="sr-only"> (נפתח בחלון חדש)</span></a></h3>
+<p class="arch-ex">מורים יקרים, אנו שמחים לבשר על השקתו של אתר "חינוך ולדורף בישראל" המחודש בכתובת (הזמנית): http://teach.waldorf.co.il האתר מהווה…</p>
+</div>
+</li>
+</ol>
+<p><span class="ph">תוכן: לקבל מהפורום את קבצי הגיליונות בפועל ואת מספריהם, כדי להחליף את הקישורים לאתר הישן</span></p>
+</section>
 <section class="card card-form">
 <h2 id="sec-tys3o7">הצטרפות לרשימת התפוצה</h2>
 <p>השאירו כתובת דוא"ל ותקבלו את האיגרת עם פרסום כל גיליון. נשלח לכתובת הודעת אישור, וההרשמה תושלם רק אחרי הלחיצה על הקישור שבה.</p>
@@ -568,11 +633,6 @@
 <div class="field col-2"><div class="btn-row"><button type="submit" class="btn btn-primary" id="nl-submit">הרשמה לאיגרת</button><span style="align-self:center;font-size:.78rem;color:var(--text-muted)">* שדות חובה</span></div></div>
 <p class="nl-status" id="nl-status" role="status" aria-live="polite"></p>
 </form>
-</section>
-<section class="card">
-<h2 id="sec-1635p79">ארכיון איגרות</h2>
-<blockquote><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg> באתר הישן קיימת קטגוריית "אגרת", אך הפריטים שאותרו בה בסריקה היו ישנים (2015–2019) ולא מהווים ארכיון פעיל ומעודכן. אין להציג כאן תאריכים או מספרי גיליון מומצאים — הרשימה למטה תוחלף בתוכן אמיתי:</blockquote>
-<p><span class="ph">תוכן: לקבל את כל קבצי הגיליונות בפועל מהפורום כדי להעלות לארכיון, מהעדכני לישן ביותר</span></p>
 </section>
 
 </main>
