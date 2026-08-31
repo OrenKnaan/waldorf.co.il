@@ -437,6 +437,17 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* .form caps at two 420px columns, so inside a full-width card it sat hard
+     against the inline edge with a third of the row empty beside it, and the
+     submit button ended up far from where the last field left the eye. The card
+     is sized to what the form actually needs (two columns, the grid gap and the
+     card's own padding) and centred, with the heading and the button row
+     centred on the same axis. Prose keeps its start alignment: centring a
+     paragraph of Hebrew would cost more in readability than it buys in symmetry. */
+  .card.card-form{max-width:908px;margin-inline:auto}
+  .card.card-form>h2{text-align:center}
+  .card.card-form .btn-row{justify-content:center}
 </style>
 <script type="application/ld+json">
 {
@@ -565,7 +576,7 @@
 </ul>
 <p>כל קבוצת עבודה מנהלת קבוצת דיון (פורום) פנימית, נגישה רק לחברי הקבוצה.</p>
 </section>
-<section class="card">
+<section class="card card-form">
 <h2 id="sec-t1gsk2">הצטרפות לקבוצת עבודה</h2>
 <p>מוזמנים להצטרף! פרטים ליצירת קשר עם רכז/ת כל קבוצה — דרך <a href="./forum-roles.html">נציגי הפורום</a> או במייל forum@antro.org.il.</p>
 <form class="form" onsubmit="return false">

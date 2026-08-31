@@ -437,6 +437,17 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* .form caps at two 420px columns, so inside a full-width card it sat hard
+     against the inline edge with a third of the row empty beside it, and the
+     submit button ended up far from where the last field left the eye. The card
+     is sized to what the form actually needs (two columns, the grid gap and the
+     card's own padding) and centred, with the heading and the button row
+     centred on the same axis. Prose keeps its start alignment: centring a
+     paragraph of Hebrew would cost more in readability than it buys in symmetry. */
+  .card.card-form{max-width:908px;margin-inline:auto}
+  .card.card-form>h2{text-align:center}
+  .card.card-form .btn-row{justify-content:center}
 </style>
 <script type="application/ld+json">
 {
@@ -547,7 +558,7 @@
 <p>האיגרת של הפורום הארצי — ארכיון גיליונות.</p>
 <p>האיגרת מתפרסמת מספר פעמים בשנה ונשלחת לכל מנויי הרשימה.</p>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
+<section class="card card-form">
 <h2 id="sec-tys3o7">הצטרפות לרשימת התפוצה</h2>
 <p>השאירו כתובת דוא"ל ותקבלו את האיגרת עם פרסום כל גיליון. נשלח לכתובת הודעת אישור, וההרשמה תושלם רק אחרי הלחיצה על הקישור שבה.</p>
 <form class="form" id="nl-form" novalidate>
