@@ -437,6 +437,21 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+  /* ===== page overrides ===== */
+  /* The form and the details it repeats belong side by side: the address is
+     what someone checks instead of writing, so making them scroll past the
+     form to reach it puts the shortcut behind the long way round. */
+  .contact-cols{display:grid;gap:18px;align-items:start;
+    grid-template-columns:minmax(0,1fr) minmax(255px,335px)}
+  .contact-cols>.card{margin-bottom:0}
+  /* Stacks well before the shared 720px breakpoint. The details card holds its
+     width, so every pixel the row loses comes out of the form: measured, its
+     two columns fall to 214px at a 900px viewport, too narrow for a label like
+     «נושא הפנייה» over a select. Below 980px the form takes the full width. */
+  @media (max-width:980px){
+    .contact-cols{grid-template-columns:minmax(0,1fr)}
+    .contact-cols>.card{margin-bottom:0}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -538,6 +553,7 @@
   <h1>צור קשר</h1>
 <p>אנחנו כאן לכל שאלה, הצעה או בקשה.</p>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+<div class="contact-cols">
 <section class="card">
 <h2 id="sec-7jx461">טופס יצירת קשר</h2>
 <form class="form" onsubmit="return false">
@@ -558,6 +574,7 @@
 </ul>
 <p><span class="ph">תוכן: שעות המענה הטלפוני במשרד הפורום — לקבל מהפורום</span></p>
 </section>
+</div>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
