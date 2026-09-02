@@ -94,7 +94,11 @@ const ALT1 = `
     --wash-rose:oklch(0.76 0.09 18);--wash-gold:oklch(0.86 0.04 62);
     --wash-sage:oklch(0.82 0.03 30);--wash-sky:oklch(0.80 0.03 320);
   }
-  body{background:#FFFFFF}
+  /* floralwhite behind the content, white panels on top of it — including
+     the space below main, which is body ground showing through the
+     footer's top margin. */
+  body{background:floralwhite}
+  main#main-content{background:floralwhite}
   .site-header{background:#FFFFFF;border-image:none;
     border-bottom:2px solid var(--brown);box-shadow:none}
   .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
@@ -137,7 +141,7 @@ const ALT1 = `
   main .dyn-empty{border-radius:0;border:1px solid var(--rule);background:#FFFFFF}
   /* accessibility.js hard-codes the floating button and injects its <style>
      after this one, so the override needs .a11y-root to outrank it. */
-  .a11y-root .a11y-fab{background:var(--brown-dark);border:2px solid #FFFFFF;
+  .a11y-root .a11y-fab{background:var(--brown-dark);border:0;
     border-radius:0;color:#FFFFFF;box-shadow:0 10px 28px rgba(84,24,28,.34)}
   .a11y-root .a11y-fab:hover{background:var(--brown)}
   .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown-dark)}
@@ -237,7 +241,7 @@ const ALT2 = `
   main .dyn-event .date-badge{border-radius:0;background:#FFFFFF;
     border-color:color-mix(in oklab,var(--veil) 45%,transparent)}
   main .dyn-empty{border-radius:0;background:#FFFFFF}
-  .a11y-root .a11y-fab{background:var(--brown);border:2px solid #FFFFFF;
+  .a11y-root .a11y-fab{background:var(--brown);border:0;
     border-radius:0;color:#FFFFFF;box-shadow:0 14px 34px rgba(70,21,79,.34)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
   .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown)}
@@ -403,7 +407,7 @@ const ALT4 = `
   main .dyn-event .date-badge b{color:var(--i4)}
   main .dyn-chip{background:var(--t5);color:var(--brown-dark)}
   main .dyn-empty{background:#FFFFFF;border:0;box-shadow:var(--shadow)}
-  .a11y-root .a11y-fab{background:var(--i5);border:2px solid #FFFFFF;
+  .a11y-root .a11y-fab{background:var(--i5);border:0;
     border-radius:58% 42% 52% 48% / 46% 56% 44% 54%;color:#FFFFFF;
     box-shadow:0 12px 30px rgba(107,84,149,.36)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}

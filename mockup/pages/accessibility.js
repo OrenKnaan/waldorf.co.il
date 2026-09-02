@@ -251,7 +251,9 @@
     // corner - the two floating buttons now behave the same way round. Hex
     // rather than tokens, like the rest of this file: the widget has to stay
     // legible while the adjustments it controls are rewriting those tokens.
-    '.a11y-fab{width:48px;height:48px;border-radius:999px;border:2px solid #FAF6F0;background:#6B4F35;',
+    // No ring and 46px, so the pair is the same object in both corners; the
+    // ring was the only thing that made them look like two different controls.
+    '.a11y-fab{width:46px;height:46px;border-radius:999px;border:0;background:#6B4F35;',
     '  color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;',
     '  box-shadow:0 10px 28px rgba(61,43,31,.34);transition:background .15s ease,transform .15s ease}',
     '.a11y-fab:hover{background:#3D2B1F;transform:translateY(-2px)}',

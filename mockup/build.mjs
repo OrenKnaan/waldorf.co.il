@@ -372,6 +372,9 @@ ${titleFontFace}  :root {
   .pagebanner {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
     background: var(--white); box-shadow: var(--shadow); border-radius: var(--radius-pill);
+    /* Hug the crumbs. At full width a one-child space-between row renders as a
+       mostly-empty white bar; the gap still separates a pending badge. */
+    width: fit-content; max-width: 100%;
     padding: 8px 18px; margin-bottom: 24px; font-size: 12.5px; color: var(--text-muted);
   }
   .pagebanner .crumbs {
