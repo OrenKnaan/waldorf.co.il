@@ -372,11 +372,13 @@ ${titleFontFace}  :root {
   .pagebanner {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
     background: var(--white); box-shadow: var(--shadow); border-radius: var(--radius-pill);
-    /* Hug the crumbs. At full width a one-child space-between row renders as a
-       mostly-empty white bar; the gap still separates a pending badge. */
-    width: fit-content; max-width: 100%;
     padding: 8px 18px; margin-bottom: 24px; font-size: 12.5px; color: var(--text-muted);
   }
+  /* Flush against the header. main's padding-block-start is the gap, so the
+     breadcrumb is pulled up through it — scoped to :first-child so home.html,
+     which carries no breadcrumb, keeps its top padding. Restated at every
+     breakpoint in responsive.mjs, because the padding changes there. */
+  main > .pagebanner:first-child { margin-block-start: -28px; }
   .pagebanner .crumbs {
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
   }

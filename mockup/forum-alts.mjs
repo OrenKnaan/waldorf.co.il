@@ -29,7 +29,7 @@ const THEMES = [
 ];
 
 function themebar(current) {
-  const links = [{ file: 'forum.html', name: 'מקורי' }, ...THEMES]
+  const links = THEMES
     .map(t => `<a href="./${t.file}"${t.file === current ? ' aria-current="page"' : ''}>${t.name}</a>`)
     .join('\n');
   return `  <nav class="themebar" aria-label="ערכות עיצוב (זמני)">
@@ -431,8 +431,8 @@ for (const t of THEMES) {
   if (i < 0) throw new Error('no </style> in ' + t.file);
   out = out.slice(0, i) + style + out.slice(i);
 
-  const anchor = '<main id="main-content" tabindex="-1">\n';
-  if (!out.includes(anchor)) throw new Error('no <main> anchor');
+  const anchor = '</span>\n  </nav>\n';   // closes the breadcrumb nav, once
+  if (out.split(anchor).length !== 2) throw new Error('breadcrumb anchor not unique');
   out = out.replace(anchor, anchor + themebar(t.file));
 
   writeFileSync(dir + t.file, out);

@@ -57,7 +57,8 @@
   .dropdown-head{padding:9px 22px 3px;font-family:var(--font-head);font-size:.72rem;letter-spacing:.08em;color:var(--tan-dark)}
   .dropdown-sep{height:1px;background:var(--beige);margin:6px 0}
   main{/* max-width:760px; */margin:0 auto;padding:28px 24px 70px}
-  .pagebanner{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--white);box-shadow:var(--shadow);border-radius:var(--radius-organic-lg);width:fit-content;max-width:100%;padding:8px 18px;margin-bottom:24px;font-size:12.5px;color:var(--text-muted)}
+  .pagebanner{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--white);box-shadow:var(--shadow);border-radius:var(--radius-organic-lg);padding:8px 18px;margin-bottom:24px;font-size:12.5px;color:var(--text-muted)}
+  main > .pagebanner:first-child{margin-block-start:-28px}
   .pagebanner .crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
   .pagebanner .crumb{color:var(--text-muted);text-decoration:none}
   .pagebanner a.crumb:hover{color:var(--brown);text-decoration:underline}
@@ -280,6 +281,7 @@
     .dropdown-head{padding:8px 18px 2px}
 
     main{padding:22px 18px 56px}
+  main > .pagebanner:first-child{margin-block-start:-22px}
     h1{font-size:1.75rem}
     main > p:first-of-type{font-size:1rem}
     section.card{padding:18px;border-radius:14px}
@@ -308,6 +310,7 @@
 
   @media (max-width:560px){
     main{padding:18px 14px 50px}
+  main > .pagebanner:first-child{margin-block-start:-18px}
     h1{font-size:1.55rem}
     section.card{padding:16px 14px}
     .art-hero{height:170px;border-radius:14px}
@@ -339,6 +342,7 @@
   @media (max-width:400px){
     .brand-name{font-size:1.06rem}
     main{padding:16px 12px 44px}
+  main > .pagebanner:first-child{margin-block-start:-16px}
     h1{font-size:1.4rem}
     section.card{padding:14px 12px}
     .art-hero{height:150px}
@@ -684,14 +688,6 @@
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
 <main id="main-content" tabindex="-1">
-  <nav class="themebar" aria-label="ערכות עיצוב (זמני)">
-<span class="themebar-lbl">ערכות עיצוב</span>
-<a href="./forum.html">מקורי</a>
-<a href="./forum-alt1.html">יין ועצם</a>
-<a href="./forum-alt2.html">אור ושמנת</a>
-<a href="./forum-alt3.html">ציור בפינה</a>
-<a href="./forum-alt4.html" aria-current="page">פסטל</a>
-</nav>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
@@ -699,6 +695,13 @@
 <span class="crumb current" aria-current="page">הפורום</span>
 </span>
   </nav>
+  <nav class="themebar" aria-label="ערכות עיצוב (זמני)">
+<span class="themebar-lbl">ערכות עיצוב</span>
+<a href="./forum-alt1.html">יין ועצם</a>
+<a href="./forum-alt2.html">אור ושמנת</a>
+<a href="./forum-alt3.html">ציור בפינה</a>
+<a href="./forum-alt4.html" aria-current="page">פסטל</a>
+</nav>
   <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-5.webp')"></div><div class="frame"><img src="./img/art/waldorf-5.webp" alt="מעגל הקהילה" width="400" height="600" decoding="async"></div><div class="cap"><b>מעגל הקהילה</b><span>רבים סביב אור אחד — ציור ולדורף</span></div></div>
   <h1>הפורום הארצי לחינוך ולדורף</h1>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
