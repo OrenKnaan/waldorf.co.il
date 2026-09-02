@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>הפורום — ערכת צבע: שזיף ושמנת</title>
+<title>הפורום — ערכת צבע: אור ושמנת</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -462,61 +462,6 @@
   .fx-tile-sub{font-size:.85rem;line-height:1.55;color:var(--text-muted)}
   .fx-tile-go{margin-top:auto;padding-top:6px;font-size:1.1rem;color:var(--brown)}
 
-  /* ===== theme: שזיף ושמנת / Plum & Cream ===== */
-  :root{
-    --cream:#FBF1DE;--beige:#F2E3C9;--tan:#DEC49B;--tan-dark:#7A6146;
-    --brown:#6E2B7E;--brown-dark:#46154F;--text:#2C2233;--text-muted:#5A4E63;
-    --white:#FFFCF5;
-    --shadow:0 2px 10px rgba(70,21,79,.07);--shadow-lg:0 16px 40px rgba(70,21,79,.18);
-    --radius:9px;--radius-lg:16px;
-    --radius-organic-sm:12px 12px 12px 3px;
-    --radius-organic:20px 20px 20px 5px;
-    --radius-organic-lg:28px 28px 28px 7px;
-    --wash-rose:oklch(0.68 0.18 340);--wash-gold:oklch(0.85 0.11 82);
-    --wash-sage:oklch(0.62 0.15 300);--wash-sky:oklch(0.72 0.12 282);
-  }
-  body{background:
-    radial-gradient(70% 40% at 100% 0%, color-mix(in oklab,var(--wash-rose) 8%,transparent), transparent 60%),
-    linear-gradient(180deg,var(--cream) 0%,#FDF6E9 420px)}
-  .site-header{background:var(--cream);border-width:0 0 4px;
-    border-image:linear-gradient(90deg,var(--brown-dark),var(--brown) 45%,var(--wash-rose)) 1}
-  .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
-  h1{color:var(--brown-dark);font-size:2.3rem}
-  h1::after{height:9px;bottom:-6px;opacity:.85;
-    background:radial-gradient(60% 100% at 25% 50%, color-mix(in oklab,var(--wash-rose) 70%,transparent), transparent 74%),
-               radial-gradient(60% 100% at 74% 50%, color-mix(in oklab,var(--wash-gold) 72%,transparent), transparent 74%)}
-  /* "A Day at WSA ————" — the rule runs out from the heading to the card edge. */
-  h2{color:var(--brown);border-bottom:none;padding-bottom:0;margin-bottom:16px;font-size:1.24rem}
-  h2::after{content:"";flex:1 1 auto;height:1.5px;min-width:24px;
-    background:color-mix(in oklab,var(--brown) 40%,transparent)}
-  section.card{border:1px solid #B08B57;padding:24px 28px}
-  li::marker{color:var(--brown)}
-  /* The slanted band the Atlanta hero ends on. The cut lifts from the end edge,
-     where only blurred backdrop sits — the caption is at the start edge. */
-  .art-hero{isolation:isolate;border-radius:0;
-    clip-path:polygon(0 0,100% 0,100% 100%,0 93%)}
-  .art-hero .bg{filter:blur(7px) grayscale(1) contrast(1.08)}
-  .art-hero::after{mix-blend-mode:multiply;
-    background:linear-gradient(115deg,rgba(70,21,79,.92) 0%,rgba(126,38,124,.82) 45%,rgba(190,60,150,.66) 100%)}
-  .art-hero .frame{border-radius:14px 14px 14px 4px;border-color:rgba(255,252,245,.9)}
-  .art-hero .cap{padding-bottom:26px}
-  .btn{font-weight:600}
-  .btn-primary:hover{background:var(--brown-dark)}
-  .btn-ghost{border-color:var(--brown);color:var(--brown)}
-  .btn-ghost:hover{background:color-mix(in oklab,var(--brown) 10%,transparent);color:var(--brown-dark)}
-  .fx-eyebrow{color:var(--brown);letter-spacing:.1em}
-  .fx-tile{background:var(--white);border:1px solid #B08B57;
-    border-inline-start:4px solid var(--brown);border-radius:16px 16px 16px 4px}
-  .fx-tile:hover{border-color:var(--brown);background:#FFFFFF}
-  .fx-tile-go{font-size:1.25rem;color:var(--brown)}
-  .fx-mail{border-bottom-color:var(--brown)}
-  .nav-badge,.pending-badge{background:var(--wash-gold);color:var(--brown-dark)}
-  footer.site-footer{background:var(--brown-dark);color:#EBD9F0;margin-top:44px;padding:40px 24px 46px}
-  footer.site-footer a{color:#FFFFFF}
-  main .dyn-item{border:1px solid #B08B57}
-  main .dyn-item .dyn-btn{background:var(--brown);color:#FFFFFF}
-  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-
   /* ===== theme switcher (temporary) ===== */
   .themebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
@@ -527,6 +472,95 @@
   .themebar a:hover{background:var(--beige);color:var(--brown-dark)}
   .themebar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
   .themebar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
+
+  /* ===== theme: אור ושמנת / Light & Cream ===== */
+  :root{
+    --cream:#FFFFFF;--beige:#F1E9F3;--tan:#DCC3E2;--tan-dark:#786B84;
+    --brown:#6E2B7E;--brown-dark:#46154F;--text:#2C2233;--text-muted:#5A4E63;
+    --white:#FFFFFF;
+    --veil:#AE72BC;
+    --shadow:0 22px 50px -34px rgba(70,21,79,.45);
+    --shadow-lg:0 28px 66px -30px rgba(70,21,79,.42);
+    --radius:0;--radius-lg:0;--radius-pill:0;
+    --radius-organic-sm:0;--radius-organic:0;--radius-organic-lg:0;
+    --wash-rose:oklch(0.80 0.09 340);--wash-gold:oklch(0.92 0.06 86);
+    --wash-sage:oklch(0.80 0.08 300);--wash-sky:oklch(0.86 0.06 268);
+  }
+  body{background:
+    radial-gradient(58% 34% at 88% 0%, color-mix(in oklab,var(--wash-rose) 20%,transparent), transparent 66%),
+    radial-gradient(52% 30% at 6% 8%, color-mix(in oklab,var(--wash-sky) 18%,transparent), transparent 66%),
+    radial-gradient(70% 34% at 50% 100%, color-mix(in oklab,var(--wash-gold) 16%,transparent), transparent 70%),
+    #FFFFFF}
+  /* The header rule fades out at both ends instead of stopping. */
+  .site-header{background:transparent;box-shadow:none;border-width:0 0 1px;
+    border-image:linear-gradient(90deg,transparent,var(--veil) 22%,var(--brown) 50%,var(--veil) 78%,transparent) 1}
+  .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
+  .dropdown{border:1px solid color-mix(in oklab,var(--veil) 55%,transparent);border-radius:0}
+  /* Every rule on this page runs out before it reaches the edge. */
+  .pagebanner{background:transparent;box-shadow:none;border:0;padding-inline:2px;
+    border-bottom:1px solid transparent;
+    border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 72%) 1}
+  h1{color:var(--brown-dark);font-size:2.4rem;font-weight:700}
+  h1::after{height:8px;bottom:-4px;opacity:.7;border-radius:0;
+    background:linear-gradient(90deg,transparent,color-mix(in oklab,var(--wash-rose) 75%,transparent) 30%,
+      color-mix(in oklab,var(--wash-gold) 70%,transparent) 70%,transparent)}
+  h2{color:var(--brown);border-bottom:none;padding-bottom:0;margin-bottom:18px;
+    font-size:1.2rem;letter-spacing:.03em}
+  h2::after{content:"";flex:1 1 auto;height:1px;min-width:24px;
+    background:linear-gradient(90deg,color-mix(in oklab,var(--veil) 80%,transparent),transparent)}
+  /* No box: the border is a gradient that runs out before the corner, and the
+     lift comes from a wide low glow rather than a drop shadow. */
+  section.card{background:#FFFFFF;border-radius:0;padding:30px 34px;margin-bottom:26px;
+    border:1px solid transparent;
+    border-image:linear-gradient(150deg,var(--brown) 0%,var(--veil) 16%,
+      transparent 52%,color-mix(in oklab,var(--wash-gold) 78%,transparent) 100%) 1;
+    box-shadow:var(--shadow)}
+  li::marker{color:var(--veil)}
+  /* Slanted band, drained and re-lit rather than saturated, dissolving into
+     the white below it. The cut lifts from the end edge; the caption sits at
+     the start edge, so nothing is clipped. */
+  .art-hero{border-radius:0;box-shadow:none;
+    clip-path:polygon(0 0,100% 0,100% 100%,0 88%)}
+  .art-hero .bg{filter:blur(8px) grayscale(1) contrast(.95) brightness(1.22)}
+  .art-hero::after{background:
+    linear-gradient(0deg,rgba(255,255,255,.42) 0%,transparent 38%),
+    linear-gradient(118deg,rgba(70,21,79,.86) 0%,rgba(126,38,124,.62) 44%,rgba(196,140,205,.34) 100%)}
+  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45)}
+  .art-hero .cap{padding-bottom:26px}
+  .btn{border-radius:0;font-weight:500;letter-spacing:.02em}
+  .btn-primary:hover{background:var(--brown-dark)}
+  .btn-ghost{border:1px solid var(--veil);color:var(--brown)}
+  .btn-ghost:hover{background:color-mix(in oklab,var(--veil) 12%,transparent);color:var(--brown-dark)}
+  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:0}
+  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
+  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:0}
+  .fx-eyebrow{color:var(--brown);letter-spacing:.11em}
+  .fx-tile{background:#FFFFFF;border-radius:0;border:1px solid transparent;
+    border-image:linear-gradient(160deg,color-mix(in oklab,var(--veil) 80%,transparent),
+      transparent 70%) 1;box-shadow:none}
+  .fx-tile:hover{transform:none;box-shadow:var(--shadow);
+    border-image:linear-gradient(160deg,var(--brown),color-mix(in oklab,var(--veil) 40%,transparent)) 1}
+  .fx-tile-go{color:var(--brown)}
+  .fx-mail{border-bottom-color:var(--veil)}
+  .nav-badge,.pending-badge{background:color-mix(in oklab,var(--wash-gold) 70%,#FFFFFF);
+    color:var(--brown-dark);border-radius:0}
+  footer.site-footer{margin-top:52px;padding-top:34px;border-top:1px solid transparent;
+    border-image:linear-gradient(90deg,transparent,color-mix(in oklab,var(--veil) 70%,transparent) 50%,transparent) 1}
+  main .dyn-item{border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
+    border-image:linear-gradient(150deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 62%) 1}
+  main .dyn-item .dyn-btn{border-radius:0;background:var(--brown);color:#FFFFFF}
+  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
+  main .dyn-event .date-badge{border-radius:0;background:color-mix(in oklab,var(--wash-gold) 34%,#FFFFFF);
+    border-color:color-mix(in oklab,var(--veil) 45%,transparent)}
+  main .dyn-empty{border-radius:0;background:color-mix(in oklab,var(--veil) 7%,#FFFFFF)}
+  .a11y-root .a11y-fab{background:var(--brown);border:2px solid #FFFFFF;
+    border-radius:0;color:#FFFFFF;box-shadow:0 14px 34px rgba(70,21,79,.34)}
+  .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
+  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown)}
+  .themebar{background:transparent;border:0;border-radius:0;padding-inline:2px;
+    border-bottom:1px solid transparent;
+    border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 60%,transparent),transparent 72%) 1}
+  .themebar a{border-radius:0;border-color:color-mix(in oklab,var(--veil) 55%,transparent)}
 </style>
 <script type="application/ld+json">
 {
@@ -621,9 +655,9 @@
 <span class="themebar-lbl">ערכות עיצוב</span>
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html">יין ועצם</a>
-<a href="./forum-alt2.html" aria-current="page">שזיף ושמנת</a>
-<a href="./forum-alt3.html">ניגודיות גבוהה</a>
-<a href="./forum-alt4.html">פריזמה</a>
+<a href="./forum-alt2.html" aria-current="page">אור ושמנת</a>
+<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt4.html">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">

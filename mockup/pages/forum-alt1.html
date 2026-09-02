@@ -462,56 +462,6 @@
   .fx-tile-sub{font-size:.85rem;line-height:1.55;color:var(--text-muted)}
   .fx-tile-go{margin-top:auto;padding-top:6px;font-size:1.1rem;color:var(--brown)}
 
-  /* ===== theme: יין ועצם / Wine & Bone ===== */
-  :root{
-    --cream:#F8F1F0;--beige:#EFE3E1;--tan:#DCC6C3;--tan-dark:#7C5F5D;
-    --brown:#8B2E33;--brown-dark:#54181C;--text:#1F1A19;--text-muted:#5B5150;
-    --white:#FFFFFF;
-    --shadow:0 1px 3px rgba(31,26,25,.06);--shadow-lg:0 16px 42px rgba(84,24,28,.16);
-    --radius:5px;--radius-lg:10px;
-    --radius-organic-sm:6px;--radius-organic:6px;--radius-organic-lg:12px;
-    --wash-rose:oklch(0.74 0.10 18);--wash-gold:oklch(0.84 0.05 62);
-    --wash-sage:oklch(0.80 0.03 30);--wash-sky:oklch(0.78 0.04 320);
-  }
-  body{background:linear-gradient(180deg,#FFFFFF 0%,var(--cream) 520px)}
-  /* No rainbow: one wine rule under a plain white bar. */
-  .site-header{background:#FFFFFF;border-image:none;
-    border-bottom:2px solid var(--brown);box-shadow:none}
-  .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
-  .dropdown{border:1px solid var(--beige);border-radius:0 0 var(--radius-lg) var(--radius-lg)}
-  .brand-name{letter-spacing:.005em}
-  h1{font-size:2.35rem;letter-spacing:.005em}
-  /* A short wine rule reads as a masthead; the soft blob did not. */
-  h1::after{inset-inline:auto;inset-inline-start:0;width:74px;height:3px;
-    border-radius:0;opacity:1;bottom:-12px;background:var(--brown)}
-  h2{color:var(--brown-dark);font-size:1.06rem;letter-spacing:.045em;
-    border-bottom:1px solid var(--beige);padding-bottom:11px}
-  section.card{border:1px solid #AA908D;box-shadow:none;padding:26px 30px}
-  li::marker{color:var(--brown)}
-  .art-hero{border-radius:var(--radius-lg)}
-  .art-hero .bg{filter:blur(8px) saturate(.7)}
-  .art-hero::after{background:linear-gradient(90deg,rgba(84,24,28,.80) 0%,rgba(84,24,28,.42) 48%,rgba(84,24,28,.10) 78%)}
-  .art-hero .frame{border-radius:3px;border-color:rgba(255,255,255,.9)}
-  .btn{border-radius:3px;letter-spacing:.02em}
-  .btn-ghost{border-color:var(--brown);color:var(--brown)}
-  .btn-ghost:hover{background:var(--brown);color:#FFFFFF}
-  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:3px}
-  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
-  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:var(--radius-pill)}
-  .fx-eyebrow{color:var(--brown);letter-spacing:.12em}
-  .fx-tile{border:1px solid #AA908D;border-radius:var(--radius);
-    border-top:3px solid var(--brown);background:#FFFFFF}
-  .fx-tile:hover{border-color:var(--brown);border-top-color:var(--brown-dark);
-    background:var(--cream);transform:none;box-shadow:none}
-  .fx-mail{border-bottom-color:var(--brown)}
-  .nav-badge,.pending-badge{background:var(--brown);color:#FFFFFF;border-radius:2px}
-  /* The wine block that closes the NYC page. */
-  footer.site-footer{background:var(--brown-dark);color:#F3DAD9;margin-top:40px;padding:44px 24px 48px}
-  footer.site-footer a{color:#FFFFFF}
-  main .dyn-item{border:1px solid #AA908D;box-shadow:none;border-radius:var(--radius)}
-  main .dyn-item .dyn-btn{border-radius:3px;background:var(--brown);color:#FFFFFF}
-  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-
   /* ===== theme switcher (temporary) ===== */
   .themebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
@@ -522,6 +472,70 @@
   .themebar a:hover{background:var(--beige);color:var(--brown-dark)}
   .themebar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
   .themebar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
+
+  /* ===== theme: יין ועצם / Wine & Bone ===== */
+  :root{
+    --cream:#FFFFFF;--beige:#EFE7E6;--tan:#D6C0BD;--tan-dark:#7C5F5D;
+    --brown:#8B2E33;--brown-dark:#54181C;--text:#1A1614;--text-muted:#574D4C;
+    --white:#FFFFFF;
+    --rule:#A28784;
+    --shadow:none;--shadow-lg:0 18px 44px rgba(84,24,28,.16);
+    /* Straight corners, everywhere: scroll-top.js and search.js read these
+       tokens too, so the two floating controls square off with the rest. */
+    --radius:0;--radius-lg:0;--radius-pill:0;
+    --radius-organic-sm:0;--radius-organic:0;--radius-organic-lg:0;
+    --wash-rose:oklch(0.76 0.09 18);--wash-gold:oklch(0.86 0.04 62);
+    --wash-sage:oklch(0.82 0.03 30);--wash-sky:oklch(0.80 0.03 320);
+  }
+  body{background:#FBF8F8}
+  .site-header{background:#FFFFFF;border-image:none;
+    border-bottom:2px solid var(--brown);box-shadow:none}
+  .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
+  .dropdown{border:1px solid var(--rule);border-radius:0;box-shadow:var(--shadow-lg)}
+  .pagebanner{background:#FFFFFF;border:1px solid var(--rule);box-shadow:none;
+    font-size:.78rem;letter-spacing:.06em}
+  h1{font-size:2.4rem;letter-spacing:.005em;color:var(--brown-dark)}
+  /* A short masthead rule, not a soft blob. */
+  h1::after{inset-inline:auto;inset-inline-start:0;width:74px;height:3px;
+    border-radius:0;opacity:1;bottom:-12px;background:var(--brown)}
+  h2{color:var(--brown-dark);font-size:1.06rem;letter-spacing:.045em;
+    border-bottom:1px solid var(--rule);padding-bottom:11px}
+  section.card{background:#FFFFFF;border:1px solid var(--rule);box-shadow:none;
+    padding:28px 32px;border-radius:0}
+  li::marker{color:var(--brown)}
+  .art-hero{border-radius:0}
+  .art-hero .bg{filter:blur(8px) saturate(.7)}
+  .art-hero::after{background:linear-gradient(90deg,rgba(84,24,28,.82) 0%,rgba(84,24,28,.44) 48%,rgba(84,24,28,.10) 78%)}
+  .art-hero .frame{border-radius:0;border-color:#FFFFFF}
+  .btn{border-radius:0;letter-spacing:.02em}
+  .btn-ghost{border-color:var(--brown);color:var(--brown)}
+  .btn-ghost:hover{background:var(--brown);color:#FFFFFF}
+  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:0}
+  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
+  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:0}
+  .fx-eyebrow{color:var(--brown);letter-spacing:.12em}
+  .fx-tile{border:1px solid var(--rule);border-radius:0;
+    border-top:3px solid var(--brown);background:#FFFFFF}
+  .fx-tile:hover{border-color:var(--brown);border-top-color:var(--brown-dark);
+    background:#FBF6F6;transform:none;box-shadow:none}
+  .fx-mail{border-bottom-color:var(--brown)}
+  .nav-badge,.pending-badge{background:var(--brown);color:#FFFFFF;border-radius:0}
+  /* The wine block that closes the NYC page. */
+  footer.site-footer{background:var(--brown-dark);color:#F3DAD9;margin-top:48px;padding:44px 24px 48px}
+  footer.site-footer a{color:#FFFFFF}
+  main .dyn-item{border:1px solid var(--rule);box-shadow:none;border-radius:0}
+  main .dyn-item .dyn-btn{border-radius:0;background:var(--brown);color:#FFFFFF}
+  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
+  main .dyn-event .date-badge{border-radius:0;border-color:var(--rule)}
+  main .dyn-empty{border-radius:0;border:1px solid var(--rule);background:#FFFFFF}
+  /* accessibility.js hard-codes the floating button and injects its <style>
+     after this one, so the override needs .a11y-root to outrank it. */
+  .a11y-root .a11y-fab{background:var(--brown-dark);border:2px solid #FFFFFF;
+    border-radius:0;color:#FFFFFF;box-shadow:0 10px 28px rgba(84,24,28,.34)}
+  .a11y-root .a11y-fab:hover{background:var(--brown)}
+  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown-dark)}
+  .themebar{background:#FFFFFF;border:1px dashed var(--rule);border-radius:0}
+  .themebar a{border-radius:0;letter-spacing:.03em}
 </style>
 <script type="application/ld+json">
 {
@@ -616,9 +630,9 @@
 <span class="themebar-lbl">ערכות עיצוב</span>
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html" aria-current="page">יין ועצם</a>
-<a href="./forum-alt2.html">שזיף ושמנת</a>
-<a href="./forum-alt3.html">ניגודיות גבוהה</a>
-<a href="./forum-alt4.html">פריזמה</a>
+<a href="./forum-alt2.html">אור ושמנת</a>
+<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt4.html">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">

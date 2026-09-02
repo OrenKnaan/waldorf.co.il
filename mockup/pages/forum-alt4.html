@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>הפורום — ערכת צבע: פריזמה</title>
+<title>הפורום — ערכת צבע: פסטל</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -462,86 +462,6 @@
   .fx-tile-sub{font-size:.85rem;line-height:1.55;color:var(--text-muted)}
   .fx-tile-go{margin-top:auto;padding-top:6px;font-size:1.1rem;color:var(--brown)}
 
-  /* ===== theme: פריזמה / Prism ===== */
-  :root{
-    --cream:#FFF3E6;--beige:#FFE6D2;--tan:#FFBE93;--tan-dark:#A83E12;
-    --brown:#7C3AED;--brown-dark:#4C1D95;--text:#241B45;--text-muted:#4E4470;
-    --white:#FFFFFF;
-    --c1:#E11D48;--c2:#CC6D00;--c3:#0B8E7D;--c4:#2563EB;--c5:#7C3AED;
-    --shadow:0 3px 14px rgba(36,27,69,.09);--shadow-lg:0 18px 44px rgba(124,58,237,.24);
-    --radius:10px;--radius-lg:22px;
-    --radius-organic-sm:14px 26px 12px 24px / 24px 12px 27px 14px;
-    --radius-organic:26px 52px 24px 48px / 48px 24px 54px 26px;
-    --radius-organic-lg:36px 70px 32px 64px / 64px 32px 72px 36px;
-    --wash-rose:oklch(0.70 0.20 20);--wash-gold:oklch(0.83 0.17 78);
-    --wash-sage:oklch(0.74 0.14 175);--wash-sky:oklch(0.70 0.17 258);
-  }
-  body{background:
-    radial-gradient(75% 45% at 100% 0%, color-mix(in oklab,var(--wash-rose) 22%,transparent), transparent 62%),
-    radial-gradient(70% 40% at 0% 4%, color-mix(in oklab,var(--wash-sky) 20%,transparent), transparent 62%),
-    radial-gradient(90% 50% at 50% 100%, color-mix(in oklab,var(--wash-sage) 16%,transparent), transparent 66%),
-    linear-gradient(180deg,#FFF9F3 0%,var(--cream) 480px)}
-  .site-header{border-width:0 0 5px;
-    background:
-      radial-gradient(120% 150% at 10% 0%, color-mix(in oklab,var(--wash-rose) 40%,transparent), transparent 56%),
-      radial-gradient(120% 150% at 40% 0%, color-mix(in oklab,var(--wash-gold) 42%,transparent), transparent 56%),
-      radial-gradient(120% 160% at 72% 0%, color-mix(in oklab,var(--wash-sage) 36%,transparent), transparent 56%),
-      radial-gradient(120% 160% at 98% 0%, color-mix(in oklab,var(--wash-sky) 34%,transparent), transparent 56%),
-      #FFF9F3;
-    border-image:linear-gradient(90deg,var(--c1),var(--c2) 26%,var(--c3) 52%,var(--c4) 76%,var(--c5)) 1}
-  .nav-link{color:var(--brown-dark)}
-  .nav-link:hover,.nav-link.active{border-bottom-color:var(--c1)}
-  h1{font-size:2.4rem;color:var(--brown-dark)}
-  h1::after{height:14px;bottom:-8px;opacity:.9;border-radius:999px;
-    background:linear-gradient(90deg,var(--c1),var(--c2) 28%,var(--c3) 55%,var(--c4) 78%,var(--c5))}
-  h2{color:var(--brown-dark);border-bottom:none;padding-bottom:0;margin-bottom:15px;font-size:1.24rem}
-  /* Each card owns a hue: a bar across the top and a matching heading dot. */
-  h2::before{content:"";flex:0 0 auto;width:11px;height:11px;border-radius:50%;
-    background:var(--card-hue,var(--c5))}
-  section.card{position:relative;overflow:hidden;padding:26px 28px 24px;
-    border:1px solid color-mix(in oklab,var(--card-hue,var(--c5)) 55%,var(--white))}
-  section.card::before{content:"";position:absolute;inset-block-start:0;inset-inline:0;height:5px;
-    background:var(--card-hue,var(--c5))}
-  section.card:nth-of-type(1){--card-hue:var(--c1)}
-  section.card:nth-of-type(2){--card-hue:var(--c2)}
-  section.card:nth-of-type(3){--card-hue:var(--c3)}
-  section.card:nth-of-type(4){--card-hue:var(--c4)}
-  section.card:nth-of-type(5){--card-hue:var(--c5)}
-  section.card:nth-of-type(6){--card-hue:var(--c1)}
-  li::marker{color:var(--card-hue,var(--c5))}
-  .art-hero{border-radius:var(--radius-lg)}
-  .art-hero .bg{filter:blur(7px) saturate(1.5)}
-  .art-hero::after{background:
-    linear-gradient(110deg,rgba(76,29,149,.86) 0%,rgba(225,29,72,.52) 46%,rgba(14,159,140,.32) 100%)}
-  .art-hero .frame{border-radius:18px;border-color:rgba(255,255,255,.92)}
-  .btn{font-weight:600}
-  .btn-primary{background:linear-gradient(115deg,var(--c5),var(--c1));color:#FFFFFF}
-  .btn-primary:hover{background:linear-gradient(115deg,var(--brown-dark),#BE123C);color:#FFFFFF;
-    box-shadow:0 8px 22px rgba(124,58,237,.35)}
-  .btn-ghost{border:2px solid var(--c3);color:var(--c3)}
-  .btn-ghost:hover{background:color-mix(in oklab,var(--c3) 14%,transparent);color:#095F53}
-  .fx-eyebrow{color:var(--c1);letter-spacing:.11em}
-  .fx-tile{background:#FFFFFF;border:2px solid color-mix(in oklab,var(--tile-hue) 65%,var(--white));
-    border-radius:var(--radius-organic-sm)}
-  .fx-tiles a:nth-child(1){--tile-hue:var(--c1)}
-  .fx-tiles a:nth-child(2){--tile-hue:var(--c3)}
-  .fx-tiles a:nth-child(3){--tile-hue:var(--c4)}
-  .fx-tile:hover{border-color:var(--tile-hue);
-    background:color-mix(in oklab,var(--tile-hue) 7%,#FFFFFF);
-    box-shadow:0 12px 26px color-mix(in oklab,var(--tile-hue) 22%,transparent)}
-  .fx-tile-go{color:var(--tile-hue);font-size:1.3rem}
-  .fx-mail{border-bottom-color:var(--c1)}
-  .nav-badge,.pending-badge{background:var(--c2);color:#2B1200}
-  footer.site-footer{margin-top:40px;padding-top:30px;
-    border-top:4px solid transparent;
-    border-image:linear-gradient(90deg,var(--c1),var(--c2) 26%,var(--c3) 52%,var(--c4) 76%,var(--c5)) 1}
-  main .dyn-item{border:1.5px solid color-mix(in oklab,var(--c4) 55%,var(--white))}
-  main .dyn-item .dyn-btn{background:linear-gradient(115deg,var(--c5),var(--c1));color:#FFFFFF}
-  main .dyn-item .dyn-btn:hover{background:linear-gradient(115deg,var(--brown-dark),#BE123C);color:#FFFFFF}
-  main .dyn-event .date-badge{background:color-mix(in oklab,var(--c4) 14%,#FFFFFF);
-    border-color:color-mix(in oklab,var(--c4) 45%,transparent)}
-  main .dyn-event .date-badge b{color:#1D4ED8}
-
   /* ===== theme switcher (temporary) ===== */
   .themebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
@@ -552,6 +472,112 @@
   .themebar a:hover{background:var(--beige);color:var(--brown-dark)}
   .themebar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
   .themebar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
+
+  /* ===== theme: פסטל / Pastel ===== */
+  :root{
+    --cream:#FDFBF7;--beige:#F3EDE4;--tan:#D8CCBC;--tan-dark:#8A6A4E;
+    --brown:#6B5495;--brown-dark:#4E3A72;--text:#3B2F52;--text-muted:#5B4F79;
+    --white:#FFFFFF;
+    --i1:#A8465A;--t1:#FBE6E9;
+    --i2:#8C5F26;--t2:#FBEEDD;
+    --i3:#456F53;--t3:#E7F1E9;
+    --i4:#4A6899;--t4:#E7EDF7;
+    --i5:#6B5495;--t5:#EFE9F7;
+    --shadow:0 4px 16px rgba(59,47,82,.07);--shadow-lg:0 16px 38px rgba(107,84,149,.18);
+    --radius:12px;--radius-lg:20px;
+    --radius-organic-sm:16px 27px 13px 24px / 25px 13px 28px 15px;
+    --radius-organic:24px 44px 20px 40px / 42px 20px 46px 23px;
+    --radius-organic-lg:34px 62px 29px 56px / 58px 29px 66px 33px;
+    --wash-rose:oklch(0.86 0.07 18);--wash-gold:oklch(0.91 0.06 82);
+    --wash-sage:oklch(0.88 0.05 158);--wash-sky:oklch(0.87 0.05 258);
+  }
+  body{background:
+    radial-gradient(70% 40% at 96% 0%, color-mix(in oklab,var(--wash-rose) 40%,transparent), transparent 64%),
+    radial-gradient(62% 34% at 2% 6%, color-mix(in oklab,var(--wash-sky) 38%,transparent), transparent 64%),
+    radial-gradient(80% 40% at 50% 100%, color-mix(in oklab,var(--wash-sage) 30%,transparent), transparent 68%),
+    var(--cream)}
+  .site-header{border-width:0 0 4px;
+    background:
+      radial-gradient(120% 150% at 12% 0%, color-mix(in oklab,var(--wash-rose) 52%,transparent), transparent 58%),
+      radial-gradient(120% 150% at 44% 0%, color-mix(in oklab,var(--wash-gold) 52%,transparent), transparent 58%),
+      radial-gradient(120% 160% at 74% 0%, color-mix(in oklab,var(--wash-sage) 46%,transparent), transparent 58%),
+      radial-gradient(120% 160% at 99% 0%, color-mix(in oklab,var(--wash-sky) 44%,transparent), transparent 58%),
+      #FDFBF7;
+    border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
+  .nav-link{color:var(--brown-dark)}
+  .nav-link:hover,.nav-link.active{border-bottom-color:var(--i1)}
+  .pagebanner{background:#FFFFFF;border:1px solid var(--beige);
+    border-radius:30px 10px 24px 14px / 12px 26px 9px 30px}
+  h1{font-size:2.4rem;color:var(--brown-dark)}
+  /* No rule under the title — the tinted sheets carry the colour now. */
+  h1::after{content:none}
+  h2{color:var(--brown-dark);border-bottom:none;padding-bottom:0;margin-bottom:15px;font-size:1.22rem}
+  /* Hand-cut dot: a circle nobody quite closed. */
+  h2::before{content:"";flex:0 0 auto;width:12px;height:12px;
+    border-radius:62% 38% 54% 46% / 48% 58% 42% 52%;
+    background:var(--ink,var(--i5))}
+  /* Sheets of tinted paper, laid down a fraction off square. */
+  section.card{background:var(--tint,var(--t5));box-shadow:var(--shadow);
+    border:1.5px solid color-mix(in oklab,var(--ink,var(--i5)) 34%,transparent);
+    border-radius:var(--sheet);transform:rotate(var(--tilt));padding:26px 30px;margin-bottom:22px}
+  section.card:nth-of-type(1){--ink:var(--i1);--tint:var(--t1);--tilt:-.55deg;
+    --sheet:52px 12px 36px 20px / 16px 44px 10px 50px}
+  section.card:nth-of-type(2){--ink:var(--i2);--tint:var(--t2);--tilt:.45deg;
+    --sheet:14px 48px 20px 34px / 46px 12px 52px 16px}
+  section.card:nth-of-type(3){--ink:var(--i3);--tint:var(--t3);--tilt:-.4deg;
+    --sheet:34px 18px 50px 12px / 12px 50px 16px 42px}
+  section.card:nth-of-type(4){--ink:var(--i4);--tint:var(--t4);--tilt:.52deg;
+    --sheet:18px 44px 12px 48px / 50px 14px 40px 12px}
+  section.card:nth-of-type(5){--ink:var(--i5);--tint:var(--t5);--tilt:-.48deg;
+    --sheet:46px 14px 40px 22px / 20px 48px 12px 44px}
+  section.card:nth-of-type(6){--ink:var(--i1);--tint:var(--t1);--tilt:.38deg;
+    --sheet:12px 50px 24px 40px / 44px 16px 46px 14px}
+  li::marker{color:var(--ink,var(--i5))}
+  .art-hero{border-radius:var(--radius-organic-lg)}
+  .art-hero .bg{filter:blur(8px) saturate(.85)}
+  .art-hero::after{background:
+    linear-gradient(112deg,rgba(78,58,114,.80) 0%,rgba(168,70,90,.42) 48%,rgba(69,111,83,.24) 100%)}
+  .art-hero .frame{border-radius:20px 26px 18px 24px;border-color:rgba(255,255,255,.94)}
+  .btn{font-weight:600}
+  .btn-primary{background:var(--i5);color:#FFFFFF}
+  .btn-primary:hover{background:var(--brown-dark);color:#FFFFFF}
+  .btn-ghost{border:1.5px solid var(--i3);color:var(--i3);background:#FFFFFF}
+  .btn-ghost:hover{background:var(--t3);color:#33553F}
+  .fx-eyebrow{color:var(--i1);letter-spacing:.1em}
+  .fx-tile{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--tile-ink) 48%,transparent);
+    border-radius:var(--tile-sheet);transform:rotate(var(--tile-tilt))}
+  .fx-tiles a:nth-child(1){--tile-ink:var(--i1);--tile-tilt:-.9deg;
+    --tile-sheet:34px 8px 24px 14px / 10px 30px 6px 34px}
+  .fx-tiles a:nth-child(2){--tile-ink:var(--i3);--tile-tilt:.75deg;
+    --tile-sheet:9px 32px 13px 26px / 30px 8px 34px 11px}
+  .fx-tiles a:nth-child(3){--tile-ink:var(--i4);--tile-tilt:-.65deg;
+    --tile-sheet:26px 11px 34px 8px / 8px 34px 12px 28px}
+  .fx-tile:hover{border-color:var(--tile-ink);box-shadow:var(--shadow-lg);
+    transform:rotate(var(--tile-tilt)) translateY(-2px)}
+  .fx-tile-go{color:var(--tile-ink);font-size:1.25rem}
+  .fx-mail{border-bottom-color:var(--i1)}
+  .nav-badge,.pending-badge{background:var(--t2);color:#6B4718;
+    border:1px solid color-mix(in oklab,var(--i2) 40%,transparent)}
+  footer.site-footer{margin-top:44px;padding-top:30px;border-top:3px solid transparent;
+    border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
+  main .dyn-item{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--i4) 40%,transparent);
+    border-radius:26px 18px 22px 20px / 20px 24px 18px 26px}
+  main .dyn-item .dyn-btn{background:var(--i5);color:#FFFFFF}
+  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
+  main .dyn-event .date-badge{background:var(--t4);border-color:color-mix(in oklab,var(--i4) 42%,transparent);
+    border-radius:18px 11px 15px 13px / 13px 16px 11px 18px}
+  main .dyn-event .date-badge b{color:var(--i4)}
+  main .dyn-chip{background:var(--t5);color:var(--brown-dark)}
+  main .dyn-empty{background:#FFFFFF;border:1.5px solid var(--beige)}
+  .a11y-root .a11y-fab{background:var(--i5);border:2px solid #FFFFFF;
+    border-radius:58% 42% 52% 48% / 46% 56% 44% 54%;color:#FFFFFF;
+    box-shadow:0 12px 30px rgba(107,84,149,.36)}
+  .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
+  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--i5)}
+  .themebar{background:#FFFFFF;border:1.4px dashed color-mix(in oklab,var(--i5) 50%,transparent);
+    border-radius:36px 12px 28px 16px / 14px 30px 10px 38px}
+  .themebar a{border-radius:18px 7px 15px 9px / 8px 16px 6px 19px;
+    border-color:color-mix(in oklab,var(--i5) 42%,transparent)}
 </style>
 <script type="application/ld+json">
 {
@@ -646,9 +672,9 @@
 <span class="themebar-lbl">ערכות עיצוב</span>
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html">יין ועצם</a>
-<a href="./forum-alt2.html">שזיף ושמנת</a>
-<a href="./forum-alt3.html">ניגודיות גבוהה</a>
-<a href="./forum-alt4.html" aria-current="page">פריזמה</a>
+<a href="./forum-alt2.html">אור ושמנת</a>
+<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt4.html" aria-current="page">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
