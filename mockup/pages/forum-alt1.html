@@ -487,7 +487,7 @@
     --wash-rose:oklch(0.76 0.09 18);--wash-gold:oklch(0.86 0.04 62);
     --wash-sage:oklch(0.82 0.03 30);--wash-sky:oklch(0.80 0.03 320);
   }
-  body{background:#FBF8F8}
+  body{background:#FFFFFF}
   .site-header{background:#FFFFFF;border-image:none;
     border-bottom:2px solid var(--brown);box-shadow:none}
   .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
@@ -536,6 +536,15 @@
   .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown-dark)}
   .themebar{background:#FFFFFF;border:1px dashed var(--rule);border-radius:0}
   .themebar a{border-radius:0;letter-spacing:.03em}
+
+  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
+  /* The band drops to 200px and then 150px, so the same scrim covers far less
+     of the caption; below 720px it has to be deeper and reach higher. */
+  @media (max-width:720px){
+    .art-hero::before{background:linear-gradient(to top,
+      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -631,7 +640,7 @@
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html" aria-current="page">יין ועצם</a>
 <a href="./forum-alt2.html">אור ושמנת</a>
-<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt3.html">ציור בפינה</a>
 <a href="./forum-alt4.html">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">

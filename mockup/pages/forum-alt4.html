@@ -483,6 +483,7 @@
     --i3:#456F53;--t3:#E7F1E9;
     --i4:#4A6899;--t4:#E7EDF7;
     --i5:#6B5495;--t5:#EFE9F7;
+    --paint-wash:url(./img/paint-wash.webp);
     --shadow:0 4px 16px rgba(59,47,82,.07);--shadow-lg:0 16px 38px rgba(107,84,149,.18);
     --radius:12px;--radius-lg:20px;
     --radius-organic-sm:16px 27px 13px 24px / 25px 13px 28px 15px;
@@ -506,7 +507,7 @@
     border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
   .nav-link{color:var(--brown-dark)}
   .nav-link:hover,.nav-link.active{border-bottom-color:var(--i1)}
-  .pagebanner{background:#FFFFFF;border:1px solid var(--beige);
+  .pagebanner{background:#FFFFFF;border:0;
     border-radius:30px 10px 24px 14px / 12px 26px 9px 30px}
   h1{font-size:2.4rem;color:var(--brown-dark)}
   /* No rule under the title — the tinted sheets carry the colour now. */
@@ -516,21 +517,30 @@
   h2::before{content:"";flex:0 0 auto;width:12px;height:12px;
     border-radius:62% 38% 54% 46% / 48% 58% 42% 52%;
     background:var(--ink,var(--i5))}
-  /* Sheets of tinted paper, laid down a fraction off square. */
-  section.card{background:var(--tint,var(--t5));box-shadow:var(--shadow);
-    border:1.5px solid color-mix(in oklab,var(--ink,var(--i5)) 34%,transparent);
-    border-radius:var(--sheet);transform:rotate(var(--tilt));padding:26px 30px;margin-bottom:22px}
-  section.card:nth-of-type(1){--ink:var(--i1);--tint:var(--t1);--tilt:-.55deg;
+  /* Sheets of tinted paper — cut, not ruled: the corners are uneven, but the
+     sheet sits square. A tilt read as a scrapbook, which is the wrong register
+     for an umbrella organisation.
+     No outline anywhere: what separates a sheet from the page is its own
+     colour. The watercolour goes on as a second background layer rather than a
+     pseudo-element, so nothing has to be fought out of the paint order — the
+     file's own alpha does the fading, and background-blend-mode multiplies it
+     into the tint below. Each sheet takes a different corner of the same
+     painting, so no two are the same wash. */
+  section.card{background-color:var(--tint,var(--t5));box-shadow:var(--shadow);border:0;
+    background-image:var(--paint-wash);background-repeat:no-repeat;
+    background-position:var(--wash,left top);background-size:var(--wash-size,175% auto);
+    border-radius:var(--sheet);padding:26px 30px;margin-bottom:22px}
+  section.card:nth-of-type(1){--ink:var(--i1);--tint:var(--t1);--wash:left -40px top -30px;
     --sheet:52px 12px 36px 20px / 16px 44px 10px 50px}
-  section.card:nth-of-type(2){--ink:var(--i2);--tint:var(--t2);--tilt:.45deg;
+  section.card:nth-of-type(2){--ink:var(--i2);--tint:var(--t2);--wash:right -70px bottom -40px;
     --sheet:14px 48px 20px 34px / 46px 12px 52px 16px}
-  section.card:nth-of-type(3){--ink:var(--i3);--tint:var(--t3);--tilt:-.4deg;
+  section.card:nth-of-type(3){--ink:var(--i3);--tint:var(--t3);--wash:right -30px top -20px;
     --sheet:34px 18px 50px 12px / 12px 50px 16px 42px}
-  section.card:nth-of-type(4){--ink:var(--i4);--tint:var(--t4);--tilt:.52deg;
+  section.card:nth-of-type(4){--ink:var(--i4);--tint:var(--t4);--wash:left -60px bottom -50px;
     --sheet:18px 44px 12px 48px / 50px 14px 40px 12px}
-  section.card:nth-of-type(5){--ink:var(--i5);--tint:var(--t5);--tilt:-.48deg;
+  section.card:nth-of-type(5){--ink:var(--i5);--tint:var(--t5);--wash:left -20px top -60px;
     --sheet:46px 14px 40px 22px / 20px 48px 12px 44px}
-  section.card:nth-of-type(6){--ink:var(--i1);--tint:var(--t1);--tilt:.38deg;
+  section.card:nth-of-type(6){--ink:var(--i1);--tint:var(--t1);--wash:right -50px top -10px;
     --sheet:12px 50px 24px 40px / 44px 16px 46px 14px}
   li::marker{color:var(--ink,var(--i5))}
   .art-hero{border-radius:var(--radius-organic-lg)}
@@ -541,43 +551,49 @@
   .btn{font-weight:600}
   .btn-primary{background:var(--i5);color:#FFFFFF}
   .btn-primary:hover{background:var(--brown-dark);color:#FFFFFF}
-  .btn-ghost{border:1.5px solid var(--i3);color:var(--i3);background:#FFFFFF}
-  .btn-ghost:hover{background:var(--t3);color:#33553F}
+  /* The outline is what made this read as a button, so it becomes a fill
+     rather than nothing at all. */
+  .btn-ghost{border:0;background:var(--t3);color:#2F5240}
+  .btn-ghost:hover{background:color-mix(in oklab,var(--i3) 22%,#FFFFFF);color:#2F5240}
   .fx-eyebrow{color:var(--i1);letter-spacing:.1em}
-  .fx-tile{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--tile-ink) 48%,transparent);
-    border-radius:var(--tile-sheet);transform:rotate(var(--tile-tilt))}
-  .fx-tiles a:nth-child(1){--tile-ink:var(--i1);--tile-tilt:-.9deg;
-    --tile-sheet:34px 8px 24px 14px / 10px 30px 6px 34px}
-  .fx-tiles a:nth-child(2){--tile-ink:var(--i3);--tile-tilt:.75deg;
-    --tile-sheet:9px 32px 13px 26px / 30px 8px 34px 11px}
-  .fx-tiles a:nth-child(3){--tile-ink:var(--i4);--tile-tilt:-.65deg;
-    --tile-sheet:26px 11px 34px 8px / 8px 34px 12px 28px}
-  .fx-tile:hover{border-color:var(--tile-ink);box-shadow:var(--shadow-lg);
-    transform:rotate(var(--tile-tilt)) translateY(-2px)}
+  .fx-tile{background:#FFFFFF;border:0;box-shadow:var(--shadow);
+    border-radius:var(--tile-sheet)}
+  .fx-tiles a:nth-child(1){--tile-ink:var(--i1);--tile-sheet:34px 8px 24px 14px / 10px 30px 6px 34px}
+  .fx-tiles a:nth-child(2){--tile-ink:var(--i3);--tile-sheet:9px 32px 13px 26px / 30px 8px 34px 11px}
+  .fx-tiles a:nth-child(3){--tile-ink:var(--i4);--tile-sheet:26px 11px 34px 8px / 8px 34px 12px 28px}
+  .fx-tile:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
   .fx-tile-go{color:var(--tile-ink);font-size:1.25rem}
   .fx-mail{border-bottom-color:var(--i1)}
-  .nav-badge,.pending-badge{background:var(--t2);color:#6B4718;
-    border:1px solid color-mix(in oklab,var(--i2) 40%,transparent)}
+  .nav-badge,.pending-badge{background:var(--t2);color:#6B4718;border:0}
   footer.site-footer{margin-top:44px;padding-top:30px;border-top:3px solid transparent;
     border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
-  main .dyn-item{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--i4) 40%,transparent);
+  main .dyn-item{background:#FFFFFF;border:0;box-shadow:var(--shadow);
     border-radius:26px 18px 22px 20px / 20px 24px 18px 26px}
   main .dyn-item .dyn-btn{background:var(--i5);color:#FFFFFF}
   main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-  main .dyn-event .date-badge{background:var(--t4);border-color:color-mix(in oklab,var(--i4) 42%,transparent);
+  main .dyn-event .date-badge{background:var(--t4);border:0;
     border-radius:18px 11px 15px 13px / 13px 16px 11px 18px}
   main .dyn-event .date-badge b{color:var(--i4)}
   main .dyn-chip{background:var(--t5);color:var(--brown-dark)}
-  main .dyn-empty{background:#FFFFFF;border:1.5px solid var(--beige)}
+  main .dyn-empty{background:#FFFFFF;border:0;box-shadow:var(--shadow)}
   .a11y-root .a11y-fab{background:var(--i5);border:2px solid #FFFFFF;
     border-radius:58% 42% 52% 48% / 46% 56% 44% 54%;color:#FFFFFF;
     box-shadow:0 12px 30px rgba(107,84,149,.36)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
   .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--i5)}
-  .themebar{background:#FFFFFF;border:1.4px dashed color-mix(in oklab,var(--i5) 50%,transparent);
+  .themebar{background:#FFFFFF;border:0;box-shadow:var(--shadow);
     border-radius:36px 12px 28px 16px / 14px 30px 10px 38px}
   .themebar a{border-radius:18px 7px 15px 9px / 8px 16px 6px 19px;
     border-color:color-mix(in oklab,var(--i5) 42%,transparent)}
+
+  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
+  /* The band drops to 200px and then 150px, so the same scrim covers far less
+     of the caption; below 720px it has to be deeper and reach higher. */
+  @media (max-width:720px){
+    .art-hero::before{background:linear-gradient(to top,
+      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -673,7 +689,7 @@
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html">יין ועצם</a>
 <a href="./forum-alt2.html">אור ושמנת</a>
-<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt3.html">ציור בפינה</a>
 <a href="./forum-alt4.html" aria-current="page">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">

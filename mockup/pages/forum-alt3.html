@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>הפורום — ערכת צבע: רישום עיפרון</title>
+<title>הפורום — ערכת צבע: ציור בפינה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -473,118 +473,33 @@
   .themebar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
   .themebar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
 
-  /* ===== theme: רישום עיפרון / Pencil ===== */
-  :root{
-    --paper:#FCFAF4;
-    --cream:#FCFAF4;--beige:#EDE9DE;--tan:#B9B3A2;--tan-dark:#565C74;
-    --brown:#3F5488;--brown-dark:#2E3242;--text:#2E3242;--text-muted:#565C74;
-    --white:#FFFFFF;
-    --p1:#A34A32;--p2:#3F5488;--p3:#8A5F14;--p4:#3C6B4A;
-    --shadow:none;--shadow-lg:0 14px 32px rgba(46,50,66,.18);
-    --radius:4px;--radius-lg:6px;
-    /* Ruled freehand: the browser scales these down proportionally on a wide
-       box, which is exactly what makes each edge come out slightly different. */
-    --hand:19px 5px 15px 7px / 6px 16px 4px 20px;
-    --hand-b:6px 17px 4px 20px / 18px 5px 16px 7px;
-    --hand-sm:11px 3px 9px 4px / 4px 10px 3px 12px;
-    --radius-organic-sm:var(--hand-sm);--radius-organic:var(--hand-sm);--radius-organic-lg:var(--hand);
-    --sketch-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 9' preserveAspectRatio='none'%3E%3Cpath d='M0 5C20 2 40 7.6 60 4.6 80 1.7 100 7.4 120 4.4 140 1.8 160 7.2 180 5' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3C/svg%3E");
-    --wash-rose:oklch(0.72 0.09 32);--wash-gold:oklch(0.80 0.09 82);
-    --wash-sage:oklch(0.68 0.07 155);--wash-sky:oklch(0.66 0.09 262);
-  }
-  /* Paper fibre: two off-axis hatches at the threshold of visibility. */
+  /* ===== theme: ציור בפינה / the site as it stands, plus a corner wash ===== */
+  :root{--paint:url(./img/paint-top-left.webp);--paint-w:min(72vw,940px);--paint-pos:-120px -78px}
   body{background:
-    repeating-linear-gradient(3deg, rgba(46,50,66,.022) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(96deg, rgba(46,50,66,.018) 0 1px, transparent 1px 5px),
-    var(--paper)}
-  .site-header{background:transparent;box-shadow:none;border-width:0 0 2px;border-image:none;
-    border-bottom:2px solid var(--brown-dark)}
-  .nav-link{color:var(--brown-dark)}
-  .nav-link{position:relative}
-  .nav-link:hover,.nav-link.active{border-bottom-color:transparent}
-  .nav-link.active::after{content:"";position:absolute;inset-inline:6px;bottom:0;height:9px;
-    background:var(--p1);
-    -webkit-mask:var(--sketch-line) repeat-x left center/186px 9px;
-    mask:var(--sketch-line) repeat-x left center/186px 9px}
-  .dropdown{background:var(--paper);border:1.6px solid var(--brown-dark);
-    border-radius:var(--hand-sm);box-shadow:var(--shadow-lg)}
-  .dropdown-link:hover,.dropdown-link.active{background:color-mix(in oklab,var(--p2) 12%,transparent)}
-  .pagebanner{background:transparent;box-shadow:none;border:0;padding-inline:2px}
-  h1{color:var(--brown-dark);font-size:2.4rem}
-  /* Pencil shading rather than a line, fading out at both ends. */
-  h1::after{inset-inline:-2px;bottom:-11px;height:13px;border-radius:0;opacity:1;
-    background:repeating-linear-gradient(72deg,var(--p2) 0 1.6px,transparent 1.6px 5.5px);
-    -webkit-mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
-    mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
-  h2{color:var(--brown-dark);border-bottom:none;padding-bottom:12px;margin-bottom:16px;
-    font-size:1.16rem;position:relative}
-  /* One squiggle, masked so each heading can tint it with its own pencil. */
-  h2::after{content:"";position:absolute;inset-inline:0;bottom:0;height:9px;
-    background:var(--pencil,var(--p2));
-    -webkit-mask:var(--sketch-line) repeat-x left center/186px 9px;
-    mask:var(--sketch-line) repeat-x left center/186px 9px}
-  section.card{position:relative;background:#FFFFFF;box-shadow:none;padding:26px 30px;
-    border:1.7px solid var(--pencil,var(--p2));border-radius:var(--hand)}
-  /* The second pass of the pencil — the line you draw again because the first
-     one wandered. Inset and lighter, on the opposite corner rhythm. */
-  section.card::after{content:"";position:absolute;inset:4px;pointer-events:none;
-    border:1px solid color-mix(in oklab,var(--pencil,var(--p2)) 38%,transparent);
-    border-radius:var(--hand-b)}
-  section.card:nth-of-type(1){--pencil:var(--p2)}
-  section.card:nth-of-type(2){--pencil:var(--p1)}
-  section.card:nth-of-type(3){--pencil:var(--p4)}
-  section.card:nth-of-type(4){--pencil:var(--p3)}
-  section.card:nth-of-type(5){--pencil:var(--p2)}
-  section.card:nth-of-type(6){--pencil:var(--p1)}
-  li::marker{color:var(--pencil,var(--p2))}
-  .art-hero{border-radius:var(--hand);border:1.7px solid var(--brown-dark);box-shadow:none}
-  /* Not drained to grey — desaturated to the level of a coloured-pencil study. */
-  .art-hero .bg{filter:blur(7px) saturate(.45) contrast(1.12)}
-  .art-hero::after{background:linear-gradient(90deg,rgba(46,50,66,.86) 0%,rgba(63,84,136,.52) 52%,rgba(63,84,136,.16) 82%)}
-  /* Hatching laid over the veil, the way a study gets shaded in. */
+      var(--paint) no-repeat var(--paint-pos)/var(--paint-w) auto,
+      radial-gradient(90% 55% at 100% 0%, color-mix(in oklab,var(--wash-rose) 10%,transparent), transparent 60%),
+      radial-gradient(85% 50% at 0% 3%, color-mix(in oklab,var(--wash-sage) 9%,transparent), transparent 60%),
+      linear-gradient(180deg,var(--beige) 0%,var(--cream) 360px)}
+  .site-header{background:
+      var(--paint) no-repeat var(--paint-pos)/var(--paint-w) auto,
+      radial-gradient(120% 150% at 14% 0%, color-mix(in oklab,var(--wash-rose) 30%,transparent), transparent 55%),
+      radial-gradient(120% 150% at 50% 0%, color-mix(in oklab,var(--wash-gold) 30%,transparent), transparent 55%),
+      radial-gradient(120% 160% at 86% 0%, color-mix(in oklab,var(--wash-sage) 26%,transparent), transparent 55%),
+      var(--cream)}
+  /* On a phone the header is the only place the wash can show at all, so it
+     gets a size that still reads there instead of a sliver in the corner. */
+  @media (max-width:720px){
+    :root{--paint-w:min(112vw,560px);--paint-pos:-70px -52px}
+  }
+
   .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:repeating-linear-gradient(58deg,rgba(252,250,244,.10) 0 1px,transparent 1px 7px)}
-  .art-hero .frame{border-radius:3px;border:3px solid var(--paper);box-shadow:0 10px 26px rgba(20,22,32,.45)}
-  .btn{border-radius:var(--hand-sm);font-weight:600;border:1.6px solid var(--brown-dark)}
-  .btn-primary{background:var(--brown-dark);color:var(--paper)}
-  .btn-primary:hover{background:var(--p2);color:var(--paper)}
-  .btn-ghost{background:transparent;color:var(--brown-dark);border-color:var(--brown-dark)}
-  .btn-ghost:hover{background:color-mix(in oklab,var(--p2) 12%,transparent);color:var(--brown-dark)}
-  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:var(--hand-sm)}
-  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
-  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:var(--hand-sm)}
-  .fx-eyebrow{color:var(--p1);letter-spacing:.1em}
-  .fx-tile{background:#FFFFFF;border:1.6px solid var(--tile-pencil,var(--p2));
-    border-radius:var(--hand-sm);box-shadow:none}
-  .fx-tiles a:nth-child(1){--tile-pencil:var(--p1)}
-  .fx-tiles a:nth-child(2){--tile-pencil:var(--p4)}
-  .fx-tiles a:nth-child(3){--tile-pencil:var(--p3)}
-  .fx-tile:hover{border-color:var(--tile-pencil);transform:none;
-    background:color-mix(in oklab,var(--tile-pencil) 8%,#FFFFFF);box-shadow:none}
-  .fx-tile-go{color:var(--tile-pencil);font-size:1.2rem}
-  .fx-mail{border-bottom:2px solid var(--p1);color:var(--brown-dark)}
-  .fx-mail:hover{color:var(--p1);border-bottom-color:var(--brown-dark)}
-  .nav-badge,.pending-badge{background:color-mix(in oklab,var(--p3) 26%,#FFFFFF);
-    color:var(--brown-dark);border:1px solid var(--p3);border-radius:var(--hand-sm)}
-  footer.site-footer{margin-top:46px;padding-top:30px;border-top:1.7px solid var(--brown-dark)}
-  main .dyn-item{background:#FFFFFF;border:1.6px solid var(--p2);
-    border-radius:var(--hand-sm);box-shadow:none}
-  main .dyn-item .dyn-btn{border-radius:var(--hand-sm);background:var(--brown-dark);
-    color:var(--paper);border:1.6px solid var(--brown-dark)}
-  main .dyn-item .dyn-btn:hover{background:var(--p2);color:var(--paper)}
-  main .dyn-event .date-badge{border-radius:var(--hand-sm);background:var(--paper);
-    border:1.4px solid var(--p2);color:var(--brown-dark)}
-  main .dyn-event .date-badge b{color:var(--p2)}
-  main .dyn-chip{background:var(--paper);border:1.2px solid color-mix(in oklab,var(--p2) 45%,transparent);
-    color:var(--brown-dark)}
-  main .dyn-empty{background:#FFFFFF;border:1.6px dashed var(--p2);
-    border-radius:var(--hand-sm);color:var(--text-muted)}
-  .a11y-root .a11y-fab{background:var(--brown-dark);border:2px solid var(--paper);
-    border-radius:var(--hand-sm);color:var(--paper);box-shadow:0 10px 28px rgba(46,50,66,.34)}
-  .a11y-root .a11y-fab:hover{background:var(--p2)}
-  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown-dark)}
-  .themebar{background:#FFFFFF;border:1.4px dashed var(--p2);border-radius:var(--hand-sm)}
-  .themebar a{border-radius:var(--hand-sm);border-color:color-mix(in oklab,var(--p2) 55%,transparent)}
+    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
+  /* The band drops to 200px and then 150px, so the same scrim covers far less
+     of the caption; below 720px it has to be deeper and reach higher. */
+  @media (max-width:720px){
+    .art-hero::before{background:linear-gradient(to top,
+      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -680,7 +595,7 @@
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html">יין ועצם</a>
 <a href="./forum-alt2.html">אור ושמנת</a>
-<a href="./forum-alt3.html" aria-current="page">רישום עיפרון</a>
+<a href="./forum-alt3.html" aria-current="page">ציור בפינה</a>
 <a href="./forum-alt4.html">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">

@@ -516,17 +516,24 @@
       transparent 52%,color-mix(in oklab,var(--wash-gold) 78%,transparent) 100%) 1;
     box-shadow:var(--shadow)}
   li::marker{color:var(--veil)}
-  /* Slanted band, drained and re-lit rather than saturated, dissolving into
-     the white below it. The cut lifts from the end edge; the caption sits at
-     the start edge, so nothing is clipped. */
-  .art-hero{border-radius:0;box-shadow:none;
-    clip-path:polygon(0 0,100% 0,100% 100%,0 88%)}
+  /* Full-bleed, drained and re-lit rather than saturated, and masked so it
+     fades in from the right instead of ending on an edge. main carries the
+     only inset, so the negative margins are its padding at each breakpoint —
+     restated at the end of this block because those media queries come later
+     in the sheet and would otherwise win. */
+  .art-hero{border-radius:0;box-shadow:none;margin-inline:-24px;
+    -webkit-mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%);
+    mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%)}
   .art-hero .bg{filter:blur(8px) grayscale(1) contrast(.95) brightness(1.22)}
+  /* The white bottom fade was lightening exactly the corner the caption sits
+     in, and white 13px type came out at 3.24:1 over it. The right-side mask
+     already does the dissolving, so it goes and the veil deepens instead. */
   .art-hero::after{background:
-    linear-gradient(0deg,rgba(255,255,255,.42) 0%,transparent 38%),
-    linear-gradient(118deg,rgba(70,21,79,.86) 0%,rgba(126,38,124,.62) 44%,rgba(196,140,205,.34) 100%)}
-  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45)}
-  .art-hero .cap{padding-bottom:26px}
+    linear-gradient(118deg,rgba(52,12,60,.93) 0%,rgba(96,28,98,.80) 30%,
+      rgba(150,62,150,.52) 62%,rgba(196,140,205,.30) 100%)}
+  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45);
+    margin-inline-end:40px}
+  .art-hero .cap{padding-bottom:22px;padding-inline:40px}
   .btn{border-radius:0;font-weight:500;letter-spacing:.02em}
   .btn-primary:hover{background:var(--brown-dark)}
   .btn-ghost{border:1px solid var(--veil);color:var(--brown)}
@@ -546,13 +553,13 @@
     color:var(--brown-dark);border-radius:0}
   footer.site-footer{margin-top:52px;padding-top:34px;border-top:1px solid transparent;
     border-image:linear-gradient(90deg,transparent,color-mix(in oklab,var(--veil) 70%,transparent) 50%,transparent) 1}
-  main .dyn-item{border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
+  main .dyn-item{background:#FFFFFF;border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
     border-image:linear-gradient(150deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 62%) 1}
   main .dyn-item .dyn-btn{border-radius:0;background:var(--brown);color:#FFFFFF}
   main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-  main .dyn-event .date-badge{border-radius:0;background:color-mix(in oklab,var(--wash-gold) 34%,#FFFFFF);
+  main .dyn-event .date-badge{border-radius:0;background:#FFFFFF;
     border-color:color-mix(in oklab,var(--veil) 45%,transparent)}
-  main .dyn-empty{border-radius:0;background:color-mix(in oklab,var(--veil) 7%,#FFFFFF)}
+  main .dyn-empty{border-radius:0;background:#FFFFFF}
   .a11y-root .a11y-fab{background:var(--brown);border:2px solid #FFFFFF;
     border-radius:0;color:#FFFFFF;box-shadow:0 14px 34px rgba(70,21,79,.34)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
@@ -561,6 +568,20 @@
     border-bottom:1px solid transparent;
     border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 60%,transparent),transparent 72%) 1}
   .themebar a{border-radius:0;border-color:color-mix(in oklab,var(--veil) 55%,transparent)}
+  @media (max-width:720px){.art-hero{margin-inline:-18px}
+    .art-hero .frame{margin-inline-end:26px}.art-hero .cap{padding-inline:26px}}
+  @media (max-width:560px){.art-hero{margin-inline:-14px}
+    .art-hero .frame{margin-inline-end:20px}.art-hero .cap{padding-inline:20px}}
+  @media (max-width:400px){.art-hero{margin-inline:-12px}}
+
+  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
+  /* The band drops to 200px and then 150px, so the same scrim covers far less
+     of the caption; below 720px it has to be deeper and reach higher. */
+  @media (max-width:720px){
+    .art-hero::before{background:linear-gradient(to top,
+      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+  }
 </style>
 <script type="application/ld+json">
 {
@@ -656,7 +677,7 @@
 <a href="./forum.html">מקורי</a>
 <a href="./forum-alt1.html">יין ועצם</a>
 <a href="./forum-alt2.html" aria-current="page">אור ושמנת</a>
-<a href="./forum-alt3.html">רישום עיפרון</a>
+<a href="./forum-alt3.html">ציור בפינה</a>
 <a href="./forum-alt4.html">פסטל</a>
 </nav>
   <nav class="pagebanner" aria-label="breadcrumb">

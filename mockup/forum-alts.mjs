@@ -24,7 +24,7 @@ const src = readFileSync(dir + 'forum.html', 'utf8');
 const THEMES = [
   { file: 'forum-alt1.html', name: 'יין ועצם' },
   { file: 'forum-alt2.html', name: 'אור ושמנת' },
-  { file: 'forum-alt3.html', name: 'רישום עיפרון' },
+  { file: 'forum-alt3.html', name: 'ציור בפינה' },
   { file: 'forum-alt4.html', name: 'פסטל' },
 ];
 
@@ -38,6 +38,29 @@ ${links}
 </nav>
 `;
 }
+
+/* Shared across all four. The art-hero caption is white type over a blurred
+   photograph, and the veil that carries it is a horizontal gradient: by the
+   time the text sits at 56% width on a phone, the veil has run out. Measured
+   on the glyph pixels themselves, alt3 — which is forum.html's own art-hero,
+   untouched — came out at 2.62:1 at 375px and 3.78:1 at 600px, against the
+   4.5:1 that 15px bold needs. A bottom scrim puts it back at every width.
+
+   axe reports none of this. Text over a background image is "incomplete" to
+   it, not failed, so the four clean axe runs never covered this caption — and
+   the same measurement applies to the other 41 pages, which is a finding about
+   the mockup, not about these four. The .cap and .frame are already z-index:2,
+   so a z-index:1 scrim sits under them and over the veil. */
+const HERO_SCRIM = `
+  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
+  /* The band drops to 200px and then 150px, so the same scrim covers far less
+     of the caption; below 720px it has to be deeper and reach higher. */
+  @media (max-width:720px){
+    .art-hero::before{background:linear-gradient(to top,
+      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+  }
+`;
 
 const BAR_CSS = `
   /* ===== theme switcher (temporary) ===== */
@@ -71,7 +94,7 @@ const ALT1 = `
     --wash-rose:oklch(0.76 0.09 18);--wash-gold:oklch(0.86 0.04 62);
     --wash-sage:oklch(0.82 0.03 30);--wash-sky:oklch(0.80 0.03 320);
   }
-  body{background:#FBF8F8}
+  body{background:#FFFFFF}
   .site-header{background:#FFFFFF;border-image:none;
     border-bottom:2px solid var(--brown);box-shadow:none}
   .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
@@ -170,17 +193,24 @@ const ALT2 = `
       transparent 52%,color-mix(in oklab,var(--wash-gold) 78%,transparent) 100%) 1;
     box-shadow:var(--shadow)}
   li::marker{color:var(--veil)}
-  /* Slanted band, drained and re-lit rather than saturated, dissolving into
-     the white below it. The cut lifts from the end edge; the caption sits at
-     the start edge, so nothing is clipped. */
-  .art-hero{border-radius:0;box-shadow:none;
-    clip-path:polygon(0 0,100% 0,100% 100%,0 88%)}
+  /* Full-bleed, drained and re-lit rather than saturated, and masked so it
+     fades in from the right instead of ending on an edge. main carries the
+     only inset, so the negative margins are its padding at each breakpoint —
+     restated at the end of this block because those media queries come later
+     in the sheet and would otherwise win. */
+  .art-hero{border-radius:0;box-shadow:none;margin-inline:-24px;
+    -webkit-mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%);
+    mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%)}
   .art-hero .bg{filter:blur(8px) grayscale(1) contrast(.95) brightness(1.22)}
+  /* The white bottom fade was lightening exactly the corner the caption sits
+     in, and white 13px type came out at 3.24:1 over it. The right-side mask
+     already does the dissolving, so it goes and the veil deepens instead. */
   .art-hero::after{background:
-    linear-gradient(0deg,rgba(255,255,255,.42) 0%,transparent 38%),
-    linear-gradient(118deg,rgba(70,21,79,.86) 0%,rgba(126,38,124,.62) 44%,rgba(196,140,205,.34) 100%)}
-  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45)}
-  .art-hero .cap{padding-bottom:26px}
+    linear-gradient(118deg,rgba(52,12,60,.93) 0%,rgba(96,28,98,.80) 30%,
+      rgba(150,62,150,.52) 62%,rgba(196,140,205,.30) 100%)}
+  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45);
+    margin-inline-end:40px}
+  .art-hero .cap{padding-bottom:22px;padding-inline:40px}
   .btn{border-radius:0;font-weight:500;letter-spacing:.02em}
   .btn-primary:hover{background:var(--brown-dark)}
   .btn-ghost{border:1px solid var(--veil);color:var(--brown)}
@@ -200,13 +230,13 @@ const ALT2 = `
     color:var(--brown-dark);border-radius:0}
   footer.site-footer{margin-top:52px;padding-top:34px;border-top:1px solid transparent;
     border-image:linear-gradient(90deg,transparent,color-mix(in oklab,var(--veil) 70%,transparent) 50%,transparent) 1}
-  main .dyn-item{border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
+  main .dyn-item{background:#FFFFFF;border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
     border-image:linear-gradient(150deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 62%) 1}
   main .dyn-item .dyn-btn{border-radius:0;background:var(--brown);color:#FFFFFF}
   main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-  main .dyn-event .date-badge{border-radius:0;background:color-mix(in oklab,var(--wash-gold) 34%,#FFFFFF);
+  main .dyn-event .date-badge{border-radius:0;background:#FFFFFF;
     border-color:color-mix(in oklab,var(--veil) 45%,transparent)}
-  main .dyn-empty{border-radius:0;background:color-mix(in oklab,var(--veil) 7%,#FFFFFF)}
+  main .dyn-empty{border-radius:0;background:#FFFFFF}
   .a11y-root .a11y-fab{background:var(--brown);border:2px solid #FFFFFF;
     border-radius:0;color:#FFFFFF;box-shadow:0 14px 34px rgba(70,21,79,.34)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
@@ -215,129 +245,53 @@ const ALT2 = `
     border-bottom:1px solid transparent;
     border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 60%,transparent),transparent 72%) 1}
   .themebar a{border-radius:0;border-color:color-mix(in oklab,var(--veil) 55%,transparent)}
+  @media (max-width:720px){.art-hero{margin-inline:-18px}
+    .art-hero .frame{margin-inline-end:26px}.art-hero .cap{padding-inline:26px}}
+  @media (max-width:560px){.art-hero{margin-inline:-14px}
+    .art-hero .frame{margin-inline-end:20px}.art-hero .cap{padding-inline:20px}}
+  @media (max-width:400px){.art-hero{margin-inline:-12px}}
 `;
 
-/* ========================= 3. רישום עיפרון =========================
-   A page drawn rather than printed. Warm paper with a fibre grain, boxes
-   ruled by hand and traced a second time, headings underscored with a wobbly
-   stroke, and four coloured pencils — sanguine, indigo, ochre, forest —
-   taking one card each. Grey would have been the wrong answer: Waldorf
-   children draw in block colour, so the graphite carries a blue cast and the
-   accents are pencils, not neutrals. */
-const SKETCH_LINE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 9' preserveAspectRatio='none'%3E%3Cpath d='M0 5C20 2 40 7.6 60 4.6 80 1.7 100 7.4 120 4.4 140 1.8 160 7.2 180 5' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3C/svg%3E")`;
+/* ========================= 3. ציור בפינה =========================
+   Not a palette at all: forum.html's own colours, untouched, with the
+   watercolour dropped into the page's top-left corner. The file carries a real
+   alpha channel that fades to nothing, so it needs no blend mode — it settles
+   onto whatever ground is already there.
+
+   It is painted twice, on the body and on the header, because the header is
+   opaque and would otherwise cut the top off it. Both boxes start at the
+   page's top-left corner (the body has no margin, the header no padding of its
+   own), so the two copies line up and read as one wash.
+
+   The offset is not decoration. At 0,0 the painting's most saturated orange
+   lands on the nav row, where --brown reads 4.31:1 against it — under AA for
+   the 0.94rem links. Pushing the origin up and out puts the peak above the bar
+   and leaves the nav over the mid-tones. */
+const PAINT = './img/paint-top-left.webp';
+/* The same painting at 30% alpha. Diluting it in the file rather than with
+   background-blend-mode keeps one clean declaration and, more to the point,
+   keeps the result predictable: multiplying the full-strength wash into a
+   pastel tint turned the first sheet into saturated orange. */
+const PAINT_WASH = './img/paint-wash.webp';
 const ALT3 = `
-  /* ===== theme: רישום עיפרון / Pencil ===== */
-  :root{
-    --paper:#FCFAF4;
-    --cream:#FCFAF4;--beige:#EDE9DE;--tan:#B9B3A2;--tan-dark:#565C74;
-    --brown:#3F5488;--brown-dark:#2E3242;--text:#2E3242;--text-muted:#565C74;
-    --white:#FFFFFF;
-    --p1:#A34A32;--p2:#3F5488;--p3:#8A5F14;--p4:#3C6B4A;
-    --shadow:none;--shadow-lg:0 14px 32px rgba(46,50,66,.18);
-    --radius:4px;--radius-lg:6px;
-    /* Ruled freehand: the browser scales these down proportionally on a wide
-       box, which is exactly what makes each edge come out slightly different. */
-    --hand:19px 5px 15px 7px / 6px 16px 4px 20px;
-    --hand-b:6px 17px 4px 20px / 18px 5px 16px 7px;
-    --hand-sm:11px 3px 9px 4px / 4px 10px 3px 12px;
-    --radius-organic-sm:var(--hand-sm);--radius-organic:var(--hand-sm);--radius-organic-lg:var(--hand);
-    --sketch-line:${SKETCH_LINE};
-    --wash-rose:oklch(0.72 0.09 32);--wash-gold:oklch(0.80 0.09 82);
-    --wash-sage:oklch(0.68 0.07 155);--wash-sky:oklch(0.66 0.09 262);
-  }
-  /* Paper fibre: two off-axis hatches at the threshold of visibility. */
+  /* ===== theme: ציור בפינה / the site as it stands, plus a corner wash ===== */
+  :root{--paint:url(${PAINT});--paint-w:min(72vw,940px);--paint-pos:-120px -78px}
   body{background:
-    repeating-linear-gradient(3deg, rgba(46,50,66,.022) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(96deg, rgba(46,50,66,.018) 0 1px, transparent 1px 5px),
-    var(--paper)}
-  .site-header{background:transparent;box-shadow:none;border-width:0 0 2px;border-image:none;
-    border-bottom:2px solid var(--brown-dark)}
-  .nav-link{color:var(--brown-dark)}
-  .nav-link{position:relative}
-  .nav-link:hover,.nav-link.active{border-bottom-color:transparent}
-  .nav-link.active::after{content:"";position:absolute;inset-inline:6px;bottom:0;height:9px;
-    background:var(--p1);
-    -webkit-mask:var(--sketch-line) repeat-x left center/186px 9px;
-    mask:var(--sketch-line) repeat-x left center/186px 9px}
-  .dropdown{background:var(--paper);border:1.6px solid var(--brown-dark);
-    border-radius:var(--hand-sm);box-shadow:var(--shadow-lg)}
-  .dropdown-link:hover,.dropdown-link.active{background:color-mix(in oklab,var(--p2) 12%,transparent)}
-  .pagebanner{background:transparent;box-shadow:none;border:0;padding-inline:2px}
-  h1{color:var(--brown-dark);font-size:2.4rem}
-  /* Pencil shading rather than a line, fading out at both ends. */
-  h1::after{inset-inline:-2px;bottom:-11px;height:13px;border-radius:0;opacity:1;
-    background:repeating-linear-gradient(72deg,var(--p2) 0 1.6px,transparent 1.6px 5.5px);
-    -webkit-mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
-    mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
-  h2{color:var(--brown-dark);border-bottom:none;padding-bottom:12px;margin-bottom:16px;
-    font-size:1.16rem;position:relative}
-  /* One squiggle, masked so each heading can tint it with its own pencil. */
-  h2::after{content:"";position:absolute;inset-inline:0;bottom:0;height:9px;
-    background:var(--pencil,var(--p2));
-    -webkit-mask:var(--sketch-line) repeat-x left center/186px 9px;
-    mask:var(--sketch-line) repeat-x left center/186px 9px}
-  section.card{position:relative;background:#FFFFFF;box-shadow:none;padding:26px 30px;
-    border:1.7px solid var(--pencil,var(--p2));border-radius:var(--hand)}
-  /* The second pass of the pencil — the line you draw again because the first
-     one wandered. Inset and lighter, on the opposite corner rhythm. */
-  section.card::after{content:"";position:absolute;inset:4px;pointer-events:none;
-    border:1px solid color-mix(in oklab,var(--pencil,var(--p2)) 38%,transparent);
-    border-radius:var(--hand-b)}
-  section.card:nth-of-type(1){--pencil:var(--p2)}
-  section.card:nth-of-type(2){--pencil:var(--p1)}
-  section.card:nth-of-type(3){--pencil:var(--p4)}
-  section.card:nth-of-type(4){--pencil:var(--p3)}
-  section.card:nth-of-type(5){--pencil:var(--p2)}
-  section.card:nth-of-type(6){--pencil:var(--p1)}
-  li::marker{color:var(--pencil,var(--p2))}
-  .art-hero{border-radius:var(--hand);border:1.7px solid var(--brown-dark);box-shadow:none}
-  /* Not drained to grey — desaturated to the level of a coloured-pencil study. */
-  .art-hero .bg{filter:blur(7px) saturate(.45) contrast(1.12)}
-  .art-hero::after{background:linear-gradient(90deg,rgba(46,50,66,.86) 0%,rgba(63,84,136,.52) 52%,rgba(63,84,136,.16) 82%)}
-  /* Hatching laid over the veil, the way a study gets shaded in. */
-  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:repeating-linear-gradient(58deg,rgba(252,250,244,.10) 0 1px,transparent 1px 7px)}
-  .art-hero .frame{border-radius:3px;border:3px solid var(--paper);box-shadow:0 10px 26px rgba(20,22,32,.45)}
-  .btn{border-radius:var(--hand-sm);font-weight:600;border:1.6px solid var(--brown-dark)}
-  .btn-primary{background:var(--brown-dark);color:var(--paper)}
-  .btn-primary:hover{background:var(--p2);color:var(--paper)}
-  .btn-ghost{background:transparent;color:var(--brown-dark);border-color:var(--brown-dark)}
-  .btn-ghost:hover{background:color-mix(in oklab,var(--p2) 12%,transparent);color:var(--brown-dark)}
-  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:var(--hand-sm)}
-  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
-  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:var(--hand-sm)}
-  .fx-eyebrow{color:var(--p1);letter-spacing:.1em}
-  .fx-tile{background:#FFFFFF;border:1.6px solid var(--tile-pencil,var(--p2));
-    border-radius:var(--hand-sm);box-shadow:none}
-  .fx-tiles a:nth-child(1){--tile-pencil:var(--p1)}
-  .fx-tiles a:nth-child(2){--tile-pencil:var(--p4)}
-  .fx-tiles a:nth-child(3){--tile-pencil:var(--p3)}
-  .fx-tile:hover{border-color:var(--tile-pencil);transform:none;
-    background:color-mix(in oklab,var(--tile-pencil) 8%,#FFFFFF);box-shadow:none}
-  .fx-tile-go{color:var(--tile-pencil);font-size:1.2rem}
-  .fx-mail{border-bottom:2px solid var(--p1);color:var(--brown-dark)}
-  .fx-mail:hover{color:var(--p1);border-bottom-color:var(--brown-dark)}
-  .nav-badge,.pending-badge{background:color-mix(in oklab,var(--p3) 26%,#FFFFFF);
-    color:var(--brown-dark);border:1px solid var(--p3);border-radius:var(--hand-sm)}
-  footer.site-footer{margin-top:46px;padding-top:30px;border-top:1.7px solid var(--brown-dark)}
-  main .dyn-item{background:#FFFFFF;border:1.6px solid var(--p2);
-    border-radius:var(--hand-sm);box-shadow:none}
-  main .dyn-item .dyn-btn{border-radius:var(--hand-sm);background:var(--brown-dark);
-    color:var(--paper);border:1.6px solid var(--brown-dark)}
-  main .dyn-item .dyn-btn:hover{background:var(--p2);color:var(--paper)}
-  main .dyn-event .date-badge{border-radius:var(--hand-sm);background:var(--paper);
-    border:1.4px solid var(--p2);color:var(--brown-dark)}
-  main .dyn-event .date-badge b{color:var(--p2)}
-  main .dyn-chip{background:var(--paper);border:1.2px solid color-mix(in oklab,var(--p2) 45%,transparent);
-    color:var(--brown-dark)}
-  main .dyn-empty{background:#FFFFFF;border:1.6px dashed var(--p2);
-    border-radius:var(--hand-sm);color:var(--text-muted)}
-  .a11y-root .a11y-fab{background:var(--brown-dark);border:2px solid var(--paper);
-    border-radius:var(--hand-sm);color:var(--paper);box-shadow:0 10px 28px rgba(46,50,66,.34)}
-  .a11y-root .a11y-fab:hover{background:var(--p2)}
-  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown-dark)}
-  .themebar{background:#FFFFFF;border:1.4px dashed var(--p2);border-radius:var(--hand-sm)}
-  .themebar a{border-radius:var(--hand-sm);border-color:color-mix(in oklab,var(--p2) 55%,transparent)}
+      var(--paint) no-repeat var(--paint-pos)/var(--paint-w) auto,
+      radial-gradient(90% 55% at 100% 0%, color-mix(in oklab,var(--wash-rose) 10%,transparent), transparent 60%),
+      radial-gradient(85% 50% at 0% 3%, color-mix(in oklab,var(--wash-sage) 9%,transparent), transparent 60%),
+      linear-gradient(180deg,var(--beige) 0%,var(--cream) 360px)}
+  .site-header{background:
+      var(--paint) no-repeat var(--paint-pos)/var(--paint-w) auto,
+      radial-gradient(120% 150% at 14% 0%, color-mix(in oklab,var(--wash-rose) 30%,transparent), transparent 55%),
+      radial-gradient(120% 150% at 50% 0%, color-mix(in oklab,var(--wash-gold) 30%,transparent), transparent 55%),
+      radial-gradient(120% 160% at 86% 0%, color-mix(in oklab,var(--wash-sage) 26%,transparent), transparent 55%),
+      var(--cream)}
+  /* On a phone the header is the only place the wash can show at all, so it
+     gets a size that still reads there instead of a sliver in the corner. */
+  @media (max-width:720px){
+    :root{--paint-w:min(112vw,560px);--paint-pos:-70px -52px}
+  }
 `;
 
 /* ============================= 4. פסטל =============================
@@ -356,6 +310,7 @@ const ALT4 = `
     --i3:#456F53;--t3:#E7F1E9;
     --i4:#4A6899;--t4:#E7EDF7;
     --i5:#6B5495;--t5:#EFE9F7;
+    --paint-wash:url(${PAINT_WASH});
     --shadow:0 4px 16px rgba(59,47,82,.07);--shadow-lg:0 16px 38px rgba(107,84,149,.18);
     --radius:12px;--radius-lg:20px;
     --radius-organic-sm:16px 27px 13px 24px / 25px 13px 28px 15px;
@@ -379,7 +334,7 @@ const ALT4 = `
     border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
   .nav-link{color:var(--brown-dark)}
   .nav-link:hover,.nav-link.active{border-bottom-color:var(--i1)}
-  .pagebanner{background:#FFFFFF;border:1px solid var(--beige);
+  .pagebanner{background:#FFFFFF;border:0;
     border-radius:30px 10px 24px 14px / 12px 26px 9px 30px}
   h1{font-size:2.4rem;color:var(--brown-dark)}
   /* No rule under the title — the tinted sheets carry the colour now. */
@@ -389,21 +344,30 @@ const ALT4 = `
   h2::before{content:"";flex:0 0 auto;width:12px;height:12px;
     border-radius:62% 38% 54% 46% / 48% 58% 42% 52%;
     background:var(--ink,var(--i5))}
-  /* Sheets of tinted paper, laid down a fraction off square. */
-  section.card{background:var(--tint,var(--t5));box-shadow:var(--shadow);
-    border:1.5px solid color-mix(in oklab,var(--ink,var(--i5)) 34%,transparent);
-    border-radius:var(--sheet);transform:rotate(var(--tilt));padding:26px 30px;margin-bottom:22px}
-  section.card:nth-of-type(1){--ink:var(--i1);--tint:var(--t1);--tilt:-.55deg;
+  /* Sheets of tinted paper — cut, not ruled: the corners are uneven, but the
+     sheet sits square. A tilt read as a scrapbook, which is the wrong register
+     for an umbrella organisation.
+     No outline anywhere: what separates a sheet from the page is its own
+     colour. The watercolour goes on as a second background layer rather than a
+     pseudo-element, so nothing has to be fought out of the paint order — the
+     file's own alpha does the fading, and background-blend-mode multiplies it
+     into the tint below. Each sheet takes a different corner of the same
+     painting, so no two are the same wash. */
+  section.card{background-color:var(--tint,var(--t5));box-shadow:var(--shadow);border:0;
+    background-image:var(--paint-wash);background-repeat:no-repeat;
+    background-position:var(--wash,left top);background-size:var(--wash-size,175% auto);
+    border-radius:var(--sheet);padding:26px 30px;margin-bottom:22px}
+  section.card:nth-of-type(1){--ink:var(--i1);--tint:var(--t1);--wash:left -40px top -30px;
     --sheet:52px 12px 36px 20px / 16px 44px 10px 50px}
-  section.card:nth-of-type(2){--ink:var(--i2);--tint:var(--t2);--tilt:.45deg;
+  section.card:nth-of-type(2){--ink:var(--i2);--tint:var(--t2);--wash:right -70px bottom -40px;
     --sheet:14px 48px 20px 34px / 46px 12px 52px 16px}
-  section.card:nth-of-type(3){--ink:var(--i3);--tint:var(--t3);--tilt:-.4deg;
+  section.card:nth-of-type(3){--ink:var(--i3);--tint:var(--t3);--wash:right -30px top -20px;
     --sheet:34px 18px 50px 12px / 12px 50px 16px 42px}
-  section.card:nth-of-type(4){--ink:var(--i4);--tint:var(--t4);--tilt:.52deg;
+  section.card:nth-of-type(4){--ink:var(--i4);--tint:var(--t4);--wash:left -60px bottom -50px;
     --sheet:18px 44px 12px 48px / 50px 14px 40px 12px}
-  section.card:nth-of-type(5){--ink:var(--i5);--tint:var(--t5);--tilt:-.48deg;
+  section.card:nth-of-type(5){--ink:var(--i5);--tint:var(--t5);--wash:left -20px top -60px;
     --sheet:46px 14px 40px 22px / 20px 48px 12px 44px}
-  section.card:nth-of-type(6){--ink:var(--i1);--tint:var(--t1);--tilt:.38deg;
+  section.card:nth-of-type(6){--ink:var(--i1);--tint:var(--t1);--wash:right -50px top -10px;
     --sheet:12px 50px 24px 40px / 44px 16px 46px 14px}
   li::marker{color:var(--ink,var(--i5))}
   .art-hero{border-radius:var(--radius-organic-lg)}
@@ -414,40 +378,37 @@ const ALT4 = `
   .btn{font-weight:600}
   .btn-primary{background:var(--i5);color:#FFFFFF}
   .btn-primary:hover{background:var(--brown-dark);color:#FFFFFF}
-  .btn-ghost{border:1.5px solid var(--i3);color:var(--i3);background:#FFFFFF}
-  .btn-ghost:hover{background:var(--t3);color:#33553F}
+  /* The outline is what made this read as a button, so it becomes a fill
+     rather than nothing at all. */
+  .btn-ghost{border:0;background:var(--t3);color:#2F5240}
+  .btn-ghost:hover{background:color-mix(in oklab,var(--i3) 22%,#FFFFFF);color:#2F5240}
   .fx-eyebrow{color:var(--i1);letter-spacing:.1em}
-  .fx-tile{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--tile-ink) 48%,transparent);
-    border-radius:var(--tile-sheet);transform:rotate(var(--tile-tilt))}
-  .fx-tiles a:nth-child(1){--tile-ink:var(--i1);--tile-tilt:-.9deg;
-    --tile-sheet:34px 8px 24px 14px / 10px 30px 6px 34px}
-  .fx-tiles a:nth-child(2){--tile-ink:var(--i3);--tile-tilt:.75deg;
-    --tile-sheet:9px 32px 13px 26px / 30px 8px 34px 11px}
-  .fx-tiles a:nth-child(3){--tile-ink:var(--i4);--tile-tilt:-.65deg;
-    --tile-sheet:26px 11px 34px 8px / 8px 34px 12px 28px}
-  .fx-tile:hover{border-color:var(--tile-ink);box-shadow:var(--shadow-lg);
-    transform:rotate(var(--tile-tilt)) translateY(-2px)}
+  .fx-tile{background:#FFFFFF;border:0;box-shadow:var(--shadow);
+    border-radius:var(--tile-sheet)}
+  .fx-tiles a:nth-child(1){--tile-ink:var(--i1);--tile-sheet:34px 8px 24px 14px / 10px 30px 6px 34px}
+  .fx-tiles a:nth-child(2){--tile-ink:var(--i3);--tile-sheet:9px 32px 13px 26px / 30px 8px 34px 11px}
+  .fx-tiles a:nth-child(3){--tile-ink:var(--i4);--tile-sheet:26px 11px 34px 8px / 8px 34px 12px 28px}
+  .fx-tile:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
   .fx-tile-go{color:var(--tile-ink);font-size:1.25rem}
   .fx-mail{border-bottom-color:var(--i1)}
-  .nav-badge,.pending-badge{background:var(--t2);color:#6B4718;
-    border:1px solid color-mix(in oklab,var(--i2) 40%,transparent)}
+  .nav-badge,.pending-badge{background:var(--t2);color:#6B4718;border:0}
   footer.site-footer{margin-top:44px;padding-top:30px;border-top:3px solid transparent;
     border-image:linear-gradient(90deg,var(--t1),var(--t2) 26%,var(--t3) 52%,var(--t4) 76%,var(--t5)) 1}
-  main .dyn-item{background:#FFFFFF;border:1.5px solid color-mix(in oklab,var(--i4) 40%,transparent);
+  main .dyn-item{background:#FFFFFF;border:0;box-shadow:var(--shadow);
     border-radius:26px 18px 22px 20px / 20px 24px 18px 26px}
   main .dyn-item .dyn-btn{background:var(--i5);color:#FFFFFF}
   main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-  main .dyn-event .date-badge{background:var(--t4);border-color:color-mix(in oklab,var(--i4) 42%,transparent);
+  main .dyn-event .date-badge{background:var(--t4);border:0;
     border-radius:18px 11px 15px 13px / 13px 16px 11px 18px}
   main .dyn-event .date-badge b{color:var(--i4)}
   main .dyn-chip{background:var(--t5);color:var(--brown-dark)}
-  main .dyn-empty{background:#FFFFFF;border:1.5px solid var(--beige)}
+  main .dyn-empty{background:#FFFFFF;border:0;box-shadow:var(--shadow)}
   .a11y-root .a11y-fab{background:var(--i5);border:2px solid #FFFFFF;
     border-radius:58% 42% 52% 48% / 46% 56% 44% 54%;color:#FFFFFF;
     box-shadow:0 12px 30px rgba(107,84,149,.36)}
   .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
   .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--i5)}
-  .themebar{background:#FFFFFF;border:1.4px dashed color-mix(in oklab,var(--i5) 50%,transparent);
+  .themebar{background:#FFFFFF;border:0;box-shadow:var(--shadow);
     border-radius:36px 12px 28px 16px / 14px 30px 10px 38px}
   .themebar a{border-radius:18px 7px 15px 9px / 8px 16px 6px 19px;
     border-color:color-mix(in oklab,var(--i5) 42%,transparent)}
@@ -461,7 +422,7 @@ for (const t of THEMES) {
   out = out.replace('<title>הפורום — מוקאפ</title>',
     `<title>הפורום — ערכת צבע: ${t.name}</title>`);
 
-  const style = BAR_CSS + CSS[t.file];
+  const style = BAR_CSS + CSS[t.file] + HERO_SCRIM;
   const i = out.lastIndexOf('</style>');
   if (i < 0) throw new Error('no </style> in ' + t.file);
   out = out.slice(0, i) + style + out.slice(i);
