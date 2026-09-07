@@ -105,6 +105,20 @@
     '.dyn-lib-item{display:block;padding:10px 14px;border-inline-start:3px solid var(--tan);background:var(--white);border-radius:var(--radius);margin:0 0 9px;box-shadow:var(--shadow)}',
     '.dyn-lib-item b{color:var(--brown-dark)}',
     '.dyn-lib-item small{display:block;color:var(--text-muted);font-size:.82rem;margin-top:2px}',
+    /* רשת אריחים: כל פריט בריבוע משלו, ארבע עמודות ברוחב מלא */
+    '.dyn-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}',
+    '.dyn-tile{display:flex;flex-direction:column;gap:6px;min-height:126px;padding:14px 16px;background:var(--white);border:1.5px solid var(--beige);border-inline-start:3px solid var(--tan);border-radius:var(--radius-organic-sm,var(--radius));box-shadow:var(--shadow);text-decoration:none;color:var(--text)}',
+    '.dyn-tile h3{margin:0;font-family:var(--font-head);font-size:1rem;line-height:1.35;color:var(--brown-dark)}',
+    '.dyn-tile p{margin:0;font-size:.84rem;line-height:1.5;color:var(--text-muted)}',
+    '.dyn-tile .dyn-meta{margin-top:auto;padding-top:8px;justify-content:flex-start}',
+    '.dyn-tiles .dyn-empty{grid-column:1/-1}',
+    // ראו ההערה על .dyn-btn: a:hover בגיליון העמוד גובר על מחלקה בודדת,
+    // ולכן צבע הטקסט נקבע כאן מחדש ולא נשען על ברירת המחדל של a:hover.
+    'a.dyn-tile:hover{color:var(--text);border-color:var(--tan);border-inline-start-color:var(--brown);box-shadow:var(--shadow-lg)}',
+    'a.dyn-tile:hover h3{color:var(--brown)}',
+    '@media (max-width:1100px){.dyn-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}',
+    '@media (max-width:820px){.dyn-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+    '@media (max-width:520px){.dyn-tiles{grid-template-columns:1fr}}',
     '@media (max-width:560px){.dyn-event .date-badge{flex-basis:60px}}'
   ].join('\n');
   function injectCSS() {
@@ -288,6 +302,44 @@
     }
     draw();
   }
+  /* אריח יחיד — שם הפריט ושורת תיאור, כפי שביקש מסמך "טקסטים לאתר מחודש" */
+  function tile(node) {
+    var box = node.url
+      ? el('a', { class: 'dyn-tile', href: node.url, target: '_blank', rel: 'noopener' })
+      : el('div', { class: 'dyn-tile' });
+    box.appendChild(el('h3', { text: node.title }));
+    if (node.description) box.appendChild(el('p', { text: node.description }));
+    var label = node.kind || node.group || node.category;
+    box.appendChild(el('div', { class: 'dyn-meta' }, [
+      label ? chip(label, 'cat') : null,
+      demoChip(node)
+    ]));
+    return box;
+  }
+  /* רשת אריחים בארבע עמודות. searchLabel ריק/חסר — בלי תיבת חיפוש. */
+  function renderTileGrid(mount, col, searchLabel) {
+    var q = '';
+    var grid = el('div', { class: 'dyn-tiles', 'aria-live': 'polite' });
+    mount.textContent = '';
+    if (searchLabel) {
+      mount.appendChild(el('div', { class: 'dyn-toolbar' }, [
+        el('input', {
+          type: 'search', placeholder: searchLabel, 'aria-label': searchLabel,
+          oninput: function (e) { q = e.target.value.trim().toLowerCase(); draw(); }
+        })
+      ]));
+    }
+    mount.appendChild(grid);
+    function draw() {
+      var items = WStore.get(col).filter(function (it) {
+        return !q || [it.title, it.description, it.kind, it.group, it.category].join(' ').toLowerCase().indexOf(q) !== -1;
+      });
+      grid.textContent = '';
+      if (!items.length) { grid.appendChild(emptyBox('לא נמצאו פריטים.')); return; }
+      items.forEach(function (it) { grid.appendChild(tile(it)); });
+    }
+    draw();
+  }
   function renderGroupedTeaching(mount) {
     var items = WStore.get('teaching');
     var groups = {};
@@ -464,6 +516,7 @@
     boardWidget: deferred(boardWidget),
     renderSearchableList: deferred(renderSearchableList),
     renderGroupedTeaching: deferred(renderGroupedTeaching),
+    renderTileGrid: deferred(renderTileGrid),
     renderVideos: deferred(renderVideos),
     renderPodcast: deferred(renderPodcast),
     renderMap: deferred(renderMap),
