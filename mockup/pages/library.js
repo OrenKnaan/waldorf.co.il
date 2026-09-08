@@ -48,6 +48,33 @@
     '.lib-body table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.9rem}',
     '.lib-body th,.lib-body td{border:1px solid var(--beige);padding:7px 10px;text-align:start}',
     '.lib-body sup{font-size:.7em}',
+    /* --- the book's chapter rail ---
+       Two columns on a wide screen: the chapter list sits in the inline-start
+       gutter, which in RTL is the left, and sticks while the chapter scrolls.
+       Below 1000px it stacks above the text as an ordinary card, expanded:
+       fourteen short titles are not worth a disclosure widget. */
+    // Column order is inline, not physical: in RTL the first track is the right
+    // one. The rail is the first child, so the fixed track has to come first, or
+    // the nav takes the wide column and the chapter gets the 254px gutter.
+    '.lib-with-toc{display:grid;grid-template-columns:254px minmax(0,1fr);gap:26px;align-items:start}',
+    '.lib-toc{position:sticky;inset-block-start:16px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);padding:16px 6px 14px 14px;max-height:calc(100vh - 34px);overflow:auto;overscroll-behavior:contain}',
+    '.lib-toc-title{margin:0 0 10px;padding:0 8px;font-family:var(--font-head);font-size:.92rem;color:var(--brown-dark);border:0}',
+    '.lib-toc ol{list-style:none;margin:0;padding:0;counter-reset:none}',
+    '.lib-toc li{margin:0}',
+    '.lib-toc a{display:flex;align-items:flex-start;gap:9px;padding:6px 8px;border-radius:var(--radius);font-size:.84rem;line-height:1.4;color:var(--text-muted);text-decoration:none}',
+    '.lib-toc a:hover{background:var(--beige);color:var(--brown-dark)}',
+    /* The hero's dot, at rest and current, in the palette this page uses. */
+    '.lib-toc .dot{flex:none;width:9px;height:9px;margin-block-start:6px;border-radius:50%;background:var(--tan);transition:background .2s,transform .2s}',
+    '.lib-toc a:hover .dot{background:var(--tan-dark)}',
+    '.lib-toc a[aria-current]{color:var(--brown-dark);font-weight:600;background:color-mix(in oklab,var(--wash-gold) 20%,var(--white))}',
+    '.lib-toc a[aria-current] .dot{background:var(--brown);transform:scale(1.35)}',
+    '@media (prefers-reduced-motion:reduce){.lib-toc .dot{transition:none}}',
+    'html.a11y-stopanim .lib-toc .dot{transition:none}',
+    '@media (max-width:1000px){',
+    '  .lib-with-toc{display:block}',
+    '  .lib-toc{position:static;max-height:none;overflow:visible;margin:0 auto 20px;max-width:68ch;padding:16px 14px}',
+    '  .lib-toc ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px}',
+    '}',
     /* --- index page: toolbar --- */
     '.lib-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}',
     '.lib-bar input[type=search],.lib-bar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:8px 16px;min-width:0}',

@@ -80,7 +80,7 @@ export const RESPONSIVE_CSS = `
     .dropdown-head{padding:8px 18px 2px}
 
     main{padding:22px 18px 56px}
-    main > .pagebanner:first-child{margin-block-start:-22px}
+    main > .pagebanner:first-child{margin-block-start:-14px}
     h1{font-size:1.75rem}
     main > p:first-of-type{font-size:1rem}
     section.card{padding:18px;border-radius:14px}
@@ -109,7 +109,7 @@ export const RESPONSIVE_CSS = `
 
   @media (max-width:560px){
     main{padding:18px 14px 50px}
-    main > .pagebanner:first-child{margin-block-start:-18px}
+    main > .pagebanner:first-child{margin-block-start:-10px}
     h1{font-size:1.55rem}
     section.card{padding:16px 14px}
     .art-hero{height:170px;border-radius:14px}
@@ -141,7 +141,7 @@ export const RESPONSIVE_CSS = `
   @media (max-width:400px){
     .brand-name{font-size:1.06rem}
     main{padding:16px 12px 44px}
-    main > .pagebanner:first-child{margin-block-start:-16px}
+    main > .pagebanner:first-child{margin-block-start:-8px}
     h1{font-size:1.4rem}
     section.card{padding:14px 12px}
     .art-hero{height:150px}

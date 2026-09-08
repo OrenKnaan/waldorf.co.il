@@ -155,13 +155,38 @@ function schema(rec) {
 </script>`;
 }
 
-function mainFor(rec, body, files) {
+// The book is fourteen chapters published as fourteen pages, so a reader who
+// opens one has no way to see the shape of the whole or reach the next part.
+// The rail borrows the homepage hero's dot language: a dot per chapter, the
+// current one gold and larger. Unlike the hero it carries its labels, because
+// "chapter 7" tells a reader nothing and "הערכה בחינוך ולדורף" tells them
+// everything. Baked in at build time, since an item page loads no store.
+function tocFor(rec, chapters) {
+  if (!chapters.length || rec.kind !== 'ספר') return '';
+  const rows = chapters.map((c) => {
+    const href = `./lib-${c.id.replace(/^lb-/, '')}.html`;
+    const here = c.id === rec.id;
+    return `      <li><a href="${esc(href)}"${here ? ' aria-current="page"' : ''}>` +
+      `<span class="dot" aria-hidden="true"></span><span class="t">${esc(c.title)}</span></a></li>`;
+  }).join('\n');
+  return `  <nav class="lib-toc" aria-label="פרקי הספר">
+    <h2 class="lib-toc-title" id="${sectionId('פרקי הספר')}">פרקי הספר</h2>
+    <ol>
+${rows}
+    </ol>
+  </nav>
+`;
+}
+
+function mainFor(rec, body, files, chapters) {
   const src = rec.id.replace(/^lb-/, '');
   const meta = [
     rec.kind ? `<span class="dyn-chip cat">${esc(rec.kind)}</span>` : '',
     rec.author ? `<span class="dyn-chip">${esc(rec.author)}</span>` : '',
     rec.date ? `<span class="dyn-chip">${esc(rec.date)}</span>` : '',
   ].filter(Boolean).join('\n    ');
+
+  const toc = tocFor(rec, chapters);
 
   const attach = files.length ? `
   <section class="card lib-attach">
@@ -192,9 +217,13 @@ ${files.map((f) => `      <li>${ICON.file} <a href="${esc(f.href)}" target="_bla
   </div>
 ${attach}
   <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-  <article class="card lib-body">
+${toc ? `  <div class="lib-with-toc">
+${toc}    <article class="card lib-body">
 ${body}
-  </article>
+    </article>
+  </div>` : `  <article class="card lib-body">
+${body}
+  </article>`}
 
 </main>`;
 }
@@ -204,9 +233,16 @@ for (const f of readdirSync(pagesDir)) {
   if (/^lib-.*\.html$/.test(f)) unlinkSync(join(pagesDir, f));
 }
 
+// Publication order, which for the book is chapter order: 0008 seeds position
+// 100..113 over the fourteen chapters in the order the old site published them.
+const chapters = records
+  .filter((r) => r.kind === 'ספר')
+  .sort((a, b) => (a.position || 0) - (b.position || 0));
+
 let written = 0;
 let withFiles = 0;
 let deadLinks = 0;
+let withToc = 0;
 for (const rec of records) {
   const src = rec.id.replace(/^lb-/, '');
   let raw;
@@ -224,11 +260,12 @@ for (const rec of records) {
   const body = fixed.html.trim();
   deadLinks += fixed.dead;
   if (files.length) withFiles += 1;
+  if (rec.kind === 'ספר') withToc += 1;
 
   let page = skeleton;
   page = page.replace(/<title>[^<]*<\/title>/, `<title>${esc(rec.title)} — מוקאפ</title>`);
   page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, schema(rec));
-  page = page.replace(/<main[\s\S]*?<\/main>/, mainFor(rec, body, files));
+  page = page.replace(/<main[\s\S]*?<\/main>/, mainFor(rec, body, files, chapters));
   // The text is baked in, so these pages have no use for the content store —
   // and store.js fetches every collection the moment it loads.
   page = page.replace('<script src="./store.js"></script>\n', '');
@@ -239,6 +276,6 @@ for (const rec of records) {
   writeFileSync(join(pagesDir, `lib-${src}.html`), page, 'utf8');
   written += 1;
 }
-console.log(`${written} library item page(s) written, ${withFiles} with attached files.`);
+console.log(`${written} library item page(s) written, ${withFiles} with attached files, ${withToc} with the book's chapter rail.`);
 if (deadLinks) console.log(`${deadLinks} footnote link(s) whose target is missing from the archive were unlinked.`);
 console.log('Now run: node mockup/patch-search.mjs && node mockup/search-index.mjs');
