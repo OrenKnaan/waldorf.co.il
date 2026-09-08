@@ -124,10 +124,35 @@ const skipped = [];
 let sectionCount = 0;
 let unanchored = 0;
 
+// A ספריית תוכן item page is one work, not a page of cards: its <h2>s are the
+// chapters of a single argument, and splitting a 30,000-character paper into
+// twenty documents would bury every other page on the site under it. Index each
+// as one document, with the text capped. Two thousand characters covers the
+// abstract and opening of every work here, which is what tells a searcher this
+// is the one; the item page is where it then gets read. Uncapped, the 104 items
+// took the index from 57 KB gzipped to 196 KB, all of it downloaded on a
+// visitor's first search.
+const isLibraryItem = (file) => /^lib-.*\.html$/.test(file);
+const ITEM_TEXT_CAP = 2000;
+
 for (const file of pageFiles) {
   const page = readPage(file);
   if (!page) {
     skipped.push(file);
+    continue;
+  }
+
+  if (isLibraryItem(file)) {
+    const whole = [page.intro, ...page.sections.map((s) => `${s.heading} ${s.body}`)]
+      .join(' ').replace(/\s+/g, ' ').trim().slice(0, ITEM_TEXT_CAP);
+    pushDoc({
+      url: `./${file}`,
+      page: page.title,
+      crumbs: page.crumbs,
+      heading: '',
+      title: page.h1,
+      text: whole,
+    });
     continue;
   }
 

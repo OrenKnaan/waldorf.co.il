@@ -1,4 +1,4 @@
-<!-- @dsCard group="ספריית תוכן" -->
+<!-- @dsCard group="מדיה" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספריית תוכן — מוקאפ</title>
+<title>יד. שירים ודקלומים מעבודות התלמידים — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,7 +86,6 @@
   .hero-image{margin:4px 0 22px;min-height:260px}
   section.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
-  h3.sub{font-family:var(--font-head);color:var(--brown);font-size:1.02rem;font-weight:700;margin:18px 0 8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
   li{margin-bottom:8px}
@@ -94,7 +93,7 @@
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
-  .ph{display:inline-block;overflow-wrap:anywhere;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
+  .ph{display:inline-block;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
   .icon-inline{width:16px;height:16px;vertical-align:-3px;color:var(--tan-dark);flex:none}
   h2 .icon-inline{color:var(--brown);width:18px;height:18px}
   .table-wrap{overflow-x:auto;margin:0 0 6px;border-radius:var(--radius)}
@@ -442,17 +441,6 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
-  /* ===== page overrides ===== */
-  /* The site runs full-bleed since the header change, which suits the archive
-     grid and ruins the prose above it: a line of Hebrew at 1400px is a long
-     way for the eye to travel back. Hold the text to a reading measure and let
-     the grid keep the width. */
-  main > p{max-width:78ch}
-  section.card{padding:26px 30px;margin-bottom:26px}
-  section.card > p,section.card > ul,section.card > h3.sub{max-width:78ch}
-  section.card > h2{margin-bottom:14px}
-  section.card > ul{margin-bottom:18px}
-  section.card > .btn-row{margin-bottom:20px}
 </style>
 <script type="application/ld+json">
 {
@@ -470,6 +458,12 @@
       "position": 2,
       "name": "ספריית תוכן",
       "item": "./content-library.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "יד. שירים ודקלומים מעבודות התלמידים",
+      "item": "./lib-p2067.html"
     }
   ]
 }
@@ -542,64 +536,261 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1" data-lib-item="p2067">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספריית תוכן</span>
+<a class="crumb" href="./content-library.html">ספריית תוכן</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">יד. שירים ודקלומים מעבודות התלמידים</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-6.webp')"></div><div class="frame"><img src="./img/art/waldorf-6.webp" alt="הנתיב אל האור" width="220" height="303" decoding="async"></div><div class="cap"><b>הנתיב אל האור</b><span>ציור ולדורף בטכניקת ווילון (Lazur)</span></div></div>
-  <h1>ספריית תוכן</h1>
-<p>מאגר מרכזי של עבודות ומאמרים על חינוך ולדורף, מאגר חומרי ההוראה והמשאבים של מורי ולדורף, והספר "חינוך ולדורף – עקרונות ויישומים" במלואו.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
-<h2 id="sec-1qrgv1m"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> עבודות ומאמרים</h2>
-<p>ארכיון העבודות והמאמרים על חינוך ולדורף. לכל פריט עמוד משלו, ואפשר להוריד פריט בודד או כמה פריטים יחד. סננו לפי סוג:</p>
-<ul>
-<li><strong>עבודות לתואר שני</strong> — של אנשים שונים מתוך חינוך ולדורף ומחוצה לו.</li>
-<li><strong>עבודות סמינריוניות</strong> — שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
-<li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
-</ul>
-<div data-lib-archive="works"></div>
-<p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1kubsyw"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> מאגר משאבים למורים</h2>
-<p>"מאגר המשאבים השיתופי של מורי ולדורף" — מאגר חומרי הוראה מבוסס Google Drive, בתשלום חד-פעמי (199 ₪, ללא מנוי), הפועל ברציפות מאז 2010 ומשמש מורי ולדורף מכל רחבי הארץ:</p>
-<ul>
-<li><strong>מערכי שיעור ותקופות</strong> — חומרי הוראה מובנים ומסודרים לפי שכבות גיל ותחומי דעת (בעיקר א'–ח').</li>
-<li><strong>חומרי עזר והשראה</strong> — דקלומים, סיפורים, רעיונות לתרגול ופעילויות יצירתיות לכיתה.</li>
-<li>גישה ניתנת דרך תשלום חד-פעמי ואישור מייל תוך יום עבודה אחד; המאגר מנוהל ומורחב באופן שוטף ומזמין מורים לשתף חומרים משלהם.</li>
-</ul>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://www.antro.co.il/db/" target="_blank" rel="noopener"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg> למאגר המשאבים</a>
-<a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSelMau3h4fd7Ye77JPlhNlFoqbhuMaMGXAzFbyZQBVRErym9w/viewform" target="_blank" rel="noopener">לשיתוף חומרים משלכם</a>
-</div>
-<h3 class="sub">חומרים במאגר של הפורום</h3>
-<div id="dyn-teaching"></div>
-<p><span class="ph">תוכן: להחליט עם הפורום אם מאגר זה (המנוהל כיום באופן עצמאי, כנראה על ידי מורה/צוות פרטני) עובר לניהול הפורום במסגרת האתר החדש, נשאר חיצוני עם קישור, או משמש השראה למאגר חדש שהפורום יבנה</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1b7rjam"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר "חינוך ולדורף – עקרונות ויישומים"</h2>
-<p>הספר נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ומציג את חינוך ולדורף כפי שהתפתח ויושם בבתי הספר בארץ. ארבעה־עשר פרקיו התפרסמו באתר הישן במלואם:</p>
-<div data-lib-archive="book"></div>
-<p style="font-size:.82rem;color:var(--text-muted)"><span class="ph">תוכן: האתר הישן מציע גם את הספר כקובץ PDF אחד (wp-content/uploads/2016/12/חינוך-ולדורף-עקרונות-וישומים.pdf). הקובץ צריך לעבור לאחסון של האתר החדש לפני מעבר הדומיין, אחרת הקישור אליו ימות</span></p>
-</section>
+  <h1>יד. שירים ודקלומים מעבודות התלמידים</h1>
+  <div class="lib-meta">
+    <span class="dyn-chip cat">ספר</span>
+    <span class="dyn-chip">מורי בית הספר ולדורף הרדוף</span>
+    <span class="dyn-chip">2000</span>
+  </div>
+  <div class="btn-row lib-actions">
+    <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
+    <a class="btn btn-ghost" href="./content-library.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספריית תוכן</a>
+  </div>
+
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <article class="card lib-body">
+<h3><strong>שיר המשאלה</strong></h3>
+<p>יש לי משאלה<br />
+היא קטנה וגם גדולה<br />
+שיהיה שלום בין ארצות<br />
+ושיהיה שלום בין אחים ואחיות<br />
+שנדע לאהוב כל אדם ואדם<br />
+למרות שאף אחד לא מושלם.</p>
+<p>יש לי משאלה<br />
+היא קטנה וגם גדולה<br />
+שנחיה בשלוה ובנחת<br />
+ושילדנו יגדלו בשלום ואחווה<br />
+ושתהיה בינינו הרבה אהבה.</p>
+<p>יש לי משאלה<br />
+היא קטנה וגם גדולה<br />
+היא שוכנת לי בלב<br />
+היא תפרח ותלבלב,<br />
+אז נקים עולם ביחד<br />
+עולם של שמחה ואהבה<br />
+ותשלוט האחווה.</p>
+<p><em>(מתקופת סגנון בכיתה ז')</em></p>
+<h3><strong>הפרה</strong></h3>
+<p>הפרה, הפרה היא אוכלת ושותה<br />
+מלחכת לה חציר<br />
+ואפה רטוב תדיר,<br />
+לאיטה היא מתנהלת<br />
+והרבה שעות אוכלת.<br />
+לה קרניים, לשון, עיניים<br />
+וארבע פרסות בקצה הרגליים.<br />
+היא מעלה גירה<br />
+זיבלה חשוב לאדמה,<br />
+הפרה מייצרת חלב<br />
+ושימושו כה רב,<br />
+זנב לה ארוך –<br />
+כמו שרוך!</p>
+<p><em>(מתקופת חיות בכיתה ה')</em></p>
+<h3><strong>גוף האדם</strong></h3>
+<p>אני ניצב על האדמה<br />
+זקוף ועומד איתן,<br />
+ליבי פועם בשלווה<br />
+הנני בן אדם!</p>
+<p>רגלי בטוחות וחזקות<br />
+בוטח אני בם,<br />
+רגלי הולכות ועובדות<br />
+הן יוליכוני בעולם.</p>
+<p>החלק האמצעי בגופי<br />
+בו נמצא הלב,<br />
+הוא החלק הרוחני שבי<br />
+וגם האוהב.</p>
+<p>והחלק העליון, הוא ראשי<br />
+בו אני הוגה, חושב,<br />
+הנני מסתכל ומקשיב לעצמי<br />
+אך גם אל תוך הלב.</p>
+<p>אני ניצב על פני אדמה<br />
+זקוף ועומד איתן<br />
+ליבי פועם בשלווה<br />
+הנני: בן אדם!</p>
+<p><em>(מתקופת אנטומיה, כיתה ח')</em></p>
+<h3><strong>שלושת העורבים</strong></h3>
+<p><u></u>שלושה בני עורב על ראש עץ<br />
+הם ישבו.<br />
+שחורים כאשר תדמו ותשוו.<br />
+האחד הוא רגזן,<br />
+השני פטפטן,<br />
+והשלישי סתם תם.<br />
+ישבו ודיברו על יופייה של<br />
+ארצם.<br />
+על תפארת מינם<br />
+ועל כוח עולם.<br />
+הרגזן – רגז כל הזמן,<br />
+הפטפטן – פטפט כל הזמן,<br />
+והתם – ישב סתם.</p>
+<p>אז יורדת עלמה,<br />
+יעלה צהבהבה,<br />
+ימיה מלאו, כן תישיר צעדה.<br />
+ביד האישה הייתה תולעת,<br />
+אך העורבים לא יכלו לדעת.<br />
+כל השלשה החלו להתווכח,<br />
+ולא חשבו שבא אורח,<br />
+עורב אחר, חכם יותר,<br />
+חטף את התולעת<br />
+ועף – לאן –<br />
+הם לא יכלו לדעת.</p>
+<p><em>(מתקופת לשון, תרגיל בכתיבה, כיתה ז')</em></p>
+<h3><strong>שיר לרבין</strong></h3>
+<p>אני מאמינה ויש עוד מאמינים<br />
+שיש בעולם יש אלוהים.</p>
+<p>אני מאמינה ויש עוד מאמינים<br />
+שהמתים לשמים עולים.</p>
+<p>וגם רבין ראש הממשלה<br />
+כבר לשמים עלה ושם הוא שומר<br />
+ולאלוהים לעשות שלום עוזר.</p>
+<p>אך אנחנו כאן<br />
+מחכים מחכים ומחכים<br />
+שתחזור אבל זה לא עוזר<br />
+אתה נשאר שם ושומר.</p>
+<p>שלום לך רבין<br />
+שלום חבר.</p>
+<p><em>(נכתב ביום השנה להרצחו, מכיתה ו')</em></p>
+<h3><strong>שיר לעץ</strong></h3>
+<p>למה להיות עץ?<br />
+אם אפשר לנוע ולהתרוצץ,<br />
+ללכת, לעמוד,<br />
+ולרוץ עוד ועוד.<br />
+כך אמר העץ,<br />
+עקר שורשיו ויצא,<br />
+זז והתנועע כמו שרצה,<br />
+רץ והשתולל<br />
+עד רדת הליל.</p>
+<p><em>( מלימודי הצומח, כיתה ה' )</em></p>
+<h3><strong>שיר מולדת</strong></h3>
+<p>במעלה ההר עם תרמיל ומקל<br />
+יצאנו אנו לטייל,<br />
+טפסנו על הרי אילת הגבוהים,<br />
+מנוף שומם וקרח<br />
+צפינו על בקעת הירח,<br />
+משם מובן מאליו<br />
+ראינו את הרי מואב.<br />
+פתאום נגלה אלינו עמק הערבה<br />
+שומם, צנוע ומלא ענווה.</p>
+<p><em>(מתקופת מולדת, כיתה ד')</em></p>
+<h3><strong>שירו של פריס להלנה</strong></h3>
+<p>הו הלנה, היפה בנשים<br />
+כל הגברים בך מתאהבים,<br />
+הו הלנה היפה מכולם<br />
+את היפה בכל העולם,<br />
+הו הלנה, ליבי הוא לך<br />
+אבוא לארצך ואקח אז אותך,<br />
+הו הלנה, הבטיחי לי אותך<br />
+אז לך לא אכפת אם אחטוף אותך ?!</p>
+<p><em>(משיעורי היסטוריה, כיתה ה')</em></p>
+<h3><strong>תקווה ויאוש</strong></h3>
+<p>תקוות הגבירה לשוב אהובה –<br />
+מול יאוש האומלל המחכה לגורל,<br />
+אכזריות הלוחם המכה באויביו –<br />
+מול עדינות ורגישות משורר מאוהב,<br />
+התלהבות של תלמיד היוצא משיעור –<br />
+מול אדישות המורה בפיו הפעור.</p>
+<p><em>(תרגיל כתיבה, תקופת סגנון, כיתה ח')</em></p>
+<h3><strong>האינסוף</strong><strong>…</strong></h3>
+<p>האינסוף,<br />
+ערפל לא-נמוג<br />
+לבן כשלג.<br />
+האינסוף,<br />
+ים בלי-חוף<br />
+דמעות של מלח.<br />
+האינסוף,<br />
+שדה חיטה צהוב<br />
+הנע ברוח.</p>
+<p><em>(מתקופת סגנון, עבודה על דימויים, כיתה ח')</em></p>
+<h3><strong>תקווה וייאוש</strong></h3>
+<p>ילד ישב מתחת עץ האגס,<br />
+היה מיואש עד כלות.<br />
+את דמעותיו שפך ושפך,<br />
+לא חדל הוא לבכות.</p>
+<p>התקרבה ילדה בשמלה לבנה<br />
+לבנה כפרחי הלילך,<br />
+את דמעותיו הגדולות מחתה<br />
+והייאוש מלבו פרח.</p>
+<p><strong>(תקופת סגנון, מכיתה ז')</strong></p>
+<h3><strong>סיכום תקופה</strong></h3>
+<p>אם תקופה זו, נדמית לשושן, שושן זה<br />
+שונה הוא מידידיו השושנים.<br />
+שושן זה מלא היה בשמחה, ויופי. אולם פריחתו<br />
+מהירה הייתה ונגמרה טרם עת.<br />
+מזיו השושן נהניתי רבות, ולו ירבו כמוהו<br />
+בשנים הבאות!</p>
+<p><em>(סיכום תקופת לשון וסגנון, מכיתה ח')</em></p>
+<h3><strong>שיר העונות</strong></h3>
+<p><strong>קיץ:</strong></p>
+<p>הקיץ היה חם<br />
+ברקיע השמש להטה<br />
+הלכנו יחדיו אל הים<br />
+מערבולת אותנו סחפה –<br />
+צללנו למעמקי העולם.</p>
+<p><strong>סתיו:</strong></p>
+<p>זהו סיפור על סתיו<br />
+עם תחילת השלכת,<br />
+בכרם מבשיל הענב<br />
+אותך ראיתי הולכת –<br />
+לבנה וזקופה כחצב.</p>
+<p><strong>חורף:</strong></p>
+<p>בחורף ירד הגשם<br />
+תיפול על העץ תרדמה,<br />
+דומם יקפא הפלג<br />
+דובים יכנסו למערה –<br />
+אפלה ושחור בחלד.</p>
+<p><em>(מתוך לימודי לשון </em><em>–</em><em> הזמנים, מכיתה ו')</em></p>
+<h3><strong>שירי טוקה </strong></h3>
+<p>את ימי חיי<br />
+למה אוכל להמשיל?<br />
+לספינה אחת<br />
+המפליגה עם שחר<br />
+מבלי להותיר עקבות.</p>
+<p>******</p>
+<p><strong><em>דומה אהבתי לבאר עמוקה,<br />
+</em><em>שואבת בת הכפר ממימי הבאר,<br />
+</em><em>דולה ושואבת<br />
+</em><em>ואין הבאר חדלה מימיה.</em></strong></p>
+<p><em> </em><em>(שירים יפניים, מתקופת גיאוגרפיה, כיתה ח')</em></p>
+<h3><strong>האביב</strong></h3>
+<p>באביב הכל פורח<br />
+וסביב מאד שמח,<br />
+בגן העץ צומח<br />
+מעליו השיר קולח.</p>
+<p>שמש במרום זורחת<br />
+את קרניה היא שולחת<br />
+ונורית קטנה פורחת –<br />
+זו תהיה שנה מוצלחת.</p>
+<p>על גבעות ועל הרים<br />
+כבר פורחים אלפי פרחים,<br />
+הפרחים קוראים אלי:<br />
+מתי, מתי תבוא אלי?</p>
+<p><em>(מתקופת טבע, כיתה ד')</em></p>
+<h3><strong>האביב</strong></h3>
+<p>האביב בא, הגיע<br />
+נצא לשדות ונריע,<br />
+השמש ברום הרקיע<br />
+עוד מעט הקיץ יגיע.</p>
+<p>בפרחים שדות צבועים<br />
+הילדים באים, קוטפים,<br />
+את הארץ מקשטים<br />
+בזרי אביב גדולים.</p>
+<p>פורחים כבר סביון ועירית,<br />
+חרצית, נורית וכלנית,<br />
+מלאים בשמחה חרישית<br />
+הם נותנים הרגשה אביבית.</p>
+<p><em> </em><em>(תקופת טבע, מכיתה ה')</em></p>
+  </article>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script src="./store.js"></script>
-<script src="./dynamic.js"></script>
-<script>
-WDyn.injectCSS();
-/* שתי הרשתות של הארכיון מנוהלות ב-library.js דרך data-lib-archive.
-   כאן נשאר רק מאגר המשאבים, שהוא אוסף אחר. */
-WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
-  empty: 'אין כרגע חומרים במאגר של הפורום. החומרים מתעדכנים דרך ממשק הניהול.'
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./library.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>

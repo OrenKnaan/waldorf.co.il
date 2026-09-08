@@ -263,7 +263,7 @@ const COLLECTIONS = {
   jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved'], publicStatus: ['approved'], publicSubmit: true,
               fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', description: 'description', date: 'date', status: 'status', demo: 'demo' } },
   library:  { table: 'library',    order: 'position ASC',
-              fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', demo: 'demo' } },
+              fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', author: 'author', date: 'date', demo: 'demo' } },
   teaching: { table: 'teaching',   order: 'position ASC',
               fields: { title: 'title', group: 'grp', url: 'url', demo: 'demo' } },
   forms:    { table: 'forms',      order: 'position ASC',

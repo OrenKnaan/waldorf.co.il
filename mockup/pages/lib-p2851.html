@@ -1,4 +1,4 @@
-<!-- @dsCard group="ספריית תוכן" -->
+<!-- @dsCard group="מדיה" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספריית תוכן — מוקאפ</title>
+<title>המעגל בחינוך ולדורף — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,7 +86,6 @@
   .hero-image{margin:4px 0 22px;min-height:260px}
   section.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
-  h3.sub{font-family:var(--font-head);color:var(--brown);font-size:1.02rem;font-weight:700;margin:18px 0 8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
   li{margin-bottom:8px}
@@ -94,7 +93,7 @@
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
-  .ph{display:inline-block;overflow-wrap:anywhere;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
+  .ph{display:inline-block;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
   .icon-inline{width:16px;height:16px;vertical-align:-3px;color:var(--tan-dark);flex:none}
   h2 .icon-inline{color:var(--brown);width:18px;height:18px}
   .table-wrap{overflow-x:auto;margin:0 0 6px;border-radius:var(--radius)}
@@ -442,17 +441,6 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
-  /* ===== page overrides ===== */
-  /* The site runs full-bleed since the header change, which suits the archive
-     grid and ruins the prose above it: a line of Hebrew at 1400px is a long
-     way for the eye to travel back. Hold the text to a reading measure and let
-     the grid keep the width. */
-  main > p{max-width:78ch}
-  section.card{padding:26px 30px;margin-bottom:26px}
-  section.card > p,section.card > ul,section.card > h3.sub{max-width:78ch}
-  section.card > h2{margin-bottom:14px}
-  section.card > ul{margin-bottom:18px}
-  section.card > .btn-row{margin-bottom:20px}
 </style>
 <script type="application/ld+json">
 {
@@ -470,6 +458,12 @@
       "position": 2,
       "name": "ספריית תוכן",
       "item": "./content-library.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "המעגל בחינוך ולדורף",
+      "item": "./lib-p2851.html"
     }
   ]
 }
@@ -542,64 +536,109 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1" data-lib-item="p2851">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספריית תוכן</span>
+<a class="crumb" href="./content-library.html">ספריית תוכן</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">המעגל בחינוך ולדורף</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-6.webp')"></div><div class="frame"><img src="./img/art/waldorf-6.webp" alt="הנתיב אל האור" width="220" height="303" decoding="async"></div><div class="cap"><b>הנתיב אל האור</b><span>ציור ולדורף בטכניקת ווילון (Lazur)</span></div></div>
-  <h1>ספריית תוכן</h1>
-<p>מאגר מרכזי של עבודות ומאמרים על חינוך ולדורף, מאגר חומרי ההוראה והמשאבים של מורי ולדורף, והספר "חינוך ולדורף – עקרונות ויישומים" במלואו.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
-<h2 id="sec-1qrgv1m"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> עבודות ומאמרים</h2>
-<p>ארכיון העבודות והמאמרים על חינוך ולדורף. לכל פריט עמוד משלו, ואפשר להוריד פריט בודד או כמה פריטים יחד. סננו לפי סוג:</p>
-<ul>
-<li><strong>עבודות לתואר שני</strong> — של אנשים שונים מתוך חינוך ולדורף ומחוצה לו.</li>
-<li><strong>עבודות סמינריוניות</strong> — שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
-<li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
+  <h1>המעגל בחינוך ולדורף</h1>
+  <div class="lib-meta">
+    <span class="dyn-chip cat">מאמר</span>
+    <span class="dyn-chip">ירון זנבל</span>
+    <span class="dyn-chip">2022</span>
+  </div>
+  <div class="btn-row lib-actions">
+    <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
+    <a class="btn btn-ghost" href="./content-library.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספריית תוכן</a>
+  </div>
+
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <article class="card lib-body">
+<p><a href="https://www.antro.co.il/papers/EDU_circle.html" target="_blank" rel="noreferrer noopener">המעגל בחינוך ולדורף</a> &#8211; עיבוד של המאמר &quot;<a rel="noreferrer noopener" href="https://us1.campaign-archive.com/?u=a0ce04e5a70babb8ef1330163&amp;id=98c8acffa2" target="_blank">Why do we have Circle Time throughout the Grades?</a>&quot; שכתבה Kolea Quincey מתוך <a rel="noreferrer noopener" href="https://www.waldorftoday.com/newsletter/" target="_blank">WaldorfToday</a></p>
+
+<p>בחינוך ולדורף נהוגה ושגורה העבודה עם הילדים במעגל מגילאי הגן, דרך כיתות ביה&quot;ס היסודי ועד לתיכון.<br><strong>מדוע למעגל יש מקום וחשיבות כה נרחבים בחינוך ולדורף? מה יש במעגל שהוא מתאים לעבודה בכל הגילאים?</strong></p>
+
+<p><strong>למה מעגל? </strong>לאורך ההיסטוריה וכמעט בכל תרבות בעולם, המעגל נחשב לצורה מקודשת. כשילד, או כל אחד לצורך העניין, חובר למעגל, נוצר <strong>שוויון מיידי</strong>. אין אף אחד לפניך או מאחוריך. והכי חשוב &#8211; אף גב של ילד לא נמצא מולך.</p>
+
+<p>המעגל נחשב ל<strong>תצורה הרמונית</strong>. אדם מחובק ומוחזק באופן מיידי כ<strong>אינדיבידואל שהוא חלק ממכלול</strong>. המעגל היא הצצה אל השלמות, האחדות והסדר האלוהי של היקום.<br>המרכיבים האיכותיים של מעגל אפקטיבי מתקיימים עבור כל קבוצות הגיל וההבדלים נעוצים במידת האתגר המדורגת ובחומר המתאים לגיל שמשלבים.<br>העבודה במעגל הופכת לחשובה ככל שהחברה שלנו מתקדמת יותר לכיוון טכנולוגיה ומתרחקת משיטות מסורתיות של אינטראקציה חברתית ולמידה קינסתטית.</p>
+
+<p>מכיוון שהמעגל הוא דרך כל כך כלכלית וקינסתטית להבטיח שההיבטים הבאים, החיוניים להתפתחות בריאה ולמידה לכל החיים, אין לדלג עליו ולקיימו מדי יום:</p>
+
+<p><strong>אלמנטים של מעגל אפקטיבי</strong></p>
+
+<ul class="wp-block-list">
+<li>שיתוף פעולה</li>
+
+<li>ריכוז</li>
+
+<li>מודעות מרחבית</li>
+
+<li>איזון</li>
+
+<li>גיאוגרפיה של הגוף</li>
+
+<li>שילוב מוח ימין/שמאל</li>
+
+<li>פעילות קצבית</li>
+
+<li>הרחבה והתכווצות</li>
+
+<li>בניית מיומנות חברתית</li>
+
+<li>שילוב רפלקס נשמר</li>
+
+<li>חוש/מיומנויות מתמטיות</li>
+
+<li>כֵּיף</li>
+
+<li>כּוֹשֵׁר עֲמִידָה</li>
+
+<li>חינוך גופני</li>
+
+<li>שיפור קיבולת הזיכרון</li>
 </ul>
-<div data-lib-archive="works"></div>
-<p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1kubsyw"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> מאגר משאבים למורים</h2>
-<p>"מאגר המשאבים השיתופי של מורי ולדורף" — מאגר חומרי הוראה מבוסס Google Drive, בתשלום חד-פעמי (199 ₪, ללא מנוי), הפועל ברציפות מאז 2010 ומשמש מורי ולדורף מכל רחבי הארץ:</p>
-<ul>
-<li><strong>מערכי שיעור ותקופות</strong> — חומרי הוראה מובנים ומסודרים לפי שכבות גיל ותחומי דעת (בעיקר א'–ח').</li>
-<li><strong>חומרי עזר והשראה</strong> — דקלומים, סיפורים, רעיונות לתרגול ופעילויות יצירתיות לכיתה.</li>
-<li>גישה ניתנת דרך תשלום חד-פעמי ואישור מייל תוך יום עבודה אחד; המאגר מנוהל ומורחב באופן שוטף ומזמין מורים לשתף חומרים משלהם.</li>
-</ul>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://www.antro.co.il/db/" target="_blank" rel="noopener"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg> למאגר המשאבים</a>
-<a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSelMau3h4fd7Ye77JPlhNlFoqbhuMaMGXAzFbyZQBVRErym9w/viewform" target="_blank" rel="noopener">לשיתוף חומרים משלכם</a>
-</div>
-<h3 class="sub">חומרים במאגר של הפורום</h3>
-<div id="dyn-teaching"></div>
-<p><span class="ph">תוכן: להחליט עם הפורום אם מאגר זה (המנוהל כיום באופן עצמאי, כנראה על ידי מורה/צוות פרטני) עובר לניהול הפורום במסגרת האתר החדש, נשאר חיצוני עם קישור, או משמש השראה למאגר חדש שהפורום יבנה</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1b7rjam"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר "חינוך ולדורף – עקרונות ויישומים"</h2>
-<p>הספר נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ומציג את חינוך ולדורף כפי שהתפתח ויושם בבתי הספר בארץ. ארבעה־עשר פרקיו התפרסמו באתר הישן במלואם:</p>
-<div data-lib-archive="book"></div>
-<p style="font-size:.82rem;color:var(--text-muted)"><span class="ph">תוכן: האתר הישן מציע גם את הספר כקובץ PDF אחד (wp-content/uploads/2016/12/חינוך-ולדורף-עקרונות-וישומים.pdf). הקובץ צריך לעבור לאחסון של האתר החדש לפני מעבר הדומיין, אחרת הקישור אליו ימות</span></p>
-</section>
+
+<p>וקיימים היבטים רבים נוספים שנוכל להוסיף לרשימה. </p>
+
+<p>מבחינה פדגוגית המעגל משמש כדרך לתמוך בלימוד התקופות השונות על ידי מתן אפשרות לילדים לחוות משהו מהתרבות, המיתולוגיה או תקופת ההיסטוריה הנלמדת כעת. לדוגמה, ךמידים הצועדים כחיילים רומיים או רועמים כמו תור הכועס! או לימוד של ריקוד ואלס מימי הביניים כדרך להחיות את התקופה.</p>
+
+<h3 class="wp-block-heading"><strong>המרכיבים של מעגל אפקטיבי</strong></h3>
+
+<p><strong>שיתוף פעולה</strong><br>כדי להנחות את הילדים לקראת חיים מוצלחים ומספקים, עלינו לטפח בהם את יכולת שיתוף הפעולה שלהם עם בני גילם ועם המבוגרים בסביבתם. במעגל, כל אדם חייב לעשות כמיטב יכולתו כדי שהמעגל &quot;יזרום&quot; כהלכה. <br>כאשר התרגילים מכוונים בקפידה להתפתחות נכונה של הילד, התלמידים ירצו לחוות את השמחה שמביא ביצוע תרגיל מאתגר והרמוני.</p>
+
+<p><strong>תֵאוּם<br></strong>פיתוח של שליטה בשרירים קטנים וגדולים הוא היבט חשוב של גוף פיזי בריא.</p>
+
+<p><strong>ריכוז</strong><br>היכולת של האינדיבדואל להתרכז במכוון לצורך משימה פיזית או נפשית חיונית להתפתחות בריאה. הדבר יוצר הזדמנות לפתח שליטה בדחפים &#8211; היבט מכריע של חיים בריאים.</p>
+
+<p><strong>מודעות מרחבית</strong><br>גבולות בריאים נלמדים ממשימות מעגל חוזרות ונשנות של התמצאות במרחב. במעגל ניתן לחקור את כל כיווני החלל באמצעות הליכה קדימה, אחורה, מימין לשמאל ומשמאל לימין. על ידי הוספת מקלות, מוטות ו/או שקיות שעועית, ניתן לחקור גם רת כיווני ה&quot;מעל&quot; ו&quot;מתחת&quot;.</p>
+
+<p><strong>איזון</strong><br>לפי רודולף שטיינר, הגוף האתרי הוא זה שמעצים אותנו בכוח לעמוד זקוף. תהליך השילוב של כל הגופים נעשה קל יותר אם כל אחד מהם חזק. למציאה והחזקה של מרכז הכובד שלנו יש השפעה מחזקת על האורגניזם כולו. מציאת ה'מרכז' שלנו עוזרת לנו להרגיש מקורקעים. איזון נותן לנו את האוריינטציה שלנו לכדור הארץ.</p>
+
+<p><strong>גיאוגרפיה של הגוף</strong><br>כאשר ילדים נולדים, אין להם אוריינטציה לגבי היכן הם נמצאים במרחב. כאשר החושים שלהם מתפתחים, במיוחד ארבעת החושים הבסיסיים, הילדים מגלים את ידיהם, רגליהם ובסופו של דבר את כל &quot;המפה&quot; של עצמם. או אז הם מוכנים לגלות את שאר העולם! אם לא הפנמנו את ה'מפה' הזו של הגוף שלנו, לא נוכל ללמוד לנוע בקלות בחלל. על ידי שימוש בתרגילי מעגל נוכל להגביר בהדרגה את המודעות לברך ימין, יד שמאל וכו'.</p>
+
+<p><strong>שילוב מוח ימין/שמאל</strong><br>בכל פעם שילדים ו/או מבוגרים מבצעים תרגילים המחזקים את הגשר בין ההמיספרה הימנית והשמאלית של המוח, יש לכך השפעה מיטיבה על מעבר דחפים חשמליים ומידע בין השניים. הדבר מסייע עם קואורדינציה פיזית כמו גם פעילויות מבוססות חשיבה כמו קריאה, לימוד מיומנויות חדשות והתמקדות.</p>
+
+<p><strong>פעילות קצבית<br></strong>פעילויות קצביות הן הביטויים הפיזיים של התגובה המנטלית והרגשית של הפרט לקצב. הן פעילויות שאדם מגיב להן פיזית, חברתית ונפשית לדפוסים קבועים של קול. הם מקור לשמחה עבור רוב האנשים בכל הגילאים. באמצעות פעילויות אלו נרכשות ומתפתחות מיומנויות וחוש הקצב, רגשות מובעים, ניתן לחוות עקרונות בסיסיים של זמן, מרחב וכוח.</p>
+
+<p><strong>הרחבה והתכווצות</strong><br>חיי היומיום שלנו מלאים בהיבטים של שאיפה ונשיפה. השנה ומחזוריה, היום והלילה וכמובן הנשימה שלנו &#8211; כולם כרוכים בעקרונות ההתרחבות וההתכווצות. אנחנו צריכים תמיד לשאוף כמורים לשלב עקרונות אלה בשיעורים שלנו. המעגל אינו שונה וההתאחדות וההפרדה כקבוצה עוזרת לווסת את הנשימה הכיתתית ולעורר את התודעה החברתית.</p>
+
+<p><strong>בניית מיומנות חברתית</strong><br>על מנת ליהנות מחיי חברה בריאים, הפרט חייב להרגיש בנוח במצבים הדורשים שיתוף פעולה. ריקוד ושירה מספקים הזדמנויות אלו בסביבה בטוחה.</p>
+
+<p><strong>חוש ומיומנויות מתמטיים</strong><br>לזמן מעגל יש יתרון נוסף בכך שהוא מאפשר לילדים לחוות חוויות קינסתטיות במתמטיקה. כל הגוף יכול להיות מעורב בספירה, ובארבעת הפעולות. המורים יכולים ליישם שקיות שעועית, מקלות, ריקודים ועוד על מנת לעזור לילדים להתמצא בתהליכים.</p>
+
+<p><strong>הנאה, סיבולת וחינוך גופני<br></strong>המעגל צריך להיות מהנה, אירובי לעיתים, ומאתגר פיזית. הילדים צריכים להיות סמוקים בלחיים ולהיות מוכנים לעבודה בספר כשהמילה האחרונה של המעגל נאמרת.</p>
+
+<p><a rel="noreferrer noopener" href="http://www.movementforchildhood.com/uploads/2/1/6/7/21671438/zoorobics.pdf" target="_blank">עוד על מעגל גן החיות</a></p>
+  </article>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script src="./store.js"></script>
-<script src="./dynamic.js"></script>
-<script>
-WDyn.injectCSS();
-/* שתי הרשתות של הארכיון מנוהלות ב-library.js דרך data-lib-archive.
-   כאן נשאר רק מאגר המשאבים, שהוא אוסף אחר. */
-WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
-  empty: 'אין כרגע חומרים במאגר של הפורום. החומרים מתעדכנים דרך ממשק הניהול.'
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./library.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>

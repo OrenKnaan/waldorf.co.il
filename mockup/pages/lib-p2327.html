@@ -1,4 +1,4 @@
-<!-- @dsCard group="ספריית תוכן" -->
+<!-- @dsCard group="מדיה" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספריית תוכן — מוקאפ</title>
+<title>דרכו הפנימית של המורה או &quot;חנוך לנער לפי דרכו&quot; — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,7 +86,6 @@
   .hero-image{margin:4px 0 22px;min-height:260px}
   section.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
-  h3.sub{font-family:var(--font-head);color:var(--brown);font-size:1.02rem;font-weight:700;margin:18px 0 8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
   li{margin-bottom:8px}
@@ -94,7 +93,7 @@
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
-  .ph{display:inline-block;overflow-wrap:anywhere;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
+  .ph{display:inline-block;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
   .icon-inline{width:16px;height:16px;vertical-align:-3px;color:var(--tan-dark);flex:none}
   h2 .icon-inline{color:var(--brown);width:18px;height:18px}
   .table-wrap{overflow-x:auto;margin:0 0 6px;border-radius:var(--radius)}
@@ -442,17 +441,6 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
-  /* ===== page overrides ===== */
-  /* The site runs full-bleed since the header change, which suits the archive
-     grid and ruins the prose above it: a line of Hebrew at 1400px is a long
-     way for the eye to travel back. Hold the text to a reading measure and let
-     the grid keep the width. */
-  main > p{max-width:78ch}
-  section.card{padding:26px 30px;margin-bottom:26px}
-  section.card > p,section.card > ul,section.card > h3.sub{max-width:78ch}
-  section.card > h2{margin-bottom:14px}
-  section.card > ul{margin-bottom:18px}
-  section.card > .btn-row{margin-bottom:20px}
 </style>
 <script type="application/ld+json">
 {
@@ -470,6 +458,12 @@
       "position": 2,
       "name": "ספריית תוכן",
       "item": "./content-library.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "דרכו הפנימית של המורה או \"חנוך לנער לפי דרכו\"",
+      "item": "./lib-p2327.html"
     }
   ]
 }
@@ -542,64 +536,52 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1" data-lib-item="p2327">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספריית תוכן</span>
+<a class="crumb" href="./content-library.html">ספריית תוכן</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">דרכו הפנימית של המורה או &quot;חנוך לנער לפי דרכו&quot;</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-6.webp')"></div><div class="frame"><img src="./img/art/waldorf-6.webp" alt="הנתיב אל האור" width="220" height="303" decoding="async"></div><div class="cap"><b>הנתיב אל האור</b><span>ציור ולדורף בטכניקת ווילון (Lazur)</span></div></div>
-  <h1>ספריית תוכן</h1>
-<p>מאגר מרכזי של עבודות ומאמרים על חינוך ולדורף, מאגר חומרי ההוראה והמשאבים של מורי ולדורף, והספר "חינוך ולדורף – עקרונות ויישומים" במלואו.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
-<h2 id="sec-1qrgv1m"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> עבודות ומאמרים</h2>
-<p>ארכיון העבודות והמאמרים על חינוך ולדורף. לכל פריט עמוד משלו, ואפשר להוריד פריט בודד או כמה פריטים יחד. סננו לפי סוג:</p>
-<ul>
-<li><strong>עבודות לתואר שני</strong> — של אנשים שונים מתוך חינוך ולדורף ומחוצה לו.</li>
-<li><strong>עבודות סמינריוניות</strong> — שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
-<li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
-</ul>
-<div data-lib-archive="works"></div>
-<p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1kubsyw"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> מאגר משאבים למורים</h2>
-<p>"מאגר המשאבים השיתופי של מורי ולדורף" — מאגר חומרי הוראה מבוסס Google Drive, בתשלום חד-פעמי (199 ₪, ללא מנוי), הפועל ברציפות מאז 2010 ומשמש מורי ולדורף מכל רחבי הארץ:</p>
-<ul>
-<li><strong>מערכי שיעור ותקופות</strong> — חומרי הוראה מובנים ומסודרים לפי שכבות גיל ותחומי דעת (בעיקר א'–ח').</li>
-<li><strong>חומרי עזר והשראה</strong> — דקלומים, סיפורים, רעיונות לתרגול ופעילויות יצירתיות לכיתה.</li>
-<li>גישה ניתנת דרך תשלום חד-פעמי ואישור מייל תוך יום עבודה אחד; המאגר מנוהל ומורחב באופן שוטף ומזמין מורים לשתף חומרים משלהם.</li>
-</ul>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://www.antro.co.il/db/" target="_blank" rel="noopener"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg> למאגר המשאבים</a>
-<a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSelMau3h4fd7Ye77JPlhNlFoqbhuMaMGXAzFbyZQBVRErym9w/viewform" target="_blank" rel="noopener">לשיתוף חומרים משלכם</a>
-</div>
-<h3 class="sub">חומרים במאגר של הפורום</h3>
-<div id="dyn-teaching"></div>
-<p><span class="ph">תוכן: להחליט עם הפורום אם מאגר זה (המנוהל כיום באופן עצמאי, כנראה על ידי מורה/צוות פרטני) עובר לניהול הפורום במסגרת האתר החדש, נשאר חיצוני עם קישור, או משמש השראה למאגר חדש שהפורום יבנה</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1b7rjam"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר "חינוך ולדורף – עקרונות ויישומים"</h2>
-<p>הספר נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ומציג את חינוך ולדורף כפי שהתפתח ויושם בבתי הספר בארץ. ארבעה־עשר פרקיו התפרסמו באתר הישן במלואם:</p>
-<div data-lib-archive="book"></div>
-<p style="font-size:.82rem;color:var(--text-muted)"><span class="ph">תוכן: האתר הישן מציע גם את הספר כקובץ PDF אחד (wp-content/uploads/2016/12/חינוך-ולדורף-עקרונות-וישומים.pdf). הקובץ צריך לעבור לאחסון של האתר החדש לפני מעבר הדומיין, אחרת הקישור אליו ימות</span></p>
-</section>
+  <h1>דרכו הפנימית של המורה או &quot;חנוך לנער לפי דרכו&quot;</h1>
+  <div class="lib-meta">
+    <span class="dyn-chip cat">מאמר</span>
+    <span class="dyn-chip">אורי עברי</span>
+    <span class="dyn-chip">2018</span>
+  </div>
+  <div class="btn-row lib-actions">
+    <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
+    <a class="btn btn-ghost" href="./content-library.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספריית תוכן</a>
+  </div>
+
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <article class="card lib-body">
+<p>מאת: אורי עברי</p>
+<p>[המאמר כ<a href="http://teach.waldorf.co.il/wp-content/uploads/2015/08/inner_work.doc" target="_blank" rel="noopener">קובץ word</a>]</p>
+<p>שתי סיבות מביאות אותי לכתוב מאמר זה על&nbsp; דרכו הפנימית של המורה. ראשית כמורה בשבתון מצאתי עצמי מלווה מורים עמיתים בדרכם ומתוך עבודתי עלו בי שאלות ומחשבות הקשורות לאופי המסע המיוחד של מורה כיתה. הסיבה השנייה קשורה לעובדה שחינוך ולדורף בארץ הגיע לנקודה שבה הוא חייב לעצב לעצמו סוג של 'תוכנית לימודים' כדי לפעול נכון מול משרד החינוך וכדי לתת בסיס מקצועי תאורטי לעבודתם של מורים, במיוחד ביוזמות צעירות רבות השואפות לפעול מתוך רוח חינוך ולדורף. הקמת בתי ספר בתוך קהילות שאינן בהכרח חיות את התמונות של מדע הרוח יכולה להתבסס רק על האקטיביות הפנימית של המורים. הסיבות לבניית תוכנית לימודים הן חשובות וראויות אך יש שיאמרו כי יצירת תוכנית לימודים&nbsp; יכולה להפוך בעצמה לסוג של&nbsp; 'רצפט' והנחייה מחייבת הנוגדת את הרוח מתוכה מצופה ממורה לפעול. הציטוטים מובאים מתוך סדרת ההרצאות של שטיינר שנקראות בעברית&nbsp; &quot;חינוך וחיים רוחיים מודרנים&quot; אשר ניתנו כבסיס לייסוד חינוך ולדורף באנגליה.</p>
+<p>החירות האנושית אליה שואפת הנפש המודרנית, ובאופן סמוי נפשות הילדים אותם אנו מלווים בהתגשמותם, איננה יכולה להיות מוזנת כראוי אם לא יוכל המורה להביא בפני תלמידיו את חירותו הפנימית. שטיינר מציב בפנינו שאלה בנושא ונותן עליה תשובה חשובה:</p>
+<p>בעל איזה אופי חייב החינוך שלנו להיות על מנת לאפשר לנו לנטוע בגיל הילדות את מה שלאחר מכן יתעורר מעצמו בישות האנושית החופשיה?&nbsp; כיצד יכולים אנו להפוך את החינוך וההוראה עצמם לפעולה חופשית במובן הגבוה ביותר, כלומר לפעולה מוסרית בדרגה הגבוהה ביותר?&#8230;&quot;חייבים לקום מורים עם אינטואיציה, מורים אשר יכנסו שוב אל הנתיב אשר לאורכו העולם הרוחי והחיים הרוחיים ניתנים להשגה על ידי האדם.&nbsp;&nbsp; [הרצאה שלישית עמ' 30]</p>
+<p>שטיינר טוען שבימינו הרוח היא בעיקרה מחשבות. מה שנקרא היום &quot;רוח&quot; מסוגל ללא יותר מאשר לחשוב באופן פילוסופי. חינוך נובע היום מתאוריות חינוכיות של הוגים בתחום החינוך והאדם המוצג בהן הוא ישות תיאורטית מופשטת בלבד. מול זה הציב שטיינר דרך להתפתחות רגשית והתפתחות פנימית עבור המורה. הוא ניסה להראות שה&quot;רוח&quot; יכולה להפוך למשהו ממשי, פועל ויוזם, דבר הבא לביטוי באופן הכשרת מורי ולדורף.</p>
+<p>המורים בבית ספר ולדורף עברו קודם כל סמינר מורים. זו לא היתה רק שאלה של הליכה על פי תוכנית נתונה, אלא של הקניה של מצב נפשי מאד מוגדר, המוביל חזרה ממה שהעידן שלנו כה מתפאר בו כמורשת שלו, לקשר עם הישות הפנימית ביותר של האדם. זאת על מנת להפוך את החשיבה המתה לחשיבה חיה, את החשיבה הניטראלית לחשיבה מלאת אופי, את החשיבה הטבעית הלא אורגנית לחשיבה חדורה על ידי האדם כולו, אכן לחשיבה אנושית אמיתית. [הרצאה רביעית עמ' 30]</p>
+<p>שטיינר מצביע אם כך על דרכו הפנימית של המורה כמפתח לחינוך ולדורף. ולכן ברצוני להתמקד באתגרים הניצבים בפני האדם המודרני בפנותו למסע של הוראה וחינוך.</p>
+<p>אני מבקש להתבונן על מסעו הפנימי של המורה דרך אחד המשפטים המורכבים והמשמעותיים בחינוך &#8211;&nbsp; <strong>&quot;חנוך לילד לפי דרכו&quot;.</strong> זהו אכן אידיאל מרשים ויפה אך מה משמעות הדבר?&nbsp; כיצד נדע מהי דרכו של הילד? האם עלינו לפגוש אותו דרך רצונותיו ולחפש הדרכה ממה שהוא מביא לנו? והילד הקטן, האם יודע הוא את דרכו או מצפה שאנו נדע אותה בשבילו?&nbsp;&nbsp; מה הם הכלים שעומדים לרשותנו כדי להבין את דרכו של הילד?&nbsp; משפט זה כמו אמירות גבוהות אחרות לא יכול להפוך למציאות נפשית רוחית אמיתית בנפש המורה אלא אם כן הוא הופך למושג חי ומתפתח, זאת כחלק מהדרך הפנימית אותה חייב המורה לעבור בדרכו למפגש הגורל עם הילד או הכיתה.</p>
+<p>כאשר אדם לוקח על עצמו מסע התחנכותי כמורה כיתה, הוא ניצב מול אתגרים רבים. הוא נושא את עיניו לתמונות הגדולות אשר מתגלות לו בעבודתו של שטיינר דרך ידע האדם, הוא נפגש עם מסורת שנבנתה עם השנים על ידי מורים מנוסים והוא עומד מול הורים וילדים רכים עם תחושת&nbsp; אחריות הנובעת ממפגש הגורל שלו עם הנפשות המתגשמות בכיתה אותה הוא נדרש להוביל.</p>
+<p>מסעו של המורה מתחיל לדעתי מהמקום בו הוא נדרש קודם להבין כיצד עליו <strong>&quot;לחנוך לילד על פי הדרך&quot;</strong> או במילים אחרות: לחנוך לילד על פי תמונה התפתחותית רוחית אנושית אוניברסאלית אותה מביא שטיינר במחקריו. כאן עושה המורה מאמץ של היכרות והפנמה עם ידע מתוך מדע הרוח שהוא מקבל כתמונות לתוך נפשו. זהו עדיין לא ידע שלו אך זהו צעד חיוני והכרחי במסעו. המאמץ כאן הוא לא סובייקטיבי מול ילד מסוים או כיתה מסוימת אלא קשור בנשיאה פנימית של תמונה רוחית של האדם המתפתח הנובעת מעבודתו של שטיינר. מורים צעירים רבים מגיעים לעבודה מעשית בחינוך כשהם עברו רק את&nbsp; השלב הזה וגם מולו הם חשים שעדיין ארוכה הדרך. לעיתים המאמץ לחיות ולהחיות תמונות אלו הוא כה רב שלמורה קשה במקביל לפגוש את הילדים באופן הנכון ברמה הרגשית וההתנהגותית. התמונות שנובעות ממדע הרוח הן תמונות מלאות עוצמה ואלו ממלאות את נפש המורה יראת כבוד, התלהבות וכוח. חשוב לראות שתי סכנות הניצבות בשלב זה באופן שכמעט איננו ניתן להפרדה מהמסע של המורה. אחד כוח של גאווה, תחושת&nbsp; עליונות ואהבה עצמית הנוצר עקב חוסר היכולת להפריד בין הידע המפרה בעוצמתו שניתן למורה מבחוץ ויכולתו הרוחית האמיתית . הכוח השני הוא כוח של פחד וחוסר אונים מול המשימה. בשלב זה הכוח של יראת הכבוד וצניעות מול האתגר אותו מציב שטיינר מול נפשו של המורה יכולה להיות עבורו דרך אמיתית בונה ומעצימה.</p>
+<p>כל מורה שעבר מחזור אחד של חינוך כיתה (בבית ספר ולדורף מחנך המורה את כיתתו במשך מספר שנים ארוכות, לעיתים 8 שנים) יודע שכעת הוא יכול, אולי, להתחיל במשימה הבאה והיא <strong>&quot;לחנוך לילד לפי דרכי&quot;.</strong> כיצד יכול אני להתחיל ולהניע תמונות התפתחותיות כאלו ואחרות מתוך המקום שבו אני פעיל ויוצר?&nbsp; כיצד אני מתגבר על הפחד &quot;לטעות&quot; או על הצורך להוכיח משהו למישהו? כיצד חיי הרוח והנפש שלי כאינדיוידואל צובעים את עבודת ההוראה שלי יותר ויותר? זאת, למרות הגוון הפרסונאלי מולו עלי להתמודד בתוכי באופן מתמיד. כיצד אני יוצר ולומד מניסיוני שלי? אחת הסכנות היא שקפיצה לחינוך מתוך הלך נפש זה, לפני השלב הראשון, תתברר לא פעם כשרלטנית ובעייתית לאדם שאיננו רואה רוחי. גם כאן ישאפו כוחות&nbsp; גאווה, יוהרה ופחד לחבור לעבודת המורה. הכוח היוצר בשלב זה קשור לכוח ההתלהבות מחד ולניסיון לתת מעצמי כדי להחיות את התמונה ההתפתחותית בעבודה פנימית שלי כמורה מאידך. כעת יכולות תקופות חדשות להיוולד בנפש המורה ורעיונות מקוריים מובאים באופן חי בפני התלמידים.</p>
+<p>כעת אנו מגיעים לשלב השלישי והקשה מכולם, במסגרתו ניתן באמת להביא למרכז התודעה את האידיאל <strong>&quot;חנוך לילד על פי דרכו&quot;.</strong> כאן אני פועל מתוך היכרות של האחר מבפנים. אני חי לעומק את גורלו והביוגרפיה שלו המיוחדים רק לו. אני לומד לפעול ברגישות וללוות&nbsp; הילד אל תוך העתיד שלו. התמונה שחייה בנפש המורה, בכל הקשור לתוכן ולמבנה השיעור, הופכת כעת רק לאמצעי עבורו למפגש הנכון עם הילד. הדבר נכון גם לגבי נשיאה נכונה של הכיתה. רק אחרי שהמורה עבר את השלב הראשון והשני והם הפכו לטבע שני בעבודתו כמורה, הוא יכול באמת להתפנות, על בסיס יסודות מוצקים אלו, לפעול ממקום כזה. כמובן שהמורה נדרש לעבוד תמיד מהרגע הראשון בכל המימדים אך בכל שלב ברור שיש איכות יותר דומיננטית במסעו. בשלב שלישי זה יש בנפשו סוג של פניות להכיל בתוכו את צרכי הילד באמת.</p>
+<p>בעיקרון&nbsp; כל בנייה של תקופת לימוד מאופיינת בשלושת השלבים הללו. ראשית על המורה להכיר לעומק את משמעות התקופה והקשר שלה להתפתחות הילד. הוא גם יכול לקרוא רעיונות ומחשבות של אחרים שעיצבו תקופה כזו. בשלב השני הוא מתחיל להניע תמונות ומביא משהו יצירתי משלו. זהו שלב חיוני ביותר הדורש אומץ ליצירה חופשית מחד וצניעות הקשורה לצורך להגביל את רעיונותיך לדבר הנכון עבור גיל הילדים, יכולותיך ויכולת הילדים.&nbsp; כעת יש לך תוכנית מגרה איתה אתה מגיע לשיעור.&nbsp; השלב השלישי המתרחש רק במפגש עם הילדים בכיתה והוא חשוב לא פחות. דרך מפגש זה חש המורה מה נידרש באמת ואופן פעולתו קשור לאינטראקציה שלו עם התלמידים. מה שמתרחש כעת הוא עבודה אומנותית אמיתית אשר תוצאותיה מסתוריות וכבר אינן קשורות במורה בלבד. לא פעם דרך המפגש יחוש המורה שעליו לשנות כיוון או לבצע שינויים בתוכניתו. כאן גם המקום של ההיכרות האישית עם הילדים ועם קבוצת הילדים המסוימת חשוב ביותר. לא פעם מורה יוצא נפעם ממה שחי בתלמידים כאשר הם משחזרים את מה שחי בשיעור יום קודם. זוהי בעצם יצירה שלהם עצמם. כאן חייב המורה להיות ערני מחד וקשוב מאידך, יוצר מרחב לשיחה אך לא הופך לדומיננטי, הילדים ועולמם הם המרכז.</p>
+<p>מעניין לראות שבכל שביעון יש דגש של אחד שלבים שהוזכר כאן וזה מאפיין את הקווים המנחים של פנייה נכונה לילד. בגיל הגן חייב המורה ליצור מרחב&nbsp; נכון להתפתחות התקינה של הילד, המפתח את גופו הפיזי בעוצמה. לגננת יש צורך לחבור לתמונות רוחניות גבוהות ולא להביא את נפשה שלה לביטוי עז מדי. לעומת זאת בגיל בית הספר היסודי דמותו של המורה חייבת להיות משמעותית עבור נפשו של הילד ועל המורה להביא עצמו כאדם באופן מלא וחי. בשלב זה חיי הרגש הם במרכז המפגש בין המורה ותלמידיו. רק בשנות התיכון&nbsp; אנחנו רואים שמשימת המורה היא למצוא את הדרך ללוות את המסע הפנימי של הנער המתבגר העומד במרכז. כאן על המורה לסגת למקום יותר&nbsp; פריפריאלי והנער עם עולמו עומדים במרכז הקשר מורה תלמיד.</p>
+<p>אם לסכם, אז המשפט <strong>&quot;חנוך לילד לפי דרכו&quot;</strong> מתחיל במחשבה יותר רוחנית ואימגינטיבית אותה בונה המורה בנפשו מתוך לימוד ידע האדם ומקורות אחרים. השלב הבא יהיה שלב יותר אינספרטיבי שבו מתחילה תנועה הנובעת מתוך האקטיביות של המורה אשר מחדיר את ישותו לתמונה הרוחנית ויוצר הקשרים משל עצמו. השלב השלישי מקורו באינטואיציה אשר נובעת מהמפגש עם האחר. כאן המניע להוראה נובע מהתלמידים עצמם ומשימת המורה היא לפעול מתוכם.</p>
+<p>&nbsp;</p>
+<p>הכותב הוא מורה הנמצא כעת בשבתון ומלווה שני בתי ספר ולדורף לאחר שחינך שלושה מחזורים בבית הספר היסודי ולדורף הרדוף.</p>
+  </article>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script src="./store.js"></script>
-<script src="./dynamic.js"></script>
-<script>
-WDyn.injectCSS();
-/* שתי הרשתות של הארכיון מנוהלות ב-library.js דרך data-lib-archive.
-   כאן נשאר רק מאגר המשאבים, שהוא אוסף אחר. */
-WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
-  empty: 'אין כרגע חומרים במאגר של הפורום. החומרים מתעדכנים דרך ממשק הניהול.'
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./library.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>

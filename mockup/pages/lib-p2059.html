@@ -1,4 +1,4 @@
-<!-- @dsCard group="ספריית תוכן" -->
+<!-- @dsCard group="מדיה" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספריית תוכן — מוקאפ</title>
+<title>ז. מחיי הכיתה – כמה דוגמאות למתודות ההוראה — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,7 +86,6 @@
   .hero-image{margin:4px 0 22px;min-height:260px}
   section.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
-  h3.sub{font-family:var(--font-head);color:var(--brown);font-size:1.02rem;font-weight:700;margin:18px 0 8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
   li{margin-bottom:8px}
@@ -94,7 +93,7 @@
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
-  .ph{display:inline-block;overflow-wrap:anywhere;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
+  .ph{display:inline-block;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
   .icon-inline{width:16px;height:16px;vertical-align:-3px;color:var(--tan-dark);flex:none}
   h2 .icon-inline{color:var(--brown);width:18px;height:18px}
   .table-wrap{overflow-x:auto;margin:0 0 6px;border-radius:var(--radius)}
@@ -442,17 +441,6 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
-  /* ===== page overrides ===== */
-  /* The site runs full-bleed since the header change, which suits the archive
-     grid and ruins the prose above it: a line of Hebrew at 1400px is a long
-     way for the eye to travel back. Hold the text to a reading measure and let
-     the grid keep the width. */
-  main > p{max-width:78ch}
-  section.card{padding:26px 30px;margin-bottom:26px}
-  section.card > p,section.card > ul,section.card > h3.sub{max-width:78ch}
-  section.card > h2{margin-bottom:14px}
-  section.card > ul{margin-bottom:18px}
-  section.card > .btn-row{margin-bottom:20px}
 </style>
 <script type="application/ld+json">
 {
@@ -470,6 +458,12 @@
       "position": 2,
       "name": "ספריית תוכן",
       "item": "./content-library.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "ז. מחיי הכיתה – כמה דוגמאות למתודות ההוראה",
+      "item": "./lib-p2059.html"
     }
   ]
 }
@@ -542,64 +536,78 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1" data-lib-item="p2059">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספריית תוכן</span>
+<a class="crumb" href="./content-library.html">ספריית תוכן</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">ז. מחיי הכיתה – כמה דוגמאות למתודות ההוראה</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-6.webp')"></div><div class="frame"><img src="./img/art/waldorf-6.webp" alt="הנתיב אל האור" width="220" height="303" decoding="async"></div><div class="cap"><b>הנתיב אל האור</b><span>ציור ולדורף בטכניקת ווילון (Lazur)</span></div></div>
-  <h1>ספריית תוכן</h1>
-<p>מאגר מרכזי של עבודות ומאמרים על חינוך ולדורף, מאגר חומרי ההוראה והמשאבים של מורי ולדורף, והספר "חינוך ולדורף – עקרונות ויישומים" במלואו.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
-<h2 id="sec-1qrgv1m"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> עבודות ומאמרים</h2>
-<p>ארכיון העבודות והמאמרים על חינוך ולדורף. לכל פריט עמוד משלו, ואפשר להוריד פריט בודד או כמה פריטים יחד. סננו לפי סוג:</p>
-<ul>
-<li><strong>עבודות לתואר שני</strong> — של אנשים שונים מתוך חינוך ולדורף ומחוצה לו.</li>
-<li><strong>עבודות סמינריוניות</strong> — שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
-<li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
-</ul>
-<div data-lib-archive="works"></div>
-<p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1kubsyw"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> מאגר משאבים למורים</h2>
-<p>"מאגר המשאבים השיתופי של מורי ולדורף" — מאגר חומרי הוראה מבוסס Google Drive, בתשלום חד-פעמי (199 ₪, ללא מנוי), הפועל ברציפות מאז 2010 ומשמש מורי ולדורף מכל רחבי הארץ:</p>
-<ul>
-<li><strong>מערכי שיעור ותקופות</strong> — חומרי הוראה מובנים ומסודרים לפי שכבות גיל ותחומי דעת (בעיקר א'–ח').</li>
-<li><strong>חומרי עזר והשראה</strong> — דקלומים, סיפורים, רעיונות לתרגול ופעילויות יצירתיות לכיתה.</li>
-<li>גישה ניתנת דרך תשלום חד-פעמי ואישור מייל תוך יום עבודה אחד; המאגר מנוהל ומורחב באופן שוטף ומזמין מורים לשתף חומרים משלהם.</li>
-</ul>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://www.antro.co.il/db/" target="_blank" rel="noopener"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg> למאגר המשאבים</a>
-<a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSelMau3h4fd7Ye77JPlhNlFoqbhuMaMGXAzFbyZQBVRErym9w/viewform" target="_blank" rel="noopener">לשיתוף חומרים משלכם</a>
-</div>
-<h3 class="sub">חומרים במאגר של הפורום</h3>
-<div id="dyn-teaching"></div>
-<p><span class="ph">תוכן: להחליט עם הפורום אם מאגר זה (המנוהל כיום באופן עצמאי, כנראה על ידי מורה/צוות פרטני) עובר לניהול הפורום במסגרת האתר החדש, נשאר חיצוני עם קישור, או משמש השראה למאגר חדש שהפורום יבנה</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1b7rjam"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר "חינוך ולדורף – עקרונות ויישומים"</h2>
-<p>הספר נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ומציג את חינוך ולדורף כפי שהתפתח ויושם בבתי הספר בארץ. ארבעה־עשר פרקיו התפרסמו באתר הישן במלואם:</p>
-<div data-lib-archive="book"></div>
-<p style="font-size:.82rem;color:var(--text-muted)"><span class="ph">תוכן: האתר הישן מציע גם את הספר כקובץ PDF אחד (wp-content/uploads/2016/12/חינוך-ולדורף-עקרונות-וישומים.pdf). הקובץ צריך לעבור לאחסון של האתר החדש לפני מעבר הדומיין, אחרת הקישור אליו ימות</span></p>
-</section>
+  <h1>ז. מחיי הכיתה – כמה דוגמאות למתודות ההוראה</h1>
+  <div class="lib-meta">
+    <span class="dyn-chip cat">ספר</span>
+    <span class="dyn-chip">מורי בית הספר ולדורף הרדוף</span>
+    <span class="dyn-chip">2000</span>
+  </div>
+  <div class="btn-row lib-actions">
+    <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
+    <a class="btn btn-ghost" href="./content-library.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספריית תוכן</a>
+  </div>
+
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <article class="card lib-body">
+<p><u></u>בפרק זה יובאו כמה דוגמאות מעבודה של כיתות שונות בבתי-הספר ולדורף בארץ. בהביאנו דוגמאות מהעבודה המעשית של חיי בית-הספר יש לזכור <strong>שבבית-ספר ולדורף אין דרך אחת ויחידה ללמד תחום ידע מסוים</strong>. חלק ניכר ממהות חינוך ולדורף נמצא בדיוק בגישה ההפוכה: הניסיון להתאים את דרכי ההוראה לתלמיד המסוים עמו נמצאים, לאווירת הכיתה, לזמן בו עובדים, לגיל הילדים, להלך הרוח של המורה וכו'. זוהי גם הסיבה לכך שבחינוך ולדורף אין ספרי לימוד. התהליך הלימודי אמור לנבוע מהמפגש החי והנושם בין אנשים- מורים, תלמידים, הורים וכל אדם אחר שמעורב בתהליכי הלימוד.</p>
+<p>הדוגמאות, אם כן, שיובאו להלן אינן אלא כעין <strong>כיוון</strong> או <strong>אפשרות</strong> לאופן לימוד שיוצא מתוך ההשראה של רוח חינוך ולדורף. בדיוק את אותו נושא , או חומר לימודי ניתן בסיטואציה שונה ללמד בצורות שונות לגמרי ולעיתים הפוכות.</p>
+<p>ובכל-זאת יכולות דוגמאות קצרות אלו לתת משהו מהאווירה ודרך הלימוד של בית-הספר ולדורף.</p>
+<h3><strong>כיתה א' </strong><strong>–</strong><strong> לימוד האותיות</strong></h3>
+<p>כאמור נלמדים בבתי-הספר ולדורף בארץ מרבית הנושאים ותחומי הידע הנלמדים במערכת החינוך בכל בתי-הספר בארץ. השוני הוא <strong>באופן הלימוד</strong>, וכמובן בכל הקשור לאווירת הלימוד ותרבות בית-הספר.</p>
+<p>כך הדבר גם לגבי הוראת הכתיבה והקריאה בכיתות הראשונות. הילדים מקבלים בצורה איטית והדרגתית את הבסיס לכתיבה וקריאה, אולם את הקריאה עצמה הם לומדים לבדם, כל תלמיד בקצב ובזמן המתאים לו. הלימוד בכיתה והתרגול בבית אינם מבוססים כלל על קריאה (אין כאמור ספרי לימוד, דפי עבודה, כרטיסיות או כל חומר כתוב דומה) אלא על המגע האנושי, הבלתי אמצעי בין המורה לתלמידיו ובין התלמידים לבין עצמם. בצורה זו רוכש כל ילד בזמנו, כאשר הוא בשל לכך את הקריאה. בכיתה ניתן לו הבסיס לכך.</p>
+<p>בסיס זה ניתן בעבודה יצירתית ואומנותית ככל האפשר &#8211; בתקופות לימוד מרוכזות &#8211; על המישורים השונים של השפה המדוברת והכתובה. בעזרת משחקי דיבור שונים ותרגילי מילים מביאים למודעות הילדים את האלמנטים השונים של השפה המדוברת. במקביל עובדים אתם על לימוד האותיות כך, שכל אות ואות תהפוך לחוויה מלאת חיים ומשמעות בנפש הילד. הדגש אינו על מהירות והספק, אלא על העמקת החוויה ורישומה החיובי והמלא.</p>
+<p>הדרכים ללימוד האותיות רבות ומגוונות. המשותף לכולן הנו הניסיון ללמדן בצורה האומנותית ומלאת החיים ביותר, וכן השימוש במירב תחומי העשייה והפעילות במהלך הלימוד. לימוד של אות יכול להמשך על-פני מספר ימים- הדגש כאמור אינו על ההספק, אלא על התהליך הרגשי-חוויתי שהילד עובר במהלך הלימוד.</p>
+<p>לדוגמא נביא דרך אחת אפשרית ללימוד האותיות:</p>
+<p>המורה מספר לתלמידים סיפור אודות האדם המתבונן בשמש הזורחת. אדם זה מלא התפעלות מהמראה והוא מניף את ידיו אל-על. בהמשך מצייר המורה עם התלמידים את האדם מול השמש הזורחת, כך שלכל ילד יש במחברתו ציור שלו על נושא זה.</p>
+<p>ביום למחרת מתבוננים בציורים וחוזרים על הסיפור. אחר-כך מוציאים מתוך הציור את האות א'. חשוב להדגיש גם את הצד המילולי: א' כהתחלה של המילה אדם. בהמשך עושים ניסיון לחוות את צורת האות עם כל הגוף- בהליכה, ריצה, רישום בגדול באוויר, בפיסול, כיור, עבודה דרך חומרים שונים ועוד. בנוסף מחפשים מילים רבות ככל האפשר שמתחילות באות א' שמסתימות בה וכו'. האות א' מצוירת במחברת התקופה בגדול, בצבעים כציור לכל דבר. אחר-כך ניתן לצייר במחברת מילים נוספות שמתחילות באות א', או שהאות א' נמצאת בתוכן.</p>
+<p>הדגש הנו כאמור על הקשר הרגשי שנוצר בין הילד בגיל זה לבין האות (שהנה אחרי הכל דבר מופשט לגמרי ומנותק מהוויית הילד ועולמו), מכאן הסיפור, שמחבר רגשית את נפש הילד לאותיות השונות ומכאן העבודה האומנותית בציור, רישום, תנועה ומשחק סביב צורתה של האות. ניתן על-ידי לימוד בדרך זו לחבר את הילדים לאותיות ולשפה הכתובה, ולהפוך את האותיות ל&quot;חברות&quot; של הילד, לחלק מעולמו הפנימי. דבר זה חשוב לתפיסתנו בהרבה מלימוד קריאה מהיר והישגי.</p>
+<h3><strong>כיתה ב' </strong><strong>–</strong><strong> לימוד אותיות הכתב</strong><strong> </strong></h3>
+<p>הלימוד של אותיות הכתב מתחיל בדרך-כלל רק במהלך כיתה ב'. כך עובר הילד תקופת זמן משמעותית של כתיבה בדפוס בלבד. לכך יש ערך רב, שכן תהליך למידה בריא בגיל זה עובר דרך תרגול אינטנסיבי בכתיבה ורק אחר-כך לימוד ותרגול של הקריאה. הכתיבה הנה – במידה והיא נעשית בצורה נכונה – תהליך יצירתי, אומנותי, שמערב את כל ישות הילד בעשייה. הקריאה לעומתה הנה תהליך מופשט, שמערב את כוחות הראש והשכל בלבד. לכן לקריאה של אותיות הדפוס – שתלווה את הילד מגיל זה ואילך לרוב ימי חייו – יש להקדים תרגול יצירתי ואומנותי ככל האפשר בכתיבת אותיות אילו.</p>
+<p>עקב הנ&quot;ל נלמדות אותיות הכתב בדרך-כלל רק במהלך כיתה ב'. שוב יש לציין שללימוד אותיות הכתב צורות רבות גם במסגרת חינוך ולדורף. דרך <strong>אחת</strong> אפשרית ללימוד זה תוצג בהמשך.</p>
+<p>דרך זו יוצאת מתוך הגישה האומנותית של חינוך ולדורף. התלמידים עוברים תהליך אומנותי באומנות שמכונה בחינוך ולדורף: רישום-צורות. באומנות זו עוברים התלמידים תהליך אומנותי ברישום, עיצוב וציור של צורות שונות במדיומים שונים. העבודה עם הצורות ועיצובן אינה לשם מטרה לימודית כל-שהיא, אלא לשם העניין עצמו. צורות אלו נחוות במרחב, נעשות בעזרת הגוף בריצה, הליכה, תנועה ומחוות גופניות שונות, ולבסוף מצוירות במחברת התקופה בצורה צבעונית ואומנותית באופנים שונים.</p>
+<p>רישום הצורות כאמור הנו מקצוע בפני עצמו, שנלמד בשנות בית הספר הראשונות כתקופת לימוד חשובה. במקרה של לימוד אותיות הכתב בוחרים צורות כאלו, שבהן מסתתרות כביכול אותיות הכתב. לאחר התנסות אומנותית ברישום צורות במשך מספר ימים, מוציאים מצורות מסוימות – בתהליך אומנותי – את אותיות הכתב המתאימות לאותה צורה.</p>
+<p>כך ניתן ללמד את רוב אותיות הכתב בצורה אומנותית, מלאת חיים ועם קשר לילד ועולמו הפנימי.</p>
+<h3><strong>כיתה ג' </strong><strong>–</strong><strong> תקופות הבנייה, חקלאות ומקצועות</strong></h3>
+<p>במשך כיתה ג' מסיימים רוב ילדי הכיתה את שנתם התשיעית. סביב גיל תשע מתרחש פעמים רבות מעין משבר עמוק ולעיתים כלל לא מודע בהוויית הילד. משבר זה קשור לשאלת הזהות ומוצא את ביטויו ברגשות פחד וחוסר בטחון. שאלות בסיסיות עולות לפתע ומציקות. כמו-כן יכול לבוא מעין ערעור של האיזון שהיה קיים קודם.</p>
+<p>כמה וכמה דברים קיימים בכיתה ג' בחינוך ולדורף על מנת לתת מעין תשובה או חיזוק סביב משבר זה. בין השאר נהוג לעשות תקופות לימוד שנוגעות לצרכיו הבסיסיים של כל אדם: תזונה, בית ומקצוע. תקופות אלו, חוץ מערכן הלימודי והחוויתי, יכולות להביא בטחון ובסיס לסיטואציה משברית וחסרת בטחון בגיל זה.</p>
+<p>בדרך כלל בונים התלמידים בכיתה ג' מבנה, בית או עוסקים באיזה שהיא צורה בבנייה. הילדים עוברים בתהליך הבנייה את כל השלבים של בניית הבית: תכנון, בחירת חומרים, עיצוב, הכנת היסודות, הכנת הלבנים, בניית הקירות, גג, טיח, צביעה ועוד.</p>
+<p>על ידי עבודה נכונה אפשר להגיע לכך, שבניית הבית לא תהיה מנותקת מהתלמידים, אלא הם יהיו כה מחוברים לתהליך הבנייה, שהבית יהיה עבורם הרבה יותר מבית פיזי. הם יכולים לבנות דרכו עבורם בית במובן רחב בהרבה. בית נפשי ןקיומי שיתן בטחון וחום למישורים עמוקים ורחבים בישותם.</p>
+<p>תהליך דומה יכול להתרחש בתחום המזון. הכיתה יכולה למשל לעשות במשך השנה את כל תהליך יצירת הלחם. בסתיו יכולים הילדים להכין שדה קטן, לחרוש אותו ולהכינו לזריעה. עם בוא הגשם לזרוע בו חיטה. אחר-כך במשך השנה לטפל בשדה, להשקותו, לנכש את העשבים וכו'. עם בוא האביב לקצור את החיטה, לדוש את השיבולים ולאסוף את הגרעינים. אז בא תור הטחינה, והכנת הלחם עצמו.</p>
+<p>שוב אין מדובר בתהליך זה רק בתהליך לימודי מלא חוויות. הכנת הלחם כמזון הבסיסי ביותר של האדם מהווה הרבה יותר מכך. יש בתהליך זה, אם הוא נעשה עם כל כוחות ההתלהבות והרצון של הילדים בגיל זה מעין תשובה על חיפוש עמוק בקרבם.</p>
+<p>בצורה דומה נהוג בכיתה ג' ללמד בצורה של התנסות ופעילות עצמית כמה ממקצועות היסוד של המין האנושי. ניתן לדוגמה לעשות את כל התהליך המוביל מהצמר או מהכותנה ועד לבגד המוכן, לעקוב אחר יצור נעליים, מוצרי עץ, ברזל, ועוד. דווקא בעולם התעשייתי והממוכן בו אנו חיים יש משמעות גדולה למעבר של הילד והעמקה בתהליכי יסוד אנושיים אלה. יש בתהליכי יסוד אלו כוח של בטחון, יציבות והכרת עולם נכונה.</p>
+<h3><strong>כיתה ד', ה' </strong><strong>–</strong><strong> לימודי הגיאוגרפיה</strong></h3>
+<p>ההתייחסות ללימודי הסביבה והטבע הסובב מתחילה כבר בגן הילדים ואחר-כך בכיתות א'-ג'. אלא שבגיל זה הלימוד עדיין אינו מודע וממוקד. הילדים חווים את הטבע על מרכיביו השונים, את הנוף הסובב אותם ואת המרחב הגיאוגרפי שבו הם חיים דרך טיולים, פעילויות שונות בטבע, סיפורים, שירים ועוד. זהו הגיל בו יש משמעות קודם כל לחוויה הישירה, של החושים השונים מהעולם הסובב. הקשר הישיר עם עולם הטבע מטופח. כל תהליך של תודעה ולימוד שכלתני יכול רק להרוס ולערער חוויה וקשר ישיר זה.</p>
+<p>מכיתה ד' יש כבר משמעות וחשיבות לתהליך יותר מודע של לימוד והפנמה של המרחב הגיאוגרפי. עדיין המוקד הנו בחוויה אומנותית ומלאת חיים של הסביבה, אבל כבר יותר מודעת ומכוונת.</p>
+<p>באופן טבעי יוצאים בדרך-כלל מהסביבה הקרובה של בית-הספר או של בית התלמיד, וממנה עוברים הלאה למרחבים גיאוגרפיים יותר ויותר גדולים.</p>
+<p>כאמור, מוקד הלמידה אינו בהבנה שכלתנית של יסודות הגיאוגרפיה והכרת הטבע, אלא ביצירת חוויה יצירתית ומלאת חיים של תחום זה. מתוך חוויה כזו אפשר מאוחר יותר לדלות את כל המושגים וההבנות הנחוצות.</p>
+<p>אפשר לדוגמא להפנים את מפת סביבת בית-הספר או יישובי התלמידים על-ידי הכנת דגם של סביבה זו. דגם זה רצוי שיהיה גדול ככל האפשר, ניתן לעשותו בחול תוך כדי העתקת תנאי השטח של הסביבה הנתונה: הרים, עמקים, גבעות, דרכים, יערות, בתים וכו' בחול. בשנים הבאות ניתן לעשות דגמים כאלו, שוב גדולים ככל האפשר של אזורים בארץ: הגליל, מישור החוף, הנגב ועוד, וכן של כל ארץ ישראל.</p>
+<p>את הפנמת תנאי השטח בדרך האמורה אפשר ללוות בציור, רישום, פיסול בחמר או בכל חומר אחר. העיקר הנו שילוב של אומנויות שונות וכוחות היצירה של הילד בתהליך הלימודי של הפנמת הידע הגיאוגרפי.</p>
+<p>בשלב מאוחר יותר – כיתות ו', ז' – נתן בצורה דומה ליצור חוויה לימודית בעלת תוכן כאשר עובדים על מבנה כדור הארץ כולו. בתהליך של יצירה יכול כל תלמיד, או קבוצת תלמידים בעבודה משותפת ליצור בטכניקות פשוטות יחסית, ממש כדור, שוב גדול ככל האפשר, ועליו אפשר לעשות כתבליט, או לצייר את היבשות השונות, את האוקיינוסים ואת שאר הפרטים הגיאוגרפיים של הגלובוס. כך מקבלים התלמידים מושג חי ובעל משמעות ממבנה כדור הארץ ומראהו, דבר שבדרך כלל אינו מובן כלל וקשה מאד לתפיסה מחשבתית בלבד.</p>
+<p>דוגמא נוספת הנה לימוד כיווני השמים בדרכים שקרובות לילד ולנפשו הצעירה. דרך משחקי תנועה שונים, דרך התנסויות גופניות במרחב ניתן ליצור זיקה אמיתית של הילדים לכיווני השמים ומשמעותם. על גופם הם חווים הילדים את הכיוונים ודרכו את משמעותם הגיאוגרפית. בהמשך ניתן לקשר כיוונים אלו לגרמי השמים, לתנועת השמש, לכוכבים ולריתמוס מהלך היום. כך מקבל נושא זה חיים וזוכה למשמעות בנפש הילד.</p>
+<h3><strong>כיתה ז' </strong><strong>–</strong><strong> היסטוריה</strong></h3>
+<p>עם עמידתם של הילדים על סף גיל ההתבגרות, על סף עולם חדש, עולות בקרבם שאלות רבות ומורכבות. עולם רגשי עמוס וסוער, עד אתה לא ידוע, מתגלה לנער/ה. שאלת הזהות העצמית וגיבושה מתעוררת.</p>
+<p>הצורך לנווט בעולם סוער זה, למצוא כיוון, &quot;לקרוא נכון את המפה&quot;, לדעת למצוא את עצמי על המפה, לגלות את הכוחות לעקוב אחר הכיוון שבחרתי למרות סערות הים, כל אלה הנן מיומנויות נפשיות חדשות שיש לרכוש. נתן גם לומר, כעת מתחיל הזמן שבו נתן &quot;לגלות את אמריקה&quot;.</p>
+<p>תקופתם של מגלי העולם הגדולים, בני המאות ה- 15 , 16, מסעותיהם, מאבקיהם ותגליותיהם כתמונות היסטוריות, יכולות להיות עבור המתבגרים הצעירים כמו הד לתחושותיהם הפנימיות, ומקור להזדהות וכוח.</p>
+<p>בחינוך ולדורף נהוג ללמד בכיתה ז' במשך שלשה עד ארבעה שבועות (תקופה) את המסעות הגדולים של גילוי העולם החדש. החל באנריקה הספן – שיכול היה לחשוב את גילוי העולם אך לא הפליג לעולם, דרך וסקו דה גמה, קולומבוס, מגלן, ועוד.</p>
+<p>דרך פועלן של הדמויות הללו עומדים הנערים והנערות מול יכולות רבות ומגוונות שיכולות להביא בפניהם מעין רמז ותוכן להזדהות:</p>
+<p>הצורך לצאת מנמל הבית ולחצות את גבולות העולם המסורתי והידוע, בדיקת הלא-נודע, חציית הפחד והדעה הקדומה, מעבר של משברים וחוסר תקווה, התמודדות עם דילמות מוסריות ( המפגש של אנשי המערב עם העושר האגדי של אמריקה…) – כל זאת במישור של כוחות הנפש. אבל גם יכולת התכנון והחשיבה ערב המסע: הכנת האונייה, רשימת הציוד הנחוץ, קביעת נתיב ההפלגה, ההתמצאות בכוכבים, בקווי האורך והרוחב, ובכלל ההתמצאות – זיהוי מקומי ודרכי…</p>
+<p>בתקופה זו התלמידים משרטטים מפות, לומדים את רשת קווי האורך והרוחב, מסכמים את סיפורי התגליות, לומדים על התקופה מזוויות רבות דרך מסעות המגלים ומקיפים את הנושא מכיוונים רבים.</p>
+<p><a href="https://www.waldorf.co.il//%d7%97%d7%99%d7%a0%d7%95%d7%9a-%d7%95%d7%9c%d7%93%d7%95%d7%a8%d7%a3-%d7%a2%d7%a7%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%95%d7%99%d7%99%d7%a9%d7%95%d7%9e%d7%99%d7%9d-08/" target="_blank" rel="noopener">קדימה</a></p>
+  </article>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script src="./store.js"></script>
-<script src="./dynamic.js"></script>
-<script>
-WDyn.injectCSS();
-/* שתי הרשתות של הארכיון מנוהלות ב-library.js דרך data-lib-archive.
-   כאן נשאר רק מאגר המשאבים, שהוא אוסף אחר. */
-WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
-  empty: 'אין כרגע חומרים במאגר של הפורום. החומרים מתעדכנים דרך ממשק הניהול.'
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./library.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>

@@ -204,10 +204,15 @@
   var LIB_PANELS = [
     { col: 'library', title: 'עבודות ומאמרים', fields: [
       { name: 'title', label: 'כותרת' },
-      { name: 'kind', label: 'סוג', type: 'select', options: ['מאמר', 'עבודה אקדמית', 'עבודת סיום', 'ספר'] },
-      { name: 'url', label: 'קישור לקובץ' },
+      // 'עבודה' is the unresolved bucket: a work whose title page never says
+      // which of the three it is. Leaving it on the list is what lets an editor
+      // close the gap instead of the site guessing.
+      { name: 'kind', label: 'סוג', type: 'select', options: ['מאמר', 'עבודה לתואר שני', 'עבודה סמינריונית', 'עבודה של מורי ולדורף', 'עבודה', 'ספר'] },
+      { name: 'author', label: 'מחבר/ת' },
+      { name: 'date', label: 'שנה' },
+      { name: 'url', label: 'קישור לעמוד הפריט' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['סוג', 'כותרת', 'קובץ', ''], row: function (it) { return [td(it.kind, 'muted'), titleCell(it.title, it.demo), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } },
+    ], cols: ['סוג', 'כותרת', 'מחבר/ת', 'שנה', ''], row: function (it) { return [td(it.kind, 'muted'), titleCell(it.title, it.demo), td(it.author || '—', 'muted'), td(it.date || '—', 'muted')]; } },
     { col: 'teaching', title: 'חומרי הוראה', fields: [
       { name: 'title', label: 'כותרת' },
       { name: 'group', label: 'קבוצה', type: 'select', options: ['סיפורים, שירים ודקלומים', 'דפי עבודה להדפסה', 'מצגות ותמונות להוראה', 'חומרי העשרה לתיכון'] },

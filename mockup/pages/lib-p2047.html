@@ -1,4 +1,4 @@
-<!-- @dsCard group="ספריית תוכן" -->
+<!-- @dsCard group="מדיה" -->
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספריית תוכן — מוקאפ</title>
+<title>ד. ניהול בית-הספר ועבודת המורים — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,7 +86,6 @@
   .hero-image{margin:4px 0 22px;min-height:260px}
   section.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 26px;margin:0 0 18px}
   h2{font-family:var(--font-head);color:var(--brown-dark);font-size:1.2rem;font-weight:700;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--beige);display:flex;align-items:center;gap:8px}
-  h3.sub{font-family:var(--font-head);color:var(--brown);font-size:1.02rem;font-weight:700;margin:18px 0 8px}
   p{margin:0 0 12px}
   ul{margin:0 0 4px;padding-inline-start:22px}
   li{margin-bottom:8px}
@@ -94,7 +93,7 @@
   li .icon-inline{flex:none;margin-top:3px}
   blockquote{background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);margin:0 0 16px;padding:12px 16px;border-radius:var(--radius);color:var(--brown-dark);display:flex;align-items:flex-start;gap:8px}
   hr{border:none;border-top:1px solid var(--beige);margin:24px 0}
-  .ph{display:inline-block;overflow-wrap:anywhere;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
+  .ph{display:inline-block;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),color-mix(in oklab,var(--wash-rose) 15%,var(--beige));color:var(--brown-dark);font-size:.85em;padding:5px 17px;border-radius:22px 44px 20px 40px/40px 20px 46px 22px}
   .icon-inline{width:16px;height:16px;vertical-align:-3px;color:var(--tan-dark);flex:none}
   h2 .icon-inline{color:var(--brown);width:18px;height:18px}
   .table-wrap{overflow-x:auto;margin:0 0 6px;border-radius:var(--radius)}
@@ -442,17 +441,6 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
-  /* ===== page overrides ===== */
-  /* The site runs full-bleed since the header change, which suits the archive
-     grid and ruins the prose above it: a line of Hebrew at 1400px is a long
-     way for the eye to travel back. Hold the text to a reading measure and let
-     the grid keep the width. */
-  main > p{max-width:78ch}
-  section.card{padding:26px 30px;margin-bottom:26px}
-  section.card > p,section.card > ul,section.card > h3.sub{max-width:78ch}
-  section.card > h2{margin-bottom:14px}
-  section.card > ul{margin-bottom:18px}
-  section.card > .btn-row{margin-bottom:20px}
 </style>
 <script type="application/ld+json">
 {
@@ -470,6 +458,12 @@
       "position": 2,
       "name": "ספריית תוכן",
       "item": "./content-library.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "ד. ניהול בית-הספר ועבודת המורים",
+      "item": "./lib-p2047.html"
     }
   ]
 }
@@ -542,64 +536,92 @@
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
-<main id="main-content" tabindex="-1">
+<main id="main-content" tabindex="-1" data-lib-item="p2047">
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספריית תוכן</span>
+<a class="crumb" href="./content-library.html">ספריית תוכן</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">ד. ניהול בית-הספר ועבודת המורים</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-6.webp')"></div><div class="frame"><img src="./img/art/waldorf-6.webp" alt="הנתיב אל האור" width="220" height="303" decoding="async"></div><div class="cap"><b>הנתיב אל האור</b><span>ציור ולדורף בטכניקת ווילון (Lazur)</span></div></div>
-  <h1>ספריית תוכן</h1>
-<p>מאגר מרכזי של עבודות ומאמרים על חינוך ולדורף, מאגר חומרי ההוראה והמשאבים של מורי ולדורף, והספר "חינוך ולדורף – עקרונות ויישומים" במלואו.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
-<section class="card">
-<h2 id="sec-1qrgv1m"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> עבודות ומאמרים</h2>
-<p>ארכיון העבודות והמאמרים על חינוך ולדורף. לכל פריט עמוד משלו, ואפשר להוריד פריט בודד או כמה פריטים יחד. סננו לפי סוג:</p>
+  <h1>ד. ניהול בית-הספר ועבודת המורים</h1>
+  <div class="lib-meta">
+    <span class="dyn-chip cat">ספר</span>
+    <span class="dyn-chip">מורי בית הספר ולדורף הרדוף</span>
+    <span class="dyn-chip">2000</span>
+  </div>
+  <div class="btn-row lib-actions">
+    <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
+    <a class="btn btn-ghost" href="./content-library.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספריית תוכן</a>
+  </div>
+
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
+  <article class="card lib-body">
+<p>כאשר התבקש רודולף שטיינר (מייסד חינוך ולדורף) לעזור בהקמת בית-הספר ולדורף הראשון (1919), הוא אסף סביבו קבוצת מורים וניסה להכשירם להוראה בתקופה הקצרה שעמדה לרשותם עד לפתיחת בית-הספר. בפגישתם הראשונה, ערב תחילת הלימודים, נשא שטיינר דברים לפניהם. כבר אז עלתה שאלת אופי הניהול:<br />
+&quot;אפשרי להשיג את רצוננו, רק אם כל אחד ייתן את כל אישיותו למען המטרה. למן ההתחלה חייב כל אחד להביא את כל ישותו. אי-לכך לא יתנהל בית-הספר בצורה היררכית, אלא בצורה רפובליקנית. ברפובליקת מורים אמיתית לא יהיו פקודות והנחיות מלמעלה, עלינו לעבוד כך שלכל אחד תהיה אחריות מלאה למה שאנו עושים במשותף. כל אחד ואחד חייב להיות אחראי לגמרי.&quot;<br />
+מאז, זהו האידיאל של חינוך ולדורף בכל מקום בו הוא מנסה להתגשם ולפעול: לנהל ולארגן את בית-הספר בצורה &quot;רפובליקנית&quot;, קבוצתית, ללא היררכיה חיצונית כל שהיא. צורה זו יכולה לאפשר את הקרקע לעבודה מלאת יוזמה ואחריות על-ידי כל אחד מהמורים. היא מאפשרת לכל מורה ומחנך לעבוד מתוך המרכז היוצר שלו עצמו. אחריות זו, יוזמה זו, העבודה מתוך המרכז האינדיבידואלי היוצר של המורה הנם הבסיס ליצירת חינוך ולדורף .</p>
+<p>כיצד אם כן מתנהלים בתי-ספר ולדורף בארץ ?<br />
+לשאלה זו תשובות בכמה מישורים:</p>
+<p><strong>המישור החינוכי</strong>:</p>
+<p>במישור החינוכי אנו מנסים ליצור אוירה כזו, שבה כל מורה עובד אך ורק מתוך אישיותו היוצרת. הוא עצמו מחליט את ההחלטות הפדגוגיות הקשורות לתחומו בכל רמות העבודה. להכרעתו ולאחריותו נתונות השאלות של תוכן השיעורים, מתודות ההוראה, זמני ותקופות הלימוד, הקשר עם התלמידים, הוריהם ועוד.<br />
+את האיזון הדרוש למרחב כה חופשי של כל מורה ומורה יוצרת ההתחייבות לקיים את תוכנית הלימודים של חינוך ולדורף, התייחסות רצינית ומחייבת לתוכני הלימוד הנדרשים על-ידי משרד החינוך, ובעיקר העבודה המשותפת בין המורים לבין עצמם. עבודה שהנה לב ליבה של הזהות הבית-ספרית.<br />
+עבודה משותפת זו כוללת מפגש שבועי של כל מורי בית-הספר (בדרך-כלל, יום ה' , בין השעות 16:30-19:30 ) שבו אנו נוהגים להעמיק לפי תקופות בנושאים הבאים:</p>
 <ul>
-<li><strong>עבודות לתואר שני</strong> — של אנשים שונים מתוך חינוך ולדורף ומחוצה לו.</li>
-<li><strong>עבודות סמינריוניות</strong> — שנכתבו במסגרות של הכשרות ולדורף האקדמיות במכללת דוד ילין ובמכללת אורנים.</li>
-<li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
+<li><strong>אמנות</strong>: המורים עוסקים ומתנסים בעצמם בתחומי אמנות שונים הקשורים בדרך-כלל לאותם תחומי אמנות בהם מתנסים גם התלמידים. לדוגמא: שירה, תנועה, דרמה, ציור, פיסול ועוד.</li>
 </ul>
-<div data-lib-archive="works"></div>
-<p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1kubsyw"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> מאגר משאבים למורים</h2>
-<p>"מאגר המשאבים השיתופי של מורי ולדורף" — מאגר חומרי הוראה מבוסס Google Drive, בתשלום חד-פעמי (199 ₪, ללא מנוי), הפועל ברציפות מאז 2010 ומשמש מורי ולדורף מכל רחבי הארץ:</p>
 <ul>
-<li><strong>מערכי שיעור ותקופות</strong> — חומרי הוראה מובנים ומסודרים לפי שכבות גיל ותחומי דעת (בעיקר א'–ח').</li>
-<li><strong>חומרי עזר והשראה</strong> — דקלומים, סיפורים, רעיונות לתרגול ופעילויות יצירתיות לכיתה.</li>
-<li>גישה ניתנת דרך תשלום חד-פעמי ואישור מייל תוך יום עבודה אחד; המאגר מנוהל ומורחב באופן שוטף ומזמין מורים לשתף חומרים משלהם.</li>
+<li><strong>לימוד</strong>: לימוד משותף, העמקה ביסודות חינוך ולדורף, העמקה במקורות חגי ישראל או בנושאים חינוכיים שונים על-פי הצורך. כמו כן שיחות בענייני אקטואליה ושאלות הזמן.</li>
 </ul>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://www.antro.co.il/db/" target="_blank" rel="noopener"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg> למאגר המשאבים</a>
-<a class="btn btn-ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSelMau3h4fd7Ye77JPlhNlFoqbhuMaMGXAzFbyZQBVRErym9w/viewform" target="_blank" rel="noopener">לשיתוף חומרים משלכם</a>
-</div>
-<h3 class="sub">חומרים במאגר של הפורום</h3>
-<div id="dyn-teaching"></div>
-<p><span class="ph">תוכן: להחליט עם הפורום אם מאגר זה (המנוהל כיום באופן עצמאי, כנראה על ידי מורה/צוות פרטני) עובר לניהול הפורום במסגרת האתר החדש, נשאר חיצוני עם קישור, או משמש השראה למאגר חדש שהפורום יבנה</span></p>
-</section>
-<section class="card">
-<h2 id="sec-1b7rjam"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר "חינוך ולדורף – עקרונות ויישומים"</h2>
-<p>הספר נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ומציג את חינוך ולדורף כפי שהתפתח ויושם בבתי הספר בארץ. ארבעה־עשר פרקיו התפרסמו באתר הישן במלואם:</p>
-<div data-lib-archive="book"></div>
-<p style="font-size:.82rem;color:var(--text-muted)"><span class="ph">תוכן: האתר הישן מציע גם את הספר כקובץ PDF אחד (wp-content/uploads/2016/12/חינוך-ולדורף-עקרונות-וישומים.pdf). הקובץ צריך לעבור לאחסון של האתר החדש לפני מעבר הדומיין, אחרת הקישור אליו ימות</span></p>
-</section>
+<ul>
+<li><strong>התבוננות פדגוגית</strong>: התבוננות משותפת בילדים, קבוצות ילדים, כיתות שונות או בעיות חינוכיות שעל הפרק.</li>
+</ul>
+<p>במפגש שבועי זה לוקחים חלק <strong>כל מורי בית-הספר</strong>, גם אלה שעובדים בצורה חלקית. אנו מנסים במפגשים הללו ליצור ביחד, כל פעם מחדש את רוח בית-הספר, אווירתו המיוחדת ולבסס את המישורים העמוקים שקושרים אותנו יחד סביב חינוך ולדורף.<br />
+במפגש נוסף (של כשעתיים עד שלוש ) נפגשים מחנכי הכיתות בצורה קבועה. כאן עובדים על שאלות הקשורות בתוכניות הלימודים, מתודות הוראה שונות, שאלות שונות שעולות מהעבודה בכיתה וכן עיצוב החגים ואירועי בית-הספר.<br />
+כל המורים של כיתה מסוימת נפגשים גם הם בתדירות של פעמיים –שלוש בשליש סביב שאלות, אתגרים ובעיות של אותה כיתה. כמו כן משמש מפגש זה להתבוננות משותפת בילדי הכיתה.<br />
+בנוסף, קיימים מפגשים של פורומים מקצועיים שונים, בדרך כלל סביב תחומים או מקצועות לימוד. לדוגמא: פגישת מורי החינוך המיוחד, מורי שפות זרות, מורי האומנות, המלאכות ועוד.<br />
+במקביל לכל הפגישות האמורות מתרחשת כמובן עבודה יומיומית בקשר שבין המורים לבין עצמם בתחומים רבים: החלפת רעיונות ודעות, העברת ניסיונות ורשמים ועוד…<br />
+עבודה משותפת זו של כלל מורי בית-הספר במסגרות השונות יוצרת את הרוח המיוחדת של בית-הספר וכיוונו החינוכי. היא, יחד עם מרחב היצירה החופשי של כל מורה ומורה, משלימים ומפרים זה את זה.<br />
+האידאל אליו אנו אם כן שואפים הנו ליצור הוראה אינדיבידואלית, יצירתית, מלאת יוזמה והתלהבות, הוראה שנובעת מלב המורה ופוגשת את לב התלמיד. וזאת בתוך מסגרת של אוירה רוחנית משותפת, שנוצרת ונובעת מתוך העבודה המשותפת של המורים.</p>
+<p><strong>המישור הארגוני</strong>:</p>
+<p>גם במישור זה יש כוונה לנהל את בית-הספר במשותף, כך שכל מורה ומורה יפעל מתוך תחושת אחריות מלאה. המרכז הארגוני של בית-הספר נוצר על-ידי קבוצת מורים, שכל אחד מחבריה רואה את עצמו כקשור לגורל בית-הספר, רוצה לתרום להתפתחותו ולקחת על עצמו את האחריות לקיומו. כל מורה העובד בבית-הספר יכול ,אם רצונו בכך, להצטרף לקבוצה זו לאחר זמן מסוים של עבודתו בבית-הספר. קבוצה זו מתפקדת כהנהלת בית-הספר.<br />
+בקבוצה זו אנו נוגעים, על-ידי שיחות ותהליכים שונים במישורים העמוקים של כיוון והתפתחות בית-הספר, עתידו, מגמותיו והחלטות אסטרטגיות. צורת הדיון וההחלטה בגוף זה מבוססת על כך, שכל חבר בפורום הוא למעשה מנהל, ובעבודה קבוצתית נכונה ניתן להגיע בכוחות משותפים להחלטות הנכונות והמשמעותיות עבור בית-הספר. ההחלטות בפורום זה ניתנות בסופו של דבר תמיד בהסכמה ותמיכה של כולם.<br />
+הניהול היותר שוטף נעשה כך, שלכל אחד מחברי קבוצת הניהול יש תחום אחריות עליו הוא מופקד. בחירת תחום האחריות עבור מורה מסוים נעשית מתוך התאמה לכשריו ואמון ביכולתו. הפעילות בתחומי האחריות נעשית בצורה עצמאית מתוך יוזמה ואחריות מלאה ( בדיוק כפי שהדבר נעשה במישור החינוכי בכיתה ). בתדירות מסוימת שומעים בפורום המנהל דיווחים מתחומי האחריות השונים, או מקבלים בתחום זה או אחר החלטות יותר מהותיות בצורה משותפת.</p>
+<p>דוגמאות לכמה מתחומי האחריות:</p>
+<ul>
+<li>קשר לגורמי חוץ – משרד החינוך, מועצה, קרנות וכו' (&quot;מנהל ייצוגי&quot;)</li>
+<li>אחריות על פורום הניהול (&quot;מנהל פנימי&quot;)</li>
+<li>אחריות על ישיבות מחנכים (&quot;מנהל חינוכי&quot;)</li>
+<li>אחריות על הניהול הטכני (&quot;מנהל אדמיניסטרטיבי&quot;)</li>
+<li>תחום החינוך המיוחד בבית-הספר</li>
+<li>אחריות על תחום האומנות, הסדנאות או תחומי מקצוע אחרים</li>
+<li>התחום הכספי/ כלכלי של בית-הספר</li>
+<li>גיוס תרומות</li>
+<li>תכנון בית-הספר, גינון וחצר בית-הספר</li>
+<li>קשר עם ועד הורים וועדות הורים שונות</li>
+</ul>
+<p>כל התפקידים בבית-הספר ניתנים לתקופה מוגבלת. הכוונה היא שיהיה סבב תפקידים, והמנדטים השונים יעברו ממורה אחד למשנהו בתדירות של כמה שנים.</p>
+<p>תדירות ותכנון הפורומים השונים בתחומי הניהול:</p>
+<ul>
+<li><strong>הפורום הניהולי</strong> – הנהלת בית-הספר, נפגש באופן שבועי. זהו כאמור הלב הארגוני-ניהולי של בית-הספר.</li>
+</ul>
+<ul>
+<li><strong>ישיבת מחנכים</strong>, נפגשת פעם בשבוע או בשבועיים. דנה בעניינים חינוכיים שונים: העמקה בתחומי עבודת המחנך, בעיות חינוכיות, תיאור של כיתות מסוימות, התבוננות בילדים ועוד. כמו-כן עוסקים המחנכים בארגון הצד החינוכי השוטף: חגים, אירועים שונים, סדר יום ועוד.</li>
+</ul>
+<ul>
+<li><strong>תחום החינוך המיוחד בבית-הספר</strong>, נפגש באורח שבועי גם על שאלות חינוכיות שונות הקשורות לתחום, וגם על שאלות ארגוניות שעל הפרק.</li>
+</ul>
+<ul>
+<li><strong>ועדות שונות</strong> של צוותי מורים: ועדה כלכלית, ועדה לענייני תכנון ובנייה, ועדה לגיוס תרומות ועוד. מתכנסות לפי הצורך, בדרך-כלל כל שבועיים.</li>
+</ul>
+<p>בנוסף קיימים כמה וכמה צוותי עבודה לנושאים שונים שמוקמים ועובדים מתוך הצרכים ודרישות הזמן. כמעט בכל התחומים המוזכרים לעיל, קיימים בנוסף למורה שמרכז את העבודה ומתאם אותה גם צוותי עבודה של קבוצות מורים, או קבוצות משותפות של הורים-מורים שנפגשים באופן שוטף.</p>
+<p><a href="https://www.waldorf.co.il//%d7%97%d7%99%d7%a0%d7%95%d7%9a-%d7%95%d7%9c%d7%93%d7%95%d7%a8%d7%a3-%d7%a2%d7%a7%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%95%d7%99%d7%99%d7%a9%d7%95%d7%9e%d7%99%d7%9d-05/" target="_blank" rel="noopener">קדימה</a></p>
+  </article>
 
 </main>
 <footer class="site-footer">גירסה פנימית — הפורום הארצי לחינוך ולדורף<span class="footer-sep" aria-hidden="true"> · </span><a class="footer-a11y" href="./accessibility-statement.html">הצהרת נגישות</a></footer>
-<script src="./store.js"></script>
-<script src="./dynamic.js"></script>
-<script>
-WDyn.injectCSS();
-/* שתי הרשתות של הארכיון מנוהלות ב-library.js דרך data-lib-archive.
-   כאן נשאר רק מאגר המשאבים, שהוא אוסף אחר. */
-WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
-  empty: 'אין כרגע חומרים במאגר של הפורום. החומרים מתעדכנים דרך ממשק הניהול.'
-});
-</script>
+<script src="./tabs.js" defer></script>
 <script src="./library.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>
