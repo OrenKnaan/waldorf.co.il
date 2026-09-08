@@ -302,41 +302,55 @@
     }
     draw();
   }
-  /* אריח יחיד — שם הפריט ושורת תיאור, כפי שביקש מסמך "טקסטים לאתר מחודש" */
-  function tile(node) {
+  /* אריח יחיד — שם הפריט ושורת תיאור, כפי שביקש מסמך "טקסטים לאתר מחודש".
+     showLabel=false כשכל האריחים ברשת חולקים אותו סוג: שבב שחוזר על עצמו
+     בארבעים אריחים אינו מוסיף מידע, רק רעש. */
+  function tile(node, showLabel) {
     var box = node.url
       ? el('a', { class: 'dyn-tile', href: node.url, target: '_blank', rel: 'noopener' })
       : el('div', { class: 'dyn-tile' });
     box.appendChild(el('h3', { text: node.title }));
     if (node.description) box.appendChild(el('p', { text: node.description }));
     var label = node.kind || node.group || node.category;
-    box.appendChild(el('div', { class: 'dyn-meta' }, [
-      label ? chip(label, 'cat') : null,
+    var meta = el('div', { class: 'dyn-meta' }, [
+      (showLabel && label) ? chip(label, 'cat') : null,
       demoChip(node)
-    ]));
+    ]);
+    if (meta.childNodes.length) box.appendChild(meta);
     return box;
   }
-  /* רשת אריחים בארבע עמודות. searchLabel ריק/חסר — בלי תיבת חיפוש. */
-  function renderTileGrid(mount, col, searchLabel) {
+  /* רשת אריחים בארבע עמודות.
+     opts.search  — תווית לתיבת החיפוש; בלעדיה אין תיבה
+     opts.filter  — פונקציה שבוררת אילו פריטים מהאוסף שייכים לרשת הזאת
+     opts.empty   — הטקסט כשאין פריטים כלל (להבדיל מחיפוש שלא החזיר דבר) */
+  function renderTileGrid(mount, col, opts) {
+    opts = opts || {};
     var q = '';
     var grid = el('div', { class: 'dyn-tiles', 'aria-live': 'polite' });
     mount.textContent = '';
-    if (searchLabel) {
+    if (opts.search) {
       mount.appendChild(el('div', { class: 'dyn-toolbar' }, [
         el('input', {
-          type: 'search', placeholder: searchLabel, 'aria-label': searchLabel,
+          type: 'search', placeholder: opts.search, 'aria-label': opts.search,
           oninput: function (e) { q = e.target.value.trim().toLowerCase(); draw(); }
         })
       ]));
     }
     mount.appendChild(grid);
     function draw() {
-      var items = WStore.get(col).filter(function (it) {
+      var all = WStore.get(col).filter(opts.filter || function () { return true; });
+      var items = all.filter(function (it) {
         return !q || [it.title, it.description, it.kind, it.group, it.category].join(' ').toLowerCase().indexOf(q) !== -1;
       });
       grid.textContent = '';
-      if (!items.length) { grid.appendChild(emptyBox('לא נמצאו פריטים.')); return; }
-      items.forEach(function (it) { grid.appendChild(tile(it)); });
+      if (!items.length) {
+        grid.appendChild(emptyBox(all.length ? 'לא נמצאו פריטים.' : (opts.empty || 'אין כרגע פריטים.')));
+        return;
+      }
+      var labels = {};
+      items.forEach(function (it) { labels[it.kind || it.group || it.category || ''] = 1; });
+      var showLabel = Object.keys(labels).length > 1;
+      items.forEach(function (it) { grid.appendChild(tile(it, showLabel)); });
     }
     draw();
   }
