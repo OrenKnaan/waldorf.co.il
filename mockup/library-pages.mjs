@@ -118,6 +118,8 @@ const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // ---------- skeleton ----------
+const BOOK_TITLE = 'חינוך ולדורף – עקרונות ויישומים';
+
 const skeleton = readFileSync(join(pagesDir, 'media.html'), 'utf8');
 
 const ICON = {
@@ -194,9 +196,9 @@ function coverFigure(cover, rec) {
   const dims = (cover.width && cover.height)
     ? ` width="${esc(cover.width)}" height="${esc(cover.height)}"` : '';
   return `    <figure class="lib-cover">
-      <span class="shot"><img src="${esc(cover.src)}" alt="כריכת הספר &quot;חינוך ולדורף – עקרונות ויישומים&quot;"${dims} loading="lazy" decoding="async"></span>
+      <span class="shot"><img src="${esc(cover.src)}" alt="כריכת הספר &quot;${esc(BOOK_TITLE)}&quot;"${dims} loading="lazy" decoding="async"></span>
       <figcaption>
-        <b>חינוך ולדורף – עקרונות ויישומים</b>
+        <b>${esc(BOOK_TITLE)}</b>
 ${rec.author ? `        <span>${esc(rec.author)}</span>\n` : ''}${rec.date ? `        <span>סתיו ${esc(rec.date)}</span>\n` : ''}      </figcaption>
     </figure>
 `;
@@ -233,15 +235,17 @@ function tocFor(rec, chapters) {
   const rows = chapters.map((c) => {
     const href = `./lib-${c.id.replace(/^lb-/, '')}.html`;
     const here = c.id === rec.id;
-    return `      <li><a href="${esc(href)}"${here ? ' aria-current="page"' : ''}>` +
+    return `          <li><a href="${esc(href)}"${here ? ' aria-current="page"' : ''}>` +
       `<span class="dot" aria-hidden="true"></span><span class="t">${esc(c.title)}</span></a></li>`;
   }).join('\n');
-  return `  <nav class="lib-toc" aria-label="פרקי הספר">
-    <h2 class="lib-toc-title" id="${sectionId('פרקי הספר')}">פרקי הספר</h2>
-    <ol>
+  return `    <div class="lib-toc-wrap">
+      <nav class="lib-toc" aria-label="פרקי הספר">
+        <h2 class="lib-toc-title" id="${sectionId('פרקי הספר')}">פרקי הספר</h2>
+        <ol>
 ${rows}
-    </ol>
-  </nav>
+        </ol>
+      </nav>
+    </div>
 `;
 }
 
@@ -275,13 +279,15 @@ ${files.map((f) => `      <li>${ICON.file} <a href="${esc(f.href)}" target="_bla
 <span class="crumb current" aria-current="page">${esc(rec.title)}</span>
 </span>
   </nav>
-  <h1>${esc(rec.title)}</h1>
-  <div class="lib-meta">
-    ${meta}
-  </div>
-  <div class="btn-row lib-actions">
-    <button type="button" class="btn btn-primary" data-lib-download>${ICON.down} הורדת הפריט</button>
-    <a class="btn btn-ghost" href="./content-library.html">${ICON.back} חזרה לספריית תוכן</a>
+  <div class="lib-head">
+    <h1>${esc(rec.title)}</h1>
+${rec.kind === 'ספר' ? `    <p class="lib-book">מתוך <cite>${esc(BOOK_TITLE)}</cite></p>\n` : ''}    <div class="lib-meta">
+      ${meta}
+    </div>
+    <div class="btn-row lib-actions">
+      <button type="button" class="btn btn-primary" data-lib-download>${ICON.down} הורדת הפריט</button>
+      <a class="btn btn-ghost" href="./content-library.html">${ICON.back} חזרה לספריית תוכן</a>
+    </div>
   </div>
 ${attach}
   <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>

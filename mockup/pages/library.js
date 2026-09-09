@@ -25,16 +25,34 @@
     '.lib-meta .dyn-chip,.lib-card .dyn-chip{background:var(--beige);color:var(--brown);border-radius:var(--radius-organic-sm,999px);padding:2px 11px;font-weight:500}',
     '.lib-meta .dyn-chip.cat,.lib-card .dyn-chip.cat{background:color-mix(in oklab,var(--wash-gold) 34%,var(--white));color:var(--brown-dark)}',
     /* --- item page --- */
-    '.lib-meta{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;font-size:.78rem}',
-    '.lib-actions{margin:0 0 22px}',
+    /* Title, source, metadata and actions read as one masthead over the text,
+       centred, rather than as four left-aligned rows of unrelated things. */
+    '.lib-head{max-width:72ch;margin:0 auto 6px;text-align:center}',
+    '.lib-head h1{margin-bottom:6px}',
+    '.lib-book{margin:0 0 12px;font-family:var(--font-head);font-size:1rem;color:var(--brown)}',
+    '.lib-book cite{font-style:normal}',
+    '.lib-meta{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;font-size:.78rem;justify-content:center}',
+    '.lib-actions{margin:0 0 22px;justify-content:center}',
+    /* Reading progress. Decorative by design: it repeats what the scrollbar
+       already tells assistive technology, and a live percentage announced on
+       every scroll tick would be noise, so it is hidden from the a11y tree.
+       The four washes are the same rail the homepage hero uses for its slides. */
+    '.lib-progress{position:fixed;inset-block-start:0;inset-inline:0;height:4px;z-index:30;pointer-events:none;background:color-mix(in oklab,var(--tan) 20%,transparent)}',
+    '.lib-progress .fill{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:right center;background:linear-gradient(270deg,var(--wash-rose),var(--wash-gold),var(--wash-sage),var(--wash-sky))}',
     '.lib-attach{padding-block:16px}',
     '.lib-attach h2{margin-top:0}',
     '.lib-files{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}',
     '.lib-files li{display:flex;align-items:center;gap:8px;font-size:.9rem}',
     '.lib-ext{font-size:.7rem;font-weight:600;color:var(--brown);background:var(--beige);border-radius:var(--radius-pill);padding:1px 9px}',
     /* The reading column. The site runs full-bleed, which suits a grid and ruins
-       a 9,000-word paper: a line of Hebrew at 1400px is unreadable. */
-    '.lib-body{max-width:68ch;margin-inline:auto;padding:26px 30px}',
+       a 9,000-word paper: a line of Hebrew at 1400px is unreadable.
+       The surface is restated here rather than inherited: the page stylesheet
+       qualifies its card rule as section.card, so this <article class="card">
+       was picking up no background, radius or shadow at all and the chapter sat
+       straight on the page while every other block on the site sat on white.
+       <article> is the right element for a self-contained document, so the
+       styles come to it instead of the element changing to suit the selector. */
+    '.lib-body{max-width:68ch;margin-inline:auto;padding:26px 30px;background:var(--white);border:1px solid var(--tan-dark);border-radius:var(--radius-lg);box-shadow:var(--shadow)}',
     '.lib-body h2{font-size:1.35rem;margin:26px 0 10px}',
     '.lib-body h3{font-size:1.1rem;margin:22px 0 8px;font-family:var(--font-head);color:var(--brown)}',
     '.lib-body h4,.lib-body h5,.lib-body h6{font-size:1rem;margin:18px 0 6px;font-family:var(--font-head);color:var(--brown)}',
@@ -49,19 +67,25 @@
     '.lib-body th,.lib-body td{border:1px solid var(--beige);padding:7px 10px;text-align:start}',
     '.lib-body sup{font-size:.7em}',
     /* --- the book's chapter rail ---
-       Two columns on a wide screen: the chapter list sits in the inline-start
-       gutter, which in RTL is the left, and sticks while the chapter scrolls.
-       Below 1000px it stacks above the text as an ordinary card, expanded:
-       fourteen short titles are not worth a disclosure widget. */
-    // Column order is inline, not physical: in RTL the first track is the right
-    // one. The rail is the first child, so the fixed track has to come first, or
-    // the nav takes the wide column and the chapter gets the 254px gutter.
-    '.lib-with-toc{display:grid;grid-template-columns:254px minmax(0,1fr);gap:26px;align-items:start}',
-    '.lib-toc{position:sticky;inset-block-start:16px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);padding:16px 6px 14px 14px;max-height:calc(100vh - 34px);overflow:auto;overscroll-behavior:contain}',
-    '.lib-toc-title{margin:0 0 10px;padding:0 8px;font-family:var(--font-head);font-size:.92rem;color:var(--brown-dark);border:0}',
+       The rail is taken out of flow so the chapter keeps the page's own centred
+       measure instead of being pushed off-centre by a reserved column. The
+       wrapper is absolute and full height, starting at the article's own top
+       edge; the nav inside it is sticky, so the rail follows a long chapter
+       down instead of scrolling away at the first screen.
+       It sticks at 54px, not 16px: the breadcrumb is itself sticky at 8px,
+       spans the full width and carries z-index 15, so at 16px it was painted
+       over the rail's heading. The breadcrumb rests 38px tall at a fixed
+       12.5px font that the accessibility text scale does not touch, so a
+       constant clears it safely. */
+    '.lib-with-toc{position:relative}',
+    '.lib-col{max-width:68ch;margin-inline:auto;min-width:0}',
+    '.lib-with-toc .lib-body{max-width:none;margin-inline:0}',
+    '.lib-toc-wrap{position:absolute;inset-block:0 auto;inset-inline-start:0;width:214px;height:100%}',
+    '.lib-toc{position:sticky;inset-block-start:54px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);padding:14px 6px 12px 12px;max-height:calc(100vh - 72px);overflow:auto;overscroll-behavior:contain}',
+    '.lib-toc-title{margin:0 0 8px;padding:0 8px;font-family:var(--font-head);font-size:.88rem;color:var(--brown-dark);border:0}',
     '.lib-toc ol{list-style:none;margin:0;padding:0;counter-reset:none}',
     '.lib-toc li{margin:0}',
-    '.lib-toc a{display:flex;align-items:flex-start;gap:9px;padding:6px 8px;border-radius:var(--radius);font-size:.84rem;line-height:1.4;color:var(--text-muted);text-decoration:none}',
+    '.lib-toc a{display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:var(--radius);font-size:.8rem;line-height:1.38;color:var(--text-muted);text-decoration:none}',
     '.lib-toc a:hover{background:var(--beige);color:var(--brown-dark)}',
     /* The hero's dot, at rest and current, in the palette this page uses. */
     '.lib-toc .dot{flex:none;width:9px;height:9px;margin-block-start:6px;border-radius:50%;background:var(--tan);transition:background .2s,transform .2s}',
@@ -70,15 +94,17 @@
     '.lib-toc a[aria-current] .dot{background:var(--brown);transform:scale(1.35)}',
     '@media (prefers-reduced-motion:reduce){.lib-toc .dot{transition:none}}',
     'html.a11y-stopanim .lib-toc .dot{transition:none}',
-    '.lib-col{min-width:0}',
     /* --- chapter pager ---
        Two cards, each naming where it goes. "הבא" on its own asks a reader to
        take the jump on trust; the chapter title lets them decide. */
     '.lib-pager{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 0}',
-    '.lib-pager a{flex:1 1 210px;min-width:0;display:flex;flex-direction:column;gap:3px;padding:12px 16px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);text-decoration:none;color:var(--text)}',
+    /* Sized to their content, capped, not stretched across the row. The title
+       is clamped to two lines so a long chapter name cannot widen the card. */
+    '.lib-pager a{flex:0 1 auto;max-width:min(30ch,calc(50% - 6px));min-width:0;display:flex;flex-direction:column;gap:2px;padding:9px 14px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);text-decoration:none;color:var(--text)}',
+    '.lib-pager .t{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}',
     '.lib-pager a:hover{color:var(--text);border-color:var(--tan);box-shadow:var(--shadow-lg)}',
-    '.lib-pager .dir{display:flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;color:var(--brown)}',
-    '.lib-pager .t{font-family:var(--font-head);font-size:.95rem;line-height:1.35;color:var(--brown-dark)}',
+    '.lib-pager .dir{display:flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;color:var(--brown)}',
+    '.lib-pager .t{font-family:var(--font-head);font-size:.88rem;line-height:1.3;color:var(--brown-dark)}',
     '.lib-pager a:hover .t{color:var(--brown)}',
     /* When only one side exists the remaining card must not stretch across the
        row: a lone "next" belongs at the end, a lone "previous" at the start. */
@@ -95,11 +121,17 @@
     '.lib-cover figcaption{display:flex;flex-direction:column;gap:3px;min-width:0}',
     '.lib-cover figcaption b{font-family:var(--font-head);font-size:1.12rem;line-height:1.3;color:var(--brown-dark)}',
     '.lib-cover figcaption span{font-size:.86rem;color:var(--text-muted)}',
-    '@media (max-width:1000px){',
-    '  .lib-with-toc{display:block}',
+    /* Below this the centred column and the rail would collide, so the rail
+       returns to the flow above the chapter. The threshold is measured, not
+       guessed: the article is 68ch wide and centred, so the free margin either
+       side is (viewport - 48 - column) / 2, and the rail needs 214 + 24 of it. */
+    '@media (max-width:1220px){',
+    '  .lib-toc-wrap{position:static;width:auto;height:auto}',
+    '  .lib-col{max-width:68ch}',
     '  .lib-toc{position:static;max-height:none;overflow:visible;margin:0 auto 20px;max-width:68ch;padding:16px 14px}',
-    '  .lib-toc ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px}',
+    '  .lib-toc ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px}',
     '}',
+    '@media (max-width:1000px){',
     /* --- index page: toolbar --- */
     '.lib-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}',
     '.lib-bar input[type=search],.lib-bar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:8px 16px;min-width:0}',
@@ -134,6 +166,9 @@
     '.lib-pick{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);cursor:pointer}',
     '.lib-pick input{width:17px;height:17px;accent-color:var(--brown);cursor:pointer;margin:0}',
     '.lib-empty{grid-column:1/-1;background:var(--beige);border-radius:var(--radius-lg);padding:22px;text-align:center;color:var(--text-muted);font-size:.92rem}',
+    /* These all sit on custom surfaces, so the ring is stated rather than left
+       to whatever the UA draws over a tinted pill or a white card. */
+    '.lib-toc a:focus-visible,.lib-pager a:focus-visible,.lib-filter:focus-visible,.lib-card h3 a:focus-visible,.lib-pick input:focus-visible{outline:2px solid var(--brown);outline-offset:2px}',
     '@media (max-width:1100px){.lib-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '@media (max-width:820px){.lib-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media (max-width:520px){.lib-grid{grid-template-columns:1fr}.lib-body{padding:18px 16px}}'
@@ -275,7 +310,37 @@
     }).filter(Boolean).join(' · ');
   }
 
+  /* Reading progress across the document. rAF-throttled rather than CSS
+     scroll-timeline: that would be the tidier answer, but Safari does not
+     support it yet and a progress rail that works in two browsers out of three
+     is worse than sixteen lines of JavaScript. */
+  function initProgress() {
+    var bar = el('div', { class: 'lib-progress', 'aria-hidden': 'true' });
+    var fill = el('span', { class: 'fill' });
+    bar.appendChild(fill);
+    document.body.appendChild(bar);
+
+    var ticking = false;
+    function measure() {
+      ticking = false;
+      var doc = document.documentElement;
+      var scrollable = doc.scrollHeight - window.innerHeight;
+      // A chapter shorter than the viewport has nothing to progress through.
+      var ratio = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+      fill.style.transform = 'scaleX(' + ratio + ')';
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(measure);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    measure();
+  }
+
   function initItemPage() {
+    initProgress();
     var btn = document.querySelector('[data-lib-download]');
     if (!btn) return;
     btn.addEventListener('click', function () {
