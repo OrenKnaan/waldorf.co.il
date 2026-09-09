@@ -70,6 +70,31 @@
     '.lib-toc a[aria-current] .dot{background:var(--brown);transform:scale(1.35)}',
     '@media (prefers-reduced-motion:reduce){.lib-toc .dot{transition:none}}',
     'html.a11y-stopanim .lib-toc .dot{transition:none}',
+    '.lib-col{min-width:0}',
+    /* --- chapter pager ---
+       Two cards, each naming where it goes. "הבא" on its own asks a reader to
+       take the jump on trust; the chapter title lets them decide. */
+    '.lib-pager{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 0}',
+    '.lib-pager a{flex:1 1 210px;min-width:0;display:flex;flex-direction:column;gap:3px;padding:12px 16px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);text-decoration:none;color:var(--text)}',
+    '.lib-pager a:hover{color:var(--text);border-color:var(--tan);box-shadow:var(--shadow-lg)}',
+    '.lib-pager .dir{display:flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;color:var(--brown)}',
+    '.lib-pager .t{font-family:var(--font-head);font-size:.95rem;line-height:1.35;color:var(--brown-dark)}',
+    '.lib-pager a:hover .t{color:var(--brown)}',
+    /* When only one side exists the remaining card must not stretch across the
+       row: a lone "next" belongs at the end, a lone "previous" at the start. */
+    '.lib-pager a.next{text-align:end}',
+    '.lib-pager a.next .dir{flex-direction:row-reverse}',
+    '.lib-pager a.next:only-child{margin-inline-start:auto;flex-grow:0}',
+    '.lib-pager a.prev:only-child{margin-inline-end:auto;flex-grow:0}',
+    /* --- the book's cover, on its opening chapter ---
+       162x157 is the only size that exists, so it is framed rather than
+       enlarged, and the frame carries the title page's information with it. */
+    '.lib-cover{display:flex;flex-wrap:wrap;align-items:center;gap:20px;margin:0 0 24px;padding:20px 22px;border-radius:var(--radius-organic);background:radial-gradient(90% 120% at 88% 0%,color-mix(in oklab,var(--wash-gold) 26%,transparent),transparent 62%),radial-gradient(80% 120% at 6% 100%,color-mix(in oklab,var(--wash-sage) 20%,transparent),transparent 60%),var(--beige)}',
+    '.lib-cover .shot{flex:none;display:block;padding:7px;background:var(--white);border-radius:6px;box-shadow:var(--shadow-lg)}',
+    '.lib-cover img{display:block;border-radius:2px;margin:0}',
+    '.lib-cover figcaption{display:flex;flex-direction:column;gap:3px;min-width:0}',
+    '.lib-cover figcaption b{font-family:var(--font-head);font-size:1.12rem;line-height:1.3;color:var(--brown-dark)}',
+    '.lib-cover figcaption span{font-size:.86rem;color:var(--text-muted)}',
     '@media (max-width:1000px){',
     '  .lib-with-toc{display:block}',
     '  .lib-toc{position:static;max-height:none;overflow:visible;margin:0 auto 20px;max-width:68ch;padding:16px 14px}',

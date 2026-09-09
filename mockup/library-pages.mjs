@@ -123,6 +123,10 @@ const skeleton = readFileSync(join(pagesDir, 'media.html'), 'utf8');
 const ICON = {
   down: '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg>',
   back: '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>',
+  // RTL: travel runs leftwards, so "next" points to the inline-end (left) and
+  // "previous" back to the inline-start (right).
+  next: '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>',
+  prev: '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6l6 6-6 6"/></svg>',
   file: '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
 };
 
@@ -155,6 +159,69 @@ function schema(rec) {
 </script>`;
 }
 
+// Each chapter of the book ended with a "קדימה" link to the next one on
+// waldorf.co.il, in a new tab. It is replaced by the pager below: same tab,
+// local page, and it names the chapter it leads to. Left in place it would be
+// 13 links off the site, all of them dead the day the domain moves.
+function dropOldChapterNav(html) {
+  let n = 0;
+  const out = html.replace(
+    /<p>\s*<a\b[^>]*href="https?:\/\/(?:www\.)?waldorf\.co\.il[^"]*"[^>]*>\s*(?:קדימה|אחורה)\s*<\/a>\s*<\/p>/gi,
+    () => { n += 1; return ''; });
+  return { html: out, dropped: n };
+}
+
+// The book's opening chapter carries its cover. WordPress floated it inline at
+// 162x157, which is also the only size that exists: i0.wp.com serves the same
+// 7,615 bytes whatever width you ask it for. So it is not enlarged, it is
+// framed, and it takes the book's title and authorship with it.
+function extractCover(html) {
+  let cover = null;
+  const out = html.replace(/<img\b[^>]*>/i, (tag) => {
+    if (cover) return tag;
+    const raw = (tag.match(/\ssrc="([^"]+)"/) || [])[1];
+    if (!raw) return tag;
+    const src = raw.replace(/&#0*38;/g, '&').replace(/&amp;/g, '&');
+    cover = { src, width: (tag.match(/\swidth="(\d+)"/) || [])[1] || '', height: (tag.match(/\sheight="(\d+)"/) || [])[1] || '' };
+    return '';
+  });
+  // The float class and the empty paragraph it leaves behind go with it.
+  return { html: cover ? out.replace(/<p>\s*<\/p>/g, '') : html, cover };
+}
+
+function coverFigure(cover, rec) {
+  if (!cover) return '';
+  const dims = (cover.width && cover.height)
+    ? ` width="${esc(cover.width)}" height="${esc(cover.height)}"` : '';
+  return `    <figure class="lib-cover">
+      <span class="shot"><img src="${esc(cover.src)}" alt="כריכת הספר &quot;חינוך ולדורף – עקרונות ויישומים&quot;"${dims} loading="lazy" decoding="async"></span>
+      <figcaption>
+        <b>חינוך ולדורף – עקרונות ויישומים</b>
+${rec.author ? `        <span>${esc(rec.author)}</span>\n` : ''}${rec.date ? `        <span>סתיו ${esc(rec.date)}</span>\n` : ''}      </figcaption>
+    </figure>
+`;
+}
+
+// Previous and next, by the chapter order in D1. Same tab, local page, and each
+// side names its chapter: "הבא" alone tells a reader nothing about whether to
+// follow it.
+function pagerFor(rec, chapters) {
+  if (rec.kind !== 'ספר') return '';
+  const i = chapters.findIndex((c) => c.id === rec.id);
+  if (i === -1) return '';
+  const link = (c, cls, label, icon) => c ? `    <a class="${cls}" rel="${cls}" href="./lib-${c.id.replace(/^lb-/, '')}.html">
+      <span class="dir">${icon}${label}</span>
+      <span class="t">${esc(c.title)}</span>
+    </a>` : '';
+  const prev = link(chapters[i - 1], 'prev', 'הפרק הקודם', ICON.prev);
+  const next = link(chapters[i + 1], 'next', 'הפרק הבא', ICON.next);
+  if (!prev && !next) return '';
+  return `  <nav class="lib-pager" aria-label="ניווט בין פרקי הספר">
+${[prev, next].filter(Boolean).join('\n')}
+  </nav>
+`;
+}
+
 // The book is fourteen chapters published as fourteen pages, so a reader who
 // opens one has no way to see the shape of the whole or reach the next part.
 // The rail borrows the homepage hero's dot language: a dot per chapter, the
@@ -178,7 +245,7 @@ ${rows}
 `;
 }
 
-function mainFor(rec, body, files, chapters) {
+function mainFor(rec, body, files, chapters, cover) {
   const src = rec.id.replace(/^lb-/, '');
   const meta = [
     rec.kind ? `<span class="dyn-chip cat">${esc(rec.kind)}</span>` : '',
@@ -187,6 +254,7 @@ function mainFor(rec, body, files, chapters) {
   ].filter(Boolean).join('\n    ');
 
   const toc = tocFor(rec, chapters);
+  const pager = pagerFor(rec, chapters);
 
   const attach = files.length ? `
   <section class="card lib-attach">
@@ -218,9 +286,11 @@ ${files.map((f) => `      <li>${ICON.file} <a href="${esc(f.href)}" target="_bla
 ${attach}
   <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 ${toc ? `  <div class="lib-with-toc">
-${toc}    <article class="card lib-body">
-${body}
-    </article>
+${toc}    <div class="lib-col">
+      <article class="card lib-body">
+${coverFigure(cover, rec)}${body}
+      </article>
+${pager}    </div>
   </div>` : `  <article class="card lib-body">
 ${body}
   </article>`}
@@ -243,6 +313,8 @@ let written = 0;
 let withFiles = 0;
 let deadLinks = 0;
 let withToc = 0;
+let oldNav = 0;
+let covers = 0;
 for (const rec of records) {
   const src = rec.id.replace(/^lb-/, '');
   let raw;
@@ -256,7 +328,15 @@ for (const rec of records) {
   // is the one tag sorting-content.mjs leaves alone because it never rewrote it.
   raw = raw.replace(/<object[\s\S]*?<\/object>/gi, '');
   const { html, files } = extractFiles(raw);
-  const fixed = dropDeadFragments(withAnchors(demote(html)));
+  const isBook = rec.kind === 'ספר';
+  const nav = isBook ? dropOldChapterNav(html) : { html, dropped: 0 };
+  oldNav += nav.dropped;
+  // Only the book's opening chapter has a cover to lift; it is also the only
+  // one of the fourteen with an image at all.
+  const lifted = (isBook && chapters.length && chapters[0].id === rec.id)
+    ? extractCover(nav.html) : { html: nav.html, cover: null };
+  if (lifted.cover) covers += 1;
+  const fixed = dropDeadFragments(withAnchors(demote(lifted.html)));
   const body = fixed.html.trim();
   deadLinks += fixed.dead;
   if (files.length) withFiles += 1;
@@ -265,7 +345,7 @@ for (const rec of records) {
   let page = skeleton;
   page = page.replace(/<title>[^<]*<\/title>/, `<title>${esc(rec.title)} — מוקאפ</title>`);
   page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, schema(rec));
-  page = page.replace(/<main[\s\S]*?<\/main>/, mainFor(rec, body, files, chapters));
+  page = page.replace(/<main[\s\S]*?<\/main>/, mainFor(rec, body, files, chapters, lifted.cover));
   // The text is baked in, so these pages have no use for the content store —
   // and store.js fetches every collection the moment it loads.
   page = page.replace('<script src="./store.js"></script>\n', '');
@@ -278,4 +358,6 @@ for (const rec of records) {
 }
 console.log(`${written} library item page(s) written, ${withFiles} with attached files, ${withToc} with the book's chapter rail.`);
 if (deadLinks) console.log(`${deadLinks} footnote link(s) whose target is missing from the archive were unlinked.`);
+if (oldNav) console.log(`${oldNav} cross-site "קדימה" link(s) replaced by the local chapter pager.`);
+if (covers) console.log(`${covers} book cover lifted out of the text into a framed title card.`);
 console.log('Now run: node mockup/patch-search.mjs && node mockup/search-index.mjs');

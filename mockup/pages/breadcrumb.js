@@ -34,7 +34,10 @@
   /* ---------- עיצוב מוזרק (כדי לא לשכפל CSS ב-41 עמודים) ---------- */
   var style = document.createElement('style');
   style.textContent = [
-    '.pagebanner{position:sticky;top:10px;z-index:15;transition:box-shadow .18s}',
+    // 8px, matching the gap the banner sits at when the page is at rest
+    // (main's padding-block-start less the negative margin on the first child).
+    // At 10px the pill dropped 2px the moment it stuck.
+    '.pagebanner{position:sticky;top:8px;z-index:15;transition:box-shadow .18s}',
     '.pagebanner.is-stuck{box-shadow:var(--shadow-lg)}',
     /* רקע רך מאחורי הפילול כדי שהתוכן לא יציץ בפינות המעוגלות */
     '.pagebanner.is-stuck::before{content:"";position:absolute;inset:-8px -12px -20px;z-index:-2;pointer-events:none;',
@@ -57,7 +60,9 @@
     '.crumb-menu.open{display:block}',
     '.crumb-menu a{display:block;padding:8px 18px;font-size:.86rem;color:var(--text-muted);text-decoration:none;white-space:nowrap}',
     '.crumb-menu a:hover,.crumb-menu a:focus-visible{background:var(--beige);color:var(--brown-dark)}',
-    '@media (max-width:560px){.pagebanner{top:6px}.crumb-sec{max-width:15ch}}'
+    // The resting gap is 8px at every breakpoint, so the sticky offset is too:
+    // at 6px the pill rose 2px here for the same reason it dropped 2px above.
+    '@media (max-width:560px){.pagebanner{top:8px}.crumb-sec{max-width:15ch}}'
   ].join('');
   document.head.appendChild(style);
 
