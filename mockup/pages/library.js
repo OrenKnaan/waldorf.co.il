@@ -131,7 +131,6 @@
     '  .lib-toc{position:static;max-height:none;overflow:visible;margin:0 auto 20px;max-width:68ch;padding:16px 14px}',
     '  .lib-toc ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px}',
     '}',
-    '@media (max-width:1000px){',
     /* --- index page: toolbar --- */
     '.lib-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}',
     '.lib-bar input[type=search],.lib-bar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:8px 16px;min-width:0}',
