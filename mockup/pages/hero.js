@@ -34,6 +34,20 @@
   var PUSH = -3;        // percent; negative = incoming enters from the left (RTL)
   var SWEEP_EASE = 2.4; // >1 delays the darkening; 1 makes it linear
 
+  /* The hero reaches the window edge while main is a centred 1200px column,
+     so the bleed is the column gutter plus whatever is left beside it. The
+     CSS fallback uses 100vw, which counts the scrollbar and so overshoots by
+     half its width; clientWidth does not. Declared on body, which is where
+     the stylesheet declares it, or the rule there would win. */
+  function setHeroSide() {
+    var cs = getComputedStyle(document.documentElement);
+    var max = parseFloat(cs.getPropertyValue('--page-max')) || 0;
+    var free = (document.documentElement.clientWidth - max) / 2;
+    document.body.style.setProperty('--hero-side', Math.max(0, free) + 'px');
+  }
+  setHeroSide();
+  window.addEventListener('resize', setHeroSide);
+
   var index = 0;
   var paused = false;     // the visitor pressed pause
   var keyboardIn = false; // keyboard focus is inside the hero

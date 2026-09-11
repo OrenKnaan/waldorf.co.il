@@ -99,9 +99,9 @@
     // edge lands under the button rather than in a centred column the button
     // no longer sits in. Uncommenting main's max-width means uncommenting this
     // one too, or the panel drifts away from its button again.
-    '.wsearch-inner{/* max-width:960px; */margin:0 auto;padding:0 16px;display:flex;justify-content:flex-end}',
+    '.wsearch-inner{max-width:var(--page-max,1200px);margin:0 auto;padding:0 16px;display:flex;justify-content:flex-end}',
     '.wsearch-panel{width:min(560px,100%);background:var(--white,#fff);',
-    '  border-radius:0 0 var(--radius-lg,18px) var(--radius-lg,18px);',
+    '  border-radius:var(--radius-organic-bottom,0 0 14px 26px / 0 0 30px 16px);',
     '  box-shadow:var(--shadow-lg,0 12px 34px rgba(0,0,0,.2));overflow:hidden;',
     '  font-size:.95rem;line-height:1.6}',
 

@@ -175,7 +175,7 @@
   var CSS = [
     /* ===== דילוג לתוכן (WCAG 2.4.1 Bypass Blocks) ===== */
     '.skip-link{position:absolute;inset-block-start:-200px;inset-inline-start:0;z-index:10000;',
-    '  background:#3D2B1F;color:#fff;padding:12px 22px;border-radius:0 0 12px 12px;font-weight:600;',
+    '  background:#3D2B1F;color:#fff;padding:12px 22px;border-radius:0 0 10px 19px / 0 0 22px 11px;font-weight:600;',
     '  text-decoration:underline;transition:inset-block-start .15s ease}',
     '.skip-link:focus{inset-block-start:0}',
 
@@ -261,12 +261,12 @@
 
     '.a11y-panel{position:absolute;inset-block-end:60px;inset-inline-start:0;width:320px;',
     '  max-height:min(74vh,540px);overflow-y:auto;background:#FAF6F0;color:#3D2B1F;',
-    '  border:1px solid #E2D6C4;border-radius:18px;box-shadow:0 18px 48px rgba(61,43,31,.32);display:block}',
+    '  border:1px solid #E2D6C4;border-radius:22px 44px 20px 40px / 40px 20px 46px 22px;box-shadow:0 18px 48px rgba(61,43,31,.32);display:block}',
     '.a11y-panel[hidden]{display:none}',
 
     '.a11y-head{display:flex;align-items:center;justify-content:space-between;gap:8px;',
     '  padding:14px 16px 10px;border-block-end:1px solid #E2D6C4;position:sticky;inset-block-start:0;',
-    '  background:#FAF6F0;border-radius:18px 18px 0 0}',
+    '  background:#FAF6F0;border-radius:22px 44px 0 0 / 40px 20px 0 0}',
     '.a11y-title{margin:0;font-size:17px;font-weight:700;color:#3D2B1F}',
     '.a11y-close{width:34px;height:34px;flex:0 0 auto;border:0;border-radius:999px;background:#F0E8DC;',
     '  color:#3D2B1F;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}',
@@ -277,7 +277,7 @@
     '  padding:7px 0;border-block-end:1px solid #EDE3D4}',
     '.a11y-step-label{font-size:14.5px;font-weight:500}',
     '.a11y-step-ctl{display:flex;align-items:center;gap:6px;flex:0 0 auto}',
-    '.a11y-step-btn{width:34px;height:34px;border:1px solid #C4A882;border-radius:9px;background:#fff;',
+    '.a11y-step-btn{width:34px;height:34px;border:1px solid #C4A882;border-radius:6px 12px 5px 11px / 11px 5px 13px 6px;background:#fff;',
     '  color:#3D2B1F;font-size:19px;font-weight:600;line-height:1;cursor:pointer;padding:0;',
     '  display:flex;align-items:center;justify-content:center}',
     '.a11y-step-btn:hover:not(:disabled){background:#F0E8DC}',
@@ -286,7 +286,7 @@
 
     '.a11y-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-block-start:12px}',
     '.a11y-toggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;',
-    '  min-height:70px;padding:9px 6px;border:1px solid #E2D6C4;border-radius:12px;background:#fff;',
+    '  min-height:70px;padding:9px 6px;border:1px solid #E2D6C4;border-radius:11px 21px 10px 19px / 19px 10px 22px 11px;background:#fff;',
     '  color:#3D2B1F;font:inherit;font-size:12.5px;font-weight:500;text-align:center;cursor:pointer;',
     '  transition:background .12s ease,border-color .12s ease}',
     '.a11y-toggle:hover{background:#F0E8DC}',
@@ -297,8 +297,8 @@
     // "reset" plus the statement link are exactly what a stuck user reaches for.
     '.a11y-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;',
     '  padding:10px 16px 14px;border-block-start:1px solid #E2D6C4;position:sticky;',
-    '  inset-block-end:0;background:#FAF6F0;border-radius:0 0 18px 18px}',
-    '.a11y-reset{border:1px solid #C4A882;border-radius:9px;background:#fff;color:#3D2B1F;font:inherit;',
+    '  inset-block-end:0;background:#FAF6F0;border-radius:0 0 20px 40px / 0 0 46px 22px}',
+    '.a11y-reset{border:1px solid #C4A882;border-radius:6px 12px 5px 11px / 11px 5px 13px 6px;background:#fff;color:#3D2B1F;font:inherit;',
     '  font-size:13.5px;font-weight:500;padding:9px 14px;cursor:pointer}',
     '.a11y-reset:hover{background:#F0E8DC}',
     '.a11y-stmt{color:#6B4F35;font-size:13.5px;font-weight:500;text-decoration:underline;',

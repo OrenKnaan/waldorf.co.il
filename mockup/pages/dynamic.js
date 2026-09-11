@@ -54,7 +54,7 @@
     '.dyn-contact{font-size:.82rem;color:var(--text-muted)}',
     '.dyn-event{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}',
     /* רקע בהיר — הגוון החום שמור לכפתורים */
-    '.dyn-event .date-badge{flex:0 0 74px;text-align:center;background:color-mix(in oklab,var(--wash-gold) 26%,var(--white));color:var(--brown-dark);border:1px solid color-mix(in oklab,var(--tan) 50%,transparent);border-radius:13px;padding:10px 6px}',
+    '.dyn-event .date-badge{flex:0 0 74px;text-align:center;background:color-mix(in oklab,var(--wash-gold) 26%,var(--white));color:var(--brown-dark);border:1px solid color-mix(in oklab,var(--tan) 50%,transparent);border-radius:var(--radius-organic-sm);padding:10px 6px}',
     '.dyn-event .date-badge b{display:block;font-family:var(--font-head);font-size:1.7rem;font-weight:700;line-height:1.05;color:var(--brown)}',
     '.dyn-event .date-badge span{font-size:.76rem;color:var(--text-muted)}',
     '.dyn-event.past{opacity:.62}',

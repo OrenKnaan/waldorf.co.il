@@ -116,7 +116,7 @@
        162x157 is the only size that exists, so it is framed rather than
        enlarged, and the frame carries the title page's information with it. */
     '.lib-cover{display:flex;flex-wrap:wrap;align-items:center;gap:20px;margin:0 0 24px;padding:20px 22px;border-radius:var(--radius-organic);background:radial-gradient(90% 120% at 88% 0%,color-mix(in oklab,var(--wash-gold) 26%,transparent),transparent 62%),radial-gradient(80% 120% at 6% 100%,color-mix(in oklab,var(--wash-sage) 20%,transparent),transparent 60%),var(--beige)}',
-    '.lib-cover .shot{flex:none;display:block;padding:7px;background:var(--white);border-radius:6px;box-shadow:var(--shadow-lg)}',
+    '.lib-cover .shot{flex:none;display:block;padding:7px;background:var(--white);border-radius:var(--radius-organic-sm);box-shadow:var(--shadow-lg)}',
     '.lib-cover img{display:block;border-radius:2px;margin:0}',
     '.lib-cover figcaption{display:flex;flex-direction:column;gap:3px;min-width:0}',
     '.lib-cover figcaption b{font-family:var(--font-head);font-size:1.12rem;line-height:1.3;color:var(--brown-dark)}',
