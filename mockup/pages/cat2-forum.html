@@ -479,7 +479,7 @@
   /* ===== category/variant switcher (temporary) ===== */
   .catbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
-    border-radius:var(--radius-lg);font-size:.82rem}
+    border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm));font-size:.82rem}
   .catbar-lbl{font-family:var(--font-head);font-weight:700;color:var(--brown-dark);margin-inline-end:2px}
   .catbar-sep{width:1px;align-self:stretch;background:var(--beige);margin:0 2px}
   .catbar a{display:inline-flex;align-items:center;color:var(--brown);text-decoration:none;padding:5px 13px;
@@ -490,9 +490,24 @@
   .catbar a[aria-current] .cat-dot{outline:1px solid rgba(255,255,255,.7)}
   .cat-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-inline-end:6px;flex:none}
 
+  /* ===== abstract shape: chamfered, not rounded (זמני) ===== */
+  :root{--chamfer-sm:12px;--chamfer:20px;--chamfer-lg:30px}
+  section.card,.pagebanner,.fx-tile{border-radius:0;clip-path:polygon(var(--chamfer) 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% calc(100% - var(--chamfer)),calc(100% - var(--chamfer)) 100%,var(--chamfer) 100%,0 calc(100% - var(--chamfer)),0 var(--chamfer))}
+  .art-hero{border-radius:0;clip-path:polygon(var(--chamfer-lg) 0,calc(100% - var(--chamfer-lg)) 0,100% var(--chamfer-lg),100% calc(100% - var(--chamfer-lg)),calc(100% - var(--chamfer-lg)) 100%,var(--chamfer-lg) 100%,0 calc(100% - var(--chamfer-lg)),0 var(--chamfer-lg))}
+  .collage-grid .tile{border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm))}
+  @media (max-width:720px){
+    :root{--chamfer:14px;--chamfer-lg:20px}
+    section.card{padding:18px}
+  }
+  @media (max-width:400px){
+    :root{--chamfer:12px;--chamfer-lg:16px}
+  }
+
   /* ===== category colour: הפורום (זמני) ===== */
-  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-sky);--paint-hue:170deg;--paint-sat:1}
-  body{background:
+  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-sky);
+    --paint-hue:170deg;--paint-sat:1;--tex-hue:0deg}
+  body{background:none}
+  .page-wash{pointer-events:none;background:
       radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
       radial-gradient(100% 60% at 0% 10%, color-mix(in oklab,var(--cat) 24%,transparent), transparent 62%),
       linear-gradient(180deg,var(--beige) 0%,var(--cream) 640px,var(--cream) 100%)}
@@ -503,14 +518,23 @@
       var(--cream)}
 
   /* ===== variant: מצגת (זמני), the home page's hero photographs again,
-     cross-fading instead of tiled; art-hero-slideshow.js drives it. ===== */
+     cross-fading instead of tiled; art-hero-slideshow.js drives it. Same
+     corner-focused scrim as the collage variant, for the same reason. ===== */
   .ah-media{position:absolute;inset:0}
   .ah-slide{position:absolute;inset:0;background-image:var(--img);background-size:cover;
     background-position:center;opacity:0;transition:opacity 1s ease}
   .ah-slide.is-active{opacity:1}
   @media (min-width:900px){.ah-slide{background-image:var(--img-lg)}}
-  .art-hero.slideshow::after{background:linear-gradient(to top,
-    rgba(20,10,8,.74) 0%,rgba(20,10,8,.30) 42%,transparent 70%)}
+  .art-hero.slideshow::after{background:radial-gradient(70% 88% at 100% 100%,
+    rgba(20,10,8,.86) 0%,rgba(20,10,8,.60) 28%,rgba(20,10,8,.28) 50%,transparent 70%)}
+  /* The band shrinks with the hero on a phone (200px, then 170px), so the
+     same percentages cover a smaller run behind the caption; measured on
+     the glyph pixels themselves, 375px came out at 3.81:1 against the 4.5:1
+     that 15px bold needs (below 18.66px, "large text" does not apply). */
+  @media (max-width:720px){
+    .art-hero.slideshow::after{background:radial-gradient(78% 92% at 100% 100%,
+      rgba(20,10,8,.90) 0%,rgba(20,10,8,.68) 30%,rgba(20,10,8,.34) 54%,transparent 74%)}
+  }
   .art-hero.slideshow .cap{position:relative;align-self:flex-end;z-index:2}
   .ah-play{position:absolute;z-index:2;top:12px;inset-inline-start:12px;width:34px;height:34px;
     border-radius:50%;border:0;background:rgba(20,10,8,.52);color:#fff;display:flex;
@@ -523,34 +547,22 @@
   .art-hero.slideshow.is-paused .ah-play .ico-play{display:block}
   @media (prefers-reduced-motion:reduce){.ah-slide{transition:none}}
 
-  /* ===== variant: מרקם צבעי מים על פני כל הדף (זמני), a fixed layer, not a
-     tiled one, so a long page never shows a seam and the wash holds still
-     while the content scrolls past it.
+  /* ===== variant: מרקם צבעי מים על פני כל הדף (זמני). Two fixed,
+     viewport-covering layers, .page-wash then .page-tex on top of it, both
+     z-index:-1 or deeper so the header and every card, both still opaque,
+     go on covering them wherever a visitor is actually looking.
 
-     body keeps its own opaque gradient from baseCategoryCSS above, and a
-     block box's own background paints in the same step as its in-flow
-     children, which comes after a negative z-index descendant's stacking
-     context, not before it. That ordering silently hid the whole layer
-     behind body's own ground. Clearing it to none here (later, so the
-     cascade favours it) lets header and main, both still opaque where a
-     card actually sits, go on covering the texture there.
-
-     The first attempt scattered five small colour blooms across the fixed
-     viewport by percentage, the way forum-alt3 places its one corner wash.
-     Nearly all of them landed under the header or the hero, which are both
-     opaque and both close to the top of every one of these pages, so almost
-     none of them ever reached a pixel a visitor could see. A full-bleed
-     radial tint plus the alpha texture on top reaches every gap and gutter
-     the page actually has, at any scroll position, instead of gambling on
-     five fixed points. */
-  body{background:none}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:
-      url(./img/watercolor-spread.webp) center/cover no-repeat,
-      radial-gradient(120% 100% at 12% 0%, color-mix(in oklab,var(--cat) 55%,transparent), transparent 62%),
-      radial-gradient(110% 90% at 88% 100%, color-mix(in oklab,var(--cat) 48%,transparent), transparent 62%),
-      radial-gradient(140% 120% at 50% 45%, color-mix(in oklab,var(--wash-gold) 20%,transparent), transparent 70%),
-      linear-gradient(180deg,color-mix(in oklab,var(--cat) 18%,var(--beige)) 0%,color-mix(in oklab,var(--cat) 11%,var(--cream)) 100%)}
+     .page-tex holds watercolor-clouds.webp (its own colour is blue) with
+     background-blend-mode:multiply against .page-wash showing through, and
+     filter:hue-rotate to match the category: filter has to sit on its own
+     element rather than on body, or it would just as happily rotate
+     .page-wash's already-correct colour a second time. multiply keeps the
+     photograph's white paper white (multiplying white changes nothing) and
+     only its blue blooms tint the ground under them. */
+  .page-wash{position:fixed;inset:0;z-index:-2}
+  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
+    background-blend-mode:multiply;filter:hue-rotate(var(--tex-hue))}
 </style>
 <script type="application/ld+json">
 {
@@ -576,6 +588,8 @@
 <script src="./search.js" defer></script>
 </head>
 <body>
+<div class="page-wash" aria-hidden="true"></div>
+<div class="page-tex" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">דילוג לתוכן המרכזי</a>
 <header class="site-header">
   <button type="button" class="nav-toggle" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="primary-nav"><span class="bars" aria-hidden="true"></span></button>

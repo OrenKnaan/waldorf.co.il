@@ -456,7 +456,7 @@
   /* ===== category/variant switcher (temporary) ===== */
   .catbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
-    border-radius:var(--radius-lg);font-size:.82rem}
+    border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm));font-size:.82rem}
   .catbar-lbl{font-family:var(--font-head);font-weight:700;color:var(--brown-dark);margin-inline-end:2px}
   .catbar-sep{width:1px;align-self:stretch;background:var(--beige);margin:0 2px}
   .catbar a{display:inline-flex;align-items:center;color:var(--brown);text-decoration:none;padding:5px 13px;
@@ -467,9 +467,24 @@
   .catbar a[aria-current] .cat-dot{outline:1px solid rgba(255,255,255,.7)}
   .cat-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-inline-end:6px;flex:none}
 
+  /* ===== abstract shape: chamfered, not rounded (זמני) ===== */
+  :root{--chamfer-sm:12px;--chamfer:20px;--chamfer-lg:30px}
+  section.card,.pagebanner,.fx-tile{border-radius:0;clip-path:polygon(var(--chamfer) 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% calc(100% - var(--chamfer)),calc(100% - var(--chamfer)) 100%,var(--chamfer) 100%,0 calc(100% - var(--chamfer)),0 var(--chamfer))}
+  .art-hero{border-radius:0;clip-path:polygon(var(--chamfer-lg) 0,calc(100% - var(--chamfer-lg)) 0,100% var(--chamfer-lg),100% calc(100% - var(--chamfer-lg)),calc(100% - var(--chamfer-lg)) 100%,var(--chamfer-lg) 100%,0 calc(100% - var(--chamfer-lg)),0 var(--chamfer-lg))}
+  .collage-grid .tile{border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm))}
+  @media (max-width:720px){
+    :root{--chamfer:14px;--chamfer-lg:20px}
+    section.card{padding:18px}
+  }
+  @media (max-width:400px){
+    :root{--chamfer:12px;--chamfer-lg:16px}
+  }
+
   /* ===== category colour: מוסדות חינוך (זמני) ===== */
-  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-gold);--paint-hue:0deg;--paint-sat:1}
-  body{background:
+  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-gold);
+    --paint-hue:0deg;--paint-sat:1;--tex-hue:172deg}
+  body{background:none}
+  .page-wash{pointer-events:none;background:
       radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
       radial-gradient(100% 60% at 0% 10%, color-mix(in oklab,var(--cat) 24%,transparent), transparent 62%),
       linear-gradient(180deg,var(--beige) 0%,var(--cream) 640px,var(--cream) 100%)}
@@ -481,22 +496,27 @@
 
   /* ===== variant: קולאז׳ (זמני), the home page's five hero photographs,
      reused here only until the forum picks real per-page art. Decorative
-     (alt="") rather than mis-describing a page they were not shot for. ===== */
+     (alt="") rather than mis-describing a page they were not shot for.
+     No border on the tiles: the gap between them plus their own shadow is
+     enough separation without an outline drawn on top of the photos. ===== */
   .art-hero.collage{background:linear-gradient(135deg,
     color-mix(in oklab,var(--cat) 55%,var(--cream)),
     color-mix(in oklab,var(--cat) 26%,var(--beige)))}
   .collage-grid{position:absolute;inset:0;display:grid;
     grid-template-columns:1.3fr .85fr .85fr;grid-template-rows:1fr 1fr;gap:10px;padding:14px}
-  .collage-grid .tile{border-radius:var(--radius-organic-sm);overflow:hidden;
-    box-shadow:0 8px 20px rgba(30,20,12,.28);border:3px solid rgba(255,255,255,.88)}
+  .collage-grid .tile{overflow:hidden;box-shadow:0 8px 20px rgba(30,20,12,.28)}
   .collage-grid .tile img{width:100%;height:100%;object-fit:cover;display:block}
   .collage-grid .tile:nth-child(1){grid-row:1/3;grid-column:1}
   .collage-grid .tile:nth-child(2){grid-row:1;grid-column:2}
   .collage-grid .tile:nth-child(3){grid-row:1;grid-column:3}
   .collage-grid .tile:nth-child(4){grid-row:2;grid-column:2}
   .collage-grid .tile:nth-child(5){grid-row:2;grid-column:3}
-  .art-hero.collage::after{background:linear-gradient(to top,
-    rgba(20,10,8,.78) 0%,rgba(20,10,8,.34) 42%,transparent 74%)}
+  /* Focused on the corner the caption actually sits in (bottom, the reading
+     side of the RTL row) instead of a band running the width of the photos:
+     the first cut was darkening tiles 2 and 3 for no reason except that the
+     gradient ran edge to edge. */
+  .art-hero.collage::after{background:radial-gradient(75% 92% at 100% 100%,
+    rgba(20,10,8,.82) 0%,rgba(20,10,8,.52) 30%,rgba(20,10,8,.20) 54%,transparent 74%)}
   .art-hero.collage .cap{position:relative;align-self:flex-end;z-index:2;
     margin-inline-start:0;margin-inline-end:0}
   @media (max-width:720px){
@@ -505,13 +525,16 @@
   }
 
   /* ===== variant: מכחול עליון ותחתון (זמני), forum-alt3's corner wash,
-     hue-rotated per category and mirrored to bookend the page. It sits
-     behind the header/main in DOM order, so it only shows in the side
-     gutters at wide widths and in the gaps between cards, the same places
-     the category wash above already shows through. */
-  :root{--paint:url(./img/paint-top-left.webp)}
+     hue-rotated per category and mirrored to bookend the page. Explicit
+     z-index:-1 (below .page-wash's -2 is one layer further back still, so
+     the wash always shows through it) rather than relying on DOM order to
+     stay behind the header/main: an absolutely positioned, z-index:auto
+     element is not guaranteed to paint behind an in-flow one, only ordinary
+     document order made it look that way here. */
   body{position:relative}
-  .brush-wash{position:absolute;inset-inline:0;height:380px;pointer-events:none;
+  :root{--paint:url(./img/paint-top-left.webp)}
+  .page-wash{position:absolute;inset:0;z-index:-2}
+  .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
     background:var(--paint) no-repeat -120px -78px/min(72vw,940px) auto;
     filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
   .brush-top{top:0}
@@ -544,6 +567,7 @@
 <script src="./search.js" defer></script>
 </head>
 <body>
+<div class="page-wash" aria-hidden="true"></div>
 <div class="brush-wash brush-top" aria-hidden="true"></div>
 <div class="brush-wash brush-bottom" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">דילוג לתוכן המרכזי</a>
@@ -632,11 +656,11 @@
 </nav>
   <div class="art-hero collage">
 <div class="collage-grid" aria-hidden="true">
-<div class="tile"><img src="./img/hero/hero-1.webp" alt="" loading="lazy"></div>
-<div class="tile"><img src="./img/hero/hero-2.webp" alt="" loading="lazy"></div>
-<div class="tile"><img src="./img/hero/hero-3.webp" alt="" loading="lazy"></div>
-<div class="tile"><img src="./img/hero/hero-4.webp" alt="" loading="lazy"></div>
-<div class="tile"><img src="./img/hero/hero-5.webp" alt="" loading="lazy"></div>
+<div class="tile"><img src="./img/hero/hero-1.webp" alt=""></div>
+<div class="tile"><img src="./img/hero/hero-2.webp" alt=""></div>
+<div class="tile"><img src="./img/hero/hero-3.webp" alt=""></div>
+<div class="tile"><img src="./img/hero/hero-4.webp" alt=""></div>
+<div class="tile"><img src="./img/hero/hero-5.webp" alt=""></div>
 </div>
 <div class="cap"><b>תחת הקשת</b><span>ילדים וצבע — ציור ולדורף</span></div>
 </div>
