@@ -517,7 +517,11 @@
     color-mix(in oklab,var(--cat) 26%,var(--beige)))}
   .collage-grid{position:absolute;inset:0;display:grid;
     grid-template-columns:1.3fr .85fr .85fr;grid-template-rows:1fr 1fr;gap:10px;padding:14px}
-  .collage-grid .tile{overflow:hidden;box-shadow:0 8px 20px rgba(30,20,12,.28)}
+  /* filter:drop-shadow instead of box-shadow: clip-path clips a box-shadow
+     off at the cut corners along with everything else, but drop-shadow
+     traces the shape's own rendered silhouette (post-clip), so the shadow
+     follows the chamfer instead of stopping dead at the old rectangle. */
+  .collage-grid .tile{overflow:hidden;filter:drop-shadow(0 6px 12px rgba(30,20,12,.30))}
   .collage-grid .tile img{width:100%;height:100%;object-fit:cover;display:block}
   .collage-grid .tile:nth-child(1){grid-row:1/3;grid-column:1}
   .collage-grid .tile:nth-child(2){grid-row:1;grid-column:2}
@@ -543,9 +547,14 @@
      the wash always shows through it) rather than relying on DOM order to
      stay behind the header/main: an absolutely positioned, z-index:auto
      element is not guaranteed to paint behind an in-flow one, only ordinary
-     document order made it look that way here. */
+     document order made it look that way here.
+
+     paint-top-left-alpha.webp replaces the earlier crop: a real alpha
+     channel fading to nothing on every edge, not just a rectangle that
+     happens to look faded, so it settles onto any category tint without a
+     hard border of its own to fight. */
   body{position:relative}
-  :root{--paint:url(./img/paint-top-left.webp)}
+  :root{--paint:url(./img/paint-top-left-alpha.webp)}
   .page-wash{position:absolute;inset:0;z-index:-2}
   .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
     background:var(--paint) no-repeat -120px -78px/min(72vw,940px) auto;
@@ -555,6 +564,36 @@
   @media (max-width:720px){
     .brush-wash{height:260px;background-position:-70px -52px;background-size:min(112vw,560px) auto}
   }
+
+  /* ===== chamfer outline (זמני) =====
+     section.card carries a real, permanent border (patch-contrast-theme.mjs:
+     --tan-dark measured against the card, so the edge reads as intentional
+     rather than a browser default) and .fx-tile carries its own. A border
+     is drawn on the box's original four straight sides and then clipped
+     along with the rest of the box, so at each chamfered corner it simply
+     stops, leaving a gap where the cut edge has no stroke at all. Rather
+     than accept a broken-looking outline, both are turned off here and
+     replaced with eight drop-shadow() calls: filter (unlike box-shadow)
+     paints from the element's own rendered, already-clipped silhouette, so
+     stacking copies of it nudged 1px in each direction reproduces a hairline
+     that actually follows the cut. */
+  section.card,.catbar{border:0;box-shadow:none;
+    filter:
+      drop-shadow(1px 0 0 var(--tan-dark)) drop-shadow(-1px 0 0 var(--tan-dark))
+      drop-shadow(0 1px 0 var(--tan-dark)) drop-shadow(0 -1px 0 var(--tan-dark))
+      drop-shadow(.75px .75px 0 var(--tan-dark)) drop-shadow(-.75px .75px 0 var(--tan-dark))
+      drop-shadow(.75px -.75px 0 var(--tan-dark)) drop-shadow(-.75px -.75px 0 var(--tan-dark))
+      drop-shadow(0 2px 8px rgba(61,43,31,.08))}
+  .fx-tile{border:0;
+    filter:
+      drop-shadow(1px 0 0 var(--beige)) drop-shadow(-1px 0 0 var(--beige))
+      drop-shadow(0 1px 0 var(--beige)) drop-shadow(0 -1px 0 var(--beige))
+      drop-shadow(.75px .75px 0 var(--beige)) drop-shadow(-.75px .75px 0 var(--beige))
+      drop-shadow(.75px -.75px 0 var(--beige)) drop-shadow(-.75px -.75px 0 var(--beige))}
+  /* Neither ever had a border, only a box-shadow, which the same clipping
+     problem cuts off at the corners; drop-shadow fixes that too, with no
+     hairline needed since there was never an outline to replace. */
+  .art-hero,.pagebanner{box-shadow:none;filter:drop-shadow(0 4px 14px rgba(61,43,31,.12))}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "דף הבית", "item": "./home.html"}, {"@type": "ListItem", "position": 2, "name": "יסודות חינוך וולדורף", "item": "./waldorf-foundations.html"}]}</script>
 <script src="./accessibility.js"></script>

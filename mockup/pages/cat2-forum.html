@@ -552,17 +552,29 @@
      z-index:-1 or deeper so the header and every card, both still opaque,
      go on covering them wherever a visitor is actually looking.
 
-     .page-tex holds watercolor-clouds.webp (its own colour is blue) with
-     background-blend-mode:multiply against .page-wash showing through, and
-     filter:hue-rotate to match the category: filter has to sit on its own
-     element rather than on body, or it would just as happily rotate
-     .page-wash's already-correct colour a second time. multiply keeps the
-     photograph's white paper white (multiplying white changes nothing) and
-     only its blue blooms tint the ground under them. */
+     .page-tex holds watercolor-clouds.webp (its own colour is blue) and
+     needs mix-blend-mode, not background-blend-mode: the photograph is a
+     single, fully opaque layer with nothing else on the same element to
+     blend against, so background-blend-mode had nothing to do and the
+     image was simply painting over .page-wash, whole and opaque. mix-blend
+     -mode blends the element against what is already on the page behind
+     it, which is .page-wash's khaki category tint, so the photograph's
+     white paper picks up that colour (multiplying white leaves the tint
+     untouched) and only its own blue blooms darken it further. filter has
+     to stay on this element rather than move to body, or it would just as
+     happily rotate .page-wash's already-correct colour a second time. */
   .page-wash{position:fixed;inset:0;z-index:-2}
   .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
-    background-blend-mode:multiply;filter:hue-rotate(var(--tex-hue))}
+    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue))}
+
+  /* ===== chamfer outline (זמני): none, for this variant =====
+     section.card and .fx-tile each carry a real border that clip-path cuts
+     off cleanly at the chamfer, leaving a gap in the stroke; rather than
+     rebuild it (as cat1 does with a stack of drop-shadow() calls), it is
+     simply removed here, so the shape reads as a plain cut sheet rather
+     than a shape wearing a broken outline. */
+  section.card,.catbar,.fx-tile{border:0}
 </style>
 <script type="application/ld+json">
 {
