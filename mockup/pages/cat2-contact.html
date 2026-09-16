@@ -496,7 +496,8 @@
 
   /* ===== category colour: צור קשר (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-rose);
-    --paint-hue:-20deg;--paint-sat:1;--tex-hue:143deg}
+    --paint-hue:-20deg;--paint-sat:1;
+    --tex-hue:143deg;--tex-transform:rotate(180deg) scaleX(-1)}
   body{background:none}
   .page-wash{pointer-events:none;background:
       radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
@@ -553,11 +554,20 @@
      white paper picks up that colour (multiplying white leaves the tint
      untouched) and only its own blue blooms darken it further. filter has
      to stay on this element rather than move to body, or it would just as
-     happily rotate .page-wash's already-correct colour a second time. */
+     happily rotate .page-wash's already-correct colour a second time.
+
+     Every category reads the same photograph, so forum (left as the plain
+     original) and four flips of it (rotate 180, flip horizontal, flip
+     vertical, rotate 180 + flip horizontal) is a second axis of variation
+     on top of the hue, not a repeat of the same crop five times. transform
+     is safe here specifically because .page-tex is inset:0 on a fixed,
+     viewport-sized box: rotating or flipping a rectangle equal to its own
+     container leaves that container exactly as full as it started. */
   .page-wash{position:fixed;inset:0;z-index:-2}
   .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
-    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue))}
+    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
+    transform:var(--tex-transform)}
 
   /* ===== chamfer outline (זמני): none, for this variant =====
      section.card and .fx-tile each carry a real border that clip-path cuts

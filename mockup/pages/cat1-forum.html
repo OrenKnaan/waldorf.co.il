@@ -505,7 +505,8 @@
 
   /* ===== category colour: הפורום (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-sky);
-    --paint-hue:170deg;--paint-sat:1;--tex-hue:0deg}
+    --paint-hue:170deg;--paint-sat:1;
+    --tex-hue:0deg;--tex-transform:none}
   body{background:none}
   .page-wash{pointer-events:none;background:
       radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
@@ -562,17 +563,26 @@
      paint-top-left-alpha.webp replaces the earlier crop: a real alpha
      channel fading to nothing on every edge, not just a rectangle that
      happens to look faded, so it settles onto any category tint without a
-     hard border of its own to fight. */
+     hard border of its own to fight.
+
+     Full scale, not shrunk to fit: background-size:auto renders the
+     painting at its native 800x436 rather than the min(72vw,940px) the
+     first pass used, which was scaling it down to roughly a sliver.
+     Anchored at 0 0, the box's own height (380px, 260px on a phone) is
+     what crops it, the same way a photo sitting in a frame smaller than
+     itself is cropped by the frame; the width can run past 800px with
+     nothing to show past that edge, which is the point, since this is a
+     corner accent, not a full-bleed wash. */
   body{position:relative}
   :root{--paint:url(./img/paint-top-left-alpha.webp)}
   .page-wash{position:absolute;inset:0;z-index:-2}
   .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
-    background:var(--paint) no-repeat -120px -78px/min(72vw,940px) auto;
+    background:var(--paint) no-repeat 0 0/auto;
     filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
   .brush-top{top:0}
   .brush-bottom{bottom:0;transform:scaleX(-1) scaleY(-1)}
   @media (max-width:720px){
-    .brush-wash{height:260px;background-position:-70px -52px;background-size:min(112vw,560px) auto}
+    .brush-wash{height:260px}
   }
 
   /* ===== chamfer outline (זמני) =====

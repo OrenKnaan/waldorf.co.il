@@ -54,15 +54,15 @@ const dir = new URL('./pages/', import.meta.url).pathname;
 
 const CATS = [
   { key: 'forum',     file: 'forum.html',              label: 'הפורום',       wash: 'var(--wash-sky)',
-    paintHue: '170deg', paintSat: '1',   texHue: '0deg' },
+    paintHue: '170deg', paintSat: '1',   texHue: '0deg',    texTransform: 'none' },
   { key: 'waldorf',   file: 'waldorf-foundations.html', label: 'חינוך ולדורף', wash: 'var(--wash-sage)',
-    paintHue: '130deg', paintSat: '.55', texHue: '-87deg' },
+    paintHue: '130deg', paintSat: '.55', texHue: '-87deg',  texTransform: 'rotate(180deg)' },
   { key: 'inst',      file: 'kinder.html',              label: 'מוסדות חינוך', wash: 'var(--wash-gold)',
-    paintHue: '0deg',   paintSat: '1',   texHue: '172deg' },
+    paintHue: '0deg',   paintSat: '1',   texHue: '172deg',  texTransform: 'scaleX(-1)' },
   { key: 'resources', file: 'content-library.html',     label: 'מידע ומשאבים', wash: 'var(--wash-plum)',
-    paintHue: '250deg', paintSat: '1',   texHue: '73deg' },
+    paintHue: '250deg', paintSat: '1',   texHue: '73deg',   texTransform: 'scaleY(-1)' },
   { key: 'contact',   file: 'contact.html',             label: 'צור קשר',      wash: 'var(--wash-rose)',
-    paintHue: '-20deg', paintSat: '1',   texHue: '143deg' },
+    paintHue: '-20deg', paintSat: '1',   texHue: '143deg',  texTransform: 'rotate(180deg) scaleX(-1)' },
 ];
 
 const VARIANTS = [
@@ -148,7 +148,8 @@ function baseCategoryCSS(cat) {
   return `
   /* ===== category colour: ${cat.label} (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:${cat.wash};
-    --paint-hue:${cat.paintHue};--paint-sat:${cat.paintSat};--tex-hue:${cat.texHue}}
+    --paint-hue:${cat.paintHue};--paint-sat:${cat.paintSat};
+    --tex-hue:${cat.texHue};--tex-transform:${cat.texTransform}}
   body{background:none}
   .page-wash{pointer-events:none;background:
       radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
@@ -229,17 +230,26 @@ const BRUSH_CSS = `
      paint-top-left-alpha.webp replaces the earlier crop: a real alpha
      channel fading to nothing on every edge, not just a rectangle that
      happens to look faded, so it settles onto any category tint without a
-     hard border of its own to fight. */
+     hard border of its own to fight.
+
+     Full scale, not shrunk to fit: background-size:auto renders the
+     painting at its native 800x436 rather than the min(72vw,940px) the
+     first pass used, which was scaling it down to roughly a sliver.
+     Anchored at 0 0, the box's own height (380px, 260px on a phone) is
+     what crops it, the same way a photo sitting in a frame smaller than
+     itself is cropped by the frame; the width can run past 800px with
+     nothing to show past that edge, which is the point, since this is a
+     corner accent, not a full-bleed wash. */
   body{position:relative}
   :root{--paint:url(./img/paint-top-left-alpha.webp)}
   .page-wash{position:absolute;inset:0;z-index:-2}
   .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
-    background:var(--paint) no-repeat -120px -78px/min(72vw,940px) auto;
+    background:var(--paint) no-repeat 0 0/auto;
     filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
   .brush-top{top:0}
   .brush-bottom{bottom:0;transform:scaleX(-1) scaleY(-1)}
   @media (max-width:720px){
-    .brush-wash{height:260px;background-position:-70px -52px;background-size:min(112vw,560px) auto}
+    .brush-wash{height:260px}
   }
 
   /* ===== chamfer outline (זמני) =====
@@ -343,11 +353,20 @@ const TEXTURE_CSS = `
      white paper picks up that colour (multiplying white leaves the tint
      untouched) and only its own blue blooms darken it further. filter has
      to stay on this element rather than move to body, or it would just as
-     happily rotate .page-wash's already-correct colour a second time. */
+     happily rotate .page-wash's already-correct colour a second time.
+
+     Every category reads the same photograph, so forum (left as the plain
+     original) and four flips of it (rotate 180, flip horizontal, flip
+     vertical, rotate 180 + flip horizontal) is a second axis of variation
+     on top of the hue, not a repeat of the same crop five times. transform
+     is safe here specifically because .page-tex is inset:0 on a fixed,
+     viewport-sized box: rotating or flipping a rectangle equal to its own
+     container leaves that container exactly as full as it started. */
   .page-wash{position:fixed;inset:0;z-index:-2}
   .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
-    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue))}
+    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
+    transform:var(--tex-transform)}
 
   /* ===== chamfer outline (זמני): none, for this variant =====
      section.card and .fx-tile each carry a real border that clip-path cuts
