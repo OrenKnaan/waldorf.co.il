@@ -560,11 +560,22 @@
      what crops it, the same way a photo sitting in a frame smaller than
      itself is cropped by the frame; the width can run past 800px with
      nothing to show past that edge, which is the point, since this is a
-     corner accent, not a full-bleed wash. */
-  body{position:relative}
+     corner accent, not a full-bleed wash.
+
+     position:fixed, not absolute: an absolutely positioned wash scrolls
+     with the document, which meant it left the viewport (and, at the top,
+     usually started behind the header before a visitor had scrolled at
+     all) and had to be repainted, filter and all, on every scroll frame
+     rather than composited once and held in place. Fixed keeps it pinned
+     to its corner of the screen the whole time a visitor is on the page,
+     which fixes both the visibility complaint and the scroll cost in the
+     same change: the browser promotes a fixed, filtered layer once instead
+     of recomputing hue-rotate() and saturate() per frame. body no longer
+     needs position:relative for either layer to anchor to, since neither
+     is absolute any more. */
   :root{--paint:url(./img/paint-top-left-alpha.webp)}
-  .page-wash{position:absolute;inset:0;z-index:-2}
-  .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
+  .page-wash{position:fixed;inset:0;z-index:-2}
+  .brush-wash{position:fixed;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
     background:var(--paint) no-repeat 0 0/auto;
     filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
   .brush-top{top:0}
@@ -573,34 +584,20 @@
     .brush-wash{height:260px}
   }
 
-  /* ===== chamfer outline (זמני) =====
-     section.card carries a real, permanent border (patch-contrast-theme.mjs:
-     --tan-dark measured against the card, so the edge reads as intentional
-     rather than a browser default) and .fx-tile carries its own. A border
-     is drawn on the box's original four straight sides and then clipped
-     along with the rest of the box, so at each chamfered corner it simply
-     stops, leaving a gap where the cut edge has no stroke at all. Rather
-     than accept a broken-looking outline, both are turned off here and
-     replaced with eight drop-shadow() calls: filter (unlike box-shadow)
-     paints from the element's own rendered, already-clipped silhouette, so
-     stacking copies of it nudged 1px in each direction reproduces a hairline
-     that actually follows the cut. */
-  section.card,.catbar{border:0;box-shadow:none;
-    filter:
-      drop-shadow(1px 0 0 var(--tan-dark)) drop-shadow(-1px 0 0 var(--tan-dark))
-      drop-shadow(0 1px 0 var(--tan-dark)) drop-shadow(0 -1px 0 var(--tan-dark))
-      drop-shadow(.75px .75px 0 var(--tan-dark)) drop-shadow(-.75px .75px 0 var(--tan-dark))
-      drop-shadow(.75px -.75px 0 var(--tan-dark)) drop-shadow(-.75px -.75px 0 var(--tan-dark))
-      drop-shadow(0 2px 8px rgba(61,43,31,.08))}
-  .fx-tile{border:0;
-    filter:
-      drop-shadow(1px 0 0 var(--beige)) drop-shadow(-1px 0 0 var(--beige))
-      drop-shadow(0 1px 0 var(--beige)) drop-shadow(0 -1px 0 var(--beige))
-      drop-shadow(.75px .75px 0 var(--beige)) drop-shadow(-.75px .75px 0 var(--beige))
-      drop-shadow(.75px -.75px 0 var(--beige)) drop-shadow(-.75px -.75px 0 var(--beige))}
-  /* Neither ever had a border, only a box-shadow, which the same clipping
-     problem cuts off at the corners; drop-shadow fixes that too, with no
-     hairline needed since there was never an outline to replace. */
+  /* ===== chamfer outline (זמני): none, for this variant, matching cat2 =====
+     section.card and .fx-tile each carry a real border that clip-path cuts
+     off cleanly at the chamfer. The previous fix rebuilt it with eight
+     stacked drop-shadow() calls per element (filter, unlike box-shadow,
+     paints from the element's own already-clipped silhouette, so it can
+     reproduce a hairline that follows the cut): real, but never actually
+     visible against these colours, and eight filter passes per card is
+     real render cost for no visible return, worse once several cards are
+     on screen during a scroll. Removed rather than tuned: a border that
+     cannot be seen is not worth paying for twice. */
+  section.card,.catbar,.fx-tile{border:0}
+  /* Neither of these ever had a border, only a box-shadow that the same
+     clipping problem cut off at the corners; one drop-shadow each fixes
+     that at a cost closer to the box-shadow it replaces. */
   .art-hero,.pagebanner{box-shadow:none;filter:drop-shadow(0 4px 14px rgba(61,43,31,.12))}
 </style>
 <script type="application/ld+json">
