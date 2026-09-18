@@ -6,8 +6,12 @@
 
    variant 1 (cat1-*): the art-hero becomes a five-image collage (the same
    photographs the home page hero rotates through), and two watercolour
-   washes (the same file forum-alt3.html uses in its top-left corner)
-   bookend the page, top and bottom, hue-rotated to the category colour.
+   washes bookend the page, top and bottom, mirrored. Hue-rotating one
+   shared painting (forum-alt3.html's corner wash) to each category colour
+   did not hold up (flat, slightly wrong-feeling colour compared with an
+   actual painting in that hue), so four of the five categories now each
+   use their own separately painted watercolour instead; see the note above
+   the CATS table.
 
    variant 2 (cat2-*): the art-hero becomes a slideshow of the same five
    photographs (a smaller, simpler cousin of home.html's hero.js), and a
@@ -25,18 +29,16 @@
      resources  (מידע ומשאבים)  plum, violet (new token)
      contact    (צור קשר)        rose, rose
 
-   Two different photographs, two different native hues. watercolor
-   -clouds.webp (the full-page texture) is already blue (~217 degrees) and
-   needs none for sky; the other four categories rotate it live with
-   filter:hue-rotate() on --tex-hue, tuned by eye against a rendered swatch.
-   paint-top-left-alpha.webp (the corner wash) sits around 35 to 48 degrees
-   and is rotated once, offline, into five separate files
-   (paint-corner-<key>.webp, see the generation note above the CATS table)
-   rather than live with a filter: it is a large image shown at full scale
-   inside an absolutely positioned element that scrolls with the page, and
-   a live filter on a scrolling layer has to be recomputed on every scroll
-   frame rather than composited once, which measurably cost real frames.
-   Baking the five colours ahead of time removes the filter entirely.
+   The full-page texture (cat2's watercolor-clouds.webp) still hue-rotates
+   live, with filter:hue-rotate() on --tex-hue: it is one photograph reused
+   across all five categories on purpose (see the multiply-blend note by
+   TEXTURE_CSS), where the corner wash is now the opposite, five different
+   photographs rather than one recoloured five ways. That also settles a
+   performance question from when the corner wash did rotate live: a large
+   image inside an absolutely positioned element that scrolls with the page
+   has to recompute filter:hue-rotate() on every scroll frame rather than
+   composite once, which measurably cost real frames. A plain, unfiltered
+   background-image has nothing left to recompute.
 
    Every decorative layer (the category page-wash, the corner washes, the
    full-page texture) is a real, empty, aria-hidden element with an explicit
@@ -61,13 +63,20 @@ const dir = new URL('./pages/', import.meta.url).pathname;
 
 /* pages/img/paint-corner-<key>.webp (used by cat1's corner wash, brushCSS
    below) are not tracked back to a generator script the way the pages
-   themselves are: they were produced once, by hand, from
-   paint-top-left-alpha.webp with a small PIL script that rotates hue in
-   HLS space per pixel (forum 170deg, waldorf 130deg at .55 saturation,
-   resources 250deg, contact -20deg; inst keeps the source file's own
-   colours, unrotated). Regenerate the same way if the source painting or
-   the rotation values change; there is no npm script for it because nothing
-   else in this repo needs a one-off image filter at build time. */
+   themselves are, and are no longer all one painting either. Recolouring
+   forum-alt3's single corner wash with filter:hue-rotate() per category
+   read as an obviously-recoloured photograph rather than a true blue or
+   green or violet watercolour, so four of the five are now separate source
+   photographs, each supplied already in roughly the right hue and used
+   as-is:
+     forum      paint-corner-forum.webp      = temp/blue.webp
+     waldorf    paint-corner-waldorf.webp    = temp/green.webp
+     resources  paint-corner-resources.webp  = temp/pink.webp (reads as violet/plum)
+     inst       paint-corner-inst.webp       = paint-top-left-alpha.webp, untouched
+   contact has no dedicated photograph yet: paint-corner-contact.webp is
+   still the old hue-rotate(-20deg) derivative of paint-top-left-alpha.webp,
+   kept only as a placeholder until a rose/pink watercolour is supplied for
+   it the way the other four were. */
 const CATS = [
   { key: 'forum',     file: 'forum.html',              label: 'הפורום',       wash: 'var(--wash-sky)',
     texHue: '0deg',    texTransform: 'none' },
@@ -243,30 +252,34 @@ function brushCSS(cat) {
      behind an in-flow one, only ordinary document order made it look that
      way here.
 
-     paint-corner-${cat.key}.webp is a hue-rotated copy of paint-top-left
-     -alpha.webp baked ahead of time at build time (see the comment at the
-     top of the CATS table for why), not the same file recoloured live with
-     filter:hue-rotate(). Same alpha channel, fading to nothing on every
-     edge, so it settles onto the solid category colour below without a
-     hard border of its own to fight.
+     paint-corner-${cat.key}.webp: four of the five categories are a
+     distinct source photograph now rather than one painting recoloured
+     five ways (see the note above the CATS table for which file is which
+     and why). All four keep a real alpha channel fading to nothing on
+     every edge, so whichever one is in play settles onto the solid
+     category colour below without a hard border of its own to fight; their
+     native sizes differ (784x338 to 800x436), which background-size:auto
+     handles the same way for each, see below.
 
-     Full scale, not shrunk to fit: background-size:auto renders the
-     painting at its native 800x436 rather than the min(72vw,940px) an
-     earlier pass used, which was scaling it down to roughly a sliver.
-     Anchored at 0 0, the box's own height (380px, 260px on a phone) is
-     what crops it, the same way a photo sitting in a frame smaller than
-     itself is cropped by the frame.
+     Full scale, not shrunk to fit: background-size:auto renders whichever
+     photograph this category uses at its own native size rather than the
+     min(72vw,940px) an earlier pass used, which was scaling it down to
+     roughly a sliver. Anchored at 0 0, the box's own height (380px, 260px
+     on a phone) is what crops it, the same way a photo sitting in a frame
+     smaller than itself is cropped by the frame; a photograph shorter than
+     the box (as most of these are) simply leaves the rest of the box to
+     the solid colour underneath instead of being stretched to fill it.
 
      position:absolute, scrolling with the page like the rest of the
      content, not fixed to the screen. .brush-top's top is the header's own
-     rendered height (--header-h, kept current by the small script this
-     variant adds after <body>), not 0: at 0 the wash sat mostly behind the
-     opaque header and only a sliver ever showed. Anchoring to the header's
-     real height, measured rather than guessed per breakpoint, means it is
-     never wrong at a width this stylesheet did not think to test, or after
-     the header changes height for a reason this file knows nothing about
-     (the mobile drawer opening, a larger a11y font size, the browser's own
-     zoom). */
+     rendered height (--header-h, kept current by a small script this
+     variant adds near the end of the document), not 0: at 0 the wash sat mostly behind
+     the opaque header and only a sliver ever showed. Anchoring to the
+     header's real height, measured rather than guessed per breakpoint,
+     means it is never wrong at a width this stylesheet did not think to
+     test, or after the header changes height for a reason this file knows
+     nothing about (the mobile drawer opening, a larger a11y font size, the
+     browser's own zoom). */
   :root{--paint:url(./img/paint-corner-${cat.key}.webp);--header-h:110px}
   body{position:relative}
   /* 16%, not higher: the intro paragraph under the h1 sits directly on this

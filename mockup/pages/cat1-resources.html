@@ -547,30 +547,34 @@
      behind an in-flow one, only ordinary document order made it look that
      way here.
 
-     paint-corner-resources.webp is a hue-rotated copy of paint-top-left
-     -alpha.webp baked ahead of time at build time (see the comment at the
-     top of the CATS table for why), not the same file recoloured live with
-     filter:hue-rotate(). Same alpha channel, fading to nothing on every
-     edge, so it settles onto the solid category colour below without a
-     hard border of its own to fight.
+     paint-corner-resources.webp: four of the five categories are a
+     distinct source photograph now rather than one painting recoloured
+     five ways (see the note above the CATS table for which file is which
+     and why). All four keep a real alpha channel fading to nothing on
+     every edge, so whichever one is in play settles onto the solid
+     category colour below without a hard border of its own to fight; their
+     native sizes differ (784x338 to 800x436), which background-size:auto
+     handles the same way for each, see below.
 
-     Full scale, not shrunk to fit: background-size:auto renders the
-     painting at its native 800x436 rather than the min(72vw,940px) an
-     earlier pass used, which was scaling it down to roughly a sliver.
-     Anchored at 0 0, the box's own height (380px, 260px on a phone) is
-     what crops it, the same way a photo sitting in a frame smaller than
-     itself is cropped by the frame.
+     Full scale, not shrunk to fit: background-size:auto renders whichever
+     photograph this category uses at its own native size rather than the
+     min(72vw,940px) an earlier pass used, which was scaling it down to
+     roughly a sliver. Anchored at 0 0, the box's own height (380px, 260px
+     on a phone) is what crops it, the same way a photo sitting in a frame
+     smaller than itself is cropped by the frame; a photograph shorter than
+     the box (as most of these are) simply leaves the rest of the box to
+     the solid colour underneath instead of being stretched to fill it.
 
      position:absolute, scrolling with the page like the rest of the
      content, not fixed to the screen. .brush-top's top is the header's own
-     rendered height (--header-h, kept current by the small script this
-     variant adds after <body>), not 0: at 0 the wash sat mostly behind the
-     opaque header and only a sliver ever showed. Anchoring to the header's
-     real height, measured rather than guessed per breakpoint, means it is
-     never wrong at a width this stylesheet did not think to test, or after
-     the header changes height for a reason this file knows nothing about
-     (the mobile drawer opening, a larger a11y font size, the browser's own
-     zoom). */
+     rendered height (--header-h, kept current by a small script this
+     variant adds near the end of the document), not 0: at 0 the wash sat mostly behind
+     the opaque header and only a sliver ever showed. Anchoring to the
+     header's real height, measured rather than guessed per breakpoint,
+     means it is never wrong at a width this stylesheet did not think to
+     test, or after the header changes height for a reason this file knows
+     nothing about (the mobile drawer opening, a larger a11y font size, the
+     browser's own zoom). */
   :root{--paint:url(./img/paint-corner-resources.webp);--header-h:110px}
   body{position:relative}
   /* 16%, not higher: the intro paragraph under the h1 sits directly on this
