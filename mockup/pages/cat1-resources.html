@@ -493,7 +493,6 @@
 
   /* ===== category colour: מידע ומשאבים (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-plum);
-    --paint-hue:250deg;--paint-sat:1;
     --tex-hue:73deg;--tex-transform:scaleY(-1)}
   body{background:none}
   .page-wash{pointer-events:none;background:
@@ -541,44 +540,50 @@
   }
 
   /* ===== variant: מכחול עליון ותחתון (זמני), forum-alt3's corner wash,
-     hue-rotated per category and mirrored to bookend the page. Explicit
-     z-index:-1 (below .page-wash's -2 is one layer further back still, so
-     the wash always shows through it) rather than relying on DOM order to
-     stay behind the header/main: an absolutely positioned, z-index:auto
-     element is not guaranteed to paint behind an in-flow one, only ordinary
-     document order made it look that way here.
+     mirrored to bookend the page. Explicit z-index:-1 (.page-wash's -2 is
+     one layer further back still, so the wash always shows through it)
+     rather than relying on DOM order to stay behind the header/main: an
+     absolutely positioned, z-index:auto element is not guaranteed to paint
+     behind an in-flow one, only ordinary document order made it look that
+     way here.
 
-     paint-top-left-alpha.webp replaces the earlier crop: a real alpha
-     channel fading to nothing on every edge, not just a rectangle that
-     happens to look faded, so it settles onto any category tint without a
+     paint-corner-resources.webp is a hue-rotated copy of paint-top-left
+     -alpha.webp baked ahead of time at build time (see the comment at the
+     top of the CATS table for why), not the same file recoloured live with
+     filter:hue-rotate(). Same alpha channel, fading to nothing on every
+     edge, so it settles onto the solid category colour below without a
      hard border of its own to fight.
 
      Full scale, not shrunk to fit: background-size:auto renders the
-     painting at its native 800x436 rather than the min(72vw,940px) the
-     first pass used, which was scaling it down to roughly a sliver.
+     painting at its native 800x436 rather than the min(72vw,940px) an
+     earlier pass used, which was scaling it down to roughly a sliver.
      Anchored at 0 0, the box's own height (380px, 260px on a phone) is
      what crops it, the same way a photo sitting in a frame smaller than
-     itself is cropped by the frame; the width can run past 800px with
-     nothing to show past that edge, which is the point, since this is a
-     corner accent, not a full-bleed wash.
+     itself is cropped by the frame.
 
-     position:fixed, not absolute: an absolutely positioned wash scrolls
-     with the document, which meant it left the viewport (and, at the top,
-     usually started behind the header before a visitor had scrolled at
-     all) and had to be repainted, filter and all, on every scroll frame
-     rather than composited once and held in place. Fixed keeps it pinned
-     to its corner of the screen the whole time a visitor is on the page,
-     which fixes both the visibility complaint and the scroll cost in the
-     same change: the browser promotes a fixed, filtered layer once instead
-     of recomputing hue-rotate() and saturate() per frame. body no longer
-     needs position:relative for either layer to anchor to, since neither
-     is absolute any more. */
-  :root{--paint:url(./img/paint-top-left-alpha.webp)}
-  .page-wash{position:fixed;inset:0;z-index:-2}
-  .brush-wash{position:fixed;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
-    background:var(--paint) no-repeat 0 0/auto;
-    filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
-  .brush-top{top:0}
+     position:absolute, scrolling with the page like the rest of the
+     content, not fixed to the screen. .brush-top's top is the header's own
+     rendered height (--header-h, kept current by the small script this
+     variant adds after <body>), not 0: at 0 the wash sat mostly behind the
+     opaque header and only a sliver ever showed. Anchoring to the header's
+     real height, measured rather than guessed per breakpoint, means it is
+     never wrong at a width this stylesheet did not think to test, or after
+     the header changes height for a reason this file knows nothing about
+     (the mobile drawer opening, a larger a11y font size, the browser's own
+     zoom). */
+  :root{--paint:url(./img/paint-corner-resources.webp);--header-h:110px}
+  body{position:relative}
+  /* 16%, not higher: the intro paragraph under the h1 sits directly on this
+     colour with no card behind it, and --text-muted against it is already
+     down to 4.58:1 at 16% (worked out per category in oklab, not eyeballed:
+     resources is the tightest). It briefly went to 32% for a bolder match
+     with the corner wash and axe caught the real failure that produced,
+     4.19:1 on that same paragraph, on three of the five categories. */
+  .page-wash{position:absolute;inset:0;z-index:-2;
+    background:color-mix(in oklab,var(--cat) 16%,var(--cream))}
+  .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
+    background:var(--paint) no-repeat 0 0/auto}
+  .brush-top{top:var(--header-h)}
   .brush-bottom{bottom:0;transform:scaleX(-1) scaleY(-1)}
   @media (max-width:720px){
     .brush-wash{height:260px}
@@ -776,5 +781,12 @@ WDyn.renderTileGrid(document.getElementById('dyn-teaching'), 'teaching', {
 <!-- Cloudflare Web Analytics -->
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"e4ea3335f4ae4f55bacc328eb40c12c9"}'></script>
 <!-- End Cloudflare Web Analytics -->
+<script>(function(){
+  var header=document.querySelector('.site-header');
+  if(!header) return;
+  function setH(){document.body.style.setProperty('--header-h',header.offsetHeight+'px');}
+  setH();
+  new ResizeObserver(setH).observe(header);
+})();</script>
 </body>
 </html>

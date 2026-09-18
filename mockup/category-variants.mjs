@@ -25,11 +25,18 @@
      resources  (מידע ומשאבים)  plum, violet (new token)
      contact    (צור קשר)        rose, rose
 
-   Two different photographs, two different native hues, so two independent
-   rotation tables: paint-top-left.webp (the corner wash) sits around 35 to
-   48 degrees and needs no rotation for gold and only a small one for rose;
-   watercolor-clouds.webp is already blue (~217 degrees) and needs none for
-   sky. Both tuned by eye against a rendered swatch, not computed.
+   Two different photographs, two different native hues. watercolor
+   -clouds.webp (the full-page texture) is already blue (~217 degrees) and
+   needs none for sky; the other four categories rotate it live with
+   filter:hue-rotate() on --tex-hue, tuned by eye against a rendered swatch.
+   paint-top-left-alpha.webp (the corner wash) sits around 35 to 48 degrees
+   and is rotated once, offline, into five separate files
+   (paint-corner-<key>.webp, see the generation note above the CATS table)
+   rather than live with a filter: it is a large image shown at full scale
+   inside an absolutely positioned element that scrolls with the page, and
+   a live filter on a scrolling layer has to be recomputed on every scroll
+   frame rather than composited once, which measurably cost real frames.
+   Baking the five colours ahead of time removes the filter entirely.
 
    Every decorative layer (the category page-wash, the corner washes, the
    full-page texture) is a real, empty, aria-hidden element with an explicit
@@ -52,17 +59,26 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = new URL('./pages/', import.meta.url).pathname;
 
+/* pages/img/paint-corner-<key>.webp (used by cat1's corner wash, brushCSS
+   below) are not tracked back to a generator script the way the pages
+   themselves are: they were produced once, by hand, from
+   paint-top-left-alpha.webp with a small PIL script that rotates hue in
+   HLS space per pixel (forum 170deg, waldorf 130deg at .55 saturation,
+   resources 250deg, contact -20deg; inst keeps the source file's own
+   colours, unrotated). Regenerate the same way if the source painting or
+   the rotation values change; there is no npm script for it because nothing
+   else in this repo needs a one-off image filter at build time. */
 const CATS = [
   { key: 'forum',     file: 'forum.html',              label: 'הפורום',       wash: 'var(--wash-sky)',
-    paintHue: '170deg', paintSat: '1',   texHue: '0deg',    texTransform: 'none' },
+    texHue: '0deg',    texTransform: 'none' },
   { key: 'waldorf',   file: 'waldorf-foundations.html', label: 'חינוך ולדורף', wash: 'var(--wash-sage)',
-    paintHue: '130deg', paintSat: '.55', texHue: '-87deg',  texTransform: 'rotate(180deg)' },
+    texHue: '-87deg',  texTransform: 'rotate(180deg)' },
   { key: 'inst',      file: 'kinder.html',              label: 'מוסדות חינוך', wash: 'var(--wash-gold)',
-    paintHue: '0deg',   paintSat: '1',   texHue: '172deg',  texTransform: 'scaleX(-1)' },
+    texHue: '172deg',  texTransform: 'scaleX(-1)' },
   { key: 'resources', file: 'content-library.html',     label: 'מידע ומשאבים', wash: 'var(--wash-plum)',
-    paintHue: '250deg', paintSat: '1',   texHue: '73deg',   texTransform: 'scaleY(-1)' },
+    texHue: '73deg',   texTransform: 'scaleY(-1)' },
   { key: 'contact',   file: 'contact.html',             label: 'צור קשר',      wash: 'var(--wash-rose)',
-    paintHue: '-20deg', paintSat: '1',   texHue: '143deg',  texTransform: 'rotate(180deg) scaleX(-1)' },
+    texHue: '143deg',  texTransform: 'rotate(180deg) scaleX(-1)' },
 ];
 
 const VARIANTS = [
@@ -148,7 +164,6 @@ function baseCategoryCSS(cat) {
   return `
   /* ===== category colour: ${cat.label} (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:${cat.wash};
-    --paint-hue:${cat.paintHue};--paint-sat:${cat.paintSat};
     --tex-hue:${cat.texHue};--tex-transform:${cat.texTransform}}
   body{background:none}
   .page-wash{pointer-events:none;background:
@@ -218,46 +233,53 @@ const COLLAGE_CSS = `
   }
 `;
 
-const BRUSH_CSS = `
+function brushCSS(cat) {
+  return `
   /* ===== variant: מכחול עליון ותחתון (זמני), forum-alt3's corner wash,
-     hue-rotated per category and mirrored to bookend the page. Explicit
-     z-index:-1 (below .page-wash's -2 is one layer further back still, so
-     the wash always shows through it) rather than relying on DOM order to
-     stay behind the header/main: an absolutely positioned, z-index:auto
-     element is not guaranteed to paint behind an in-flow one, only ordinary
-     document order made it look that way here.
+     mirrored to bookend the page. Explicit z-index:-1 (.page-wash's -2 is
+     one layer further back still, so the wash always shows through it)
+     rather than relying on DOM order to stay behind the header/main: an
+     absolutely positioned, z-index:auto element is not guaranteed to paint
+     behind an in-flow one, only ordinary document order made it look that
+     way here.
 
-     paint-top-left-alpha.webp replaces the earlier crop: a real alpha
-     channel fading to nothing on every edge, not just a rectangle that
-     happens to look faded, so it settles onto any category tint without a
+     paint-corner-${cat.key}.webp is a hue-rotated copy of paint-top-left
+     -alpha.webp baked ahead of time at build time (see the comment at the
+     top of the CATS table for why), not the same file recoloured live with
+     filter:hue-rotate(). Same alpha channel, fading to nothing on every
+     edge, so it settles onto the solid category colour below without a
      hard border of its own to fight.
 
      Full scale, not shrunk to fit: background-size:auto renders the
-     painting at its native 800x436 rather than the min(72vw,940px) the
-     first pass used, which was scaling it down to roughly a sliver.
+     painting at its native 800x436 rather than the min(72vw,940px) an
+     earlier pass used, which was scaling it down to roughly a sliver.
      Anchored at 0 0, the box's own height (380px, 260px on a phone) is
      what crops it, the same way a photo sitting in a frame smaller than
-     itself is cropped by the frame; the width can run past 800px with
-     nothing to show past that edge, which is the point, since this is a
-     corner accent, not a full-bleed wash.
+     itself is cropped by the frame.
 
-     position:fixed, not absolute: an absolutely positioned wash scrolls
-     with the document, which meant it left the viewport (and, at the top,
-     usually started behind the header before a visitor had scrolled at
-     all) and had to be repainted, filter and all, on every scroll frame
-     rather than composited once and held in place. Fixed keeps it pinned
-     to its corner of the screen the whole time a visitor is on the page,
-     which fixes both the visibility complaint and the scroll cost in the
-     same change: the browser promotes a fixed, filtered layer once instead
-     of recomputing hue-rotate() and saturate() per frame. body no longer
-     needs position:relative for either layer to anchor to, since neither
-     is absolute any more. */
-  :root{--paint:url(./img/paint-top-left-alpha.webp)}
-  .page-wash{position:fixed;inset:0;z-index:-2}
-  .brush-wash{position:fixed;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
-    background:var(--paint) no-repeat 0 0/auto;
-    filter:hue-rotate(var(--paint-hue)) saturate(var(--paint-sat))}
-  .brush-top{top:0}
+     position:absolute, scrolling with the page like the rest of the
+     content, not fixed to the screen. .brush-top's top is the header's own
+     rendered height (--header-h, kept current by the small script this
+     variant adds after <body>), not 0: at 0 the wash sat mostly behind the
+     opaque header and only a sliver ever showed. Anchoring to the header's
+     real height, measured rather than guessed per breakpoint, means it is
+     never wrong at a width this stylesheet did not think to test, or after
+     the header changes height for a reason this file knows nothing about
+     (the mobile drawer opening, a larger a11y font size, the browser's own
+     zoom). */
+  :root{--paint:url(./img/paint-corner-${cat.key}.webp);--header-h:110px}
+  body{position:relative}
+  /* 16%, not higher: the intro paragraph under the h1 sits directly on this
+     colour with no card behind it, and --text-muted against it is already
+     down to 4.58:1 at 16% (worked out per category in oklab, not eyeballed:
+     resources is the tightest). It briefly went to 32% for a bolder match
+     with the corner wash and axe caught the real failure that produced,
+     4.19:1 on that same paragraph, on three of the five categories. */
+  .page-wash{position:absolute;inset:0;z-index:-2;
+    background:color-mix(in oklab,var(--cat) 16%,var(--cream))}
+  .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
+    background:var(--paint) no-repeat 0 0/auto}
+  .brush-top{top:var(--header-h)}
   .brush-bottom{bottom:0;transform:scaleX(-1) scaleY(-1)}
   @media (max-width:720px){
     .brush-wash{height:260px}
@@ -279,11 +301,25 @@ const BRUSH_CSS = `
      that at a cost closer to the box-shadow it replaces. */
   .art-hero,.pagebanner{box-shadow:none;filter:drop-shadow(0 4px 14px rgba(61,43,31,.12))}
 `;
+}
 
 function brushHTML() {
   return `<div class="brush-wash brush-top" aria-hidden="true"></div>
 <div class="brush-wash brush-bottom" aria-hidden="true"></div>`;
 }
+
+/* Inserted before </body>, not next to the two divs above right after
+   <body>: at that point in the document <header> has not been parsed yet,
+   so document.querySelector('.site-header') returned null and --header-h
+   silently kept its fallback value forever. */
+const HEADER_HEIGHT_SCRIPT = `<script>(function(){
+  var header=document.querySelector('.site-header');
+  if(!header) return;
+  function setH(){document.body.style.setProperty('--header-h',header.offsetHeight+'px');}
+  setH();
+  new ResizeObserver(setH).observe(header);
+})();</script>
+`;
 
 /* ===== variant 2: slideshow art-hero, plus full-page watercolour texture ===== */
 
@@ -395,7 +431,7 @@ for (const cat of CATS) {
     text = text.replace(/\u2014 מוקאפ<\/title>/, `, ${variant.label} · ${cat.label}</title>`);
 
     const styleBlock = BAR_CSS + SHAPE_CSS + baseCategoryCSS(cat)
-      + (variant.key === 'v1' ? COLLAGE_CSS + BRUSH_CSS : SLIDESHOW_CSS + TEXTURE_CSS);
+      + (variant.key === 'v1' ? COLLAGE_CSS + brushCSS(cat) : SLIDESHOW_CSS + TEXTURE_CSS);
     const si = text.lastIndexOf('</style>');
     if (si < 0) throw new Error('no </style> in ' + cat.file);
     text = text.slice(0, si) + styleBlock + text.slice(si);
@@ -409,10 +445,11 @@ for (const cat of CATS) {
     const extraDiv = variant.key === 'v1' ? brushHTML() : pageTexHTML();
     text = text.replace(bodyAnchor, bodyAnchor + pageWashHTML() + '\n' + extraDiv + '\n');
 
-    if (variant.key === 'v2') {
-      if (text.split('</body>').length !== 2) throw new Error('</body> anchor not unique in ' + cat.file);
-      text = text.replace('</body>', '<script src="./art-hero-slideshow.js" defer></script>\n</body>');
-    }
+    if (text.split('</body>').length !== 2) throw new Error('</body> anchor not unique in ' + cat.file);
+    const bodyEndScript = variant.key === 'v1'
+      ? HEADER_HEIGHT_SCRIPT
+      : '<script src="./art-hero-slideshow.js" defer></script>\n';
+    text = text.replace('</body>', bodyEndScript + '</body>');
 
     const outFile = `${variant.prefix}-${cat.key}.html`;
     writeFileSync(dir + outFile, text);
