@@ -155,6 +155,16 @@ const SHAPE_CSS = `
   section.card,.pagebanner,.fx-tile{border-radius:0;clip-path:${chamferPoly('--chamfer')}}
   .art-hero{border-radius:0;clip-path:${chamferPoly('--chamfer-lg')}}
   .collage-grid .tile{border-radius:0;clip-path:${chamferPoly('--chamfer-sm')}}
+  /* The rest of the base stylesheet's border-radius usage is already one of
+     the two abstract shapes (var(--radius)/--radius-lg alias to the organic
+     tokens site-wide) or a genuine circle/pill (avatars, colour-swatch
+     dots, the map pin, the switcher tabs), which is a different, deliberate
+     shape category rather than "a card with rounded corners" and is left
+     alone here. These two are the only plain, un-abstracted roundings left
+     in these ten pages: a focus ring and a scrollbar thumb, neither a
+     container, both trivial to flatten. */
+  :focus-visible{border-radius:0}
+  .table-wrap::-webkit-scrollbar-thumb,.table-wrap::-webkit-scrollbar-track{border-radius:0}
   @media (max-width:720px){
     :root{--chamfer:14px;--chamfer-lg:20px}
     section.card{padding:18px}
