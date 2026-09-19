@@ -66,17 +66,18 @@ const dir = new URL('./pages/', import.meta.url).pathname;
    themselves are, and are no longer all one painting either. Recolouring
    forum-alt3's single corner wash with filter:hue-rotate() per category
    read as an obviously-recoloured photograph rather than a true blue or
-   green or violet watercolour, so four of the five are now separate source
-   photographs, each supplied already in roughly the right hue and used
-   as-is:
+   green or violet watercolour, so every category now has its own separate
+   source photograph, each supplied already in roughly the right hue and
+   used as-is, none of them filtered:
      forum      paint-corner-forum.webp      = temp/blue.webp
      waldorf    paint-corner-waldorf.webp    = temp/green.webp
+     inst       paint-corner-inst.webp       = temp/peach.webp
      resources  paint-corner-resources.webp  = temp/pink.webp (reads as violet/plum)
-     inst       paint-corner-inst.webp       = paint-top-left-alpha.webp, untouched
-   contact has no dedicated photograph yet: paint-corner-contact.webp is
-   still the old hue-rotate(-20deg) derivative of paint-top-left-alpha.webp,
-   kept only as a placeholder until a rose/pink watercolour is supplied for
-   it the way the other four were. */
+     contact    paint-corner-contact.webp    = temp/yellow.webp (reads as green/slate, not yellow)
+   paint-top-left-alpha.webp (inst's original painting, before this) and
+   the two intermediate hue-rotated files this replaced are no longer
+   referenced by any page; kept on disk since forum-alt3.html still uses
+   paint-top-left-alpha.webp for its own, unrelated corner wash. */
 const CATS = [
   { key: 'forum',     file: 'forum.html',              label: 'הפורום',       wash: 'var(--wash-sky)',
     texHue: '0deg',    texTransform: 'none' },
