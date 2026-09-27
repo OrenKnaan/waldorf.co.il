@@ -422,13 +422,37 @@
       .replace(/ף/g, 'פ').replace(/ץ/g, 'צ');
   }
 
+  // The category filter reads and writes ?category=<key> (one of FILTERS'
+  // own keys), so a filtered view has an address: "the seminar papers" is a
+  // link someone can send, not a click they have to repeat. replaceState,
+  // not pushState, on every filter change: a visitor picking through five
+  // categories in a row should get back to the archive on one press of the
+  // browser's back button, not walk their click history backwards one
+  // filter at a time. The 'book' scope has no filters and never reads or
+  // writes this.
+  var CATEGORY_PARAM = 'category';
+  function readCategoryFromURL(filters) {
+    var v = new URLSearchParams(window.location.search).get(CATEGORY_PARAM);
+    var known = filters.some(function (f) { return f.key === v; });
+    return known ? v : 'all';
+  }
+  function writeCategoryToURL(key) {
+    var url = new URL(window.location.href);
+    if (key === 'all') url.searchParams.delete(CATEGORY_PARAM);
+    else url.searchParams.set(CATEGORY_PARAM, key);
+    window.history.replaceState(window.history.state, '', url);
+  }
+
   function initArchive(mount) {
     var scope = mount.getAttribute('data-lib-archive');   // 'works' | 'book'
     var all = window.WStore.get('library').filter(function (r) {
       return scope === 'book' ? r.kind === 'ספר' : r.kind !== 'ספר';
     });
 
-    var state = { filter: 'all', q: '', sort: 'new', picking: false, picked: {} };
+    var state = {
+      filter: scope === 'book' ? 'all' : readCategoryFromURL(FILTERS),
+      q: '', sort: 'new', picking: false, picked: {}
+    };
 
     var grid = el('ul', { class: 'lib-grid' });
     var count = el('p', { class: 'lib-count', 'aria-live': 'polite' });
@@ -442,8 +466,8 @@
         var n = all.filter(f.match).length;
         if (!n && f.key !== 'all') return;
         var b = el('button', {
-          type: 'button', class: 'lib-filter', 'aria-pressed': String(f.key === 'all'),
-          onclick: function () { state.filter = f.key; syncFilters(); draw(); }
+          type: 'button', class: 'lib-filter', 'aria-pressed': String(f.key === state.filter),
+          onclick: function () { state.filter = f.key; writeCategoryToURL(f.key); syncFilters(); draw(); }
         }, [
           el('span', { text: f.label }),
           el('span', { class: 'n', text: '(' + n + ')' })
