@@ -470,7 +470,7 @@
   /* ===== category/variant switcher (temporary) ===== */
   .catbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
-    border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm));font-size:.82rem}
+    border-radius:var(--round);font-size:.82rem}
   .catbar-lbl{font-family:var(--font-head);font-weight:700;color:var(--brown-dark);margin-inline-end:2px}
   .catbar-sep{width:1px;align-self:stretch;background:var(--beige);margin:0 2px}
   .catbar a{display:inline-flex;align-items:center;color:var(--brown);text-decoration:none;padding:5px 13px;
@@ -481,27 +481,31 @@
   .catbar a[aria-current] .cat-dot{outline:1px solid rgba(255,255,255,.7)}
   .cat-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-inline-end:6px;flex:none}
 
-  /* ===== abstract shape: chamfered, not rounded (זמני) ===== */
-  :root{--chamfer-sm:12px;--chamfer:20px;--chamfer-lg:30px}
-  section.card,.pagebanner,.fx-tile{border-radius:0;clip-path:polygon(var(--chamfer) 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% calc(100% - var(--chamfer)),calc(100% - var(--chamfer)) 100%,var(--chamfer) 100%,0 calc(100% - var(--chamfer)),0 var(--chamfer))}
-  .art-hero{border-radius:0;clip-path:polygon(var(--chamfer-lg) 0,calc(100% - var(--chamfer-lg)) 0,100% var(--chamfer-lg),100% calc(100% - var(--chamfer-lg)),calc(100% - var(--chamfer-lg)) 100%,var(--chamfer-lg) 100%,0 calc(100% - var(--chamfer-lg)),0 var(--chamfer-lg))}
-  .collage-grid .tile{border-radius:0;clip-path:polygon(var(--chamfer-sm) 0,calc(100% - var(--chamfer-sm)) 0,100% var(--chamfer-sm),100% calc(100% - var(--chamfer-sm)),calc(100% - var(--chamfer-sm)) 100%,var(--chamfer-sm) 100%,0 calc(100% - var(--chamfer-sm)),0 var(--chamfer-sm))}
-  /* The rest of the base stylesheet's border-radius usage is already one of
-     the two abstract shapes (var(--radius)/--radius-lg alias to the organic
-     tokens site-wide) or a genuine circle/pill (avatars, colour-swatch
-     dots, the map pin, the switcher tabs), which is a different, deliberate
-     shape category rather than "a card with rounded corners" and is left
-     alone here. These two are the only plain, un-abstracted roundings left
-     in these ten pages: a focus ring and a scrollbar thumb, neither a
-     container, both trivial to flatten. */
+  /* ===== shape: plain rounded corners for text containers and images, the
+     organic blob for everything else (זמני) =====
+     The rest of the site already runs every button, badge, dropdown and
+     chip through --radius-organic-*, a rounded, hand-drawn blob shape, and
+     nothing here touches that. Two rounds of alternatives for the
+     card-like surfaces on these ten pages didn't land: a chamfer (a
+     clip-path octagon, cut corners rather than curved ones), then a side
+     -by-side comparison of two more of each in mockup/pages/shape-test.html.
+     Landed on a third option instead, plain and uniform: the "text
+     container" surfaces (section.card, .pagebanner, .fx-tile, .catbar) and
+     the photo-bearing ones (.art-hero, .collage-grid .tile) get an ordinary
+     border-radius, not the organic blob and not a cut corner. */
+  :root{--round-sm:12px;--round:18px;--round-lg:26px}
+  section.card,.pagebanner,.fx-tile{border-radius:var(--round)}
+  .art-hero{border-radius:var(--round-lg)}
+  .collage-grid .tile{border-radius:var(--round-sm)}
+  /* Two roundings elsewhere in the base stylesheet were flattened during the
+     chamfer round because clip-path cut them off unevenly at the corners: a
+     focus ring and a scrollbar thumb, neither a text container or an image,
+     so left flattened rather than un-done now that the reason for touching
+     them at all no longer applies. */
   :focus-visible{border-radius:0}
   .table-wrap::-webkit-scrollbar-thumb,.table-wrap::-webkit-scrollbar-track{border-radius:0}
   @media (max-width:720px){
-    :root{--chamfer:14px;--chamfer-lg:20px}
     section.card{padding:18px}
-  }
-  @media (max-width:400px){
-    :root{--chamfer:12px;--chamfer-lg:16px}
   }
 
   /* ===== art-hero: taller, and wider than the column it sits in (זמני) =====
@@ -596,12 +600,10 @@
     mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
     transform:var(--tex-transform)}
 
-  /* ===== chamfer outline (זמני): none, for this variant =====
-     section.card and .fx-tile each carry a real border that clip-path cuts
-     off cleanly at the chamfer, leaving a gap in the stroke; rather than
-     rebuild it (as cat1 does with a stack of drop-shadow() calls), it is
-     simply removed here, so the shape reads as a plain cut sheet rather
-     than a shape wearing a broken outline. */
+  /* ===== outline (זמני): none, matching cat1 =====
+     section.card and .fx-tile each carry a real border in the base
+     stylesheet; removed on both variants, see brushCSS()'s longer note on
+     why. */
   section.card,.catbar,.fx-tile{border:0}
 </style>
 <script type="application/ld+json">
