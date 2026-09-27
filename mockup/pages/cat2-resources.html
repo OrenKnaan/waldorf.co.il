@@ -501,6 +501,20 @@
     :root{--chamfer:12px;--chamfer-lg:16px}
   }
 
+  /* ===== art-hero: taller, and wider than the column it sits in (זמני) =====
+     --art-bleed is 150px only on a screen wide enough to spare it: capped by
+     min() so it never asks for more than half of whatever room actually
+     exists outside the 1200px column (max(0px, ...) keeps that half from
+     going negative once the viewport is narrower than the column itself),
+     and margin-inline/width move together so the box is exactly as much
+     wider than main as it is pulled outside it, not clipped by main on one
+     side. .collage-grid and .ah-media are already inset:0 on this element,
+     so they fill the wider box on their own, nothing to change there. */
+  :root{--art-bleed:min(150px, max(0px, (100vw - var(--page-max)) / 2))}
+  .art-hero{height:600px;margin-inline:calc(-1 * var(--art-bleed));width:calc(100% + var(--art-bleed) * 2)}
+  @media (max-width:720px){.art-hero{height:300px}}
+  @media (max-width:400px){.art-hero{height:255px}}
+
   /* ===== category colour: מידע ומשאבים (זמני) ===== */
   :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-plum);
     --tex-hue:73deg;--tex-transform:scaleY(-1)}
@@ -570,7 +584,11 @@
      viewport-sized box: rotating or flipping a rectangle equal to its own
      container leaves that container exactly as full as it started. */
   .page-wash{position:fixed;inset:0;z-index:-2}
-  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  /* opacity:.8, not a change to the image or the blend: the request was a
+     softer wash, and cutting the element's own opacity by 20% lets .page
+     -wash's khaki show through a little more everywhere at once, rather
+     than picking one of the two colours to weaken. */
+  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.8;
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
     mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
     transform:var(--tex-transform)}
@@ -719,6 +737,90 @@
 <li><strong>עבודות של מורי ולדורף</strong> — עבודות סיום של הכשרות לא אקדמיות ומאמרים שנכתבו על ידי מחנכים לצרכים פנימיים.</li>
 </ul>
 <div data-lib-archive="works"></div>
+<h3 class="sub">עבודות שנוספו לאחרונה</h3>
+<p style="font-size:.82rem;color:var(--text-muted)">16 עבודות חדשות, כרגע כקבצים בלבד: בלי עמוד פריט משלהן, בלי הצהרה על סוג העבודה, ובלי להשתתף בסינון, במיון או בהורדה של כמה פריטים יחד כמו שאר הארכיון. <span class="ph">תוכן: לקבוע לכל אחת מ-16 העבודות למטה לאיזו משלוש הקטגוריות היא שייכת. כמו כן יש לוודא את הפרדת הכותרת מהמחבר/ת בפריטים שהחלוקה בשם הקובץ המקורי לא הייתה חד-משמעית בהם, בעיקר "ברגמן שטיינר" ו"עבודת גמר", ששניהם רשומים על שם יעל הרן וייתכן שהם שתי גרסאות של אותה עבודה</span></p>
+<ul class="lib-grid">
+<li class="lib-card">
+<h3><a href="./library-files/works-01.docx">המוסיקה בחינוך ולדורף כתמיכה וסיוע בבניית חוויית חוסן בקרב ילדות וילדים צעירים במציאות משברית</a></h3>
+<p class="by">שלומית קדמן</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-02.docx">אופני היישום של עבודה עם שנים עשר החושים בחינוך ולדורף ותרומתה הנתפסת להתפתחות הילד</a></h3>
+<p class="by">נג׳וא ועאידה</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-03.docx">ברגמן שטיינר</a></h3>
+<p class="by">יעל הרן</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-04.pdf">העומס והשחיקה של מחנכים בבית ספר ולדורף</a></h3>
+<p class="by">דניאל ולנסי</p>
+<div class="foot"><span class="dyn-chip">PDF</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-05.docx">השפעת תפקיד המחנך בבית ספר ולדורף על בני הזוג</a></h3>
+<p class="by">אירית מרום קפלן</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-06.docx">הכישורים איתם יוצאים בוגרי ולדורף לאחר 12 שנה</a></h3>
+<p class="by">חדוה פרנק</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-07.docx">חוויית הגדילה בקרב ילדי מחנכים בחינוך ולדורף</a></h3>
+<p class="by">שני מגריל ועירית</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-08.docx">יישומו של חינוך ולדורף ומקורותיו הגרמניים בחברה הישראלית</a></h3>
+<p class="by">ראוואן עוואד</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-09.doc">עבודה סמינריונית על חינוך ולדורף ויהדות</a></h3>
+<p class="by">ינון</p>
+<div class="foot"><span class="dyn-chip">DOC</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-10.docx">העקרונות הפדגוגיים של הגיל הרך בחינוך ולדורף, עבודה לתואר שני</a></h3>
+<p class="by">כרמי ינון</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-11.pdf">לאן נושבת הרוח: ולדורף בתלמוד תורה (תזה, אוניברסיטת חיפה, תשפ״א)</a></h3>
+<p class="by">גיורא אבידור</p>
+<div class="foot"><span class="dyn-chip">PDF</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-12.doc">סמינר (ללא הנספחים)</a></h3>
+<p class="by">איל קנץ</p>
+<div class="foot"><span class="dyn-chip">DOC</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-13.docx">סמינריון: משחק בחינוך ולדורף</a></h3>
+<p class="by">אדם שבדרון</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-14.docx">עבודת גמר</a></h3>
+<p class="by">יעל הרן</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-15.docx">פיתוח תכנית להוראת הסכסוך הישראלי-פלסטיני בגישה דיאלוגית ורב-נרטיבית בצל ‘מלחמת ה-7 באוקטובר’</a></h3>
+<p class="by">זהר שפירא</p>
+<div class="foot"><span class="dyn-chip">DOCX</span></div>
+</li>
+<li class="lib-card">
+<h3><a href="./library-files/works-16.pdf">תזה (להפקדה בספרייה)</a></h3>
+<p class="by">שחר זהבי</p>
+<div class="foot"><span class="dyn-chip">PDF</span></div>
+</li>
+</ul>
 <p style="font-size:.82rem;color:var(--text-muted)">התוכן נאסף מהאתר הישן. <span class="ph">תוכן: לעשר עבודות אין הצהרה בעמוד השער על המסגרת שבה נכתבו, והן מסומנות "עבודות ללא סיווג". צריך לקבוע לאיזו משלוש הקטגוריות כל אחת מהן שייכת</span></p>
 </section>
 <section class="card">

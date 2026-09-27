@@ -51,5 +51,10 @@ pnpm-debug.log*
 *.docx
 /Rav Messer API.txt
 
+# ...except the downloadable works themselves: these are public content
+# (ספריית תוכן > עבודות ומאמרים), not internal documents, and *.docx above
+# would otherwise silently drop them from every commit.
+!/mockup/pages/library-files/*.docx
+
 # wrangler build output
 /analytics-worker/.wrangler/

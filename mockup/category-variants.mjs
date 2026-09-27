@@ -172,6 +172,20 @@ const SHAPE_CSS = `
   @media (max-width:400px){
     :root{--chamfer:12px;--chamfer-lg:16px}
   }
+
+  /* ===== art-hero: taller, and wider than the column it sits in (זמני) =====
+     --art-bleed is 150px only on a screen wide enough to spare it: capped by
+     min() so it never asks for more than half of whatever room actually
+     exists outside the 1200px column (max(0px, ...) keeps that half from
+     going negative once the viewport is narrower than the column itself),
+     and margin-inline/width move together so the box is exactly as much
+     wider than main as it is pulled outside it, not clipped by main on one
+     side. .collage-grid and .ah-media are already inset:0 on this element,
+     so they fill the wider box on their own, nothing to change there. */
+  :root{--art-bleed:min(150px, max(0px, (100vw - var(--page-max)) / 2))}
+  .art-hero{height:600px;margin-inline:calc(-1 * var(--art-bleed));width:calc(100% + var(--art-bleed) * 2)}
+  @media (max-width:720px){.art-hero{height:300px}}
+  @media (max-width:400px){.art-hero{height:255px}}
 `;
 
 /* Shared by both variants. body itself carries no background any more (see
@@ -420,7 +434,11 @@ const TEXTURE_CSS = `
      viewport-sized box: rotating or flipping a rectangle equal to its own
      container leaves that container exactly as full as it started. */
   .page-wash{position:fixed;inset:0;z-index:-2}
-  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  /* opacity:.8, not a change to the image or the blend: the request was a
+     softer wash, and cutting the element's own opacity by 20% lets .page
+     -wash's khaki show through a little more everywhere at once, rather
+     than picking one of the two colours to weaken. */
+  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.8;
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
     mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
     transform:var(--tex-transform)}
