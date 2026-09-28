@@ -489,11 +489,14 @@
      clip-path octagon, cut corners rather than curved ones), then a side
      -by-side comparison of two more of each in mockup/pages/shape-test.html.
      Landed on a third option instead, plain and uniform: the "text
-     container" surfaces (section.card, .pagebanner, .fx-tile, .catbar) and
-     the photo-bearing ones (.art-hero, .collage-grid .tile) get an ordinary
-     border-radius, not the organic blob and not a cut corner. */
+     container" surfaces (section.card, .fx-tile, .catbar) and the
+     photo-bearing ones (.art-hero, .collage-grid .tile) get an ordinary
+     border-radius, not the organic blob and not a cut corner. .pagebanner
+     (the breadcrumb strip) is deliberately left out of that list: it reads
+     as a slim wayfinding bar rather than a card, so it keeps the base
+     stylesheet's own organic blob (--radius-organic-lg) unoverridden. */
   :root{--round-sm:12px;--round:18px;--round-lg:26px}
-  section.card,.pagebanner,.fx-tile{border-radius:var(--round)}
+  section.card,.fx-tile{border-radius:var(--round)}
   .art-hero{border-radius:var(--round-lg)}
   .collage-grid .tile{border-radius:var(--round-sm)}
   /* Two roundings elsewhere in the base stylesheet were flattened during the
