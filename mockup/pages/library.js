@@ -273,7 +273,10 @@
     var FLAG = 0x0800;
     entries.forEach(function (e) {
       var name = enc.encode(e.name);
-      var body = enc.encode(e.text);
+      // Some entries are already bytes: the original file for a record that
+      // has one, kept as-is rather than round-tripped through a re-rendered
+      // standalone .html the way a scraped legacy item's text is.
+      var body = e.bytes ? e.bytes : enc.encode(e.text);
       var crc = crc32(body);
       var local = [].concat(
         u32(0x04034b50), u16(20), u16(FLAG), u16(0), u16(0), u16(0),
@@ -356,10 +359,27 @@
 
   /* ---------- index page ---------- */
 
+  function extOf(path) {
+    var m = String(path).match(/\.([a-z0-9]+)(?:[?#]|$)/i);
+    return m ? m[1].toLowerCase() : 'bin';
+  }
+
   /* Fetches an item page and lifts the article out of it. Those pages are the
      only copy of the text on this side, so a bulk download reads exactly what a
-     visitor reads rather than a second export that can drift from it. */
+     visitor reads rather than a second export that can drift from it.
+
+     A record with a real uploaded file (rec.file) skips all of that: the file
+     itself, byte for byte, is the thing to put in the zip, not a re-rendered
+     snapshot of a page that does not exist. */
   function fetchItem(rec) {
+    if (rec.file) {
+      return fetch(rec.file).then(function (r) {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.arrayBuffer();
+      }).then(function (buf) {
+        return { name: fileName(rec.title, extOf(rec.file)), bytes: new Uint8Array(buf) };
+      });
+    }
     var href = rec.url || '';
     return fetch(href).then(function (r) {
       if (!r.ok) throw new Error(String(r.status));
@@ -448,6 +468,15 @@
     var all = window.WStore.get('library').filter(function (r) {
       return scope === 'book' ? r.kind === 'ספר' : r.kind !== 'ספר';
     });
+
+    // A handful of items the archive does not have a D1 record for yet (real
+    // files, not yet migrated) ride along as a JSON island next to the mount,
+    // named by data-lib-extra. Concatenated into `all` before anything below
+    // reads it, so filtering, counting, sorting, search and bulk download
+    // treat them exactly like every other record: one grid, not two.
+    var extraId = mount.getAttribute('data-lib-extra');
+    var extraEl = extraId ? document.getElementById(extraId) : null;
+    if (extraEl) all = all.concat(JSON.parse(extraEl.textContent));
 
     var state = {
       filter: scope === 'book' ? 'all' : readCategoryFromURL(FILTERS),
@@ -549,8 +578,8 @@
         pick = el('label', { class: 'lib-pick' }, [cb, el('span', { text: 'בחירה' })]);
       }
       return el('li', { class: 'lib-card' }, [
-        el('h3', {}, [rec.url
-          ? el('a', { href: rec.url, text: rec.title })
+        el('h3', {}, [(rec.url || rec.file)
+          ? el('a', { href: rec.url || rec.file, text: rec.title })
           : el('span', { text: rec.title })]),
         by ? el('p', { class: 'by', text: by }) : null,
         rec.description ? el('p', { class: 'desc', text: rec.description }) : null,
