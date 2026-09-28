@@ -43,7 +43,7 @@
     '.lib-attach h2{margin-top:0}',
     '.lib-files{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}',
     '.lib-files li{display:flex;align-items:center;gap:8px;font-size:.9rem}',
-    '.lib-ext{font-size:.7rem;font-weight:600;color:var(--brown);background:var(--beige);border-radius:var(--radius-pill);padding:1px 9px}',
+    '.lib-ext{font-size:.7rem;font-weight:600;color:var(--brown);background:var(--beige);border-radius:var(--radius);padding:1px 9px}',
     /* The reading column. The site runs full-bleed, which suits a grid and ruins
        a 9,000-word paper: a line of Hebrew at 1400px is unreadable.
        The surface is restated here rather than inherited: the page stylesheet
@@ -133,11 +133,20 @@
     '}',
     /* --- index page: toolbar --- */
     '.lib-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}',
-    '.lib-bar input[type=search],.lib-bar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:8px 16px;min-width:0}',
+    '.lib-bar input[type=search],.lib-bar select{font-family:var(--font-body);font-size:.88rem;color:var(--text);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius);padding:8px 16px;min-width:0}',
     '.lib-bar input[type=search]{flex:1;min-width:190px}',
+    // The native <select> arrow does not mirror for RTL the way the rest of a
+    // form control does: Chrome still carves its own reserved gutter out of
+    // the physical right, so the arrow lands hard against the left edge while
+    // the text sits pushed away from the right one. appearance:none hands
+    // both back to us, with the same chevron .icon-inline already uses
+    // elsewhere, positioned and inset by hand instead of left to the engine.
+    '.lib-bar select{appearance:none;-webkit-appearance:none;padding:8px 14px 8px 34px;',
+    '  background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23A88B69%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 8.5l7 7 7-7%27/%3E%3C/svg%3E");',
+    '  background-repeat:no-repeat;background-position:left 12px center;background-size:13px}',
     '.lib-bar input[type=search]:focus,.lib-bar select:focus{outline:none;border-color:var(--tan)}',
     '.lib-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px;padding:0;list-style:none}',
-    '.lib-filter{font-family:var(--font-body);font-size:.82rem;font-weight:500;color:var(--brown);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-pill);padding:6px 15px;cursor:pointer}',
+    '.lib-filter{font-family:var(--font-body);font-size:.82rem;font-weight:500;color:var(--brown);background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius);padding:6px 15px;cursor:pointer}',
     '.lib-filter:hover{border-color:var(--tan)}',
     '.lib-filter[aria-pressed=true]{background:var(--brown);border-color:var(--brown);color:#fff}',
     // No opacity here. Fading the count to .72 to sit it behind the label put

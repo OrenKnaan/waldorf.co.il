@@ -39,8 +39,12 @@
     // At 10px the pill dropped 2px the moment it stuck.
     '.pagebanner{position:sticky;top:8px;z-index:15;transition:box-shadow .18s}',
     '.pagebanner.is-stuck{box-shadow:var(--shadow-lg)}',
-    /* רקע רך מאחורי הפילול כדי שהתוכן לא יציץ בפינות המעוגלות */
-    '.pagebanner.is-stuck::before{content:"";position:absolute;inset:-8px -12px -20px;z-index:-2;pointer-events:none;',
+    /* רקע רך מאחורי הפילול כדי שהתוכן לא יציץ בפינות המעוגלות. רוחב מלא של
+       העמוד ולא רק של הפיל עצמו: left:50%+margin-left:-50vw הוא הטריק
+       הרגיל לפרוץ מהעמודה הממורכזת (main) לרוחב ה-viewport המלא, ועובד כאן
+       כי .pagebanner עצמו ממורכז אופקית באותו אופן: top/bottom
+       נשארים יחסיים לגובה הפיל עצמו, כולל גלישה לשתי שורות. */
+    '.pagebanner.is-stuck::before{content:"";position:absolute;top:-8px;bottom:-20px;left:50%;width:100vw;margin-left:-50vw;z-index:-2;pointer-events:none;',
     '  background:linear-gradient(180deg,var(--cream) 56%,color-mix(in oklab,var(--cream) 55%,transparent) 82%,transparent)}',
     /* הפילול נשאר לבן: פסאודו שלילי נצבע מעל רקע האלמנט עצמו, ולכן הרקע
        הלבן מצויר שוב מעל הרך ומתחת לטקסט */
