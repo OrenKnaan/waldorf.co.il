@@ -1,7 +1,9 @@
-/* Cross-fading photo slideshow for the art-hero band on the category-variant
-   demo pages (cat2-*.html). A small, simpler cousin of hero.js on home.html:
-   opacity cross-fade instead of a translated push, no dots and no progress
-   rail, because this hero is a decorative band, not the page's main image.
+/* Cross-fading photo slideshow for the art-hero band on the five category
+   pages (forum.html, waldorf-foundations.html, kinder.html,
+   content-library.html, contact.html). A small, simpler cousin of hero.js on
+   home.html: opacity cross-fade instead of a translated push, no dots and no
+   progress rail, because this hero is a decorative band, not the page's main
+   image.
 
    The pause control is not optional, though. The slideshow auto-advances for
    longer than five seconds, so WCAG 2.2.2 requires a way to stop it, and that
