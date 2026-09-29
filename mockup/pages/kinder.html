@@ -503,8 +503,8 @@
 
   /* ===== art-hero slideshow, cross-fading; art-hero-slideshow.js drives it. */
   .ah-media{position:absolute;inset:0}
-  .ah-slide{position:absolute;inset:0;background-image:var(--img);background-size:cover;
-    background-position:center;opacity:0;transition:opacity 1s ease}
+  .ah-slide{position:absolute;inset:0;background-image:var(--img);background-size:100% auto;
+    background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1s ease}
   .ah-slide.is-active{opacity:1}
   @media (min-width:900px){.ah-slide{background-image:var(--img-lg)}}
   .art-hero.slideshow::after{background:radial-gradient(70% 88% at 100% 100%,
