@@ -1,24 +1,22 @@
 /* TEMPORARY, colour-by-category exploration, item for the cutover inventory.
-   Builds ten pages, one per (category x variant), from five existing content
-   pages (one representative page per main-menu category). Same markup, same
-   copy as the source page; each gets a category-tinted background and a
-   variant-specific art-hero treatment, plus a switcher bar linking all ten.
+   Builds five pages, one per category, from five existing content pages
+   (one representative page per main-menu category). Same markup, same copy
+   as the source page; each gets a category-tinted background and an
+   art-hero treatment, plus a switcher bar linking all five.
 
-   variant 1 (cat1-*): the art-hero becomes a five-image collage (the same
-   photographs the home page hero rotates through), and two watercolour
-   washes bookend the page, top and bottom, mirrored. Hue-rotating one
-   shared painting (forum-alt3.html's corner wash) to each category colour
-   did not hold up (flat, slightly wrong-feeling colour compared with an
-   actual painting in that hue), so four of the five categories now each
-   use their own separately painted watercolour instead; see the note above
-   the CATS table.
+   This used to be two competing variants side by side: a five-image collage
+   art-hero with a watercolour corner wash top and bottom (cat1-*), and a
+   slideshow art-hero with a full-page watercolour texture (cat2-*). The
+   collage/corner-wash direction (קולאז׳ ומכחול) was dropped after review;
+   what is left, previously "variant 2", is the only style these five pages
+   build now:
 
-   variant 2 (cat2-*): the art-hero becomes a slideshow of the same five
-   photographs (a smaller, simpler cousin of home.html's hero.js), and a
-   second watercolour photograph is laid across the whole page background,
-   multiplied onto the category tint and hue-rotated to match it, via a
-   fixed, viewport-covering layer, so it holds still while the page scrolls
-   past it rather than repeating with seams.
+   the art-hero becomes a slideshow of the same five photographs (a smaller,
+   simpler cousin of home.html's hero.js), and a watercolour photograph is
+   laid across the whole page background, multiplied onto the category tint
+   and hue-rotated to match it, via a fixed, viewport-covering layer, so it
+   holds still while the page scrolls past it rather than repeating with
+   seams.
 
    Category to wash mapping (all five sit at the same lightness/chroma as the
    site's existing wash-rose/gold/sage/sky quartet, so --wash-plum extends
@@ -29,55 +27,34 @@
      resources  (מידע ומשאבים)  plum, violet (new token)
      contact    (צור קשר)        rose, rose
 
-   The full-page texture (cat2's watercolor-clouds.webp) still hue-rotates
-   live, with filter:hue-rotate() on --tex-hue: it is one photograph reused
-   across all five categories on purpose (see the multiply-blend note by
-   TEXTURE_CSS), where the corner wash is now the opposite, five different
-   photographs rather than one recoloured five ways. That also settles a
-   performance question from when the corner wash did rotate live: a large
-   image inside an absolutely positioned element that scrolls with the page
-   has to recompute filter:hue-rotate() on every scroll frame rather than
-   composite once, which measurably cost real frames. A plain, unfiltered
-   background-image has nothing left to recompute.
+   The full-page texture (watercolor-clouds.webp) still hue-rotates live,
+   with filter:hue-rotate() on --tex-hue: it is one photograph reused across
+   all five categories on purpose (see the multiply-blend note by
+   TEXTURE_CSS), not five separately painted washes. A plain, unfiltered
+   background-image also has nothing to recompute on scroll, unlike the
+   corner wash the dropped variant used to animate past.
 
-   Every decorative layer (the category page-wash, the corner washes, the
-   full-page texture) is a real, empty, aria-hidden element with an explicit
-   negative z-index, not a bare CSS background on body: a block element's own
-   background paints in the same step as its in-flow children, which is
-   after a negative z-index descendant's stacking context, not before it, so
-   body itself carries no background at all. See baseCategoryCSS's comment.
+   Every decorative layer (the category page-wash, the full-page texture) is
+   a real, empty, aria-hidden element with an explicit negative z-index, not
+   a bare CSS background on body: a block element's own background paints in
+   the same step as its in-flow children, which is after a negative z-index
+   descendant's stacking context, not before it, so body itself carries no
+   background at all. See baseCategoryCSS's comment.
 
-   Both variants inject a <style> after this stylesheet: accessibility.js
-   and search.js already read the design tokens, so they follow a category
-   on their own; nothing here needs the .a11y-root-style specificity fight
-   the four forum-alt pages had to fight, because none of these overrides
-   touch the floating button.
+   Injects a <style> after this stylesheet: accessibility.js and search.js
+   already read the design tokens, so they follow a category on their own;
+   nothing here needs the .a11y-root-style specificity fight the four
+   forum-alt pages had to fight, because none of these overrides touch the
+   floating button.
 
-   Re-run after editing a palette or a variant: node mockup/category-variants.mjs
+   Re-run after editing a palette: node mockup/category-variants.mjs
    Do NOT run search-index.mjs while these exist, it globs pages/ and would
-   index ten duplicates of five pages' sections. Delete the ten pages and this
-   script once a direction is picked. */
+   index five duplicates of five pages' sections. Delete the five pages and
+   this script once a direction is picked. */
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = new URL('./pages/', import.meta.url).pathname;
 
-/* pages/img/paint-corner-<key>.webp (used by cat1's corner wash, brushCSS
-   below) are not tracked back to a generator script the way the pages
-   themselves are, and are no longer all one painting either. Recolouring
-   forum-alt3's single corner wash with filter:hue-rotate() per category
-   read as an obviously-recoloured photograph rather than a true blue or
-   green or violet watercolour, so every category now has its own separate
-   source photograph, each supplied already in roughly the right hue and
-   used as-is, none of them filtered:
-     forum      paint-corner-forum.webp      = temp/blue.webp
-     waldorf    paint-corner-waldorf.webp    = temp/green.webp
-     inst       paint-corner-inst.webp       = temp/peach.webp
-     resources  paint-corner-resources.webp  = temp/pink.webp (reads as violet/plum)
-     contact    paint-corner-contact.webp    = temp/yellow.webp (reads as green/slate, not yellow)
-   paint-top-left-alpha.webp (inst's original painting, before this) and
-   the two intermediate hue-rotated files this replaced are no longer
-   referenced by any page; kept on disk since forum-alt3.html still uses
-   paint-top-left-alpha.webp for its own, unrelated corner wash. */
 const CATS = [
   { key: 'forum',     file: 'forum.html',              label: 'הפורום',       wash: 'var(--wash-sky)',
     texHue: '0deg',    texTransform: 'none' },
@@ -91,34 +68,26 @@ const CATS = [
     texHue: '143deg',  texTransform: 'rotate(180deg) scaleX(-1)' },
 ];
 
-const VARIANTS = [
-  { key: 'v1', prefix: 'cat1', label: 'קולאז׳ ומכחול' },
-  { key: 'v2', prefix: 'cat2', label: 'מצגת ומרקם' },
-];
+// The prefix these five pages are still generated under (cat2-*): renaming
+// them now that only one style is left would be pure churn, nothing outside
+// this script and the five pages themselves links to that name.
+const PREFIX = 'cat2';
 
-function catbar(catKey, variantKey) {
+function catbar(catKey) {
   const cats = CATS.map(c => {
-    const href = `./${VARIANTS.find(v => v.key === variantKey).prefix}-${c.key}.html`;
+    const href = `./${PREFIX}-${c.key}.html`;
     const cur = c.key === catKey ? ' aria-current="page"' : '';
     return `<a href="${href}"${cur}><span class="cat-dot" style="background:${c.wash}"></span>${c.label}</a>`;
-  }).join('\n');
-  const variants = VARIANTS.map(v => {
-    const href = `./${v.prefix}-${catKey}.html`;
-    const cur = v.key === variantKey ? ' aria-current="page"' : '';
-    return `<a href="${href}"${cur}>${v.label}</a>`;
   }).join('\n');
   return `  <nav class="catbar" aria-label="ערכת נושא לפי קטגוריה (זמני)">
 <span class="catbar-lbl">קטגוריה</span>
 ${cats}
-<span class="catbar-sep" aria-hidden="true"></span>
-<span class="catbar-lbl">גרסה</span>
-${variants}
 </nav>
 `;
 }
 
 const BAR_CSS = `
-  /* ===== category/variant switcher (temporary) ===== */
+  /* ===== category switcher (temporary) ===== */
   .catbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
     padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
     border-radius:var(--round);font-size:.82rem}
@@ -139,20 +108,19 @@ const SHAPE_CSS = `
      The rest of the site already runs every button, badge, dropdown and
      chip through --radius-organic-*, a rounded, hand-drawn blob shape, and
      nothing here touches that. Two rounds of alternatives for the
-     card-like surfaces on these ten pages didn't land: a chamfer (a
+     card-like surfaces on these five pages didn't land: a chamfer (a
      clip-path octagon, cut corners rather than curved ones), then a side
      -by-side comparison of two more of each in mockup/pages/shape-test.html.
      Landed on a third option instead, plain and uniform: the "text
      container" surfaces (section.card, .fx-tile, .catbar) and the
-     photo-bearing ones (.art-hero, .collage-grid .tile) get an ordinary
-     border-radius, not the organic blob and not a cut corner. .pagebanner
-     (the breadcrumb strip) is deliberately left out of that list: it reads
-     as a slim wayfinding bar rather than a card, so it keeps the base
-     stylesheet's own organic blob (--radius-organic-lg) unoverridden. */
-  :root{--round-sm:12px;--round:18px;--round-lg:26px}
+     photo-bearing .art-hero get an ordinary border-radius, not the organic
+     blob and not a cut corner. .pagebanner (the breadcrumb strip) is
+     deliberately left out of that list: it reads as a slim wayfinding bar
+     rather than a card, so it keeps the base stylesheet's own organic blob
+     (--radius-organic-lg) unoverridden. */
+  :root{--round:18px;--round-lg:26px}
   section.card,.fx-tile{border-radius:var(--round)}
   .art-hero{border-radius:var(--round-lg)}
-  .collage-grid .tile{border-radius:var(--round-sm)}
   /* Two roundings elsewhere in the base stylesheet were flattened during the
      chamfer round because clip-path cut them off unevenly at the corners: a
      focus ring and a scrollbar thumb, neither a text container or an image,
@@ -171,15 +139,15 @@ const SHAPE_CSS = `
      going negative once the viewport is narrower than the column itself),
      and margin-inline/width move together so the box is exactly as much
      wider than main as it is pulled outside it, not clipped by main on one
-     side. .collage-grid and .ah-media are already inset:0 on this element,
-     so they fill the wider box on their own, nothing to change there. */
+     side. .ah-media is already inset:0 on this element, so it fills the
+     wider box on its own, nothing to change there. */
   :root{--art-bleed:min(150px, max(0px, (100vw - var(--page-max)) / 2))}
   .art-hero{height:600px;margin-inline:calc(-1 * var(--art-bleed));width:calc(100% + var(--art-bleed) * 2)}
   @media (max-width:720px){.art-hero{height:300px}}
   @media (max-width:400px){.art-hero{height:255px}}
 `;
 
-/* Shared by both variants. body itself carries no background any more (see
+/* body itself carries no background any more (see
    the file header comment on stacking): .page-wash is a real element with
    z-index:-2 instead, holding the same category-tinted gradient the body
    background used to. .site-header keeps its own opaque background, tinted
@@ -207,142 +175,7 @@ function pageWashHTML() {
   return `<div class="page-wash" aria-hidden="true"></div>`;
 }
 
-/* ===== variant 1: collage art-hero, plus top/bottom brush washes ===== */
-
-function collageHTML(capB, capSpan) {
-  return `  <div class="art-hero collage">
-<div class="collage-grid" aria-hidden="true">
-<div class="tile"><img src="./img/hero/hero-1.webp" alt=""></div>
-<div class="tile"><img src="./img/hero/hero-2.webp" alt=""></div>
-<div class="tile"><img src="./img/hero/hero-3.webp" alt=""></div>
-<div class="tile"><img src="./img/hero/hero-4.webp" alt=""></div>
-<div class="tile"><img src="./img/hero/hero-5.webp" alt=""></div>
-</div>
-<div class="cap"><b>${capB}</b><span>${capSpan}</span></div>
-</div>`;
-}
-
-const COLLAGE_CSS = `
-  /* ===== variant: קולאז׳ (זמני), the home page's five hero photographs,
-     reused here only until the forum picks real per-page art. Decorative
-     (alt="") rather than mis-describing a page they were not shot for.
-     No border on the tiles: the gap between them plus their own shadow is
-     enough separation without an outline drawn on top of the photos. ===== */
-  .art-hero.collage{background:linear-gradient(135deg,
-    color-mix(in oklab,var(--cat) 55%,var(--cream)),
-    color-mix(in oklab,var(--cat) 26%,var(--beige)))}
-  .collage-grid{position:absolute;inset:0;display:grid;
-    grid-template-columns:1.3fr .85fr .85fr;grid-template-rows:1fr 1fr;gap:10px;padding:14px}
-  .collage-grid .tile{overflow:hidden;box-shadow:0 6px 12px rgba(30,20,12,.30)}
-  .collage-grid .tile img{width:100%;height:100%;object-fit:cover;display:block}
-  .collage-grid .tile:nth-child(1){grid-row:1/3;grid-column:1}
-  .collage-grid .tile:nth-child(2){grid-row:1;grid-column:2}
-  .collage-grid .tile:nth-child(3){grid-row:1;grid-column:3}
-  .collage-grid .tile:nth-child(4){grid-row:2;grid-column:2}
-  .collage-grid .tile:nth-child(5){grid-row:2;grid-column:3}
-  /* Focused on the corner the caption actually sits in (bottom, the reading
-     side of the RTL row) instead of a band running the width of the photos:
-     the first cut was darkening tiles 2 and 3 for no reason except that the
-     gradient ran edge to edge. */
-  .art-hero.collage::after{background:radial-gradient(75% 92% at 100% 100%,
-    rgba(20,10,8,.82) 0%,rgba(20,10,8,.52) 30%,rgba(20,10,8,.20) 54%,transparent 74%)}
-  .art-hero.collage .cap{position:relative;align-self:flex-end;z-index:2;
-    margin-inline-start:0;margin-inline-end:0}
-  @media (max-width:720px){
-    .collage-grid{grid-template-columns:1.2fr .9fr;grid-template-rows:1fr 1fr}
-    .collage-grid .tile:nth-child(3),.collage-grid .tile:nth-child(5){display:none}
-  }
-`;
-
-function brushCSS(cat) {
-  return `
-  /* ===== variant: מכחול עליון ותחתון (זמני), forum-alt3's corner wash,
-     mirrored to bookend the page. Explicit z-index:-1 (.page-wash's -2 is
-     one layer further back still, so the wash always shows through it)
-     rather than relying on DOM order to stay behind the header/main: an
-     absolutely positioned, z-index:auto element is not guaranteed to paint
-     behind an in-flow one, only ordinary document order made it look that
-     way here.
-
-     paint-corner-${cat.key}.webp: four of the five categories are a
-     distinct source photograph now rather than one painting recoloured
-     five ways (see the note above the CATS table for which file is which
-     and why). All four keep a real alpha channel fading to nothing on
-     every edge, so whichever one is in play settles onto the solid
-     category colour below without a hard border of its own to fight; their
-     native sizes differ (784x338 to 800x436), which background-size:auto
-     handles the same way for each, see below.
-
-     .brush-bottom stays at its own native size (background-size:auto):
-     shrinking it to min(72vw,940px) in an earlier pass scaled it down to
-     roughly a sliver, and it sits low on the page where a photo-sized corner
-     accent reads fine on its own. .brush-top is stretched to the full width
-     of the page instead (background-size:100% auto), so the fade directly
-     under the breadcrumb spans edge to edge rather than fading out partway
-     across on any screen wider than the image's own ~800-940px. Anchored at
-     0 0 either way, the box's own height (380px, 260px on a phone) is what
-     crops it, the same way a photo sitting in a frame smaller than itself is
-     cropped by the frame; a photograph shorter than the box (as most of
-     these are, even stretched) simply leaves the rest of the box to the
-     solid colour underneath instead of being stretched to fill it too.
-
-     position:absolute, scrolling with the page like the rest of the
-     content, not fixed to the screen. .brush-top's top is the header's own
-     rendered height (--header-h, kept current by a small script this
-     variant adds near the end of the document), not 0: at 0 the wash sat mostly behind
-     the opaque header and only a sliver ever showed. Anchoring to the
-     header's real height, measured rather than guessed per breakpoint,
-     means it is never wrong at a width this stylesheet did not think to
-     test, or after the header changes height for a reason this file knows
-     nothing about (the mobile drawer opening, a larger a11y font size, the
-     browser's own zoom). */
-  :root{--paint:url(./img/paint-corner-${cat.key}.webp);--header-h:110px}
-  body{position:relative}
-  /* 16%, not higher: the intro paragraph under the h1 sits directly on this
-     colour with no card behind it, and --text-muted against it is already
-     down to 4.58:1 at 16% (worked out per category in oklab, not eyeballed:
-     resources is the tightest). It briefly went to 32% for a bolder match
-     with the corner wash and axe caught the real failure that produced,
-     4.19:1 on that same paragraph, on three of the five categories. */
-  .page-wash{position:absolute;inset:0;z-index:-2;
-    background:color-mix(in oklab,var(--cat) 16%,var(--cream))}
-  .brush-wash{position:absolute;inset-inline:0;height:380px;z-index:-1;pointer-events:none;
-    background:var(--paint) no-repeat 0 0/auto}
-  .brush-top{top:var(--header-h);background-size:100% auto}
-  .brush-bottom{bottom:0;transform:scaleX(-1) scaleY(-1)}
-  @media (max-width:720px){
-    .brush-wash{height:260px}
-  }
-
-  /* ===== outline (זמני): none, on either variant =====
-     section.card and .fx-tile each carry a real border in the base
-     stylesheet. Removed here, on both cat1 and cat2, confirmed rather than
-     assumed: it was reworked once already to survive the chamfer's cut
-     corners, and once the user could see the result on the live pages, no
-     outline at all read better than any version of one, chamfer or not. */
-  section.card,.catbar,.fx-tile{border:0}
-`;
-}
-
-function brushHTML() {
-  return `<div class="brush-wash brush-top" aria-hidden="true"></div>
-<div class="brush-wash brush-bottom" aria-hidden="true"></div>`;
-}
-
-/* Inserted before </body>, not next to the two divs above right after
-   <body>: at that point in the document <header> has not been parsed yet,
-   so document.querySelector('.site-header') returned null and --header-h
-   silently kept its fallback value forever. */
-const HEADER_HEIGHT_SCRIPT = `<script>(function(){
-  var header=document.querySelector('.site-header');
-  if(!header) return;
-  function setH(){document.body.style.setProperty('--header-h',header.offsetHeight+'px');}
-  setH();
-  new ResizeObserver(setH).observe(header);
-})();</script>
-`;
-
-/* ===== variant 2: slideshow art-hero, plus full-page watercolour texture ===== */
+/* ===== slideshow art-hero, plus full-page watercolour texture ===== */
 
 function slideshowHTML(capB, capSpan) {
   const n = [1, 2, 3, 4, 5];
@@ -426,10 +259,12 @@ const TEXTURE_CSS = `
     mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
     transform:var(--tex-transform)}
 
-  /* ===== outline (זמני): none, matching cat1 =====
+  /* ===== outline (זמני): none =====
      section.card and .fx-tile each carry a real border in the base
-     stylesheet; removed on both variants, see brushCSS()'s longer note on
-     why. */
+     stylesheet; removed here, confirmed rather than assumed: it was
+     reworked once already to survive an earlier chamfer-corners attempt,
+     and once the user could see the result on the live pages, no outline at
+     all read better than any version of one, chamfer or not. */
   section.card,.catbar,.fx-tile{border:0}
 `;
 
@@ -446,36 +281,29 @@ for (const cat of CATS) {
   if (!capMatch) throw new Error('no caption in ' + cat.file);
   const [, capB, capSpan] = capMatch;
 
-  for (const variant of VARIANTS) {
-    const out = lines.slice();
-    out[heroIdx] = variant.key === 'v1' ? collageHTML(capB, capSpan) : slideshowHTML(capB, capSpan);
-    let text = out.join('\n');
+  const out = lines.slice();
+  out[heroIdx] = slideshowHTML(capB, capSpan);
+  let text = out.join('\n');
 
-    text = text.replace(/\u2014 מוקאפ<\/title>/, `, ${variant.label} · ${cat.label}</title>`);
+  text = text.replace(/\u2014 מוקאפ<\/title>/, `, ${cat.label}</title>`);
 
-    const styleBlock = BAR_CSS + SHAPE_CSS + baseCategoryCSS(cat)
-      + (variant.key === 'v1' ? COLLAGE_CSS + brushCSS(cat) : SLIDESHOW_CSS + TEXTURE_CSS);
-    const si = text.lastIndexOf('</style>');
-    if (si < 0) throw new Error('no </style> in ' + cat.file);
-    text = text.slice(0, si) + styleBlock + text.slice(si);
+  const styleBlock = BAR_CSS + SHAPE_CSS + baseCategoryCSS(cat) + SLIDESHOW_CSS + TEXTURE_CSS;
+  const si = text.lastIndexOf('</style>');
+  if (si < 0) throw new Error('no </style> in ' + cat.file);
+  text = text.slice(0, si) + styleBlock + text.slice(si);
 
-    const crumbAnchor = '</span>\n  </nav>\n';
-    if (text.split(crumbAnchor).length !== 2) throw new Error('breadcrumb anchor not unique in ' + cat.file);
-    text = text.replace(crumbAnchor, crumbAnchor + catbar(cat.key, variant.key));
+  const crumbAnchor = '</span>\n  </nav>\n';
+  if (text.split(crumbAnchor).length !== 2) throw new Error('breadcrumb anchor not unique in ' + cat.file);
+  text = text.replace(crumbAnchor, crumbAnchor + catbar(cat.key));
 
-    const bodyAnchor = '<body>\n';
-    if (text.split(bodyAnchor).length !== 2) throw new Error('<body> anchor not unique in ' + cat.file);
-    const extraDiv = variant.key === 'v1' ? brushHTML() : pageTexHTML();
-    text = text.replace(bodyAnchor, bodyAnchor + pageWashHTML() + '\n' + extraDiv + '\n');
+  const bodyAnchor = '<body>\n';
+  if (text.split(bodyAnchor).length !== 2) throw new Error('<body> anchor not unique in ' + cat.file);
+  text = text.replace(bodyAnchor, bodyAnchor + pageWashHTML() + '\n' + pageTexHTML() + '\n');
 
-    if (text.split('</body>').length !== 2) throw new Error('</body> anchor not unique in ' + cat.file);
-    const bodyEndScript = variant.key === 'v1'
-      ? HEADER_HEIGHT_SCRIPT
-      : '<script src="./art-hero-slideshow.js" defer></script>\n';
-    text = text.replace('</body>', bodyEndScript + '</body>');
+  if (text.split('</body>').length !== 2) throw new Error('</body> anchor not unique in ' + cat.file);
+  text = text.replace('</body>', '<script src="./art-hero-slideshow.js" defer></script>\n</body>');
 
-    const outFile = `${variant.prefix}-${cat.key}.html`;
-    writeFileSync(dir + outFile, text);
-    console.log('wrote', outFile, (text.length / 1024).toFixed(0) + 'KB');
-  }
+  const outFile = `${PREFIX}-${cat.key}.html`;
+  writeFileSync(dir + outFile, text);
+  console.log('wrote', outFile, (text.length / 1024).toFixed(0) + 'KB');
 }
