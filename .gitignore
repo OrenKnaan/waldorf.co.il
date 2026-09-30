@@ -33,7 +33,8 @@ pnpm-debug.log*
 .idea/
 
 # local Claude Code config/skills - not part of the site
-/.claude/
+# unanchored, so it also covers content-api/.claude/ and any other subdirectory
+.claude/
 # Serena MCP project cache - not part of the site
 /.serena/
 
