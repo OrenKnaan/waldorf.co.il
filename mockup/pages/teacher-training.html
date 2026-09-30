@@ -453,6 +453,89 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+
+  /* ===== shape: plain rounded corners for text containers and images, the
+     organic blob for everything else =====
+     The rest of the site already runs every button, badge, dropdown and
+     chip through --radius-organic-*, a rounded, hand-drawn blob shape, and
+     nothing here touches that. The "text container" surfaces (section.card,
+     .fx-tile) and the photo-bearing .art-hero get an ordinary border-radius
+     instead, plain and uniform. .pagebanner (the breadcrumb strip) is
+     deliberately left out of that list: it reads as a slim wayfinding bar
+     rather than a card, so it keeps the base stylesheet's own organic blob
+     (--radius-organic-lg) unoverridden. Existing borders are untouched. */
+  :root{--round:18px;--round-lg:26px}
+  section.card,.fx-tile{border-radius:var(--round)}
+  .art-hero{border-radius:var(--round-lg)}
+  :focus-visible{border-radius:0}
+  .table-wrap::-webkit-scrollbar-thumb,.table-wrap::-webkit-scrollbar-track{border-radius:0}
+  @media (max-width:720px){
+    section.card{padding:18px}
+  }
+
+  /* ===== art-hero: taller, and wider than the column it sits in =====
+     --art-bleed is 150px only on a screen wide enough to spare it: capped by
+     min() so it never asks for more than half of whatever room actually
+     exists outside the 1200px column (max(0px, ...) keeps that half from
+     going negative once the viewport is narrower than the column itself),
+     and margin-inline/width move together so the box is exactly as much
+     wider than main as it is pulled outside it, not clipped by main on one
+     side. .ah-media is already inset:0 on this element, so it fills the
+     wider box on its own, nothing to change there. */
+  :root{--art-bleed:min(150px, max(0px, (100vw - var(--page-max)) / 2))}
+  .art-hero{height:600px;margin-inline:calc(-1 * var(--art-bleed));width:calc(100% + var(--art-bleed) * 2)}
+  @media (max-width:720px){.art-hero{height:300px}}
+  @media (max-width:400px){.art-hero{height:255px}}
+
+  /* ===== category colour ===== */
+  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-gold);
+    --tex-hue:172deg;--tex-transform:scaleX(-1)}
+  body{background:none}
+  .page-wash{pointer-events:none;background:
+      radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
+      radial-gradient(100% 60% at 0% 10%, color-mix(in oklab,var(--cat) 24%,transparent), transparent 62%),
+      linear-gradient(180deg,var(--beige) 0%,var(--cream) 640px,var(--cream) 100%)}
+  .site-header{background:
+      radial-gradient(120% 150% at 14% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 55%),
+      radial-gradient(120% 150% at 50% 0%, color-mix(in oklab,var(--wash-gold) 16%,transparent), transparent 55%),
+      radial-gradient(120% 160% at 86% 0%, color-mix(in oklab,var(--cat) 30%,transparent), transparent 55%),
+      var(--cream)}
+
+  /* ===== art-hero slideshow, cross-fading; art-hero-slideshow.js drives it. */
+  .ah-media{position:absolute;inset:0}
+  .ah-slide{position:absolute;inset:0;background-image:var(--img);background-size:100% auto;
+    background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1s ease}
+  .ah-slide.is-active{opacity:1}
+  @media (min-width:900px){.ah-slide{background-image:var(--img-lg)}}
+  .art-hero.slideshow::after{background:radial-gradient(70% 88% at 100% 100%,
+    rgba(20,10,8,.86) 0%,rgba(20,10,8,.60) 28%,rgba(20,10,8,.28) 50%,transparent 70%)}
+  @media (max-width:720px){
+    .art-hero.slideshow::after{background:radial-gradient(78% 92% at 100% 100%,
+      rgba(20,10,8,.90) 0%,rgba(20,10,8,.68) 30%,rgba(20,10,8,.34) 54%,transparent 74%)}
+  }
+  .art-hero.slideshow .cap{position:relative;align-self:flex-end;z-index:2}
+  .ah-play{position:absolute;z-index:2;top:12px;inset-inline-start:12px;width:34px;height:34px;
+    border-radius:50%;border:0;background:rgba(20,10,8,.52);color:#fff;display:flex;
+    align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .ah-play:hover{background:rgba(20,10,8,.72)}
+  .ah-play:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .ah-play .ico-pause{display:block}
+  .ah-play .ico-play{display:none}
+  .art-hero.slideshow.is-paused .ah-play .ico-pause{display:none}
+  .art-hero.slideshow.is-paused .ah-play .ico-play{display:block}
+  @media (prefers-reduced-motion:reduce){.ah-slide{transition:none}}
+
+  /* ===== full-page watercolour texture. Two fixed, viewport-covering
+     layers, .page-wash then .page-tex on top of it, both z-index:-1 or
+     deeper so the header and every card, both still opaque, go on covering
+     them wherever a visitor is actually looking. See the note that used to
+     live in category-variants.mjs's TEXTURE_CSS for the full blend-mode
+     reasoning; unchanged here. */
+  .page-wash{position:fixed;inset:0;z-index:-2}
+  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.8;
+    background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
+    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
+    transform:var(--tex-transform)}
 </style>
 <script type="application/ld+json">
 {
@@ -478,6 +561,8 @@
 <script src="./search.js" defer></script>
 </head>
 <body>
+<div class="page-wash" aria-hidden="true"></div>
+<div class="page-tex" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">דילוג לתוכן המרכזי</a>
 <header class="site-header">
   <button type="button" class="nav-toggle" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="primary-nav"><span class="bars" aria-hidden="true"></span></button>
@@ -550,7 +635,23 @@
 <span class="crumb current" aria-current="page">הכשרת מורים</span>
 </span>
   </nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-10.webp')"></div><div class="frame"><img src="./img/art/waldorf-10.webp" alt="נגינת החליל" width="507" height="721" decoding="async"></div><div class="cap"><b>נגינת החליל</b><span>צליל וצבע — ציור ולדורף</span></div></div>
+  <div class="art-hero slideshow" data-art-slideshow>
+<div class="ah-media" aria-hidden="true">
+<div class="ah-slide is-active" style="--img:url('./img/hero/art-2.webp');--img-lg:url('./img/hero/art-2.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-3.webp');--img-lg:url('./img/hero/art-3.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-4.webp');--img-lg:url('./img/hero/art-4.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-5.webp');--img-lg:url('./img/hero/art-5.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-6.webp');--img-lg:url('./img/hero/art-6.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-7.webp');--img-lg:url('./img/hero/art-7.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-8.webp');--img-lg:url('./img/hero/art-8.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-1.webp');--img-lg:url('./img/hero/art-1.webp')"></div>
+</div>
+<button type="button" class="ah-play" aria-pressed="false" aria-label="עצירת מצגת התמונות">
+<svg class="ico-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
+<svg class="ico-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>
+</button>
+<div class="cap"><b>נגינת החליל</b><span>צליל וצבע — ציור ולדורף</span></div>
+</div>
   <h1>הכשרת מורים</h1>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 <section class="card">
@@ -583,5 +684,6 @@
 <!-- Cloudflare Web Analytics -->
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"e4ea3335f4ae4f55bacc328eb40c12c9"}'></script>
 <!-- End Cloudflare Web Analytics -->
+<script src="./art-hero-slideshow.js" defer></script>
 </body>
 </html>
