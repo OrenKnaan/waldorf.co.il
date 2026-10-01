@@ -41,14 +41,20 @@
     '.aform label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--ink)}',
     '.aform .wide{grid-column:1/-1}',
     '.aform input,.aform select,.aform textarea{font-family:inherit;font-size:.88rem;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:9px 12px}',
-    '.aform input:focus,.aform select:focus,.aform textarea:focus{outline:none;border-color:var(--tan)}',
+    // The focus ring has to be visible against the field it rings: --tan measured
+    // 2.27:1 on --paper in light mode, under the 3:1 WCAG 1.4.11 asks of a focus
+    // indicator, and dropping the outline left that border as the only cue. --tan-dark
+    // plus a ring of its own gives a mark that survives both dark paths too.
+    '.aform input:focus-visible,.aform select:focus-visible,.aform textarea:focus-visible{outline:none;border-color:var(--tan-dark);box-shadow:0 0 0 3px color-mix(in oklab,var(--tan-dark) 45%,transparent)}',
     '.aform textarea{min-height:70px;resize:vertical}',
+    '.aform .field-hint{font-size:.74rem;font-weight:400;color:var(--muted);line-height:1.45}',
     '.aform .actions{grid-column:1/-1;display:flex;gap:10px}',
     '.tag-demo{font-size:.7rem;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-pill);padding:1px 8px;margin-inline-start:6px}'
   ].join('\n');
   document.head.appendChild(st);
 
   /* ---- טופס גנרי (הוספה/עריכה) ---- */
+  openForm.hintSeq = 0;
   function openForm(panel, fields, item, onSave) {
     var old = panel.querySelector('.aform');
     if (old) old.remove();
@@ -59,8 +65,18 @@
         : f.type === 'select' ? el('select', { name: f.name }, f.options.map(function (o) { return el('option', { value: o.v !== undefined ? o.v : o, text: o.t || o }); }))
         : el('input', { type: f.type || 'text', name: f.name });
       input.value = val;
+      if (f.placeholder) input.setAttribute('placeholder', f.placeholder);
       inputs[f.name] = input;
-      return el('label', { class: f.wide ? 'wide' : '' }, [document.createTextNode(f.label), input]);
+      // A hint belongs to the field, so it is wired with aria-describedby rather than
+      // left as loose text after it: a screen reader reaching the input by Tab reads
+      // the label and nothing else otherwise, and the hint is where the format lives.
+      var kids = [document.createTextNode(f.label), input];
+      if (f.hint) {
+        var hid = 'fh' + (++openForm.hintSeq);
+        input.setAttribute('aria-describedby', hid);
+        kids.push(el('small', { class: 'field-hint', id: hid, text: f.hint }));
+      }
+      return el('label', { class: f.wide ? 'wide' : '' }, kids);
     }).concat([
       el('div', { class: 'actions' }, [
         el('button', { class: 'btn btn-primary btn-sm', type: 'submit', style: 'width:auto', text: 'שמירה' }),
@@ -72,6 +88,11 @@
       var out = {};
       fields.forEach(function (f) {
         var v = inputs[f.name].value.trim();
+        // `clean` normalises what a human pasted into what the field actually stores,
+        // at the one point every value passes through. Doing it here rather than in the
+        // renderer means the stored value is the canonical one and nothing downstream
+        // has to re-parse it.
+        if (f.clean) v = f.clean(v);
         out[f.name] = f.type === 'number' && v !== '' ? parseFloat(v) : v;
       });
       form.remove();
@@ -106,6 +127,25 @@
     tbody.appendChild(el('tr', {}, [el('td', { class: 'muted', colspan: String(cols), text: text })]));
   }
 
+  // Filter chips. The markup is <button class="chip"> inside a role="group"; exactly one
+  // carries .on. aria-pressed has to move with it, or the active filter is announced
+  // identically to the inactive ones and the state is left to colour alone. `map` turns
+  // the chip's own label into whatever the caller filters by, so the labels stay the
+  // single source of truth for what a chip means.
+  function wireChips(root, map, onChange) {
+    var chips = root.querySelectorAll('.tools .chip');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        chips.forEach(function (x) {
+          var on = x === c;
+          x.classList.toggle('on', on);
+          x.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        onChange(map(c.textContent.trim()));
+      });
+    });
+  }
+
   /* =============== אירועים =============== */
   var EVENT_FIELDS = [
     { name: 'title', label: 'כותרת' },
@@ -121,17 +161,10 @@
     var oldWrap = section.querySelector('.table-wrap');
     var t = makeTable(['תאריך', 'כותרת', 'מיקום', 'שעות', 'סטטוס', '']);
     oldWrap.replaceWith(t.wrap);
-    var chips = section.querySelectorAll('.tools .chip');
     var filter = '';
-    chips.forEach(function (c) {
-      c.style.cursor = 'pointer';
-      c.addEventListener('click', function () {
-        chips.forEach(function (x) { x.classList.remove('on'); });
-        c.classList.add('on');
-        filter = c.textContent === 'מפורסם' ? 'published' : c.textContent === 'טיוטה' ? 'draft' : c.textContent === 'הסתיים' ? 'past' : '';
-        draw();
-      });
-    });
+    wireChips(section, function (label) {
+      return label === 'מפורסם' ? 'published' : label === 'טיוטה' ? 'draft' : label === 'הסתיים' ? 'past' : '';
+    }, function (v) { filter = v; draw(); });
     var addBtn = section.querySelector('.btn-primary');
     addBtn.addEventListener('click', function () {
       openForm(section, EVENT_FIELDS, { status: 'published' }, function (out) { WStore.add('events', out); refreshAll(); });
@@ -161,6 +194,38 @@
     }
     renderEventsAdmin.draw = draw;
     draw();
+  }
+
+  /* =============== מוסדות חינוך =============== */
+  // The table in this view is static markup in admin-dashboard.html, not a collection:
+  // the content API has no `institutions`, so there is nothing to read, write or count
+  // here yet and the "מוסד חדש" button is disabled in the page. What the filter can
+  // honestly do today is narrow the demo rows that are already in the DOM, which is what
+  // this does - matching on the שלב cell, whose values are the chip labels verbatim.
+  // When the collection lands, this moves to the WStore/makeTable pattern every other
+  // view uses and the chips keep working unchanged.
+  function renderInstAdmin() {
+    var section = $('.view[data-view="inst"] .panel');
+    if (!section) return;
+    var tbody = section.querySelector('tbody');
+    var rows = [].slice.call(tbody.querySelectorAll('tr'));
+    var cols = section.querySelectorAll('thead th').length;
+    var none = el('tr', {}, [el('td', { class: 'muted', colspan: String(cols), text: 'אין מוסדות בשלב הזה' })]);
+    // The chips are labelled in the plural and the שלב column is written in the
+    // singular, so the label is not the cell value: "גנים" has to match "גן".
+    var STAGE = { 'גנים': 'גן', 'יסודי': 'יסודי', 'תיכון': 'תיכון' };
+    wireChips(section, function (label) { return STAGE[label] || ''; }, function (stage) {
+      var shown = 0;
+      rows.forEach(function (tr) {
+        // style.display, not the hidden attribute: a stylesheet that sets display on a
+        // row would override [hidden], and tbody tr already carries rules here.
+        var ok = !stage || (tr.cells[2] && tr.cells[2].textContent.trim() === stage);
+        tr.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      if (shown) { if (none.parentNode) none.remove(); }
+      else if (!none.parentNode) tbody.appendChild(none);
+    });
   }
 
   /* =============== הודעות =============== */
@@ -218,7 +283,14 @@
       { name: 'kind', label: 'סוג', type: 'select', options: ['מאמר', 'עבודה לתואר שני', 'עבודה סמינריונית', 'עבודה של מורי ולדורף', 'עבודה', 'ספר'] },
       { name: 'author', label: 'מחבר/ת' },
       { name: 'date', label: 'שנה' },
-      { name: 'url', label: 'קישור לעמוד הפריט' },
+      // Was labelled 'קישור לעמוד הפריט', which named an implementation detail: for
+      // the 104 works migrated in 0008 this holds the generated lib-<id>.html page, and
+      // an editor adding a new work has no such page to point at. What the field really
+      // is, is where the item opens - a PDF, a Drive link, or that generated page.
+      // Attaching a file straight from the computer needs somewhere to put it; see the
+      // hint, and the note in CLAUDE.md about R2 not being set up.
+      { name: 'url', label: 'קישור למסמך', placeholder: 'https://…',
+        hint: 'הדביקו כתובת של קובץ PDF או של מסמך ב-Google Drive. העלאת קובץ ישירות מהמחשב תתאפשר רק אחרי שיחובר אחסון קבצים (R2) — כרגע אין לאן לשמור אותו.' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
     ], cols: ['סוג', 'כותרת', 'מחבר/ת', 'שנה', ''], row: function (it) { return [td(it.kind, 'muted'), titleCell(it.title, it.demo), td(it.author || '—', 'muted'), td(it.date || '—', 'muted')]; } },
     { col: 'teaching', title: 'חומרי הוראה', fields: [
@@ -279,9 +351,14 @@
       { name: 'title', label: 'כותרת' },
       { name: 'date', label: 'תאריך', type: 'date' },
       { name: 'duration', label: 'משך (למשל 42 דק׳)' },
-      { name: 'url', label: 'קישור לקובץ שמע' },
+      // Spotify is the only way offered to attach an episode. The field takes whichever
+      // of Spotify's shapes was copied - the share URL, the spotify:episode: URI, or a
+      // bare id - and stores the bare id, because that is what the embed needs.
+      { name: 'spotifyId', label: 'פרק ב-Spotify', placeholder: 'https://open.spotify.com/episode/…',
+        hint: 'הדביקו את כתובת הפרק מ-Spotify (כפתור Share ← Copy link), או את המזהה בלבד. זו הדרך היחידה להוסיף פרק כרגע.',
+        clean: function (v) { return WDyn.spotifyEpisodeId(v); } },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['פרק', 'כותרת', 'תאריך', 'שמע', ''], row: function (it) { return [td(String(it.num || '—'), 'muted tnum'), titleCell(it.title, it.demo), td(fmtDate(it.date), 'muted tnum'), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } }
+    ], cols: ['פרק', 'כותרת', 'תאריך', 'Spotify', ''], row: function (it) { return [td(String(it.num || '—'), 'muted tnum'), titleCell(it.title, it.demo), td(fmtDate(it.date), 'muted tnum'), td(it.spotifyId ? 'מקושר' : 'חסר', 'muted')]; } }
   ];
   function renderMediaAdmin() {
     var host = $('#mediaAdmin');
@@ -552,7 +629,8 @@
     setText('#kpiPendingSub', pending ? 'ממתינות לאישור מנהל' : 'הכול מאושר');
     setText('#kpiLibrary', String(libTotal));
     setText('#kpiLibrarySub', 'מאמרים, חומרי הוראה וטפסים');
-    /* מנויי הניוזלטר מגיעים משירות דיוור שטרם חובר — נשאר "לא מחובר" */
+    /* אין כאן מונה מנויים: הרשימה יושבת ב-ActiveTrail, לא ב-D1, ולקריאת המספר
+       משם צריך קריאה נוספת ל-API שלהם שטרם נבנתה. ראו את הפאנל של "שירות הדיוור". */
 
     var evCount = $('.nav-link[data-view="events"] .count'); if (evCount) evCount.textContent = String(events.length);
     var libCount = $('.nav-link[data-view="lib"] .count'); if (libCount) libCount.textContent = String(libTotal);
@@ -828,6 +906,7 @@
   function boot() {
     renderEventsAdmin();
     renderNewsAdmin();
+    renderInstAdmin();
     renderLibAdmin();
     renderMediaAdmin();
     renderModAdmin();

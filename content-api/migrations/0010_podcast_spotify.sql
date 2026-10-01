@@ -1,0 +1,11 @@
+-- Spotify is now the only way the admin offers to attach a podcast episode, so the
+-- episode gets a column of its own rather than being written into `url`. That mirrors
+-- videos.youtube_id, which already stores a bare platform identifier for the same
+-- reason: the embed needs the id, and deriving it from a URL on every render means
+-- re-parsing a value a human pasted, in whichever of Spotify's several URL shapes.
+--
+-- Additive, and `url` is deliberately left in place: it holds the direct audio file
+-- the old player used. All three seeded episodes have url IS NULL so nothing is
+-- orphaned today, but dropping a column in SQLite rewrites the table, and keeping it
+-- costs nothing if the forum later asks for a non-Spotify episode after all.
+ALTER TABLE podcast ADD COLUMN spotify_id TEXT;

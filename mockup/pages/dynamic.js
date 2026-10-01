@@ -94,6 +94,9 @@
     '.dyn-video .info h3{margin:0 0 3px;font-family:var(--font-head);font-size:.98rem;color:var(--brown-dark)}',
     '.dyn-video .info p{margin:0;font-size:.82rem;color:var(--text-muted)}',
     '.dyn-episode{display:flex;gap:14px;align-items:flex-start}',
+    // 152px is Spotify's own compact episode-player height; below that their iframe
+    // scrolls its own content instead of shrinking.
+    '.dyn-spotify{width:100%;height:152px;border:0;border-radius:12px;margin-top:8px;display:block}',
     '.dyn-episode .num{flex:0 0 44px;height:44px;border-radius:50%;background:radial-gradient(130% 150% at 18% 22%,color-mix(in oklab,var(--wash-gold) 42%,transparent),transparent 72%),var(--beige);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--brown-dark)}',
     '.dyn-map{height:380px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);margin:0 0 8px;background:var(--beige)}',
     // Leaflet's attribution credits Leaflet and OpenStreetMap as links inside a
@@ -332,6 +335,21 @@
     mount.appendChild(grid);
   }
 
+  // Spotify hands out an episode in three shapes and people paste whichever one they
+  // copied: the share link (open.spotify.com/episode/<id>?si=..., sometimes with an
+  // /intl-he/ segment in front), the desktop app's spotify:episode:<id> URI, or the
+  // bare id. All three reduce to the same 22-character base62 id, which is what the
+  // embed URL needs. Anything that does not reduce to one returns '' rather than being
+  // passed through, so a mistyped value shows as "no episode" instead of as an iframe
+  // pointing at nothing.
+  function spotifyEpisodeId(raw) {
+    var v = String(raw || '').trim();
+    if (!v) return '';
+    var m = v.match(/(?:episode[\/:])([A-Za-z0-9]{22})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9]{22}$/.test(v) ? v : '';
+  }
+
   function renderPodcast(mount) {
     var eps = WStore.get('podcast').slice().sort(function (a, b) { return (b.num || 0) - (a.num || 0); });
     mount.textContent = '';
@@ -342,12 +360,22 @@
         p.description ? el('p', { text: p.description }) : null,
         el('div', { class: 'dyn-meta' }, [chip(fmtDate(p.date)), p.duration ? chip(p.duration) : null, demoChip(p)])
       ]);
-      if (p.url) {
+      // Episodes are attached as Spotify ids now (migration 0010). `url`, the direct
+      // audio file the old <audio> player used, is still read as a fallback so an
+      // episode saved before the change keeps playing.
+      var sid = spotifyEpisodeId(p.spotifyId);
+      if (sid) {
+        body.appendChild(el('iframe', {
+          class: 'dyn-spotify', src: 'https://open.spotify.com/embed/episode/' + encodeURIComponent(sid),
+          title: 'נגן Spotify — פרק ' + p.num + ': ' + p.title,
+          loading: 'lazy', allow: 'clipboard-write; encrypted-media; fullscreen; picture-in-picture'
+        }));
+      } else if (p.url) {
         var audio = el('audio', { controls: '', preload: 'none', style: 'width:100%;margin-top:6px' });
         audio.appendChild(el('source', { src: p.url }));
         body.appendChild(audio);
       } else {
-        body.appendChild(el('div', { class: 'dyn-meta' }, [chip('הנגן יופעל עם קישור הפרק בממשק הניהול')]));
+        body.appendChild(el('div', { class: 'dyn-meta' }, [chip('הנגן יופעל עם קישור הפרק ב-Spotify מממשק הניהול')]));
       }
       mount.appendChild(el('div', { class: 'dyn-item dyn-episode' }, [
         el('div', { class: 'num', text: String(p.num) }), body
@@ -469,6 +497,7 @@
     renderMap: deferred(renderMap),
     applyAbout: deferred(applyAbout),
     renderHighlights: deferred(renderHighlights),
+    spotifyEpisodeId: spotifyEpisodeId,
     upcomingEvents: upcomingEvents,
     approvedNews: approvedNews,
     eventCard: eventCard,

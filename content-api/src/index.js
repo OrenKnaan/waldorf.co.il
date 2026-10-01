@@ -273,7 +273,10 @@ const COLLECTIONS = {
   videos:   { table: 'videos',     order: 'position ASC',
               fields: { title: 'title', youtubeId: 'youtube_id', description: 'description', demo: 'demo' } },
   podcast:  { table: 'podcast',    order: 'num DESC',
-              fields: { title: 'title', num: 'num', date: 'date', duration: 'duration', description: 'description', url: 'url', demo: 'demo' } },
+              // spotifyId holds a bare episode id, like videos.youtubeId. `url` stays
+              // exposed so the three legacy columns remain readable, but the admin no
+              // longer offers it - see migration 0010.
+              fields: { title: 'title', num: 'num', date: 'date', duration: 'duration', description: 'description', spotifyId: 'spotify_id', url: 'url', demo: 'demo' } },
 };
 
 const SINGLETONS = ['about'];

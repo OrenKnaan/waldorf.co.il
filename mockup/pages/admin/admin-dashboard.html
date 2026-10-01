@@ -17,9 +17,29 @@
   --crit:#A5533F; --crit-bg:#F1DED7; --info:#5E93A8; --info-bg:#DDEBEF;
   --tip-bg:#3D2B1F;
   --shadow:0 2px 12px rgba(61,43,31,.08); --shadow-lg:0 12px 34px rgba(61,43,31,.16);
+  /* Hover tints. Mixed from --brown into --paper rather than set per theme, because
+     both halves are redefined in all four :root blocks and the mix is then resolved
+     against whichever pair is live - one line that is correct on the light path, the
+     [data-theme="dark"] path and the @media (prefers-color-scheme:dark) path alike.
+     --beige used to do this job and could not: it is lighter than --paper in light
+     mode (1.22:1) but a hair darker than it in dark mode (#2A2019 on #2C221A, 1.02:1),
+     so every hover built on it was simply invisible to anyone on a dark OS. */
+  --hover-tint: color-mix(in oklab, var(--brown) 20%, var(--paper));
+  --hover-tint-soft: color-mix(in oklab, var(--brown) 12%, var(--paper));
   --r:9px; --r-lg:16px; --r-pill:999px;
-  --r-organic-sm: 11px 21px 10px 19px / 19px 10px 22px 11px;
-  --r-organic: 22px 44px 20px 40px / 40px 20px 46px 22px;
+  /* Organic radii at control scale. Every consumer of these two in this file is a
+     button, chip, pill or input - no card in the admin uses the organic shape - so
+     the site's card-scale values (22px 44px 20px 40px / 40px 20px 46px 22px) cannot
+     be reused verbatim. CSS Backgrounds 5.5 scales all eight radii by one common
+     factor as soon as the two on an edge exceed that edge's length, and on a 30px
+     .btn-sm the right edge wanted 20+46=66px, forcing f=.45: the browser painted a
+     lopsided blob that matched neither the authored shape nor the box you had to
+     click in, which is what read as an "offset inner shadow" on :hover. Keep each
+     pair of vertical radii (here 9+8 left, 7+10 right) under the shortest control,
+     .nav-link .count at 18px, and each horizontal pair under its width, or the
+     scaling comes back. */
+  --r-organic-sm: 7px 11px 6px 10px / 6px 5px 7px 6px;
+  --r-organic: 10px 16px 9px 15px / 9px 7px 10px 8px;
   --font-head:'Antropos Hebrew','Frank Ruhl Libre','Arial Hebrew',serif;
   --font-body:'Assistant','Segoe UI','Arial Hebrew',Arial,sans-serif;
   --sidebar:linear-gradient(200deg,#4A3623,#2F2114);
@@ -109,8 +129,11 @@ button{font-family:inherit;cursor:pointer}
    label lands at 1.69:1 on its own button and all but disappears. Only the
    explicit theme choice was covered. */
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{color:#1a120a}}
-.btn-ghost{background:transparent;color:var(--brown);border-color:var(--tan)}
-.btn-ghost:hover{background:var(--beige)}
+/* --tan-dark, not --tan: on a ghost button the border is the only thing marking where
+   the control is, and WCAG 1.4.11 wants 3:1 against what is behind it. --tan measured
+   2.27:1 on --paper in light mode; --tan-dark is 3.2:1 there and 8.69:1 on both dark paths. */
+.btn-ghost{background:transparent;color:var(--brown);border-color:var(--tan-dark)}
+.btn-ghost:hover{background:var(--hover-tint);border-color:var(--brown)}
 .btn-sm{padding:7px 13px;font-size:.82rem}
 .notice{
   display:flex;gap:8px;align-items:flex-start;margin:18px 0 2px;padding:9px 12px;
@@ -152,7 +175,7 @@ button{font-family:inherit;cursor:pointer}
 .search svg{width:15px;height:15px;flex:none}
 .search input{border:none;background:none;outline:none;font-family:inherit;font-size:.86rem;color:var(--ink);width:100%}
 .icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--paper);color:var(--brown)}
-.icon-btn:hover{background:var(--beige)}
+.icon-btn:hover{background:var(--hover-tint)}
 .icon-btn svg{width:18px;height:18px}
 .user{display:flex;align-items:center;gap:9px}
 .avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-head);font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,#8A6A49,#4A3623)}
@@ -184,12 +207,20 @@ button{font-family:inherit;cursor:pointer}
 .chip.on{background:var(--brown);color:#fff;border-color:var(--brown)}
 :root[data-theme="dark"] .chip.on{color:#1a120a}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#1a120a}}
+/* Both filter groups are <button class="chip">, not <span>: they are controls, so they
+   have to be reachable by Tab and operable by Enter/Space, and .on alone would convey
+   the active filter by colour only - the JS keeps aria-pressed in step with it. A
+   <button> does not inherit the page font and brings its own background and border,
+   none of which the .chip rule above resets. */
+button.chip{font-family:inherit;font-weight:inherit;line-height:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
+button.chip:hover:not(.on){background:var(--hover-tint);border-color:var(--tan-dark);color:var(--ink)}
+button.chip.on:hover{background:color-mix(in oklab,var(--brown) 86%,#000)}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
 th,td{text-align:start;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
 th{background:var(--sink);color:var(--ink);font-family:var(--font-head);font-weight:700;font-size:.78rem;letter-spacing:.02em;position:sticky;top:0}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--beige)}
+tbody tr:hover{background:var(--hover-tint-soft)}
 td .title{color:var(--ink);font-weight:600;white-space:normal}
 td.muted{color:var(--muted)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:var(--r-organic-sm);white-space:nowrap}
@@ -385,7 +416,7 @@ td.muted{color:var(--muted)}
           <div class="panel">
             <div class="panel-head">
               <h2>אירועים</h2>
-              <div class="tools"><span class="chip on">הכול</span><span class="chip">מפורסם</span><span class="chip">טיוטה</span><span class="chip">הסתיים</span></div>
+              <div class="tools" role="group" aria-label="סינון אירועים לפי סטטוס"><button type="button" class="chip on" aria-pressed="true">הכול</button><button type="button" class="chip" aria-pressed="false">מפורסם</button><button type="button" class="chip" aria-pressed="false">טיוטה</button><button type="button" class="chip" aria-pressed="false">הסתיים</button></div>
               <div class="grow"></div>
               <button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>אירוע חדש</button>
             </div>
@@ -424,10 +455,11 @@ td.muted{color:var(--muted)}
           <div class="panel">
             <div class="panel-head">
               <h2>מוסדות חינוך</h2>
-              <div class="tools"><span class="chip on">הכול</span><span class="chip">גנים</span><span class="chip">יסודי</span><span class="chip">תיכון</span></div>
+              <div class="tools" role="group" aria-label="סינון מוסדות לפי שלב"><button type="button" class="chip on" aria-pressed="true">הכול</button><button type="button" class="chip" aria-pressed="false">גנים</button><button type="button" class="chip" aria-pressed="false">יסודי</button><button type="button" class="chip" aria-pressed="false">תיכון</button></div>
               <div class="grow"></div>
-              <button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>מוסד חדש</button>
+              <button type="button" class="btn btn-primary btn-sm" style="width:auto" id="instAddBtn" disabled aria-describedby="instPh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>מוסד חדש</button>
             </div>
+            <div style="padding:14px 20px 0"><p id="instPh"><span class="ph">הפאנל הזה עדיין לא מחובר לנתונים. ארבע השורות שלמטה הן הדגמה שנכתבה ידנית, ואין עדיין אוסף <code>institutions</code> ב-D1 — ולכן גם אין מה לשמור, והכפתור ״מוסד חדש״ מושבת. הסינון למעלה פועל על שורות ההדגמה. צריך להחליט מה המבנה של רשומת מוסד לפני שבונים את האוסף.</span></p></div>
             <div class="table-wrap"><table>
               <thead><tr><th>שם המוסד</th><th>יישוב</th><th>שלב</th><th>סטטוס</th><th></th></tr></thead>
               <tbody>
@@ -476,9 +508,10 @@ td.muted{color:var(--muted)}
         <section class="view" data-view="nl" hidden>
           <p class="crumb">רשימת תפוצה ודיוור</p>
           <div class="panel">
-            <div class="panel-head"><h2>שירות הדיוור</h2><span class="pill neutral">לא מחובר</span><div class="grow"></div></div>
-            <p class="empty-hint">טרם חובר שירות דיוור (רב מסר / שלח מסר / דומה). עד שיחובר אין מספר מנויים אמיתי להציג, ולכן לא מוצג כאן מספר כלל.</p>
-            <p class="empty-hint">אחרי החיבור יופיעו כאן מספר הנרשמים, קצב ההצטרפות ורשימת הגיליונות שנשלחו — נתונים מהשירות עצמו.</p>
+            <div class="panel-head"><h2>שירות הדיוור</h2><span class="pill ok">ActiveTrail</span><div class="grow"></div></div>
+            <p class="empty-hint">שירות הדיוור שנבחר הוא <b>ActiveTrail</b>, והוא כבר מחובר: טופס ההרשמה בעמוד ״ניוזלטר״ שולח לכתובת <code>/api/newsletter/subscribe</code> ב-Worker, וזה מעביר את הנרשם ל-ActiveTrail לקבוצה 715085, עם אישור כפול במייל.</p>
+            <p class="empty-hint"><b>היכן מדביקים את ה-API Token:</b> בשום קובץ. הוא נשמר כסוד מוצפן של ה-Worker — מתוך תיקיית <code>content-api</code> מריצים <code>npx wrangler secret put ACTIVETRAIL_TOKEN</code> ומדביקים את הערך כשהפקודה מבקשת אותו. המאגר הזה ציבורי, ולכן טוקן שנכתב לתוך קובץ ונשמר ב-git מתפרסם לכל, ומחיקה מאוחרת אינה מבטלת את הפרסום. להחלפה: אותה פקודה עם הערך החדש, ואז ביטול הישן בממשק ActiveTrail תחת settings ← API apps.</p>
+            <p class="empty-hint">כל עוד הטוקן לא הוגדר, הטופס עונה 503 ואומר לנרשם שההרשמה עדיין לא זמינה. מספר המנויים אינו מוצג כאן כי הוא נמצא ב-ActiveTrail בלבד — הוספת מסך כזה דורשת קריאה נוספת ל-API שלהם, שטרם נבנתה.</p>
           </div>
         </section>
         <section class="view" data-view="analytics" hidden>

@@ -293,9 +293,16 @@
     if (e.kind === 'network') return 'אין תקשורת עם ה-Worker. בדקו את הכתובת.';
     if (e.kind === 'api') {
       var b = e.body || {};
-      if (b.error === 'unauthorized') return 'מפתח הגישה שגוי.';
-      if (b.error === 'site_tag_missing') return 'לא הוגדר עדיין אתר ב-Cloudflare Web Analytics.';
-      if (b.error === 'api_token_missing') return 'חסר מפתח ה-API בצד השרת. הריצו: wrangler secret put CF_API_TOKEN';
+      // Each of these is something only the operator can fix, so each says what to do.
+      // 'מפתח הגישה שגוי' on its own sent people looking for a bug: the Worker is
+      // answering correctly, it is the key stored in this browser that is wrong or
+      // empty. The two cases are worth telling apart - the Worker returns
+      // dash_key_missing (503) when DASH_KEY is not set on it at all, and unauthorized
+      // (401) when it is set and what we sent does not match - because the fix differs.
+      if (b.error === 'unauthorized') return 'מפתח הגישה שמור בדפדפן הזה שגוי (או ריק). ה-Worker עצמו מוגדר כראוי. פתחו ״שינוי הגדרות החיבור״ והדביקו את המפתח הנכון. אם אבד — אפשר לקבוע אותו מחדש: מתוך תיקיית analytics-worker הריצו npx wrangler secret put DASH_KEY, ואז הדביקו כאן את אותו הערך.';
+      if (b.error === 'dash_key_missing') return 'לא הוגדר מפתח גישה ב-Worker עצמו, ולכן הוא דוחה כל בקשה. מתוך תיקיית analytics-worker הריצו: npx wrangler secret put DASH_KEY — ואז הדביקו כאן את אותו הערך.';
+      if (b.error === 'site_tag_missing') return 'לא הוגדר עדיין אתר ב-Cloudflare Web Analytics. הגדירו CF_SITE_TAG בקובץ analytics-worker/wrangler.toml.';
+      if (b.error === 'api_token_missing') return 'חסר מפתח ה-API בצד השרת. מתוך תיקיית analytics-worker הריצו: npx wrangler secret put CF_API_TOKEN';
       if (b.error === 'graphql_error') return 'Cloudflare החזיר שגיאה: ' + [].concat(b.detail || []).join('; ');
       return 'שגיאה ' + e.status + ' (' + (b.error || 'לא ידוע') + ').';
     }
