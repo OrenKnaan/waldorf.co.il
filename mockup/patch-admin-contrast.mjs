@@ -95,6 +95,41 @@ const EDITS = [
     from: '.an-tip:hover,.an-tip:focus-visible{background:var(--tan);color:#fff}',
     to:   '.an-tip:hover,.an-tip:focus-visible{background:var(--tan);color:#3D2B1F}' },
 
+  // The label bug the token divergence caused: .aform label asked for
+  // var(--brown-dark) and got #120C07 on the --sink #251C15 panel - 1.16:1,
+  // invisible - but only until the visitor touched the theme toggle, because the
+  // attribute block had already been corrected and the media block had not. That
+  // rule now reads var(--ink) (admin-app.js), the same token .field label uses;
+  // these edits remove the divergence that let one token mean two things.
+  //
+  // 2026-08-22 split the old --brown-dark in two - --tip-bg for the one dark
+  // surface, --brown-dark for text - and applied the split only to
+  // :root[data-theme="dark"] in admin-dashboard.html. The media block in all
+  // three files, and the attribute block in the other two, kept the surface
+  // value on a token that is now text. Indentation is what keeps the two anchors
+  // apart: the media block is nested 4 spaces, the attribute block 2. The second
+  // edit names its files because admin-dashboard.html is already correct there,
+  // and a blanket match would revert it when ENABLED = false.
+  { name: 'brown-dark dark-media',
+    from: '\n    --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#120C07;',
+    to:   '\n    --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#F2E7D8;' },
+  { name: 'brown-dark dark-attr', files: ['index.html', 'set-password.html'],
+    from: '\n  --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#120C07;',
+    to:   '\n  --tan:#C9A97E; --tan-dark:#D8BE97; --brown:#D8BC93; --brown-dark:#F2E7D8;' },
+
+  // --tip-bg itself was never added to the media block, so the analytics tooltip
+  // fell back to the light theme's #3D2B1F for anyone on a dark OS who had not
+  // touched the toggle. Not a contrast failure - 12.48:1 against its #FBF6EE
+  // text, where the intended #120C07 gives 18.05:1 - just the wrong shade.
+  // admin-dashboard.html only: the other two have no tooltip and never declared
+  // the token. Appends to its own anchor, so it needs `done` - see the loop.
+  { name: 'tip-bg dark-media', files: ['admin-dashboard.html'],
+    done: '\n    --tip-bg:#120C07;',
+    from: '\n    --ink:#F2E7D8; --muted:#B39C84; --line:#3A2D21;',
+    to:   '\n    --ink:#F2E7D8; --muted:#B39C84; --line:#3A2D21;'
+        + '\n    /* surface, not text - see the note in the [data-theme="dark"] block */'
+        + '\n    --tip-bg:#120C07;' },
+
   { name: 'side-sec alpha',
     from: '.side-sec{font-size:.68rem;letter-spacing:.13em;color:rgba(255,255,255,.42);',
     to:   '.side-sec{font-size:.68rem;letter-spacing:.13em;color:rgba(255,255,255,.58);' },
@@ -107,6 +142,7 @@ for (const file of FILES) {
   const before = readFileSync(path, 'utf8');
   let html = before;
   for (const e of EDITS) {
+    if (e.files && !e.files.includes(file)) continue;
     const [from, to] = ENABLED ? [e.from, e.to] : [e.to, e.from];
     // An edit whose `from` still matches its own output re-applies on every run.
     // `chip.on dark-media override` appended a second copy of its @media block

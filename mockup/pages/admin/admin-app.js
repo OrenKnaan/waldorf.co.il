@@ -30,7 +30,15 @@
   var st = document.createElement('style');
   st.textContent = [
     '.aform{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--sink)}',
-    '.aform label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--brown-dark)}',
+    // --ink, not --brown-dark: this is label text, and --ink is the label ink in
+    // all four :root blocks - the same token .field label uses in the page
+    // stylesheet. --brown-dark used to mean two different things on the two dark
+    // paths (#120C07 under @media (prefers-color-scheme:dark), #F2E7D8 under
+    // [data-theme="dark"]), so these labels came up near-black on the dark panel
+    // and only became readable once a theme toggle moved the page onto the
+    // attribute path. patch-admin-contrast.mjs has since made the paths agree,
+    // but the right token for label text was never that one.
+    '.aform label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--ink)}',
     '.aform .wide{grid-column:1/-1}',
     '.aform input,.aform select,.aform textarea{font-family:inherit;font-size:.88rem;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:9px 12px}',
     '.aform input:focus,.aform select:focus,.aform textarea:focus{outline:none;border-color:var(--tan)}',
