@@ -74,6 +74,8 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 11. **`חומר למיון` — the triage section.** Seven pages (`mockup/pages/sorting*.html`), a shared widget (`pages/sorting.js`), 364 content items under `pages/sorting-data/`, two generators (`mockup/sorting-content.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together — pages, data, generators, and the nav entry (`node mockup/patch-sorting-nav.mjs` with `ENABLED = false` strips the entry and its CSS from every page).
 
+11b. **Hero layout tests.** `mockup/pages/forum-hero-full.html` and `forum-hero-inset.html`, generated from `forum.html` by `mockup/hero-tests.mjs`. They compare a full-bleed slideshow with an inset one (10px top, 100px sides, breadcrumb resting on the slide). Delete both pages and the script once a direction is picked, and do not run `search-index.mjs` while they exist: it would index two duplicates of every `forum.html` section.
+
 **Placeholder content that must not ship:**
 
 12. Page titles all end in `— מוקאפ`, and the footer of all 49 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.

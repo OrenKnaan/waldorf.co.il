@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>הפורום — ערכת צבע: אור ושמנת</title>
+<title>הפורום: בדיקת סליידר עם שוליים</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -477,126 +477,132 @@
   .fx-tile-sub{font-size:.85rem;line-height:1.55;color:var(--text-muted)}
   .fx-tile-go{margin-top:auto;padding-top:6px;font-size:1.1rem;color:var(--brown)}
 
-  /* ===== theme switcher (temporary) ===== */
-  .themebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px;
-    padding:9px 14px;background:var(--white);border:1px dashed var(--tan-dark);
-    border-radius:var(--radius-lg);font-size:.82rem}
-  .themebar-lbl{font-family:var(--font-head);font-weight:700;color:var(--brown-dark);margin-inline-end:4px}
-  .themebar a{color:var(--brown);text-decoration:none;padding:5px 13px;
-    border:1px solid var(--tan);border-radius:var(--radius-pill);transition:background .15s,color .15s}
-  .themebar a:hover{background:var(--beige);color:var(--brown-dark)}
-  .themebar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
-  .themebar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
-
-  /* ===== theme: אור ושמנת / Light & Cream ===== */
-  :root{
-    --cream:#FFFFFF;--beige:#F1E9F3;--tan:#DCC3E2;--tan-dark:#786B84;
-    --brown:#6E2B7E;--brown-dark:#46154F;--text:#2C2233;--text-muted:#5A4E63;
-    --white:#FFFFFF;
-    --veil:#AE72BC;
-    --shadow:0 22px 50px -34px rgba(70,21,79,.45);
-    --shadow-lg:0 28px 66px -30px rgba(70,21,79,.42);
-    --radius:0;--radius-lg:0;--radius-pill:0;
-    --radius-organic-sm:0;--radius-organic:0;--radius-organic-lg:0;
-    --wash-rose:oklch(0.80 0.09 340);--wash-gold:oklch(0.92 0.06 86);
-    --wash-sage:oklch(0.80 0.08 300);--wash-sky:oklch(0.86 0.06 268);
-  }
-  body{background:
-    radial-gradient(58% 34% at 88% 0%, color-mix(in oklab,var(--wash-rose) 20%,transparent), transparent 66%),
-    radial-gradient(52% 30% at 6% 8%, color-mix(in oklab,var(--wash-sky) 18%,transparent), transparent 66%),
-    radial-gradient(70% 34% at 50% 100%, color-mix(in oklab,var(--wash-gold) 16%,transparent), transparent 70%),
-    #FFFFFF}
-  /* The header rule fades out at both ends instead of stopping. */
-  .site-header{background:transparent;box-shadow:none;border-width:0 0 1px;
-    border-image:linear-gradient(90deg,transparent,var(--veil) 22%,var(--brown) 50%,var(--veil) 78%,transparent) 1}
-  .nav-link:hover,.nav-link.active{border-bottom-color:var(--brown)}
-  .dropdown{border:1px solid color-mix(in oklab,var(--veil) 55%,transparent);border-radius:0}
-  /* Every rule on this page runs out before it reaches the edge. */
-  .pagebanner{background:transparent;box-shadow:none;border:0;padding-inline:2px;
-    border-bottom:1px solid transparent;
-    border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 72%) 1}
-  h1{color:var(--brown-dark);font-size:2.4rem;font-weight:700}
-  h1::after{height:8px;bottom:-4px;opacity:.7;border-radius:0;
-    background:linear-gradient(90deg,transparent,color-mix(in oklab,var(--wash-rose) 75%,transparent) 30%,
-      color-mix(in oklab,var(--wash-gold) 70%,transparent) 70%,transparent)}
-  h2{color:var(--brown);border-bottom:none;padding-bottom:0;margin-bottom:18px;
-    font-size:1.2rem;letter-spacing:.03em}
-  h2::after{content:"";flex:1 1 auto;height:1px;min-width:24px;
-    background:linear-gradient(90deg,color-mix(in oklab,var(--veil) 80%,transparent),transparent)}
-  /* No box: the border is a gradient that runs out before the corner, and the
-     lift comes from a wide low glow rather than a drop shadow. */
-  section.card{background:#FFFFFF;border-radius:0;padding:30px 34px;margin-bottom:26px;
-    border:1px solid transparent;
-    border-image:linear-gradient(150deg,var(--brown) 0%,var(--veil) 16%,
-      transparent 52%,color-mix(in oklab,var(--wash-gold) 78%,transparent) 100%) 1;
-    box-shadow:var(--shadow)}
-  li::marker{color:var(--veil)}
-  /* Full-bleed, drained and re-lit rather than saturated, and masked so it
-     fades in from the right instead of ending on an edge. main carries the
-     only inset, so the negative margins are its padding at each breakpoint —
-     restated at the end of this block because those media queries come later
-     in the sheet and would otherwise win. */
-  .art-hero{border-radius:0;box-shadow:none;margin-inline:-24px;
-    -webkit-mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%);
-    mask-image:linear-gradient(to right,#000 0%,#000 52%,rgba(0,0,0,.55) 78%,transparent 100%)}
-  .art-hero .bg{filter:blur(8px) grayscale(1) contrast(.95) brightness(1.22)}
-  /* The white bottom fade was lightening exactly the corner the caption sits
-     in, and white 13px type came out at 3.24:1 over it. The right-side mask
-     already does the dissolving, so it goes and the veil deepens instead. */
-  .art-hero::after{background:
-    linear-gradient(118deg,rgba(52,12,60,.93) 0%,rgba(96,28,98,.80) 30%,
-      rgba(150,62,150,.52) 62%,rgba(196,140,205,.30) 100%)}
-  .art-hero .frame{border-radius:0;border:0;box-shadow:0 14px 40px rgba(30,10,35,.45);
-    margin-inline-end:40px}
-  .art-hero .cap{padding-bottom:22px;padding-inline:40px}
-  .btn{border-radius:0;font-weight:500;letter-spacing:.02em}
-  .btn-primary:hover{background:var(--brown-dark)}
-  .btn-ghost{border:1px solid var(--veil);color:var(--brown)}
-  .btn-ghost:hover{background:color-mix(in oklab,var(--veil) 12%,transparent);color:var(--brown-dark)}
-  .btn-row .btn:nth-child(2n),.actions .btn:nth-child(2n){border-radius:0}
-  .chip-row .chip:nth-child(3n+2),.dyn-meta .dyn-chip:nth-child(3n+2),
-  .chip-row .chip:nth-child(3n+3),.dyn-meta .dyn-chip:nth-child(3n+3){border-radius:0}
-  .fx-eyebrow{color:var(--brown);letter-spacing:.11em}
-  .fx-tile{background:#FFFFFF;border-radius:0;border:1px solid transparent;
-    border-image:linear-gradient(160deg,color-mix(in oklab,var(--veil) 80%,transparent),
-      transparent 70%) 1;box-shadow:none}
-  .fx-tile:hover{transform:none;box-shadow:var(--shadow);
-    border-image:linear-gradient(160deg,var(--brown),color-mix(in oklab,var(--veil) 40%,transparent)) 1}
-  .fx-tile-go{color:var(--brown)}
-  .fx-mail{border-bottom-color:var(--veil)}
-  .nav-badge,.pending-badge{background:color-mix(in oklab,var(--wash-gold) 70%,#FFFFFF);
-    color:var(--brown-dark);border-radius:0}
-  footer.site-footer{margin-top:52px;padding-top:34px;border-top:1px solid transparent;
-    border-image:linear-gradient(90deg,transparent,color-mix(in oklab,var(--veil) 70%,transparent) 50%,transparent) 1}
-  main .dyn-item{background:#FFFFFF;border-radius:0;border:1px solid transparent;box-shadow:var(--shadow);
-    border-image:linear-gradient(150deg,color-mix(in oklab,var(--veil) 70%,transparent),transparent 62%) 1}
-  main .dyn-item .dyn-btn{border-radius:0;background:var(--brown);color:#FFFFFF}
-  main .dyn-item .dyn-btn:hover{background:var(--brown-dark);color:#FFFFFF}
-  main .dyn-event .date-badge{border-radius:0;background:#FFFFFF;
-    border-color:color-mix(in oklab,var(--veil) 45%,transparent)}
-  main .dyn-empty{border-radius:0;background:#FFFFFF}
-  .a11y-root .a11y-fab{background:var(--brown);border:0;
-    border-radius:0;color:#FFFFFF;box-shadow:0 14px 34px rgba(70,21,79,.34)}
-  .a11y-root .a11y-fab:hover{background:var(--brown-dark)}
-  .a11y-root .a11y-fab:focus-visible{outline:3px solid var(--brown)}
-  .themebar{background:transparent;border:0;border-radius:0;padding-inline:2px;
-    border-bottom:1px solid transparent;
-    border-image:linear-gradient(90deg,color-mix(in oklab,var(--veil) 60%,transparent),transparent 72%) 1}
-  .themebar a{border-radius:0;border-color:color-mix(in oklab,var(--veil) 55%,transparent)}
-  @media (max-width:720px){.art-hero{margin-inline:-18px}
-    .art-hero .frame{margin-inline-end:26px}.art-hero .cap{padding-inline:26px}}
-  @media (max-width:560px){.art-hero{margin-inline:-14px}
-    .art-hero .frame{margin-inline-end:20px}.art-hero .cap{padding-inline:20px}}
-  @media (max-width:400px){.art-hero{margin-inline:-12px}}
-
-  .art-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to top,rgba(20,8,16,.66) 0%,rgba(20,8,16,.30) 30%,transparent 58%)}
-  /* The band drops to 200px and then 150px, so the same scrim covers far less
-     of the caption; below 720px it has to be deeper and reach higher. */
+  /* ===== shape: plain rounded corners for text containers and images, the
+     organic blob for everything else =====
+     The rest of the site already runs every button, badge, dropdown and
+     chip through --radius-organic-*, a rounded, hand-drawn blob shape, and
+     nothing here touches that. The "text container" surfaces (section.card,
+     .fx-tile) and the photo-bearing .art-hero get an ordinary border-radius
+     instead, plain and uniform. .pagebanner (the breadcrumb strip) is
+     deliberately left out of that list: it reads as a slim wayfinding bar
+     rather than a card, so it keeps the base stylesheet's own organic blob
+     (--radius-organic-lg) unoverridden. Existing borders are untouched. */
+  :root{--round:18px;--round-lg:26px}
+  section.card,.fx-tile{border-radius:var(--round)}
+  .art-hero{border-radius:var(--round-lg)}
+  :focus-visible{border-radius:0}
+  .table-wrap::-webkit-scrollbar-thumb,.table-wrap::-webkit-scrollbar-track{border-radius:0}
   @media (max-width:720px){
-    .art-hero::before{background:linear-gradient(to top,
-      rgba(20,8,16,.84) 0%,rgba(20,8,16,.60) 44%,rgba(20,8,16,.20) 68%,transparent 88%)}
+    section.card{padding:18px}
   }
+
+  /* ===== art-hero: taller, and wider than the column it sits in =====
+     --art-bleed is 150px only on a screen wide enough to spare it: capped by
+     min() so it never asks for more than half of whatever room actually
+     exists outside the 1200px column (max(0px, ...) keeps that half from
+     going negative once the viewport is narrower than the column itself),
+     and margin-inline/width move together so the box is exactly as much
+     wider than main as it is pulled outside it, not clipped by main on one
+     side. .ah-media is already inset:0 on this element, so it fills the
+     wider box on its own, nothing to change there. */
+  :root{--art-bleed:min(150px, max(0px, (100vw - var(--page-max)) / 2))}
+  .art-hero{height:600px;margin-inline:calc(-1 * var(--art-bleed));width:calc(100% + var(--art-bleed) * 2)}
+  @media (max-width:720px){.art-hero{height:300px}}
+  @media (max-width:400px){.art-hero{height:255px}}
+
+  /* ===== category colour ===== */
+  :root{--wash-plum:oklch(0.74 0.055 320);--cat:var(--wash-sky);
+    --tex-hue:0deg;--tex-transform:none}
+  body{background:none}
+  .page-wash{pointer-events:none;background:
+      radial-gradient(120% 70% at 100% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 62%),
+      radial-gradient(100% 60% at 0% 10%, color-mix(in oklab,var(--cat) 24%,transparent), transparent 62%),
+      linear-gradient(180deg,var(--beige) 0%,var(--cream) 640px,var(--cream) 100%)}
+  .site-header{background:
+      radial-gradient(120% 150% at 14% 0%, color-mix(in oklab,var(--cat) 34%,transparent), transparent 55%),
+      radial-gradient(120% 150% at 50% 0%, color-mix(in oklab,var(--wash-gold) 16%,transparent), transparent 55%),
+      radial-gradient(120% 160% at 86% 0%, color-mix(in oklab,var(--cat) 30%,transparent), transparent 55%),
+      var(--cream)}
+
+  /* ===== art-hero slideshow, cross-fading; art-hero-slideshow.js drives it. */
+  .ah-media{position:absolute;inset:0}
+  .ah-slide{position:absolute;inset:0;background-image:var(--img);background-size:100% auto;
+    background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1s ease}
+  .ah-slide.is-active{opacity:1}
+  @media (min-width:900px){.ah-slide{background-image:var(--img-lg)}}
+  .art-hero.slideshow::after{background:var(--cap-scrim),radial-gradient(70% 88% at 100% 100%,
+    rgba(20,10,8,.86) 0%,rgba(20,10,8,.60) 28%,rgba(20,10,8,.28) 50%,transparent 70%)}
+  @media (max-width:720px){
+    .art-hero.slideshow::after{background:var(--cap-scrim),radial-gradient(78% 92% at 100% 100%,
+      rgba(20,10,8,.90) 0%,rgba(20,10,8,.68) 30%,rgba(20,10,8,.34) 54%,transparent 74%)}
+  }
+  .art-hero.slideshow .cap{position:relative;align-self:flex-end;z-index:2}
+  .ah-play{position:absolute;z-index:2;top:12px;inset-inline-start:12px;width:34px;height:34px;
+    border-radius:50%;border:0;background:rgba(20,10,8,.52);color:#fff;display:flex;
+    align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .ah-play:hover{background:rgba(20,10,8,.72)}
+  .ah-play:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .ah-play .ico-pause{display:block}
+  .ah-play .ico-play{display:none}
+  .art-hero.slideshow.is-paused .ah-play .ico-pause{display:none}
+  .art-hero.slideshow.is-paused .ah-play .ico-play{display:block}
+  @media (prefers-reduced-motion:reduce){.ah-slide{transition:none}}
+
+  /* ===== full-page watercolour texture. Two fixed, viewport-covering
+     layers, .page-wash then .page-tex on top of it, both z-index:-1 or
+     deeper so the header and every card, both still opaque, go on covering
+     them wherever a visitor is actually looking. See the note that used to
+     live in category-variants.mjs's TEXTURE_CSS for the full blend-mode
+     reasoning; unchanged here. */
+  .page-wash{position:fixed;inset:0;z-index:-2}
+  .page-tex{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.8;
+    background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
+    mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
+    transform:var(--tex-transform)}
+
+  /* ===== layout switcher (temporary) ===== */
+  .testbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 16px;
+    background:var(--white);border-bottom:1px dashed var(--tan-dark);font-size:.82rem}
+  .testbar-lbl{font-family:var(--font-head);font-weight:700;color:var(--brown-dark);margin-inline-end:4px}
+  .testbar a{color:var(--brown);text-decoration:none;padding:4px 13px;
+    border:1px solid var(--tan);border-radius:var(--radius-pill)}
+  .testbar a:hover{background:var(--beige);color:var(--brown-dark)}
+  .testbar a[aria-current]{background:var(--brown);color:var(--white);border-color:var(--brown)}
+  .testbar a[aria-current]:hover{background:var(--brown-dark);color:var(--white)}
+
+  /* ===== hero test: shared ===== */
+  :root{--side:clamp(16px,7.5vw,100px);--hero-h:clamp(240px,38vw,600px);--bar-h:44px;--bar-gap:14px}
+
+  /* 3. text containers as wide as the slides' margins allow */
+  body.ht main{max-width:none;padding-inline:var(--side)}
+
+  /* 2. text containers: a light tint of the page's watercolour colour */
+  body.ht section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
+
+  body.ht .art-hero{height:var(--hero-h);margin:0;width:auto}
+  body.ht .ah-slide{background-size:cover}
+
+  /* 1b. the caption is gone; the title sits bottom-centre over a bottom scrim.
+     The old bottom-right radial is dropped, nothing sits there any more. */
+  body.ht .art-hero.slideshow::after{background:var(--cap-scrim)}
+  body.ht .hero-title{position:absolute;z-index:2;inset-inline:0;bottom:0;margin:0;
+    padding:0 64px 22px;text-align:center;display:block;color:#fff;
+    font-size:clamp(1.35rem,3.4vw,2.4rem);line-height:1.25;text-shadow:0 1px 10px rgba(0,0,0,.55)}
+  body.ht .hero-title::after{display:none}
+
+  /* The pause control moves from top-start (where the inset page's breadcrumb
+     rests) to bottom-end, clear of the centred title. */
+  body.ht .ah-play{top:auto;bottom:16px;inset-inline-start:auto;inset-inline-end:16px}
+
+  /* ===== hero test 2: inset ===== */
+  body.ht-inset main{padding-top:10px}
+
+  /* 1c. The pill rests on the slide, --bar-gap from its top and sides. A fixed
+     bar height is what lets the bottom margin hand back exactly the distance
+     the top margin pulled up. */
+  body.ht-inset .pagebanner{height:var(--bar-h);padding-block:0;white-space:nowrap;
+    margin:calc(var(--bar-gap) - var(--hero-h)) var(--bar-gap)
+           calc(var(--hero-h) - var(--bar-gap) - var(--bar-h) + 24px)}
 </style>
 <script type="application/ld+json">
 {
@@ -621,8 +627,16 @@
 <script src="./accessibility.js"></script>
 <script src="./search.js" defer></script>
 </head>
-<body>
+<body class="ht ht-inset">
+<div class="page-wash" aria-hidden="true"></div>
+<div class="page-tex" aria-hidden="true"></div>
 <a class="skip-link" href="#main-content">דילוג לתוכן המרכזי</a>
+<nav class="testbar" aria-label="בדיקות עיצוב (זמני)">
+<span class="testbar-lbl">בדיקת סליידר</span>
+<a href="./forum-hero-full.html">סליידר ברוחב מלא</a>
+<a href="./forum-hero-inset.html" aria-current="page">סליידר עם שוליים</a>
+<a href="./forum.html">העמוד הנוכחי</a>
+</nav>
 <header class="site-header">
   <button type="button" class="nav-toggle" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="primary-nav"><span class="bars" aria-hidden="true"></span></button>
   <div class="brand-row">
@@ -687,6 +701,23 @@
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
 <main id="main-content" tabindex="-1">
+  <div class="art-hero slideshow" data-art-slideshow>
+<div class="ah-media" aria-hidden="true">
+<div class="ah-slide is-active" style="--img:url('./img/hero/art-1.webp');--img-lg:url('./img/hero/art-1.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-2.webp');--img-lg:url('./img/hero/art-2.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-3.webp');--img-lg:url('./img/hero/art-3.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-4.webp');--img-lg:url('./img/hero/art-4.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-5.webp');--img-lg:url('./img/hero/art-5.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-6.webp');--img-lg:url('./img/hero/art-6.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-7.webp');--img-lg:url('./img/hero/art-7.webp')"></div>
+<div class="ah-slide" style="--img:url('./img/hero/art-8.webp');--img-lg:url('./img/hero/art-8.webp')"></div>
+</div>
+<button type="button" class="ah-play" aria-pressed="false" aria-label="עצירת מצגת התמונות">
+<svg class="ico-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
+<svg class="ico-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>
+</button>
+<h1 class="hero-title">הפורום הארצי לחינוך ולדורף</h1>
+</div>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
@@ -694,16 +725,6 @@
 <span class="crumb current" aria-current="page">הפורום</span>
 </span>
   </nav>
-  <nav class="themebar" aria-label="ערכות עיצוב (זמני)">
-<span class="themebar-lbl">ערכות עיצוב</span>
-<a href="./forum-alt1.html">יין ועצם</a>
-<a href="./forum-alt2.html" aria-current="page">אור ושמנת</a>
-<a href="./forum-alt3.html">ציור בפינה</a>
-<a href="./forum-alt4.html">פסטל</a>
-</nav>
-  <div class="art-hero"><div class="bg" style="background-image:url('./img/art/waldorf-5.webp')"></div><div class="frame"><img src="./img/art/waldorf-5.webp" alt="מעגל הקהילה" width="400" height="600" decoding="async"></div><div class="cap"><b>מעגל הקהילה</b><span>רבים סביב אור אחד — ציור ולדורף</span></div></div>
-  <h1>הפורום הארצי לחינוך ולדורף</h1>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 <section class="card">
 <h2 id="sec-hyf6t9">מבוא</h2>
 <div id="about-intro">
@@ -798,5 +819,6 @@ WDyn.applyAbout({intro:'#about-intro',activities:'#about-activities',admission:'
 <!-- Cloudflare Web Analytics -->
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"e4ea3335f4ae4f55bacc328eb40c12c9"}'></script>
 <!-- End Cloudflare Web Analytics -->
+<script src="./art-hero-slideshow.js" defer></script>
 </body>
 </html>
