@@ -40,9 +40,11 @@
      half its width; clientWidth does not. Declared on body, which is where
      the stylesheet declares it, or the rule there would win. */
   function setHeroSide() {
-    var cs = getComputedStyle(document.documentElement);
-    var max = parseFloat(cs.getPropertyValue('--page-max')) || 0;
-    var free = (document.documentElement.clientWidth - max) / 2;
+    // Measured from <main> itself, not from --page-max: main is as wide as the
+    // inner pages' column now, so the free space beside it can be anything,
+    // including none, and a constant would put the hero past the window edge.
+    var main = document.querySelector('main');
+    var free = main ? (document.documentElement.clientWidth - main.clientWidth) / 2 : 0;
     document.body.style.setProperty('--hero-side', Math.max(0, free) + 'px');
   }
   setHeroSide();

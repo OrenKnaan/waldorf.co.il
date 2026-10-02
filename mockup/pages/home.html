@@ -633,6 +633,18 @@
   /* The drawer and its accordions are keyboard- and switch-operable; without a
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
+
+  /* ===== home: the same column as the inner pages =====
+     --side is the inset the inner pages use for their slides and cards. Cards
+     and the hero's own content (lede, buttons, controls) follow it; the photograph
+     still runs to the window edge, so the bleed is exactly one --side. The hero
+     block above derives main's padding and the bleed from --gutter and
+     --hero-side, so those two tokens are what get replaced here. */
+  :root{--side:clamp(16px,7.5vw,100px)}
+  body.has-hero{--gutter:var(--side);--hero-side:0px}
+  main{max-width:none}
+  .hero-body{padding-inline:var(--side)}
+  @media (min-width:961px){.brand-row,.primary-nav{max-width:none;padding-inline:var(--side)}}
 </style>
 <script type="application/ld+json">
 {
