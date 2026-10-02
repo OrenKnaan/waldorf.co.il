@@ -58,6 +58,33 @@
     '.pagebanner .crumbs{flex:1 1 auto;min-width:0;flex-wrap:nowrap}',
     '.pagebanner .crumbs>*,.pagebanner .crumbs .crumb-sec{flex:none;white-space:nowrap}',
     '.pagebanner .crumbs .crumb-end{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}',
+    // Hamburger that slides in at the start (right, in RTL) edge once the pill is
+    // stuck. Closed it is 0 wide with a negative end margin that cancels the
+    // banner's gap, so the trail is not nudged; open it is a square as tall as the
+    // pill (--sm-size, measured in JS), flush with the pill's edge. Width, margin,
+    // opacity and offset all ease out together, so the trail shrinks as it arrives.
+    // visibility keeps the hidden button out of the tab order.
+    '.stick-menu-btn{flex:none;box-sizing:border-box;width:0;height:var(--sm-size,44px);',
+    '  margin-block:calc(var(--sm-pad-b,0px) * -1);margin-inline:0 -12px;padding:0;border:0;border-radius:inherit;',
+    '  background:var(--brown);color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;',
+    '  cursor:pointer;opacity:0;transform:translateX(16px);visibility:hidden;',
+    '  transition:width .35s ease-out,margin .35s ease-out,opacity .35s ease-out,transform .35s ease-out,visibility 0s linear .35s}',
+    '.pagebanner.is-stuck .stick-menu-btn{width:var(--sm-size,44px);margin-inline:calc(var(--sm-pad-s,0px) * -1) 0;',
+    '  opacity:1;transform:none;visibility:visible;transition-delay:0s}',
+    '.stick-menu-btn:hover,.stick-menu-btn[aria-expanded="true"]{background:var(--brown-dark)}',
+    '.stick-menu-btn:focus-visible{outline:3px solid var(--brown-dark);outline-offset:2px}',
+    '.stick-menu-btn svg{width:42%;height:42%;flex:none}',
+    '.stick-menu{position:absolute;top:calc(100% + 9px);inset-inline-start:0;width:min(300px,calc(100vw - 32px));',
+    '  max-height:min(70vh,520px);overflow:auto;background:var(--white);border:1px solid var(--beige);',
+    '  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:8px 0;z-index:40;white-space:normal}',
+    '.stick-menu[hidden]{display:none}',
+    '.stick-menu .sm-head{padding:10px 20px 2px;font-family:var(--font-head);font-size:.8rem;color:var(--text-muted)}',
+    '.stick-menu .sm-sep{height:1px;background:var(--beige);margin:6px 0}',
+    '.stick-menu a{display:block;padding:8px 20px;font-size:.9rem;color:var(--text);text-decoration:none}',
+    '.stick-menu a.sm-top{font-weight:600}',
+    '.stick-menu a:hover,.stick-menu a:focus-visible{background:var(--beige);color:var(--brown-dark)}',
+    '.stick-menu a[aria-current="page"]{color:var(--brown-dark);font-weight:700}',
+    '@media (prefers-reduced-motion:reduce){.stick-menu-btn{transition:none}}',
     '.pagebanner a.crumb,.pagebanner button.crumb{cursor:pointer}',
     '.pagebanner button.crumb{font:inherit;background:none;border:0;padding:0;color:var(--text-muted);display:inline-flex;align-items:center;gap:3px}',
     '.pagebanner button.crumb:hover,.pagebanner button.crumb[aria-expanded="true"]{color:var(--brown);text-decoration:underline}',
@@ -269,6 +296,75 @@
     for (var i = 0; i < all.length; i++) all[i].classList.toggle('crumb-end', all[i] === last);
   }
 
+  /* ---------- hamburger: appears when the pill sticks ---------- */
+  var navRoot = document.querySelector('.primary-nav');
+  var menuBtn = null, menuPanel = null;
+
+  function buildMenu() {
+    var panel = document.createElement('div');
+    panel.className = 'stick-menu';
+    panel.id = 'stick-menu';
+    panel.hidden = true;
+    var here = (location.pathname.split('/').pop() || 'home.html').toLowerCase();
+    function link(src, top) {
+      var a = document.createElement('a');
+      a.href = src.getAttribute('href');
+      a.textContent = src.textContent.trim();
+      if (top) a.className = 'sm-top';
+      if ((a.getAttribute('href') || '').split('/').pop().toLowerCase() === here) a.setAttribute('aria-current', 'page');
+      return a;
+    }
+    navRoot.querySelectorAll('.nav-item').forEach(function (item, i) {
+      var head = item.querySelector('.nav-link');
+      var dd = item.querySelector('.dropdown');
+      if (!head) return;
+      if (i) { var s = document.createElement('div'); s.className = 'sm-sep'; panel.appendChild(s); }
+      if (!dd) { if (head.getAttribute('href')) panel.appendChild(link(head, true)); return; }
+      var h = document.createElement('div');
+      h.className = 'sm-head';
+      h.textContent = head.textContent.trim();
+      panel.appendChild(h);
+      Array.prototype.forEach.call(dd.children, function (el) {
+        if (el.tagName === 'A') panel.appendChild(link(el, false));
+        else if (el.classList.contains('dropdown-head')) { var sh = document.createElement('div'); sh.className = 'sm-head'; sh.textContent = el.textContent.trim(); panel.appendChild(sh); }
+        else if (el.classList.contains('dropdown-sep')) { var sp = document.createElement('div'); sp.className = 'sm-sep'; panel.appendChild(sp); }
+      });
+    });
+    return panel;
+  }
+
+  function setMenu(open) {
+    if (!menuBtn) return;
+    if (open && !menuPanel) { menuPanel = buildMenu(); banner.appendChild(menuPanel); menuBtn.setAttribute('aria-controls', 'stick-menu'); }
+    if (menuPanel) menuPanel.hidden = !open;
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.setAttribute('aria-label', open ? 'סגירת תפריט' : 'פתיחת תפריט');
+  }
+
+  function sizeMenuBtn() {
+    var cs = window.getComputedStyle(banner);
+    banner.style.setProperty('--sm-size', banner.offsetHeight + 'px');
+    banner.style.setProperty('--sm-pad-b', cs.paddingTop);
+    banner.style.setProperty('--sm-pad-s', cs.paddingInlineStart);
+  }
+
+  if (navRoot && navRoot.querySelector('.nav-item')) {
+    menuBtn = document.createElement('button');
+    menuBtn.type = 'button';
+    menuBtn.className = 'stick-menu-btn';
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-label', 'פתיחת תפריט');
+    menuBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>';
+    banner.insertBefore(menuBtn, banner.firstChild);
+    sizeMenuBtn();
+    window.addEventListener('resize', sizeMenuBtn);
+    menuBtn.addEventListener('click', function () { setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'); });
+    document.addEventListener('click', function (e) { if (menuPanel && !menuPanel.hidden && !banner.contains(e.target)) setMenu(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menuPanel && !menuPanel.hidden) { setMenu(false); menuBtn.focus(); }
+    });
+  }
+
   var ticking = false;
   function schedule() {
     if (ticking) return;
@@ -276,6 +372,7 @@
     requestAnimationFrame(function () {
       ticking = false;
       banner.classList.toggle('is-stuck', banner.getBoundingClientRect().top <= stickyTop() + 1);
+      if (!banner.classList.contains('is-stuck')) setMenu(false);
       update();
       markEnd();
     });
