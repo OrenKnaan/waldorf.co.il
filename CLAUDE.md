@@ -74,7 +74,6 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 
 11. **`חומר למיון` — the triage section.** Seven pages (`mockup/pages/sorting*.html`), a shared widget (`pages/sorting.js`), 364 content items under `pages/sorting-data/`, two generators (`mockup/sorting-content.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together — pages, data, generators, and the nav entry (`node mockup/patch-sorting-nav.mjs` with `ENABLED = false` strips the entry and its CSS from every page).
 
-11b. **Hero layout tests.** `mockup/pages/forum-hero-full.html` and `forum-hero-inset.html`, generated from `forum.html` by `mockup/hero-tests.mjs`. They compare a full-bleed slideshow with an inset one (10px top, 100px sides, breadcrumb resting on the slide). Delete both pages and the script once a direction is picked, and do not run `search-index.mjs` while they exist: it would index two duplicates of every `forum.html` section.
 
 **Placeholder content that must not ship:**
 
@@ -300,6 +299,10 @@ Per PRD section 3.4, these are unresolved and need client sign-off before being 
 2. Whether kindergarten extras (job board, morning circles, annual plans) are in the base scope.
 3. Whether "מדיה" (media) is its own top-level page or a subsection.
 4. Whether the curriculum page is a class×subject matrix or a flat subject list.
+
+## Page hero layout
+
+The 41 pages with an `art-hero` slideshow share one layout, written as a `/* ===== hero: inset slideshow =====` block at the end of each page's stylesheet: slides 10px under the header and `--side` (up to 100px) from the page edges, rounded; the page `<h1>` lives inside the slide, bottom-centre, and the old painting caption is gone; `section.card` is a 13% tint of the page's `--cat` watercolour colour; `main` has no max-width. The breadcrumb stays inside `<main>` because `breadcrumb.js` makes it sticky against `main`; a negative top margin pulls it onto the slide and a fixed `--bar-h` lets the bottom margin give the distance back, so do not let the bar's height vary. Breadcrumbs never wrap: every crumb can shrink and clips with an ellipsis. The block was added by a one-off script, so a new page should be cloned from a finished one.
 
 ## Language/direction
 

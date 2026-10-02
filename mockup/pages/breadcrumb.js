@@ -52,7 +52,14 @@
     '  border-radius:inherit;background:var(--white)}',
     'main h2,main h3{scroll-margin-top:84px}',
     '.crumb-sections{display:contents}',
-    '.crumb-sec{max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    // One row, always: the trail takes all the width the pill has, and whatever
+    // does not fit is clipped with an ellipsis instead of wrapping. Every crumb may
+    // shrink (long labels give up the most), the separators never do.
+    '.pagebanner .crumbs{flex:1 1 auto;min-width:0;flex-wrap:nowrap}',
+    '.pagebanner .crumbs>*,.pagebanner .crumbs .crumb-sec{flex:0 1 auto;min-width:0;white-space:nowrap}',
+    '.pagebanner .crumbs>.crumb-sep{flex:none}',
+    '.pagebanner .crumbs>.crumb:not(button),.crumb-sec,.crumb-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.crumb-menu-wrap>button.crumb{min-width:0;max-width:100%}',
     '.pagebanner a.crumb,.pagebanner button.crumb{cursor:pointer}',
     '.pagebanner button.crumb{font:inherit;background:none;border:0;padding:0;color:var(--text-muted);display:inline-flex;align-items:center;gap:3px}',
     '.pagebanner button.crumb:hover,.pagebanner button.crumb[aria-expanded="true"]{color:var(--brown);text-decoration:underline}',
@@ -66,7 +73,7 @@
     '.crumb-menu a:hover,.crumb-menu a:focus-visible{background:var(--beige);color:var(--brown-dark)}',
     // The resting gap is 8px at every breakpoint, so the sticky offset is too:
     // at 6px the pill rose 2px here for the same reason it dropped 2px above.
-    '@media (max-width:560px){.pagebanner{top:8px}.crumb-sec{max-width:15ch}}'
+    '@media (max-width:560px){.pagebanner{top:8px}}'
   ].join('');
   document.head.appendChild(style);
 
@@ -153,7 +160,10 @@
     btn.className = node.className;
     btn.setAttribute('aria-haspopup', 'true');
     btn.setAttribute('aria-expanded', 'false');
-    btn.appendChild(document.createTextNode(label));
+    var lbl = document.createElement('span');
+    lbl.className = 'crumb-label';
+    lbl.textContent = label;
+    btn.appendChild(lbl);
     var caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     caret.setAttribute('class', 'caret');
     caret.setAttribute('viewBox', '0 0 24 24');

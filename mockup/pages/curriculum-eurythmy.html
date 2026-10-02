@@ -535,6 +535,30 @@
     background:url(./img/watercolor-clouds.webp) center/cover no-repeat;
     mix-blend-mode:multiply;filter:hue-rotate(var(--tex-hue));
     transform:var(--tex-transform)}
+
+  /* ===== hero: inset slideshow =====
+     Slides sit 10px under the header and --side from the page edges, with rounded
+     corners; the page title (the h1) is inside the slide, bottom-centre. The
+     breadcrumb stays in <main> (breadcrumb.js makes it sticky against main) and is
+     pulled up onto the slide by a negative margin; the fixed bar height lets the
+     bottom margin give back exactly the distance the top margin took. Text
+     containers take a light tint of the page's watercolour colour, and main is as
+     wide as the slides' margins allow. */
+  :root{--side:clamp(16px,7.5vw,100px);--hero-h:clamp(240px,38vw,600px);--bar-h:44px;--bar-gap:14px}
+  main{max-width:none;padding:10px var(--side) 70px}
+  section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
+  main section.card,main blockquote,main blockquote>*{min-width:0}
+  main .art-hero{height:var(--hero-h);margin:0;width:auto}
+  main .ah-slide{background-size:cover}
+  main .art-hero.slideshow::after{background:var(--cap-scrim)}
+  main .hero-title{position:absolute;z-index:2;inset-inline:0;bottom:0;margin:0;
+    padding:0 64px 22px;text-align:center;display:block;color:#fff;
+    font-size:clamp(1.35rem,3.4vw,2.4rem);line-height:1.25;text-shadow:0 1px 10px rgba(0,0,0,.55)}
+  main .hero-title::after{display:none}
+  main .ah-play{top:auto;bottom:16px;inset-inline-start:auto;inset-inline-end:16px}
+  main > .pagebanner{height:var(--bar-h);padding-block:0;white-space:nowrap;
+    margin:calc(var(--bar-gap) - var(--hero-h)) var(--bar-gap)
+           calc(var(--hero-h) - var(--bar-gap) - var(--bar-h) + 24px)}
 </style>
 <script type="application/ld+json">
 {
@@ -639,17 +663,6 @@
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
 <script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
 <main id="main-content" tabindex="-1">
-  <nav class="pagebanner" aria-label="breadcrumb">
-    <span class="crumbs">
-<a class="crumb" href="./home.html">דף הבית</a>
-<span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./school.html">בית הספר</a>
-<span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./curriculum.html">תוכניות לימודים</a>
-<span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">אאוריתמיה</span>
-</span>
-  </nav>
   <div class="art-hero slideshow" data-art-slideshow>
 <div class="ah-media" aria-hidden="true">
 <div class="ah-slide is-active" style="--img:url('./img/hero/art-5.webp');--img-lg:url('./img/hero/art-5.webp')"></div>
@@ -665,11 +678,20 @@
 <svg class="ico-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
 <svg class="ico-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>
 </button>
-<div class="cap"><b>הפנינה בצדף</b><span>אור עולה מן המעמקים — ציור ולדורף</span></div>
+<h1 class="hero-title">אאוריתמיה</h1>
 </div>
-  <h1>אאוריתמיה</h1>
+  <nav class="pagebanner" aria-label="breadcrumb">
+    <span class="crumbs">
+<a class="crumb" href="./home.html">דף הבית</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<a class="crumb" href="./school.html">בית הספר</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<a class="crumb" href="./curriculum.html">תוכניות לימודים</a>
+<span class="crumb-sep" aria-hidden="true">/</span>
+<span class="crumb current" aria-current="page">אאוריתמיה</span>
+</span>
+  </nav>
 <p>אמנות תנועה ייחודית לחינוך ולדורף, שבה מבטאים בגוף צלילי דיבור ומוזיקה — מטפחת מודעות מרחבית, קצב ועבודת קבוצה.</p>
-<div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div>
 <section class="card">
 <div class="tabs" data-group="4">
 <div class="tab-buttons" role="tablist">
