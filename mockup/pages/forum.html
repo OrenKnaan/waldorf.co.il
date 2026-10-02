@@ -579,13 +579,17 @@
   @media (min-width:961px){.brand-row,.primary-nav{max-width:none;padding-inline:var(--side)}}
   main .art-hero{height:var(--hero-h);margin:0;width:auto}
   main .ah-slide{background-size:cover}
-  /* A soft pool of shade centred on the title, not a band across the whole bottom. */
-  main .art-hero.slideshow::after{background:radial-gradient(ellipse min(55%,500px) 115px at 50% 100%,
-    rgba(20,10,8,.68) 0%,rgba(20,10,8,.50) 50%,rgba(20,10,8,0) 100%)}
-  main .hero-title{position:absolute;z-index:2;inset-inline:0;bottom:0;margin:0;
-    padding:0 64px 22px;text-align:center;display:block;color:#fff;
+  /* No band along the bottom edge: the shade belongs to the title (see below). */
+  main .art-hero.slideshow::after{background:none}
+  main .hero-title{position:absolute;z-index:2;left:50%;bottom:22px;transform:translateX(-50%);
+    width:max-content;max-width:calc(100% - 128px);margin:0;padding:0;text-align:center;display:block;color:#fff;
     font-size:clamp(1.35rem,3.4vw,2.4rem);line-height:1.25;text-shadow:0 0 16px rgba(20,10,8,.7),0 1px 4px rgba(20,10,8,.6)}
   main .hero-title::after{display:none}
+  /* A soft oval of shade sized from the title itself (em, so it follows the font
+     size), fading to nothing well inside the slide. Light on purpose; the halo
+     text-shadow above carries part of the legibility. */
+  main .hero-title::before{content:"";position:absolute;z-index:-1;inset:-2em -4.6em;pointer-events:none;
+    background:radial-gradient(ellipse closest-side,rgba(20,10,8,.5) 0%,rgba(20,10,8,.4) 50%,rgba(20,10,8,.16) 80%,rgba(20,10,8,0) 100%)}
   main .ah-play{top:auto;bottom:16px;inset-inline-start:auto;inset-inline-end:16px}
   main > .pagebanner{height:var(--bar-h);padding-block:0;white-space:nowrap;
     margin:calc(var(--bar-gap) - var(--hero-h)) var(--bar-gap)
