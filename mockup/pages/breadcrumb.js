@@ -78,10 +78,11 @@
     '  max-height:min(70vh,520px);overflow:auto;background:var(--white);border:1px solid var(--beige);',
     '  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:8px 0;z-index:40;white-space:normal}',
     '.stick-menu[hidden]{display:none}',
-    '.stick-menu .sm-head{padding:10px 20px 2px;font-family:var(--font-head);font-size:.8rem;color:var(--text-muted)}',
+    '.stick-menu .sm-head{padding:10px 24px 2px;font-family:var(--font-head);font-size:.8rem;color:var(--text-muted)}',
     '.stick-menu .sm-sep{height:1px;background:var(--beige);margin:6px 0}',
-    '.stick-menu a{display:block;padding:8px 20px;font-size:.9rem;color:var(--text);text-decoration:none}',
+    '.stick-menu a{display:block;margin-inline:10px;padding:8px 14px;border-radius:var(--radius-organic-sm);font-size:.9rem;color:var(--text);text-decoration:none}',
     '.stick-menu a.sm-top{font-weight:600}',
+    '.stick-menu a:focus-visible{outline:none}',
     '.stick-menu a:hover,.stick-menu a:focus-visible{background:var(--beige);color:var(--brown-dark)}',
     '.stick-menu a[aria-current="page"]{color:var(--brown-dark);font-weight:700}',
     '@media (prefers-reduced-motion:reduce){.stick-menu-btn{transition:none}}',
@@ -92,10 +93,15 @@
     '.crumb-menu-wrap{position:relative;display:inline-flex}',
     '.crumb-menu{position:absolute;top:calc(100% + 9px);inset-inline-start:50%;transform:translateX(50%);min-width:190px;',
     '  background:var(--white);border:1px solid var(--beige);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);',
-    '  padding:6px 0;z-index:40;display:none}',
+    '  padding:10px 0;z-index:40;display:none}',
     '.crumb-menu.open{display:block}',
-    '.crumb-menu a{display:block;padding:8px 18px;font-size:.86rem;color:var(--text-muted);text-decoration:none;white-space:nowrap}',
+    // Items are inset pills in the site's organic shape, so the hover fill follows
+    // the blob of the menu instead of running square into its curved corners.
+    '.crumb-menu a{display:block;margin-inline:10px;padding:8px 14px;border-radius:var(--radius-organic-sm);font-size:.86rem;color:var(--text-muted);text-decoration:none;white-space:nowrap}',
     '.crumb-menu a:hover,.crumb-menu a:focus-visible{background:var(--beige);color:var(--brown-dark)}',
+    '.crumb-menu a:focus-visible{outline:none}',
+    // The trigger gets no focus box; keyboard focus shows as the underline instead.
+    '.pagebanner button.crumb:focus-visible{outline:none;text-decoration:underline;color:var(--brown)}',
     // The resting gap is 8px at every breakpoint, so the sticky offset is too:
     // at 6px the pill rose 2px here for the same reason it dropped 2px above.
     '@media (max-width:560px){.pagebanner{top:8px}}'
