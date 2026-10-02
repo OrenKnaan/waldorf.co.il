@@ -548,9 +548,16 @@
   main{max-width:none;padding:10px var(--side) 70px}
   section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
   main section.card,main blockquote,main blockquote>*{min-width:0}
+  /* Header: same column as the page, and tinted from the page's watercolour colour,
+     a little deeper than the cards. Below 961px the menu needs the room, so the header
+     keeps its own padding there (and the mobile drawer has always had its own). */
+  .site-header{background:color-mix(in oklab,var(--cat) 27%,var(--white))}
+  @media (min-width:961px){.brand-row,.primary-nav{max-width:none;padding-inline:var(--side)}}
   main .art-hero{height:var(--hero-h);margin:0;width:auto}
   main .ah-slide{background-size:cover}
-  main .art-hero.slideshow::after{background:var(--cap-scrim)}
+  /* A soft pool of shade centred on the title, not a band across the whole bottom. */
+  main .art-hero.slideshow::after{background:radial-gradient(ellipse min(60%,520px) 125px at 50% 100%,
+    rgba(20,10,8,.86) 0%,rgba(20,10,8,.70) 50%,rgba(20,10,8,0) 100%)}
   main .hero-title{position:absolute;z-index:2;inset-inline:0;bottom:0;margin:0;
     padding:0 64px 22px;text-align:center;display:block;color:#fff;
     font-size:clamp(1.35rem,3.4vw,2.4rem);line-height:1.25;text-shadow:0 1px 10px rgba(0,0,0,.55)}

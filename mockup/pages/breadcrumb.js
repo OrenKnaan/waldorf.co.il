@@ -55,7 +55,8 @@
     // One row, always: the trail takes all the width the pill has. Every crumb keeps
     // its full label except the last one in the trail (.crumb-end, set by markEnd()),
     // which takes whatever room is left and is clipped with a single ellipsis.
-    '.pagebanner .crumbs{flex:1 1 auto;min-width:0;flex-wrap:nowrap}',
+    '.pagebanner{flex-wrap:nowrap}',
+    '.pagebanner .crumbs{flex:1 1 0;min-width:0;flex-wrap:nowrap}',
     '.pagebanner .crumbs>*,.pagebanner .crumbs .crumb-sec{flex:none;white-space:nowrap}',
     '.pagebanner .crumbs .crumb-end{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}',
     // Hamburger that slides in at the start (right, in RTL) edge once the pill is
