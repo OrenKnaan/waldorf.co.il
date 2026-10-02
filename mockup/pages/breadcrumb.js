@@ -52,14 +52,12 @@
     '  border-radius:inherit;background:var(--white)}',
     'main h2,main h3{scroll-margin-top:84px}',
     '.crumb-sections{display:contents}',
-    // One row, always: the trail takes all the width the pill has, and whatever
-    // does not fit is clipped with an ellipsis instead of wrapping. Every crumb may
-    // shrink (long labels give up the most), the separators never do.
+    // One row, always: the trail takes all the width the pill has. Every crumb keeps
+    // its full label except the last one in the trail (.crumb-end, set by markEnd()),
+    // which takes whatever room is left and is clipped with a single ellipsis.
     '.pagebanner .crumbs{flex:1 1 auto;min-width:0;flex-wrap:nowrap}',
-    '.pagebanner .crumbs>*,.pagebanner .crumbs .crumb-sec{flex:0 1 auto;min-width:0;white-space:nowrap}',
-    '.pagebanner .crumbs>.crumb-sep{flex:none}',
-    '.pagebanner .crumbs>.crumb:not(button),.crumb-sec,.crumb-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-    '.crumb-menu-wrap>button.crumb{min-width:0;max-width:100%}',
+    '.pagebanner .crumbs>*,.pagebanner .crumbs .crumb-sec{flex:none;white-space:nowrap}',
+    '.pagebanner .crumbs .crumb-end{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}',
     '.pagebanner a.crumb,.pagebanner button.crumb{cursor:pointer}',
     '.pagebanner button.crumb{font:inherit;background:none;border:0;padding:0;color:var(--text-muted);display:inline-flex;align-items:center;gap:3px}',
     '.pagebanner button.crumb:hover,.pagebanner button.crumb[aria-expanded="true"]{color:var(--brown);text-decoration:underline}',
@@ -263,6 +261,14 @@
     });
   }
 
+  /* Only the last crumb in the trail may be clipped with an ellipsis: the
+     current page, or the deepest section once one is showing. */
+  function markEnd() {
+    var all = crumbs.querySelectorAll('.crumb');
+    var last = all[all.length - 1];
+    for (var i = 0; i < all.length; i++) all[i].classList.toggle('crumb-end', all[i] === last);
+  }
+
   var ticking = false;
   function schedule() {
     if (ticking) return;
@@ -271,10 +277,12 @@
       ticking = false;
       banner.classList.toggle('is-stuck', banner.getBoundingClientRect().top <= stickyTop() + 1);
       update();
+      markEnd();
     });
   }
 
   collect();
+  markEnd();
   schedule();
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
