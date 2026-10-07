@@ -18,11 +18,14 @@
     b.innerHTML = I[kind];
     return b;
   }
+  function setText(sel, val) { var n = $(sel); if (n) n.textContent = val; }
   function pill(text, tone) { return el('span', { class: 'pill ' + tone, text: text }); }
   function statusPill(st) {
     return st === 'published' || st === 'approved' ? pill('מפורסם', 'ok')
       : st === 'pending' ? pill('ממתין לאישור', 'warn')
       : st === 'draft' ? pill('טיוטה', 'warn')
+      : st === 'active' ? pill('פעיל', 'ok')
+      : st === 'inactive' ? pill('לא פעיל', 'neutral')
       : pill(st || '—', 'neutral');
   }
 
@@ -49,6 +52,15 @@
     '.aform textarea{min-height:70px;resize:vertical}',
     '.aform .field-hint{font-size:.74rem;font-weight:400;color:var(--muted);line-height:1.45}',
     '.aform .actions{grid-column:1/-1;display:flex;gap:10px}',
+    '.search{position:relative}',
+    '.search-results{position:absolute;inset-inline:0;top:calc(100% + 6px);z-index:30;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);max-height:340px;overflow:auto;padding:4px}',
+    '.search-results[hidden]{display:none}',
+    '.search-results button{display:flex;width:100%;gap:8px;align-items:baseline;justify-content:space-between;text-align:start;background:none;border:0;border-radius:var(--r);padding:8px 10px;font:inherit;font-size:.84rem;color:var(--ink);cursor:pointer}',
+    '.search-results button:hover,.search-results button:focus-visible,.search-results button[aria-selected=true]{background:var(--sink);outline:none}',
+    '.search-results small{color:var(--muted);font-size:.74rem;white-space:nowrap}',
+    '.search-results .none{padding:10px;color:var(--muted);font-size:.84rem}',
+    '.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;padding:14px 20px 18px;font-size:.88rem}',
+    '.kv dt{color:var(--muted)}.kv dd{margin:0;color:var(--ink)}',
     '.tag-demo{font-size:.7rem;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-pill);padding:1px 8px;margin-inline-start:6px}'
   ].join('\n');
   document.head.appendChild(st);
@@ -197,35 +209,53 @@
   }
 
   /* =============== מוסדות חינוך =============== */
-  // The table in this view is static markup in admin-dashboard.html, not a collection:
-  // the content API has no `institutions`, so there is nothing to read, write or count
-  // here yet and the "מוסד חדש" button is disabled in the page. What the filter can
-  // honestly do today is narrow the demo rows that are already in the DOM, which is what
-  // this does - matching on the שלב cell, whose values are the chip labels verbatim.
-  // When the collection lands, this moves to the WStore/makeTable pattern every other
-  // view uses and the chips keep working unchanged.
+  // A real collection (`institutions`, migration 0011), read and written through WStore
+  // like every other view. The chips are labelled in the plural and the stored stage is
+  // a code, so the label is mapped rather than compared.
+  var STAGES = [{ v: 'gan', t: 'גן' }, { v: 'elementary', t: 'יסודי' }, { v: 'high', t: 'תיכון' }];
+  var STAGE_LABEL = { gan: 'גן', elementary: 'יסודי', high: 'תיכון' };
+  var INST_FIELDS = [
+    { name: 'name', label: 'שם המוסד' },
+    { name: 'town', label: 'יישוב' },
+    { name: 'stage', label: 'שלב', type: 'select', options: STAGES },
+    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'active', t: 'פעיל' }, { v: 'pending', t: 'ממתין לאישור' }, { v: 'inactive', t: 'לא פעיל' }] },
+    { name: 'url', label: 'אתר המוסד (כתובת)' },
+    { name: 'contact', label: 'איש קשר / טלפון' },
+    { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
+  ];
   function renderInstAdmin() {
     var section = $('.view[data-view="inst"] .panel');
     if (!section) return;
-    var tbody = section.querySelector('tbody');
-    var rows = [].slice.call(tbody.querySelectorAll('tr'));
-    var cols = section.querySelectorAll('thead th').length;
-    var none = el('tr', {}, [el('td', { class: 'muted', colspan: String(cols), text: 'אין מוסדות בשלב הזה' })]);
-    // The chips are labelled in the plural and the שלב column is written in the
-    // singular, so the label is not the cell value: "גנים" has to match "גן".
-    var STAGE = { 'גנים': 'גן', 'יסודי': 'יסודי', 'תיכון': 'תיכון' };
-    wireChips(section, function (label) { return STAGE[label] || ''; }, function (stage) {
-      var shown = 0;
-      rows.forEach(function (tr) {
-        // style.display, not the hidden attribute: a stylesheet that sets display on a
-        // row would override [hidden], and tbody tr already carries rules here.
-        var ok = !stage || (tr.cells[2] && tr.cells[2].textContent.trim() === stage);
-        tr.style.display = ok ? '' : 'none';
-        if (ok) shown++;
-      });
-      if (shown) { if (none.parentNode) none.remove(); }
-      else if (!none.parentNode) tbody.appendChild(none);
+    var oldWrap = section.querySelector('.table-wrap');
+    var t = makeTable(['שם המוסד', 'יישוב', 'שלב', 'סטטוס', '']);
+    oldWrap.replaceWith(t.wrap);
+    var filter = '';
+    wireChips(section, function (label) {
+      return { 'גנים': 'gan', 'יסודי': 'elementary', 'תיכון': 'high' }[label] || '';
+    }, function (v) { filter = v; draw(); });
+    section.querySelector('#instAddBtn').addEventListener('click', function () {
+      openForm(section, INST_FIELDS, { stage: 'gan', status: 'active' }, function (out) { WStore.add('institutions', out); refreshAll(); });
     });
+    function draw() {
+      var items = WStore.get('institutions');
+      if (filter) items = items.filter(function (i) { return i.stage === filter; });
+      t.tbody.textContent = '';
+      if (!items.length) return emptyRow(t.tbody, 5, filter ? 'אין מוסדות בשלב הזה' : 'עדיין לא נוספו מוסדות');
+      items.forEach(function (it) {
+        t.tbody.appendChild(el('tr', {}, [
+          titleCell(it.name, it.demo),
+          td(it.town || '—', 'muted'),
+          td(STAGE_LABEL[it.stage] || it.stage || '—', 'muted'),
+          td(statusPill(it.status)),
+          td(el('div', { class: 'row-actions' }, [
+            actBtn('edit', 'עריכה', function () { openForm(section, INST_FIELDS, it, function (out) { WStore.update('institutions', it.id, out); refreshAll(); }); }),
+            actBtn('del', 'מחיקה', function () { WStore.remove('institutions', it.id); refreshAll(); })
+          ]))
+        ]));
+      });
+    }
+    renderInstAdmin.draw = draw;
+    draw();
   }
 
   /* =============== הודעות =============== */
@@ -620,9 +650,8 @@
     var libTotal = WStore.get('library').length + WStore.get('teaching').length + WStore.get('forms').length;
     var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs'))
       .filter(function (i) { return i.status === 'pending'; }).length;
-    var institutions = WStore.get('mapPoints').length;
+    var institutions = WStore.get('institutions').length;
 
-    function setText(sel, val) { var n = $(sel); if (n) n.textContent = val; }
     setText('#kpiEvents', String(upcoming));
     setText('#kpiEventsSub', upcoming ? 'מתוך ' + events.length + ' אירועים במאגר' : 'אין אירועים עתידיים');
     setText('#kpiPending', String(pending));
@@ -699,6 +728,7 @@
     MEDIA_PANELS.forEach(function (c) { if (c._draw) c._draw(); });
     MOD_PANELS.forEach(function (c) { if (c._draw) c._draw(); });
     if (renderMapAdmin.draw) renderMapAdmin.draw();
+    if (renderInstAdmin.draw) renderInstAdmin.draw();
   }
 
 
@@ -900,6 +930,142 @@
     draw();
   }
 
+  /* =============== ניוזלטר (ActiveTrail) =============== */
+  /* הרשימה יושבת ב-ActiveTrail, לא ב-D1. ה-Worker מחזיק את הטוקן ועונה תמיד 200 עם
+     `state`, כדי שאפשר יהיה לנסח במדויק מה חסר במקום להציג "שגיאה". */
+  var NL_MSG = {
+    not_configured: 'הטוקן של ActiveTrail עדיין לא הוגדר ב-Worker, ולכן ההרשמה באתר מחזירה ״לא זמין״ ואי אפשר לקרוא את מספר המנויים. ' +
+      'מתוך תיקיית content-api מריצים: npx wrangler secret put ACTIVETRAIL_TOKEN',
+    bad_token: 'ActiveTrail דחה את הטוקן שהוגדר ב-Worker. יש להפיק טוקן חדש ולהגדיר אותו מחדש.',
+    unreachable: 'לא ניתן להגיע ל-ActiveTrail כרגע. נסו שוב בעוד מספר דקות.',
+    upstream_error: 'ActiveTrail החזיר שגיאה בקריאת הקבוצה. ודאו שמספר הקבוצה נכון.',
+    count_unavailable: 'החיבור ל-ActiveTrail תקין, אך לא נמצא בתשובה שלהם שדה שמכיל את מספר המנויים.'
+  };
+  function loadNewsletter() {
+    return WStore.newsletterStats().then(function (r) { return r; }, function (e) {
+      return { state: e && e.status === 401 ? 'login' : 'unreachable' };
+    });
+  }
+  function renderNewsletterAdmin() {
+    var host = $('#nlAdmin');
+    if (!host) return;
+    function draw(r) {
+      host.textContent = '';
+      var kids = [el('div', { class: 'panel-head' }, [el('h2', { text: 'שירות הדיוור' }), el('span', { class: 'pill ' + (r.state === 'ok' ? 'ok' : 'warn'), text: r.state === 'ok' ? 'מחובר' : 'ממתין לחיבור' }), el('div', { class: 'grow' })])];
+      if (r.state === 'ok') {
+        kids.push(el('dl', { class: 'kv' }, [
+          el('dt', { text: 'שירות' }), el('dd', { text: 'ActiveTrail' }),
+          el('dt', { text: 'קבוצת התפוצה' }), el('dd', { text: r.name || '—' }),
+          el('dt', { text: 'מספר מנויים' }), el('dd', { text: String(r.count) }),
+          el('dt', { text: 'אישור כפול במייל' }), el('dd', { text: r.doubleOptin ? 'פעיל' : 'כבוי' })
+        ]));
+        kids.push(el('p', { class: 'empty-hint', text: 'טופס ההרשמה בעמוד ״ניוזלטר״ שולח ל-Worker, וזה מעביר את הנרשם ל-ActiveTrail. שליחת הדיוור עצמה, ניהול הרשימה והסרות נעשים במערכת של ActiveTrail.' }));
+      } else if (r.state === 'login') {
+        kids.push(el('p', { class: 'empty-hint', text: 'יש להתחבר כדי לראות את מצב הדיוור.' }));
+      } else {
+        kids.push(el('p', { class: 'empty-hint', text: NL_MSG[r.state] || 'מצב הדיוור לא ידוע.' }));
+      }
+      host.appendChild(el('div', { class: 'panel' }, kids));
+      setText('#kpiNewsletter', r.state === 'ok' ? String(r.count) : '—');
+      setText('#kpiNewsletterSub', r.state === 'ok' ? 'בקבוצה ' + (r.name || 'הראשית') : r.state === 'login' ? 'נדרשת התחברות' : 'הדיוור טרם חובר ל-ActiveTrail');
+    }
+    return loadNewsletter().then(draw);
+  }
+
+  /* =============== חיפוש בסרגל העליון =============== */
+  /* מחפש בכותרות של כל האוספים ופותח את המסך שבו הפריט נערך. */
+  var SEARCH_SOURCES = [
+    { col: 'events', view: 'events', label: 'אירוע', field: 'title' },
+    { col: 'news', view: 'news', label: 'הודעה', field: 'title' },
+    { col: 'institutions', view: 'inst', label: 'מוסד', field: 'name' },
+    { col: 'mapPoints', view: 'inst', label: 'נקודת מפה', field: 'name' },
+    { col: 'library', view: 'lib', label: 'ספרייה', field: 'title' },
+    { col: 'teaching', view: 'lib', label: 'חומר הוראה', field: 'title' },
+    { col: 'forms', view: 'lib', label: 'טופס', field: 'title' },
+    { col: 'videos', view: 'media', label: 'סרטון', field: 'title' },
+    { col: 'podcast', view: 'media', label: 'פודקאסט', field: 'title' },
+    { col: 'board', view: 'mod', label: 'מודעה', field: 'title' },
+    { col: 'jobs', view: 'mod', label: 'משרה', field: 'role' }
+  ];
+  function wireSearch() {
+    var box = $('.topbar .search'), input = box && box.querySelector('input');
+    if (!input) return;
+    var list = el('div', { class: 'search-results', id: 'searchResults', hidden: '', role: 'listbox', 'aria-label': 'תוצאות חיפוש' });
+    box.appendChild(list);
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-controls', 'searchResults');
+    var active = -1;
+    // Hebrew final letters and quote marks differ between how people type and how
+    // text is stored, so both sides are folded the same way before comparing.
+    function fold(x) {
+      return String(x || '').toLowerCase().replace(/[\u0591-\u05C7]/g, '').replace(/["״׳'`]/g, '')
+        .replace(/ך/g, 'כ').replace(/ם/g, 'מ').replace(/ן/g, 'נ').replace(/ף/g, 'פ').replace(/ץ/g, 'צ');
+    }
+    function close() { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
+    function go(src) {
+      close(); input.value = '';
+      var nav = document.querySelector('.nav-link[data-view="' + src.view + '"]');
+      if (nav) nav.click();
+    }
+    function options() { return [].slice.call(list.querySelectorAll('button')); }
+    function mark(i) {
+      var o = options();
+      o.forEach(function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+      active = i;
+      if (o[i]) { o[i].scrollIntoView({ block: 'nearest' }); input.setAttribute('aria-activedescendant', o[i].id); }
+    }
+    input.addEventListener('input', function () {
+      var q = fold(input.value.trim());
+      list.textContent = '';
+      if (!q || !WStore.isLoaded()) return close();
+      var hits = [];
+      SEARCH_SOURCES.forEach(function (src) {
+        WStore.get(src.col).forEach(function (it) {
+          var text = it[src.field] || '';
+          if (fold(text).indexOf(q) !== -1) hits.push({ src: src, text: text });
+        });
+      });
+      if (!hits.length) list.appendChild(el('div', { class: 'none', text: 'לא נמצאו תוצאות' }));
+      hits.slice(0, 12).forEach(function (h, i) {
+        var b = el('button', { type: 'button', role: 'option', id: 'sr' + i, 'aria-selected': 'false' }, [el('span', { text: h.text }), el('small', { text: h.src.label })]);
+        b.addEventListener('click', function () { go(h.src); });
+        list.appendChild(b);
+      });
+      list.hidden = false; input.setAttribute('aria-expanded', 'true'); active = -1;
+    });
+    input.addEventListener('keydown', function (e) {
+      var o = options();
+      if (e.key === 'Escape') { close(); }
+      else if (e.key === 'ArrowDown' && o.length) { e.preventDefault(); mark(Math.min(active + 1, o.length - 1)); }
+      else if (e.key === 'ArrowUp' && o.length) { e.preventDefault(); mark(Math.max(active - 1, 0)); }
+      else if (e.key === 'Enter' && o.length) { e.preventDefault(); o[active >= 0 ? active : 0].click(); }
+    });
+    document.addEventListener('click', function (e) { if (!box.contains(e.target)) close(); });
+  }
+
+  /* =============== הגדרות =============== */
+  function renderSettingsAdmin() {
+    var host = $('#settingsAdmin');
+    if (!host) return;
+    var me = WStore.currentUser();
+    var demo = 0;
+    SEARCH_SOURCES.forEach(function (src) { WStore.get(src.col).forEach(function (it) { if (it.demo) demo++; }); });
+    var api = el('dd', { text: 'בודק…' });
+    host.textContent = '';
+    host.appendChild(el('div', { class: 'panel-head' }, [el('h2', { text: 'החשבון והמערכת' })]));
+    host.appendChild(el('dl', { class: 'kv' }, [
+      el('dt', { text: 'משתמש מחובר' }), el('dd', { text: me ? me.name + ' · ' + (me.email || '') : WStore.hasAdminKey() ? 'מפתח ניהול (ללא חשבון אישי)' : 'לא מחובר' }),
+      el('dt', { text: 'הרשאה' }), el('dd', { text: me ? (ROLE_NAMES[me.role] || me.role) : WStore.hasAdminKey() ? 'מנהל־על' : 'צפייה בלבד' }),
+      el('dt', { text: 'שרת התוכן' }), api,
+      el('dt', { text: 'רשומות הדגמה במאגר' }), el('dd', { text: demo ? demo + ' (מסומנות ״הדגמה״ בטבלאות; יש למחוק אותן לפני ההשקה)' : 'אין' })
+    ]));
+    host.appendChild(el('p', { class: 'empty-hint', text: 'ניהול משתמשים והרשאות נמצא במסך ״נציגי פורום״, והחיבור לדיוור במסך ״ניוזלטר״.' }));
+    fetch(WStore.apiBase + '/health').then(function (r) { return r.json(); }).then(function (j) {
+      api.textContent = j && j.ok ? 'פועל' : 'תשובה לא תקינה';
+    }).catch(function () { api.textContent = 'לא זמין'; });
+  }
+
   /* =============== איתחול =============== */
   /* התוכן מגיע מ-D1 דרך ה-API, כלומר לא זמין באופן מיידי כמו קודם. כל הציור
      ממתין ל-WStore.ready; ללא זה כל טבלה הייתה נטענת ריקה ומדווחת שגיאה. */
@@ -913,6 +1079,9 @@
     renderAboutAdmin();
     renderMapAdmin();
     renderPeopleAdmin();
+    renderSettingsAdmin();
+    wireSearch();
+    renderNewsletterAdmin();
     refreshCounts();
   }
 
@@ -951,8 +1120,10 @@
       var av = document.querySelector('.user .avatar');
       if (av) av.textContent = (u.name || '?').trim().charAt(0);
     } else {
-      if (who) who.textContent = 'לא מחובר';
-      if (role) role.textContent = 'צפייה בלבד';
+      // A management key is a full login with no personal account behind it.
+      var keyed = WStore.hasAdminKey();
+      if (who) who.textContent = keyed ? 'מפתח ניהול' : 'לא מחובר';
+      if (role) role.textContent = keyed ? 'מנהל־על' : 'צפייה בלבד';
     }
     var out = document.querySelector('.topbar .icon-btn[title], .topbar a.icon-btn');
     document.querySelectorAll('.topbar .icon-btn').forEach(function (b) {
@@ -991,11 +1162,11 @@
     });
   })();
 
-  var reset = $('#resetDemo');
-  if (reset) reset.addEventListener('click', function () {
-    WStore.reset().then(function () { location.reload(); });
-  });
-
   /* רענון כשחוזרים לטאב (אם נערך תוכן ממקום אחר) */
+  var nlNav = $('.nav-link[data-view="nl"]');
+  if (nlNav) nlNav.addEventListener('click', function () { renderNewsletterAdmin(); });
+  var setNav = $('.nav-link[data-view="set"]');
+  if (setNav) setNav.addEventListener('click', renderSettingsAdmin);
+
   window.addEventListener('focus', function () { WStore.reload().catch(function () {}); });
 })();

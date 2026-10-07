@@ -270,6 +270,8 @@ const COLLECTIONS = {
               fields: { title: 'title', category: 'category', description: 'description', url: 'url', demo: 'demo' } },
   mapPoints:{ table: 'map_points', order: 'position ASC',
               fields: { name: 'name', town: 'town', count: 'count', lat: 'lat', lng: 'lng', url: 'url', demo: 'demo' } },
+  institutions: { table: 'institutions', order: 'position ASC, name ASC', statuses: ['pending', 'active', 'inactive'], publicStatus: ['active'],
+              fields: { name: 'name', town: 'town', stage: 'stage', status: 'status', url: 'url', contact: 'contact', description: 'description', demo: 'demo' } },
   videos:   { table: 'videos',     order: 'position ASC',
               fields: { title: 'title', youtubeId: 'youtube_id', description: 'description', demo: 'demo' } },
   podcast:  { table: 'podcast',    order: 'num DESC',
@@ -374,6 +376,46 @@ export default {
       return json({ ok: true, db: 'waldorf-content', eventsRows: n.c, adminKeySet: Boolean(env.ADMIN_KEY) }, 200, origin);
     }
 
+
+    // ---- GET /api/newsletter/stats ----
+    //
+    // Admin-only. The subscriber list lives in ActiveTrail, not D1, so the admin
+    // asks the Worker, which holds the token. The reply is always 200 with a
+    // `state` the admin can word honestly, because "token not set yet" and "the
+    // count is not where we looked" are different problems for the person
+    // reading the dashboard and neither is an error in the admin itself.
+    if (parts[0] === 'api' && parts[1] === 'newsletter' && parts[2] === 'stats') {
+      if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, origin);
+      if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      if (!env.ACTIVETRAIL_TOKEN || !env.ACTIVETRAIL_GROUP_ID) {
+        return json({ state: 'not_configured', groupId: env.ACTIVETRAIL_GROUP_ID || null }, 200, origin);
+      }
+      let res;
+      try {
+        res = await fetch(`${ACTIVETRAIL_BASE}/api/groups/${encodeURIComponent(env.ACTIVETRAIL_GROUP_ID)}`, {
+          headers: { Authorization: env.ACTIVETRAIL_TOKEN, Accept: 'application/json' },
+        });
+      } catch (e) {
+        console.error('newsletter stats: ActiveTrail unreachable', String(e));
+        return json({ state: 'unreachable' }, 200, origin);
+      }
+      if (!res.ok) {
+        console.error('newsletter stats: ActiveTrail rejected', res.status);
+        return json({ state: res.status === 401 ? 'bad_token' : 'upstream_error' }, 200, origin);
+      }
+      const group = await res.json().catch(() => null);
+      // ActiveTrail's group object is not documented anywhere reachable without a
+      // token, so take the first numeric field whose name says it counts members
+      // rather than hard-coding one spelling.
+      let count = null;
+      if (group && typeof group === 'object') {
+        for (const [k, v] of Object.entries(group)) {
+          if (typeof v === 'number' && /(member|contact|subscriber|count)/i.test(k) && !/^id$/i.test(k)) { count = v; break; }
+        }
+      }
+      return json({ state: count === null ? 'count_unavailable' : 'ok', count, name: group && group.name ? String(group.name) : null,
+                    doubleOptin: String(env.ACTIVETRAIL_DOUBLE_OPTIN || 'true') !== 'false' }, 200, origin);
+    }
 
     // ---- POST /api/newsletter/subscribe ----
     //

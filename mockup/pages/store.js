@@ -113,6 +113,7 @@
     },
 
     activity: function () { return req('/api/activity'); },
+    newsletterStats: function () { return req('/api/newsletter/stats'); },
 
     /* ---- users ---- */
     users: function () { return req('/api/users'); },

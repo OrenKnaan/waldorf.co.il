@@ -383,7 +383,7 @@ td.muted{color:var(--muted)}
             <div class="stat"><div class="lbl">אירועים קרובים</div><div class="num" id="kpiEvents">—</div><div class="sub" id="kpiEventsSub">&nbsp;</div></div>
             <div class="stat"><div class="lbl">מודעות ממתינות לאישור</div><div class="num" id="kpiPending">—</div><div class="sub" id="kpiPendingSub">&nbsp;</div></div>
             <div class="stat"><div class="lbl">פריטים בספרייה</div><div class="num" id="kpiLibrary">—</div><div class="sub" id="kpiLibrarySub">&nbsp;</div></div>
-            <div class="stat"><div class="lbl">מנויים לניוזלטר</div><div class="num" id="kpiNewsletter" style="font-size:1.15rem">לא מחובר</div><div class="sub">אין שירות דיוור מחובר</div></div>
+            <div class="stat"><div class="lbl">מנויים לניוזלטר</div><div class="num" id="kpiNewsletter">—</div><div class="sub" id="kpiNewsletterSub">&nbsp;</div></div>
           </div>
         <div class="two-col">
             <div class="panel">
@@ -457,18 +457,9 @@ td.muted{color:var(--muted)}
               <h2>מוסדות חינוך</h2>
               <div class="tools" role="group" aria-label="סינון מוסדות לפי שלב"><button type="button" class="chip on" aria-pressed="true">הכול</button><button type="button" class="chip" aria-pressed="false">גנים</button><button type="button" class="chip" aria-pressed="false">יסודי</button><button type="button" class="chip" aria-pressed="false">תיכון</button></div>
               <div class="grow"></div>
-              <button type="button" class="btn btn-primary btn-sm" style="width:auto" id="instAddBtn" disabled aria-describedby="instPh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>מוסד חדש</button>
+              <button type="button" class="btn btn-primary btn-sm" style="width:auto" id="instAddBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>מוסד חדש</button>
             </div>
-            <div style="padding:14px 20px 0"><p id="instPh"><span class="ph">הפאנל הזה עדיין לא מחובר לנתונים. ארבע השורות שלמטה הן הדגמה שנכתבה ידנית, ואין עדיין אוסף <code>institutions</code> ב-D1 — ולכן גם אין מה לשמור, והכפתור ״מוסד חדש״ מושבת. הסינון למעלה פועל על שורות ההדגמה. צריך להחליט מה המבנה של רשומת מוסד לפני שבונים את האוסף.</span></p></div>
-            <div class="table-wrap"><table>
-              <thead><tr><th>שם המוסד</th><th>יישוב</th><th>שלב</th><th>סטטוס</th><th></th></tr></thead>
-              <tbody>
-                <tr><td class="title">גן ולדורף ״האלון״</td><td class="muted">הרדוף</td><td class="muted">גן</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button type="button" class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button type="button" class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
-                <tr><td class="title">בית ספר ולדורף כפר תבור</td><td class="muted">כפר תבור</td><td class="muted">יסודי</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button type="button" class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button type="button" class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
-                <tr><td class="title">תיכון ולדורף הרדוף</td><td class="muted">הרדוף</td><td class="muted">תיכון</td><td><span class="pill ok">פעיל</span></td><td><div class="row-actions"><button type="button" class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button type="button" class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
-                <tr><td class="title">גן ״הפעמון״</td><td class="muted">מודיעין</td><td class="muted">גן</td><td><span class="pill warn">ממתין לאישור</span></td><td><div class="row-actions"><button type="button" class="act" aria-label="עריכה" title="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button><button type="button" class="act danger" aria-label="מחיקה" title="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button></div></td></tr>
-              </tbody>
-            </table></div>
+            <div class="table-wrap"></div>
           </div>
         </section>
 
@@ -507,12 +498,7 @@ td.muted{color:var(--muted)}
         </section>
         <section class="view" data-view="nl" hidden>
           <p class="crumb">רשימת תפוצה ודיוור</p>
-          <div class="panel">
-            <div class="panel-head"><h2>שירות הדיוור</h2><span class="pill ok">ActiveTrail</span><div class="grow"></div></div>
-            <p class="empty-hint">שירות הדיוור שנבחר הוא <b>ActiveTrail</b>, והוא כבר מחובר: טופס ההרשמה בעמוד ״ניוזלטר״ שולח לכתובת <code>/api/newsletter/subscribe</code> ב-Worker, וזה מעביר את הנרשם ל-ActiveTrail לקבוצה 715085, עם אישור כפול במייל.</p>
-            <p class="empty-hint"><b>היכן מדביקים את ה-API Token:</b> בשום קובץ. הוא נשמר כסוד מוצפן של ה-Worker — מתוך תיקיית <code>content-api</code> מריצים <code>npx wrangler secret put ACTIVETRAIL_TOKEN</code> ומדביקים את הערך כשהפקודה מבקשת אותו. המאגר הזה ציבורי, ולכן טוקן שנכתב לתוך קובץ ונשמר ב-git מתפרסם לכל, ומחיקה מאוחרת אינה מבטלת את הפרסום. להחלפה: אותה פקודה עם הערך החדש, ואז ביטול הישן בממשק ActiveTrail תחת settings ← API apps.</p>
-            <p class="empty-hint">כל עוד הטוקן לא הוגדר, הטופס עונה 503 ואומר לנרשם שההרשמה עדיין לא זמינה. מספר המנויים אינו מוצג כאן כי הוא נמצא ב-ActiveTrail בלבד — הוספת מסך כזה דורשת קריאה נוספת ל-API שלהם, שטרם נבנתה.</p>
-          </div>
+          <div id="nlAdmin"></div>
         </section>
         <section class="view" data-view="analytics" hidden>
           <p class="crumb">כמה אנשים מבקרים באתר, מה הם קוראים ומאיפה הגיעו — מבוסס על Cloudflare Web Analytics</p>
@@ -531,8 +517,7 @@ td.muted{color:var(--muted)}
                 <span id="adminKeyMsg" class="empty-hint" style="align-self:center"></span>
               </div>
             </div>
-          </div><div class="panel"><div class="panel-head"><h2>הגדרות</h2></div><p class="empty-hint">הרשאות משתמשים, פרטי האתר ואינטגרציות.</p>
-        <div style="padding:0 20px 18px"><button type="button" class="btn btn-ghost btn-sm" id="resetDemo" style="width:auto">איפוס נתוני ההדגמה (מוחק עריכות מקומיות)</button></div></div></section>
+          </div><div class="panel" id="settingsAdmin"></div></section>
       </div>
     </div>
   </div>
