@@ -351,7 +351,10 @@ for (const rec of records) {
   let page = skeleton;
   page = page.replace(/<title>[^<]*<\/title>/, `<title>${esc(rec.title)} — מוקאפ</title>`);
   page = page.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, schema(rec));
-  page = page.replace(/<main[\s\S]*?<\/main>/, mainFor(rec, body, files, chapters, lifted.cover));
+  // Anchored on the real tag: media.html's own "===== hero =====" CSS comment
+  // mentions "<main>" in prose, and a loose /<main[\s\S]*?<\/main>/ latches
+  // onto that instead, consuming everything up to the real closing tag.
+  page = page.replace(/<main id="main-content"[\s\S]*?<\/main>/, mainFor(rec, body, files, chapters, lifted.cover));
   // The text is baked in, so these pages have no use for the content store —
   // and store.js fetches every collection the moment it loads.
   page = page.replace('<script src="./store.js"></script>\n', '');

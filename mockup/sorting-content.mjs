@@ -17,12 +17,18 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync, existsSync
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { GROUP_TITLE_OVERRIDE, ADMIN_ONLY_GROUPS, applyDecisions } from './sorting-decisions.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..');
 const pagesDir = join(__dirname, 'pages');
 const outDir = join(pagesDir, 'sorting-data');
 const itemsDir = join(outDir, 'items');
+// Announcements and articles are not up for consideration on the new site
+// (see CLAUDE.md, "The triage section"): their data moves to an admin-only
+// copy instead of the public one, same shape, different directory.
+const adminOutDir = join(pagesDir, 'admin', 'sorting-data');
+const adminItemsDir = join(adminOutDir, 'items');
 
 const OLD = 'https://www.waldorf.co.il';
 const API = `${OLD}/wp-json/wp/v2`;
@@ -175,10 +181,11 @@ const GROUP_BY_CAT = [
 ];
 
 const GROUPS = {
-  library: { title: 'ספרייה', groupBy: 'book' },
+  library: { title: GROUP_TITLE_OVERRIDE.library, groupBy: 'book' },
   articles: { title: 'מאמרים', groupBy: 'year' },
-  subjects: { title: 'מאמרים לפי מקצוע', groupBy: 'subject' },
-  capstone: { title: 'עבודות גמר', groupBy: 'year' },
+  subjects: { title: GROUP_TITLE_OVERRIDE.subjects, groupBy: 'subject' },
+  // Bucket is now a content type, not a year: see sorting-decisions.mjs.
+  capstone: { title: 'עבודות גמר', groupBy: 'type' },
   announcements: { title: 'מודעות ופרסומים', groupBy: 'year' },
   pages: { title: 'דפים מהאתר הישן', groupBy: 'section' },
 };
@@ -321,24 +328,37 @@ for (const p of wpPages) {
   bodies.set(`g${p.id}`, body);
 }
 
-// ---------- write ----------
-if (existsSync(itemsDir)) rmSync(itemsDir, { recursive: true });
-mkdirSync(itemsDir, { recursive: true });
-for (const [id, body] of bodies) writeFileSync(join(itemsDir, `${id}.html`), body, 'utf8');
+// ---------- the forum's decisions, then split public from admin-only ----------
+const decided = applyDecisions(items);
+const isAdminOnly = (i) => ADMIN_ONLY_GROUPS.includes(i.group);
+const publicItems = decided.filter((i) => !isAdminOnly(i));
+const adminItems = decided.filter(isAdminOnly);
 
-items.sort((a, b) => (a.order - b.order) || b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'he'));
+function writeSet(dir, itemsDirPath, setItems, groupKeys) {
+  if (existsSync(itemsDirPath)) rmSync(itemsDirPath, { recursive: true });
+  mkdirSync(itemsDirPath, { recursive: true });
+  const ids = new Set(setItems.map((i) => i.id));
+  for (const [id, body] of bodies) if (ids.has(id)) writeFileSync(join(itemsDirPath, `${id}.html`), body, 'utf8');
+  setItems.sort((a, b) => (a.order - b.order) || b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'he'));
+  const index = {
+    generated: new Date().toISOString().slice(0, 10),
+    source: OLD,
+    groups: Object.fromEntries(groupKeys.map((k) => [k, {
+      title: GROUPS[k].title,
+      groupBy: GROUPS[k].groupBy,
+      count: setItems.filter((i) => i.group === k).length,
+    }])),
+    items: setItems,
+  };
+  writeFileSync(join(dir, 'index.json'), JSON.stringify(index), 'utf8');
+  return index;
+}
 
-const index = {
-  generated: new Date().toISOString().slice(0, 10),
-  source: OLD,
-  groups: Object.fromEntries(Object.entries(GROUPS).map(([k, v]) => [k, {
-    title: v.title,
-    groupBy: v.groupBy,
-    count: items.filter((i) => i.group === k).length,
-  }])),
-  items,
-};
-writeFileSync(join(outDir, 'index.json'), JSON.stringify(index), 'utf8');
+const publicGroupKeys = Object.keys(GROUPS).filter((k) => !ADMIN_ONLY_GROUPS.includes(k));
+const publicIndex = writeSet(outDir, itemsDir, publicItems, publicGroupKeys);
+mkdirSync(adminOutDir, { recursive: true });
+const adminIndex = writeSet(adminOutDir, adminItemsDir, adminItems, ADMIN_ONLY_GROUPS);
 
-for (const [k, v] of Object.entries(index.groups)) console.log(String(v.count).padStart(4), k, '—', v.title);
-console.log(`${items.length} items, ${bodies.size} bodies -> pages/sorting-data/`);
+for (const [k, v] of Object.entries(publicIndex.groups)) console.log(String(v.count).padStart(4), k, '-', v.title);
+for (const [k, v] of Object.entries(adminIndex.groups)) console.log(String(v.count).padStart(4), k, '- (admin) -', v.title);
+console.log(`${publicItems.length} public item(s), ${adminItems.length} admin-only item(s), ${bodies.size} bodies scraped.`);

@@ -632,6 +632,7 @@
 <a class="dropdown-link" href="./news.html">הודעות</a>
 <a class="dropdown-link" href="./events.html">אירועים</a>
 <a class="dropdown-link" href="./content-library.html">ספריית תוכן</a>
+<a class="dropdown-link" href="./ebooks.html">ספרים אלקטרוניים</a>
 <a class="dropdown-link" href="./media.html">מדיה</a>
 <div class="dropdown-sep"></div>
 <div class="dropdown-head">לוח מודעות</div>
@@ -644,18 +645,16 @@
 <div class="dropdown">
 <a class="dropdown-link" href="./sorting.html">על המדור</a>
 <div class="dropdown-sep"></div>
-<a class="dropdown-link" href="./sorting-library.html">ספרייה</a>
-<a class="dropdown-link" href="./sorting-articles.html">מאמרים</a>
-<a class="dropdown-link" href="./sorting-subjects.html">מאמרים לפי מקצוע</a>
+<a class="dropdown-link" href="./sorting-library.html">ספרים אלקטרוניים</a>
+<a class="dropdown-link" href="./sorting-subjects.html">תוכניות לימודים לפי מקצוע</a>
 <a class="dropdown-link" href="./sorting-capstone.html">עבודות גמר</a>
-<a class="dropdown-link" href="./sorting-announcements.html">מודעות ופרסומים</a>
 <a class="dropdown-link" href="./sorting-pages.html">דפים מהאתר הישן</a>
 </div></div>
 <div class="nav-item"><a class="nav-link" data-nav="contact" href="./contact.html">צור קשר</a></div>
 </div></nav>
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
-<script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
+<script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|ebooks|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
 <main id="main-content" tabindex="-1">
   <div class="art-hero slideshow" data-art-slideshow>
 <div class="ah-media" aria-hidden="true">

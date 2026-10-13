@@ -64,6 +64,8 @@
     '.si-by{color:var(--brown);font-weight:500}',
     '.si-tag{background:var(--beige);color:var(--brown);border-radius:var(--radius-organic-sm);padding:2px 10px;font-size:.75rem}',
     '.si-excerpt{margin:8px 0 0;font-size:.88rem;color:var(--text-muted);line-height:1.65}',
+    '.si-note{margin:8px 0 0;font-size:.82rem;color:var(--brown-dark);background:var(--beige);',
+    '  border-radius:var(--radius-organic-sm);padding:6px 12px}',
     '.si-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin:9px 0 0;font-size:.8rem}',
     '.si-body{margin:14px 0 2px;padding:14px 0 0;border-top:1px solid var(--beige);line-height:1.8}',
     '.si-body[hidden]{display:none}',
@@ -152,6 +154,7 @@
     li.appendChild(meta);
 
     if (item.excerpt) li.appendChild(el('p', 'si-excerpt', item.excerpt + '…'));
+    if (item.note) li.appendChild(el('p', 'si-note', item.note));
 
     var links = el('div', 'si-links');
     var orig = el('a', null, 'העמוד המקורי באתר הישן');

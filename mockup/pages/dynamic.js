@@ -303,6 +303,28 @@
     });
   }
 
+  /* ---------- ספרים אלקטרוניים ----------
+     Separate from libItem: a purchase link opens in a new tab (leaving the
+     site to buy), a free one does not (it is this site's own page). */
+  function ebookItem(node) {
+    var external = !!node.purchaseUrl;
+    var href = node.purchaseUrl || node.url;
+    var a = !href ? el('div', { class: 'dyn-lib-item' })
+      : external ? el('a', { class: 'dyn-lib-item', href: href, target: '_blank', rel: 'noopener' })
+      : el('a', { class: 'dyn-lib-item', href: href });
+    a.appendChild(el('b', { text: node.title }));
+    var metaBits = [node.author, node.demo ? 'רשומת הדגמה' : '',
+      external ? 'לרכישה באתר חיצוני' : (href ? 'קריאה חופשית באתר' : 'בקרוב')].filter(Boolean).join(' · ');
+    a.appendChild(el('small', { text: (node.description ? node.description + '. ' : '') + metaBits }));
+    return a;
+  }
+  function renderEbooks(mount) {
+    var items = WStore.get('library').filter(function (r) { return r.kind === 'ספר אלקטרוני'; });
+    mount.textContent = '';
+    if (!items.length) { mount.appendChild(emptyBox('אין כרגע ספרים אלקטרוניים נוספים. ספרים נוספים יתווספו דרך ממשק הניהול.')); return; }
+    items.forEach(function (it) { mount.appendChild(ebookItem(it)); });
+  }
+
   /* ---------- מדיה: סרטונים ופודקאסט ---------- */
   function renderVideos(mount) {
     var vids = WStore.get('videos');
@@ -492,6 +514,7 @@
     boardWidget: deferred(boardWidget),
     renderSearchableList: deferred(renderSearchableList),
     renderGroupedTeaching: deferred(renderGroupedTeaching),
+    renderEbooks: deferred(renderEbooks),
     renderVideos: deferred(renderVideos),
     renderPodcast: deferred(renderPodcast),
     renderMap: deferred(renderMap),

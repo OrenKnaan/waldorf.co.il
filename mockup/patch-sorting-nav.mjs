@@ -27,11 +27,9 @@ const NAV_ITEM = `<div class="nav-item"><a class="nav-link" data-nav="sorting" h
 <div class="dropdown">
 <a class="dropdown-link" href="./sorting.html">על המדור</a>
 <div class="dropdown-sep"></div>
-<a class="dropdown-link" href="./sorting-library.html">ספרייה</a>
-<a class="dropdown-link" href="./sorting-articles.html">מאמרים</a>
-<a class="dropdown-link" href="./sorting-subjects.html">מאמרים לפי מקצוע</a>
+<a class="dropdown-link" href="./sorting-library.html">ספרים אלקטרוניים</a>
+<a class="dropdown-link" href="./sorting-subjects.html">תוכניות לימודים לפי מקצוע</a>
 <a class="dropdown-link" href="./sorting-capstone.html">עבודות גמר</a>
-<a class="dropdown-link" href="./sorting-announcements.html">מודעות ופרסומים</a>
 <a class="dropdown-link" href="./sorting-pages.html">דפים מהאתר הישן</a>
 </div></div>
 `;
