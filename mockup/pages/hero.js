@@ -1,8 +1,9 @@
 /* מצגת תמונות ברקע הכותרת של דף הבית.
 
-   The markup ships with all five slides already in the DOM and the first one
+   The markup ships with every slide already in the DOM and the first one
    marked active, so the hero is a finished picture before this file runs and
-   stays one if it never does. Everything here is enhancement: the auto-advance,
+   stays one if it never does. An inline script in home.html shuffles the slides
+   before first paint, so the order and the first slide are random on every load. Everything here is enhancement: the auto-advance,
    the dots, the pause control and the progress rail.
 
    Direction. The page is RTL, so the slide strip runs right-to-left: slide 2
@@ -25,6 +26,21 @@
   var media = root.querySelector('.hero-media');
   var slides = [].slice.call(root.querySelectorAll('.hero-slide'));
   if (slides.length < 2) return;
+
+  /* The inline shuffle leaves every slide but the first without its image, so
+     the page does not fetch them all up front; they are handed back here once
+     the page has loaded. Appended rather than assigned, so a transform this
+     file has already set on a slide survives. */
+  function restoreImages() {
+    slides.forEach(function (slide) {
+      var style = slide.getAttribute('data-style');
+      if (!style) return;
+      slide.style.cssText += ';' + style;
+      slide.removeAttribute('data-style');
+    });
+  }
+  if (document.readyState === 'complete') restoreImages();
+  else window.addEventListener('load', restoreImages);
 
   /* ---------- knobs ---------- */
   // The veil's colour and depth are CSS, in the hero block of the page; these

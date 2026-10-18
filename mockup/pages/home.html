@@ -7,8 +7,6 @@
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
 <title>דף הבית — מוקאפ</title>
-<link rel="preload" as="image" href="./img/hero/hero-1-sm.webp" media="(max-width:1100px)">
-<link rel="preload" as="image" href="./img/hero/hero-1.webp" media="(min-width:1101px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -717,12 +715,20 @@
 <main id="main-content" tabindex="-1">
   <div class="hero-wrap" data-hero>
     <div class="hero-media" aria-hidden="true">
-      <div class="hero-slide is-active" style="--img:url('./img/hero/hero-1-sm.webp');--img-lg:url('./img/hero/hero-1.webp')"></div>
-      <div class="hero-slide" style="--img:url('./img/hero/hero-2-sm.webp');--img-lg:url('./img/hero/hero-2.webp')"></div>
-      <div class="hero-slide" style="--img:url('./img/hero/hero-3-sm.webp');--img-lg:url('./img/hero/hero-3.webp')"></div>
-      <div class="hero-slide" style="--img:url('./img/hero/hero-4-sm.webp');--img-lg:url('./img/hero/hero-4.webp')"></div>
-      <div class="hero-slide" style="--img:url('./img/hero/hero-5-sm.webp');--img-lg:url('./img/hero/hero-5.webp')"></div>
+      <div class="hero-slide is-active" style="--img:url('./img/hero/home-01-sm.webp');--img-lg:url('./img/hero/home-01.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-02-sm.webp');--img-lg:url('./img/hero/home-02.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-03-sm.webp');--img-lg:url('./img/hero/home-03.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-04-sm.webp');--img-lg:url('./img/hero/home-04.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-05-sm.webp');--img-lg:url('./img/hero/home-05.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-06-sm.webp');--img-lg:url('./img/hero/home-06.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-07-sm.webp');--img-lg:url('./img/hero/home-07.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-08-sm.webp');--img-lg:url('./img/hero/home-08.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-09-sm.webp');--img-lg:url('./img/hero/home-09.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-10-sm.webp');--img-lg:url('./img/hero/home-10.webp')"></div>
+      <div class="hero-slide" style="--img:url('./img/hero/home-11-sm.webp');--img-lg:url('./img/hero/home-11.webp')"></div>
     </div>
+    <script>/* Random order, random first slide. Runs here, before the page paints, so the visitor never sees the markup's own first slide swap out. Only the first slide keeps its image for now; hero.js gives the rest theirs once the page has loaded, so eleven pictures are not fetched up front. Without JavaScript nothing changes: the first slide shows. */
+    (function(){var m=document.querySelector('.hero-media');if(!m)return;var s=[].slice.call(m.children);for(var i=s.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=s[i];s[i]=s[j];s[j]=t;}s.forEach(function(e,i){m.appendChild(e);e.classList.toggle('is-active',i===0);if(i){e.setAttribute('data-style',e.getAttribute('style'));e.removeAttribute('style');}});})();</script>
     <div class="hero-sweep" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="hero-body">
