@@ -72,7 +72,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 9. `.github/workflows/pages.yml` — publishes `mockup/pages/` to GitHub Pages. Decide explicitly whether to retire it or keep it as a design reference; if it stays, the GitHub Pages URL stays public.
 10. Cloudflare Web Analytics is pointed at the **mockup host** (`orenknaan.github.io`), token in `mockup/analytics-config.mjs`, injected by `mockup/patch-analytics.mjs`. Cloudflare has no "clear data" action, so at cutover: delete the Web Analytics site, create a fresh one for `waldorf.co.il`, put the new token in the config and the new site tag in `analytics-worker/wrangler.toml`, re-run the patcher. Pre-launch numbers vanish with the old site — which is the intent.
 
-11. **`חומר למיון`, the triage section.** Four public pages (`mockup/pages/sorting-{library,subjects,capstone,pages}.html` plus the `sorting.html` index), two admin-only pages for the groups the forum rejected (`mockup/pages/admin/sorting-{announcements,articles}.html`), a shared widget (`pages/sorting.js`), content items under `pages/sorting-data/` and `pages/admin/sorting-data/`, three generators (`mockup/sorting-content.mjs`, `mockup/sorting-decisions.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together: pages, data, generators, and the nav entry (`node mockup/patch-sorting-nav.mjs` with `ENABLED = false` strips the entry and its CSS from every page).
+11. **`חומר למיון`, the triage section.** Admin-only as of 2026-10-18: seven pages under `mockup/pages/admin/sorting*.html` (one overview plus six groups), a shared widget (`pages/sorting.js`), content items under `pages/admin/sorting-data/`, three generators (`mockup/sorting-content.mjs`, `mockup/sorting-decisions.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`, currently `ENABLED = false`, having already stripped the entry from the public nav). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together: the `pages/admin/sorting*` files, the data directory, and the generators.
 
 
 **Placeholder content that must not ship:**
@@ -188,27 +188,28 @@ site for free, and future e-books are bought elsewhere.
 
 ## The triage section (חומר למיון)
 
-**Temporary**, unlike the three layers above: it is item 11 of the cutover inventory, and
-it comes out whole. It exists because the new site is a rewrite: its pages are shorter and
-better organised than the old ones, and in the process items were left behind that nobody
-had decided about. The section is where that decision gets made, not a part of the site a
-reader is meant to browse.
+**Admin-only as of 2026-10-18.** It used to have four public pages and two admin-only ones;
+all six groups are admin-only now, reachable only from the admin dashboard sidebar
+("חומר למיון (ארכיון)" → "סקירה כללית"), not from the public nav at all. It exists because
+the new site is a rewrite: its pages are shorter and better organised than the old ones, and
+in the process items were left behind that nobody had decided about.
 
-The forum reviewed the pile on 2026-10-11 and answered item by item. `mockup/sorting-decisions.mjs`
-records those answers (moves, drops, and short reviewer notes shown on the item) so a future
-re-scrape does not lose them. Three results of that review:
+The forum reviewed the pile on 2026-10-11 and answered item by item (`mockup/sorting-decisions.mjs`
+records every answer, so a future re-scrape does not lose them), but "classified" turned out
+not to mean "has a confirmed home." Checking the forum's reading of **תוכניות לימודים לפי
+מקצוע** (was "מאמרים לפי מקצוע": each subject bucket *is* that subject's curriculum, not a
+separate article, per the forum) against the actual `curriculum-*.html` pages found two
+subject buckets with no match anywhere: בוטמר ומשחקים (2 items) and אמנות הדיבור (5 items,
+only a passing mention of "דקלום" in `curriculum-hebrew.html`). Everything else checked out:
+**ספרים אלקטרוניים** (was "ספרייה") and **עבודות גמר** turned out to already be fully covered
+by `content-library.html` and `ebooks.html` (built before this reorg), the other 15 subject
+categories map onto real `curriculum-*.html` content, and the "pages" group's "already on the
+new site" notes held up against `school.html`/`kinder.html`/`school-list.html`/`kinder-list.html`.
+Given two unresolved items out of 361, the forum's own "pile stays up until it is actually
+empty" rule (see below) is what took the whole thing off the public site, not just those two:
+nothing was deleted, only moved behind the admin login, so re-exposing any of it later is a
+nav-entry toggle, not a rebuild.
 
-- **Only four groups are public now.** מודעות ופרסומים (announcements) and מאמרים (general
-  articles) are not under consideration for the new site at all (most articles are
-  elsewhere already; see the newsletter and library sections for what *is* going public).
-  Their data and pages moved to admin-only copies: `mockup/pages/admin/sorting-data/` and
-  `mockup/pages/admin/sorting-announcements.html` / `sorting-articles.html`, linked from the
-  admin dashboard sidebar, reusing the unmodified `sorting.js` widget against the site's CSS
-  tokens aliased to the admin's own palette. The remaining public groups, at
-  `mockup/pages/sorting-data/` and `mockup/pages/sorting-{library,subjects,capstone,pages}.html`,
-  are **ספרים אלקטרוניים** (was "ספרייה"; title changed, same `library` group key), **תוכניות
-  לימודים לפי מקצוע** (was "מאמרים לפי מקצוע": the forum's reading is that this content *is*
-  each subject's curriculum, not a separate article), עבודות גמר, and the old-site pages pile.
 - **עבודות גמר is bucketed by type, not by year.** The old year buckets are replaced by three:
   עבודות סמינריוניות, עבודות של מורים שונים, and עבודות לתואר שני, decided by the forum rather
   than guessed (`capstoneBucket()` in the decisions module).
@@ -218,24 +219,24 @@ re-scrape does not lose them. Three results of that review:
   new site" keep a short `note` field, rendered on the card by `sorting.js` so the reason stays
   visible rather than silently vanishing from the pile.
 
-Nothing in it edits existing content. The generators only ever write `pages/sorting*.html`,
-`pages/sorting-data/` and (for the two admin-only groups) `pages/admin/sorting-data/`; the one
-change to the other pages is the nav entry `patch-sorting-nav.mjs` adds, which the same script
-removes.
+Nothing in it edits existing content. The generators only ever write `pages/admin/sorting*.html`
+and `pages/admin/sorting-data/`.
 
 - `mockup/sorting-content.mjs` — pulls the content from the old site's **WordPress REST
   API**, the same one `migration/README.md` documents, so the inventory is complete rather
-  than crawled, then applies `sorting-decisions.mjs` and splits the result into the public
-  write (four groups) and the admin-only write (announcements, articles). Writes
-  `index.json` (metadata) and `items/<id>.html` (one sanitised body each, fetched only when
-  opened) under both output directories. Re-run it to refresh; the forum is still
+  than crawled, then applies `sorting-decisions.mjs`. The public/admin split machinery is
+  still there (`ADMIN_ONLY_GROUPS` now lists all six groups, so the public write is a no-op)
+  rather than deleted, since a future group could again go public without rewriting this.
+  Writes `pages/admin/sorting-data/index.json` (metadata) and `items/<id>.html` (one
+  sanitised body each, fetched only when opened). Re-run it to refresh; the forum is still
   publishing, so the counts move, but the forum's standing decisions do not.
   - **What counts as missing.** All posts, plus the structural pages whose text the new
     site does not carry. That second judgement is measured, not guessed: eight-word shingles
     of the old page are looked for across all the static pages and the D1 collections, and
     anything above 50% coverage is treated as already migrated. Pages between 15% and 50%
     are kept and flagged, the new site carries a shortened version, and the interesting
-    part is what was cut.
+    part is what was cut. The same measured standard is what caught the בוטמר/אמנות הדיבור
+    gap above; the forum's "I think we already have this" is a lead, not a finding.
   - **Sanitising.** Element ids are stripped (several bodies open on one page would collide),
     inline handlers go, and every `<iframe>` becomes a plain link, nine third parties, one
     of them a `javascript:` src. Two accessibility repairs happen here rather than in the
@@ -245,30 +246,38 @@ removes.
 - `mockup/sorting-decisions.mjs` — the forum's editorial decisions, kept separate from the
   scraper so a re-run against the WordPress API does not lose them: `GROUP_TITLE_OVERRIDE`,
   `ADMIN_ONLY_GROUPS`, `DROP_IDS`, `MOVES`, `NOTES`, and the capstone bucket rule.
-- `mockup/sorting-pages.mjs` — generates the public pages from `media.html`'s skeleton, so
-  they inherit the stylesheet, header, nav, footer, accessibility and search layers verbatim
-  instead of a second copy that drifts. It strips `store.js`/`dynamic.js` (this section reads
-  nothing from D1) **and the skeleton's own `WDyn` render calls**, which otherwise throw on
-  every page. It writes the `id="sec-…"` anchors itself, using the same FNV-1a hash
-  `patch-search.mjs` uses, so that patcher stays a no-op here.
-  - **The `<main>` replace is anchored on `<main id="main-content"`, not a bare `<main`.**
-    `media.html`'s own "hero: inset slideshow" CSS comment mentions `<main>` in prose before
-    the real tag, and a loose `/<main[\s\S]*?<\/main>/` latches onto that instead, consuming
-    everything from the comment through the real closing tag (head, body, header, nav
-    included) and silently writing a corrupted page. `library-pages.mjs` had the identical
-    regex and the identical latent bug, fixed the same way; re-check any future `<main>`
-    replace in a generator against this trap before trusting its output unseen.
-- `mockup/patch-sorting-nav.mjs` — the nav entry and its badge CSS, on every page.
-  `ENABLED = false` strips both back out. The badge rule is inserted **before** the
-  `/* ===== responsive ===== */` marker, which `patch-responsive.mjs` rewrites verbatim on
-  every run and would otherwise swallow.
+- `mockup/sorting-pages.mjs` — generates all seven pages (one overview plus the six groups)
+  with a skeleton of its own, not a clone of a public page: an admin page carries none of
+  the site's nav, accessibility layer or search, the same way `admin/set-password.html`
+  does not. `sorting.js` is loaded unmodified against the admin palette's own tokens,
+  aliased to the names its injected CSS expects (`--white`, `--text`,
+  `--radius-organic-sm`, …), rather than forking the widget's stylesheet.
+  - **The `<main>` replace used to be anchored on a bare `<main`.** `media.html`'s own
+    "hero: inset slideshow" CSS comment mentions `<main>` in prose before the real tag, and
+    a loose `/<main[\s\S]*?<\/main>/` latches onto that instead, consuming everything from
+    the comment through the real closing tag and silently writing a corrupted page. Hit once
+    while this section was still public-page based and fixed by anchoring on
+    `<main id="main-content"`; `library-pages.mjs` had the identical regex and the identical
+    latent bug, fixed the same way. Now moot for this generator, since its own skeleton has
+    no such comment, but re-check any future `<main>` replace in a generator against this
+    trap before trusting its output unseen.
+  - Template substitution is `String.replaceAll`, not `replace`: the skeleton's own
+    `{{TITLE}}` placeholder appears twice (`<title>` and `<h1>`), and `replace` silently
+    fills in only the first.
+- `mockup/patch-sorting-nav.mjs` — added the nav entry and its badge CSS to every public
+  page; `ENABLED = false` is the resting state now, having stripped both back out. Flip it
+  back to `true` and re-run only if some part of the pile goes public again.
+  - **Its CSS strip only escaped `*` and `/` before building a regex from the marker
+    string, not the parentheses in "(temporary)".** An unescaped `(...)` in a regex is a
+    capture group, not two literal characters, so the pattern never matched and
+    `ENABLED = false` had silently left the badge CSS on every page it ever ran on, since
+    this patcher was first written. Fixed with a proper escape-all-metacharacters helper;
+    confirmed by re-running and finding zero remaining `.nav-badge` rules.
 - `mockup/pages/sorting.js` — the widget: injects its own CSS (like `search.js`), renders the
   list for whichever group `<main data-sorting-group>` names, buckets it, filters it, shows
   an item's `note` when the forum left one, and fetches an item's body on first open. Hebrew
   filtering folds niqqud, quote marks and final letters, for the reason the search section
-  gives. Shared verbatim by the public pages and the two admin-only pages; the admin pages
-  alias the site's CSS token names (`--white`, `--text`, `--radius-organic-sm`, …) to the
-  admin palette's own tokens rather than forking the widget's stylesheet.
+  gives. Unmodified since it was a public-facing widget; only the pages around it moved.
   - It re-implements the overflowing-table `tabindex` toggle from `accessibility.js` for the
     tables it injects. That file observes only the wraps present when it initialises, and
     these arrive when somebody opens an item, the alternative was exporting a re-scan hook
@@ -288,10 +297,11 @@ Two things to know before relying on it:
   hand to the existing snapshot rather than by a fresh scrape; re-run `sorting-content.mjs`
   itself once network access is available, to confirm it reproduces the same split.
 
-Not re-verified after the 2026-10-11 reorg: the "seven pages, 364 items, 0 console errors,
-0 axe violations" audit this section used to report was run against the *old* six-group
-structure. Re-run the Chrome-over-CDP and axe-core passes described in "Scanning for bugs
-and violations" before trusting that result again.
+Not re-verified after the 2026-10-18 move to admin-only: the "seven pages, 364 items, 0
+console errors, 0 axe violations" audit this section used to report was run against the
+*original* public, six-group structure, two reorgs ago. Re-run the Chrome-over-CDP and
+axe-core passes described in "Scanning for bugs and violations" before trusting that result
+again.
 
 ## Scanning for bugs and violations
 

@@ -354,8 +354,13 @@ function writeSet(dir, itemsDirPath, setItems, groupKeys) {
   return index;
 }
 
+// All six groups are admin-only as of 2026-10-18 (see sorting-decisions.mjs),
+// so there is nothing left to write publicly. Keep the split machinery
+// rather than deleting it: a future group could again be public-only, and
+// this is the one place that would need to change.
 const publicGroupKeys = Object.keys(GROUPS).filter((k) => !ADMIN_ONLY_GROUPS.includes(k));
-const publicIndex = writeSet(outDir, itemsDir, publicItems, publicGroupKeys);
+if (publicGroupKeys.length && existsSync(outDir)) rmSync(outDir, { recursive: true });
+const publicIndex = publicGroupKeys.length ? writeSet(outDir, itemsDir, publicItems, publicGroupKeys) : { groups: {} };
 mkdirSync(adminOutDir, { recursive: true });
 const adminIndex = writeSet(adminOutDir, adminItemsDir, adminItems, ADMIN_ONLY_GROUPS);
 

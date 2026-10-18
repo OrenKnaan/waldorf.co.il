@@ -15,7 +15,9 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-const ENABLED = true;
+// Off as of 2026-10-18: the whole חומר למיון pile moved admin-only (see
+// CLAUDE.md, "The triage section"), so the public nav no longer carries it.
+const ENABLED = false;
 
 const pagesDir = join(dirname(fileURLToPath(import.meta.url)), 'pages');
 
@@ -44,6 +46,12 @@ const BADGE_CSS = `  /* ===== sorting badge (temporary) ===== */
   .dropdown-link .nav-badge{margin-inline-start:6px}
 `;
 
+// Escapes every regex metacharacter, not just * and /: CSS_MARKER below has
+// parentheses too, and leaving those as live regex syntax (a capture group
+// instead of two literal characters) made the strip below never match, so
+// ENABLED = false silently left the badge CSS on every page it ran on.
+const reEscape = (s) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
 const MARKER = 'data-nav="sorting"';
 const CSS_MARKER = '/* ===== sorting badge (temporary) ===== */';
 const CONTACT = '<div class="nav-item"><a class="nav-link" data-nav="contact" href="./contact.html">צור קשר</a></div>';
@@ -57,7 +65,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
 
   if (!ENABLED) {
     html = html.replace(new RegExp(`<div class="nav-item"><a class="nav-link" ${MARKER}[\\s\\S]*?</div></div>\\n`), '');
-    html = html.replace(new RegExp(`${CSS_MARKER.replace(/[*/]/g, '\\$&')}[\\s\\S]*?\\n(?=\\s*/\\*|</style>)`), '');
+    html = html.replace(new RegExp(`${reEscape(CSS_MARKER)}[\\s\\S]*?\\n(?=\\s*/\\*|</style>)`), '');
     if (html !== before) { writeFileSync(path, html, 'utf8'); removed += 1; }
     continue;
   }

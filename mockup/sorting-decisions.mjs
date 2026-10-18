@@ -14,10 +14,14 @@ export const GROUP_TITLE_OVERRIDE = {
   subjects: 'תוכניות לימודים לפי מקצוע',
 };
 
-// Groups whose public sorting-*.html page and nav entry do not exist: the
-// forum does not want this material considered for the new site at all, so it
-// moves to an admin-only copy instead (see mockup/sorting-pages.mjs).
-export const ADMIN_ONLY_GROUPS = ['announcements', 'articles'];
+// All six groups are admin-only as of 2026-10-18: the forum's classification
+// work is done, but at least two subject buckets (בוטמר ומשחקים, אמנות
+// הדיבור) turned out to have no confirmed home on the new site yet, so the
+// whole pile stays off the public site until that is resolved, visible only
+// from the admin dashboard (see mockup/sorting-pages.mjs). announcements and
+// articles were already admin-only before that, for a different reason: the
+// forum does not want that material considered for the new site at all.
+export const ADMIN_ONLY_GROUPS = ['library', 'subjects', 'capstone', 'pages', 'announcements', 'articles'];
 
 export const DROP_IDS = new Set([
   'p1913', // "חלום חדש", פרוייקט חינוך לקיימות: הפורום ביקש להוריד אותו.
