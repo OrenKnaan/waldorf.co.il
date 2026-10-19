@@ -55,10 +55,21 @@ function capstoneBucket(item) {
 const BLANKET_NOTE = 'הפורום: חלק מהרשימה הראשונית שאינה רלוונטית להעברה.';
 const SCHOOL_KINDER_NOTE = 'הפורום: החומר הזה כבר קיים באתר החדש.';
 const FORUM_EVENTS_NOTE = 'הפורום: לא רלוונטי כרגע (לוח אירועים/פורום).';
+// 2026-10-18: Gilad's answer to the two subject buckets with no confirmed
+// home anywhere on the new site (see CLAUDE.md, "The triage section").
+const BOTHMER_NOTE = 'גלעד: אפשר לוותר, לא יועבר לאתר החדש.';
+const SPEECH_ARTS_NOTE = 'גלעד: הועבר למדור הספרים האלקטרוניים (lib-speech-arts.html).';
 
 export const NOTES = {
   g2087: 'הפורום: כבר טופל, הספר במדור "ספרים אלקטרוניים".',
   g1295: 'הפורום: באתר החדש צריך להיות דף קישורים, לבדוק אם קיים.',
+  p3003: BOTHMER_NOTE,
+  p3001: BOTHMER_NOTE,
+  p1602: SPEECH_ARTS_NOTE,
+  p1604: SPEECH_ARTS_NOTE,
+  p1605: SPEECH_ARTS_NOTE,
+  p1606: SPEECH_ARTS_NOTE,
+  p1607: SPEECH_ARTS_NOTE,
   g1051: BLANKET_NOTE,
   g779: BLANKET_NOTE,
   g1001: BLANKET_NOTE,

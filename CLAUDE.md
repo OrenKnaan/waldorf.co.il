@@ -174,17 +174,22 @@ site for free, and future e-books are bought elsewhere.
   by `WDyn.renderEbooks` in `mockup/pages/dynamic.js`.
 - The `library` table gained a `purchase_url` column (migration `0013_library_ebooks.sql`,
   content API field `purchaseUrl`). A row with `purchase_url` set renders a "לרכישה" link
-  that opens in a new tab (leaving the site to buy); a row with only `url` set (today, just
-  "22 שאלות ותשובות על חינוך ולדורף", `lb-p2323`, moved here out of the general `מאמר` kind)
-  renders a same-tab "קריאה חופשית" link to its own page on this site. A row with neither is
-  a future book not yet linked to anything, and renders "בקרוב".
+  that opens in a new tab (leaving the site to buy); a row with only `url` set renders a
+  same-tab "קריאה חופשית" link to its own page on this site. A row with neither is a future
+  book not yet linked to anything, and renders "בקרוב". Two rows are open today: "22 שאלות
+  ותשובות על חינוך ולדורף" (`lb-p2323`, moved here out of the general `מאמר` kind), and
+  "אמנות הדיבור" (`lb-speech-arts`, migration `0014_library_speech_arts.sql`), the subject
+  the forum found no curriculum page for and asked to put here instead (see "The triage
+  section" below). Unlike every other library item, `lib-speech-arts.html` has no single
+  WordPress post behind it: it combines five pieces from the triage archive (an intro, a
+  curriculum summary, and three age-group chapters) by hand into one page, the same way the
+  main book's cover and chapter rail are hand-built rather than generated per record.
 - `mockup/pages/library.js` excludes `kind = 'ספר אלקטרוני'` from `content-library.html`'s own
   works/book grids, so an e-book shows up on `ebooks.html` only, not twice.
 - `mockup/patch-ebooks-nav.mjs` adds the nav entry (idempotent, `ENABLED = false` to strip).
-- Migrations `0012_library_works_reclassify_2026.sql` and `0013_library_ebooks.sql` are
-  written but **not yet applied** to the D1 database from this sandbox (no network access to
-  run `npx wrangler d1 migrations apply`); run that from `content-api/` before relying on the
-  new kind or column in production.
+- Migrations `0012` through `0014` are written but **not yet applied** to the D1 database from
+  this sandbox (no network access to run `npx wrangler d1 migrations apply`); run that from
+  `content-api/` before relying on the new kind, column, or row in production.
 
 ## The triage section (חומר למיון)
 
@@ -205,10 +210,12 @@ only a passing mention of "דקלום" in `curriculum-hebrew.html`). Everything 
 by `content-library.html` and `ebooks.html` (built before this reorg), the other 15 subject
 categories map onto real `curriculum-*.html` content, and the "pages" group's "already on the
 new site" notes held up against `school.html`/`kinder.html`/`school-list.html`/`kinder-list.html`.
-Given two unresolved items out of 361, the forum's own "pile stays up until it is actually
-empty" rule (see below) is what took the whole thing off the public site, not just those two:
-nothing was deleted, only moved behind the admin login, so re-exposing any of it later is a
-nav-entry toggle, not a rebuild.
+Both gaps were put to Gilad on 2026-10-19 and are resolved now: בוטמר ומשחקים is dropped
+(`BOTHMER_NOTE` in the decisions module, no further action), and אמנות הדיבור moved to the
+e-books showcase instead of a curriculum page (`lb-speech-arts`, see "E-books showcase"
+above). Neither change brought the pile back to the public site: once moved, it stays
+admin-only regardless of how many open items remain, since nothing was deleted, only moved
+behind the admin login, so re-exposing any of it later is a nav-entry toggle, not a rebuild.
 
 - **עבודות גמר is bucketed by type, not by year.** The old year buckets are replaced by three:
   עבודות סמינריוניות, עבודות של מורים שונים, and עבודות לתואר שני, decided by the forum rather
