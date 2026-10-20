@@ -540,7 +540,7 @@
      bottom margin give back exactly the distance the top margin took. Text
      containers take a light tint of the page's watercolour colour, and main is as
      wide as the slides' margins allow. */
-  :root{--side:clamp(16px,7.5vw,100px);--hero-h:clamp(240px,38vw,600px);--bar-h:44px;--bar-gap:14px}
+  :root{--side:clamp(16px,7.5vw,100px);--hero-h:max(200px,calc((100vw - 2 * var(--side)) * 658 / 1500));--bar-h:44px;--bar-gap:14px}
   main{max-width:none;padding:10px var(--side) 70px}
   section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
   main section.card,main blockquote,main blockquote>*{min-width:0}
