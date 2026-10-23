@@ -66,7 +66,7 @@
     slides[0].classList.add('is-active');
 
     var playBtn = root.querySelector('.ah-play');
-    var DWELL = 5200;
+    var DWELL = 4200;
     var FADE = 1000;
 
     var index = 0;

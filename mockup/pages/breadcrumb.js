@@ -37,7 +37,10 @@
     // 8px, matching the gap the banner sits at when the page is at rest
     // (main's padding-block-start less the negative margin on the first child).
     // At 10px the pill dropped 2px the moment it stuck.
-    '.pagebanner{position:sticky;top:8px;z-index:15;transition:box-shadow .18s}',
+    '.pagebanner{position:sticky;top:8px;z-index:15;transition:box-shadow .18s,opacity .18s,visibility 0s}',
+    // On pages with an art-hero the pill (and its menu button) stays hidden until the slideshow has scrolled out of view.
+    // visibility, not just opacity, so a hidden pill is not a tab stop.
+    '.pagebanner.is-pre-hero{opacity:0;visibility:hidden;pointer-events:none;transition:box-shadow .18s,opacity .18s,visibility 0s .18s}',
     '.pagebanner.is-stuck{box-shadow:var(--shadow-lg)}',
     /* רקע רך מאחורי הפילול כדי שהתוכן לא יציץ בפינות המעוגלות. רוחב מלא של
        העמוד ולא רק של הפיל עצמו: left:50%+margin-left:-50vw הוא הטריק
@@ -372,6 +375,7 @@
     });
   }
 
+  var artHero = main.querySelector('.art-hero');
   var ticking = false;
   function schedule() {
     if (ticking) return;
@@ -379,6 +383,11 @@
     requestAnimationFrame(function () {
       ticking = false;
       banner.classList.toggle('is-stuck', banner.getBoundingClientRect().top <= stickyTop() + 1);
+      if (artHero) {
+        var pre = artHero.getBoundingClientRect().bottom > stickyTop();
+        banner.classList.toggle('is-pre-hero', pre);
+        if (pre) setMenu(false);
+      }
       if (!banner.classList.contains('is-stuck')) setMenu(false);
       update();
       markEnd();

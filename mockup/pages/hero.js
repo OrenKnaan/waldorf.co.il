@@ -45,7 +45,7 @@
   /* ---------- knobs ---------- */
   // The veil's colour and depth are CSS, in the hero block of the page; these
   // are the timings. See the note above .hero-sweep in home-hero.html.
-  var DWELL = 6000;     // how long a slide is held, ms
+  var DWELL = 5000;     // how long a slide is held, ms
   var FADE = 1100;      // cross-fade duration, ms; must match the CSS transition
   var PUSH = -3;        // percent; negative = incoming enters from the left (RTL)
   var SWEEP_EASE = 2.4; // >1 delays the darkening; 1 makes it linear
