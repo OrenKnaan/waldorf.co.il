@@ -265,8 +265,9 @@
   /* ---- hamburger drawer ---- */
   @media (max-width:720px){
     .nav-toggle{display:flex}
-    .brand-row{padding-block:16px 10px;padding-inline-start:62px;padding-inline-end:20px}
-    .brand-name{font-size:1.2rem}
+    .brand-row{display:flex;align-items:center;justify-content:center;min-height:68px;padding-block:6px;padding-inline:60px;text-align:center}
+    .nav-toggle{inset-block-start:34px;transform:translateY(-50%)}
+    .brand-name{font-size:1.2rem;line-height:1.3}
     .brand-tagline{font-size:.7rem;letter-spacing:.1em}
     .primary-nav{flex-direction:column;gap:0;padding:0 14px;overflow-x:visible;
       max-height:0;overflow-y:hidden;transition:max-height .3s ease}
@@ -541,7 +542,8 @@
      containers take a light tint of the page's watercolour colour, and main is as
      wide as the slides' margins allow. */
   :root{--side:clamp(16px,7.5vw,100px);--hero-h:max(200px,calc((100vw - 2 * var(--side)) * 658 / 1500));--bar-h:44px;--bar-gap:14px}
-  main{max-width:none;padding:10px var(--side) 70px}
+  main{max-width:none}
+  @media (min-width:721px){main{padding:10px var(--side) 70px}}
   section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
   main section.card,main blockquote,main blockquote>*{min-width:0}
   /* Header: same column as the page, and tinted from the page's watercolour colour,

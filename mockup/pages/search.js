@@ -148,7 +148,7 @@
     // button out to the header's own bar, in the corner the hamburger does not
     // occupy. Its containing block is .site-header (position:relative), not the
     // drawer, so the drawer's overflow does not clip it.
-    '  .wsearch-btn{position:absolute;inset-block-start:14px;inset-inline-end:10px;z-index:30;',
+    '  .wsearch-btn{position:absolute;inset-block-start:34px;transform:translateY(-50%);inset-inline-end:10px;z-index:30;',
     '    height:44px;border-block-end:0;border-radius:var(--radius,8px)}',
     '  .wsearch-btn:hover,.wsearch-btn[aria-expanded="true"]',
     '    {border-block-end-color:transparent;',

@@ -265,8 +265,9 @@
   /* ---- hamburger drawer ---- */
   @media (max-width:720px){
     .nav-toggle{display:flex}
-    .brand-row{padding-block:16px 10px;padding-inline-start:62px;padding-inline-end:20px}
-    .brand-name{font-size:1.2rem}
+    .brand-row{display:flex;align-items:center;justify-content:center;min-height:68px;padding-block:6px;padding-inline:60px;text-align:center}
+    .nav-toggle{inset-block-start:34px;transform:translateY(-50%)}
+    .brand-name{font-size:1.2rem;line-height:1.3}
     .brand-tagline{font-size:.7rem;letter-spacing:.1em}
     .primary-nav{flex-direction:column;gap:0;padding:0 14px;overflow-x:visible;
       max-height:0;overflow-y:hidden;transition:max-height .3s ease}
@@ -541,7 +542,8 @@
      containers take a light tint of the page's watercolour colour, and main is as
      wide as the slides' margins allow. */
   :root{--side:clamp(16px,7.5vw,100px);--hero-h:clamp(240px,38vw,600px);--bar-h:44px;--bar-gap:14px}
-  main{max-width:none;padding:10px var(--side) 70px}
+  main{max-width:none}
+  @media (min-width:721px){main{padding:10px var(--side) 70px}}
   section.card{background:color-mix(in oklab,var(--cat) 13%,var(--white))}
   main section.card,main blockquote,main blockquote>*{min-width:0}
   /* Header: same column as the page, and tinted from the page's watercolour colour,
@@ -687,15 +689,15 @@
 <th><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg> דוא"ל</th>
 </tr></thead>
 <tbody>
-<tr><td>אורי עברי (מנהלים)</td><td>ivriori56@gmail.com</td></tr>
-<tr><td>איציק שכן טוב</td><td>izikst69@gmail.com</td></tr>
-<tr><td>גיל קינן (דליה)</td><td>gilkkenan@gmail.com</td></tr>
-<tr><td>מיכל בן שלום (מלווים)</td><td>benshalom@harduf.org.il</td></tr>
-<tr><td>מיכל רוזנברג (ריכוז, מנהלים)</td><td>roznberg@netvision.net.il</td></tr>
-<tr><td>נעמה שפירא (ריכוז, מנהלים)</td><td>naama.ritte@gmail.com</td></tr>
-<tr><td>רחל האן</td><td>rachelhahn3@gmail.com</td></tr>
+<tr><td>אורי עברי (מנהלים)</td><td><a href="mailto:ivriori56@gmail.com">ivriori56@gmail.com</a></td></tr>
+<tr><td>איציק שכן טוב</td><td><a href="mailto:izikst69@gmail.com">izikst69@gmail.com</a></td></tr>
+<tr><td>גיל קינן (דליה)</td><td><a href="mailto:gilkkenan@gmail.com">gilkkenan@gmail.com</a></td></tr>
+<tr><td>מיכל בן שלום (מלווים)</td><td><a href="mailto:benshalom@harduf.org.il">benshalom@harduf.org.il</a></td></tr>
+<tr><td>מיכל רוזנברג (ריכוז, מנהלים)</td><td><a href="mailto:roznberg@netvision.net.il">roznberg@netvision.net.il</a></td></tr>
+<tr><td>נעמה שפירא (ריכוז, מנהלים)</td><td><a href="mailto:naama.ritte@gmail.com">naama.ritte@gmail.com</a></td></tr>
+<tr><td>רחל האן</td><td><a href="mailto:rachelhahn3@gmail.com">rachelhahn3@gmail.com</a></td></tr>
 </tbody></table></div>
-<p style="font-size:.82rem;color:var(--text-muted)">לפנייה לכלל חברי צוות הלב: forum@antro.org.il</p>
+<p style="font-size:.82rem;color:var(--text-muted)">לפנייה לכלל חברי צוות הלב: <a href="mailto:forum@antro.org.il">forum@antro.org.il</a></p>
 </section>
 <section class="card">
 <h2 id="sec-a1d5r8">ועדה כלכלית</h2>
@@ -705,11 +707,11 @@
 <th><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg> דוא"ל</th>
 </tr></thead>
 <tbody>
-<tr><td>רחל האן (מנהלים)</td><td>rachelhahn3@gmail.com</td></tr>
-<tr><td>אייל בלוך</td><td>bloch.eyal@gmx.com</td></tr>
-<tr><td>גיל ארז</td><td>gil@erezconsulting.com</td></tr>
-<tr><td>יואב גבעון</td><td>yoavgiv@gmail.com</td></tr>
-<tr><td>יעלה שביב</td><td>s.yeala@gmail.com</td></tr>
+<tr><td>רחל האן (מנהלים)</td><td><a href="mailto:rachelhahn3@gmail.com">rachelhahn3@gmail.com</a></td></tr>
+<tr><td>אייל בלוך</td><td><a href="mailto:bloch.eyal@gmx.com">bloch.eyal@gmx.com</a></td></tr>
+<tr><td>גיל ארז</td><td><a href="mailto:gil@erezconsulting.com">gil@erezconsulting.com</a></td></tr>
+<tr><td>יואב גבעון</td><td><a href="mailto:yoavgiv@gmail.com">yoavgiv@gmail.com</a></td></tr>
+<tr><td>יעלה שביב</td><td><a href="mailto:s.yeala@gmail.com">s.yeala@gmail.com</a></td></tr>
 </tbody></table></div>
 </section>
 

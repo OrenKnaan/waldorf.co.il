@@ -50,6 +50,8 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 >
 > Verify by crawling the CSV's `old_path` column against the live site and asserting every response is a 301 to a 200. A spot check is not enough at this volume.
 
+> **Old-site links are already local (2026-10-23).** No page under `mockup/pages/` links to `waldorf.co.il` any more. The 40 attachments that library items and the newsletter point to live in `mockup/pages/wp-content/uploads/...` (and one in `papers/`) under their **original paths**, so those URLs keep working after the move with no redirect. The five newsletter issues are `nl-p*.html` (`mockup/newsletter-pages.mjs`), and `migration/url-map.csv` points their old URLs at them. After regenerating library pages run `node mockup/patch-old-site-links.mjs` (idempotent; expect `0 file(s) rewritten`). Still open: `/ליווי_יוזמות_2017/` is password-protected on the old site, so it has no body to copy. The admin triage pile (`pages/admin/sorting-data`) still links to old-site files, and `/wp-content/uploads/` has more files than the 40 copied, so the rest of that decision remains.
+
 > **The same day, carry the DNS across: `migration/dns-records.md`.**
 >
 > The zone is at livedns and so is the mailbox (`MX -> mail.waldorf.co.il`). Moving nameservers to Cloudflare means recreating every record, and Cloudflare's import scan builds its list from public queries, so anything that does not currently resolve is silently not imported. Export the zone file from livedns first and diff it after. Moving DNS does not require moving the mailbox: keep the MX pointing at livedns and mail is unaffected.

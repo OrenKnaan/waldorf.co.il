@@ -371,4 +371,4 @@ console.log(`${written} library item page(s) written, ${withFiles} with attached
 if (deadLinks) console.log(`${deadLinks} footnote link(s) whose target is missing from the archive were unlinked.`);
 if (oldNav) console.log(`${oldNav} cross-site "קדימה" link(s) replaced by the local chapter pager.`);
 if (covers) console.log(`${covers} book cover lifted out of the text into a framed title card.`);
-console.log('Now run: node mockup/patch-search.mjs && node mockup/search-index.mjs');
+console.log('Now run: node mockup/patch-old-site-links.mjs && node mockup/patch-search.mjs && node mockup/search-index.mjs');
