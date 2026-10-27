@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync, existsSync
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { GROUP_TITLE_OVERRIDE, ADMIN_ONLY_GROUPS, applyDecisions } from './sorting-decisions.mjs';
+import { GROUP_TITLE_OVERRIDE, ADMIN_ONLY_GROUPS, MANUAL_ITEMS, applyDecisions } from './sorting-decisions.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..');
@@ -287,6 +287,33 @@ for (const p of posts) {
     hasBody: text.length > 0 || /<img|si-embed/.test(body),
   });
   bodies.set(`p${p.id}`, body);
+}
+
+// Items that never came from the WordPress API at all (see MANUAL_ITEMS in
+// sorting-decisions.mjs): same shape as a scraped post, body read from its
+// own file instead of fetched.
+for (const m of MANUAL_ITEMS) {
+  const body = readFileSync(join(__dirname, 'manual-items', `${m.id}.html`), 'utf8');
+  const text = plain(body);
+  items.push({
+    id: m.id,
+    group: m.group,
+    bucket: m.date.slice(0, 4),
+    order: 0,
+    title: m.title,
+    author: m.author,
+    date: m.date,
+    kind: 'manual',
+    cats: m.cats,
+    oldPath: '',
+    oldUrl: '',
+    redirectsTo: '',
+    chars: text.length,
+    assets: countAssets(body),
+    excerpt: text.slice(0, 240),
+    hasBody: true,
+  });
+  bodies.set(m.id, body);
 }
 
 // The 62 structural pages are the ones the new site was written from, so most

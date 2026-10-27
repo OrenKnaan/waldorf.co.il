@@ -157,12 +157,16 @@
     if (item.note) li.appendChild(el('p', 'si-note', item.note));
 
     var links = el('div', 'si-links');
-    var orig = el('a', null, 'העמוד המקורי באתר הישן');
-    orig.href = item.oldUrl;
-    orig.target = '_blank';
-    orig.rel = 'noopener';
-    orig.appendChild(el('span', 'sr-only', ' (נפתח בחלון חדש)'));
-    links.appendChild(orig);
+    // Items added directly rather than scraped (see MANUAL_ITEMS in
+    // sorting-decisions.mjs) have no old-site page to point at.
+    if (item.oldUrl) {
+      var orig = el('a', null, 'העמוד המקורי באתר הישן');
+      orig.href = item.oldUrl;
+      orig.target = '_blank';
+      orig.rel = 'noopener';
+      orig.appendChild(el('span', 'sr-only', ' (נפתח בחלון חדש)'));
+      links.appendChild(orig);
+    }
     if (item.redirectsTo) {
       var to = el('a', null, 'ההפניה מובילה כיום אל ' + item.redirectsTo.replace(/^\//, ''));
       to.href = '.' + item.redirectsTo;

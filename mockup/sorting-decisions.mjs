@@ -41,8 +41,24 @@ export const MOVES = {
   g1924: { bucket: 'מאמרים של מורים בחינוך ולדורף' },
 };
 
-const THESIS_IDS = new Set(['p2812', 'p2764']);
+const THESIS_IDS = new Set(['p2812', 'p2764', 'm1']);
 const TEACHER_IDS = new Set(['p2903']);
+
+// Items that live only in this repo, never on the old site's WordPress API:
+// handed to us directly rather than scraped. Metadata here, body in
+// mockup/manual-items/<id>.html; sorting-content.mjs merges them into the
+// scrape before grouping and sorting, so a re-run against the API does not
+// lose them.
+export const MANUAL_ITEMS = [
+  {
+    id: 'm1',
+    group: 'capstone',
+    title: 'העמקת העבודה הפנימית והתרגול המדיטטיבי בקרב מורים בחינוך ולדורף',
+    author: 'שחר סלע',
+    date: '2026-09-01',
+    cats: ['עבודות גמר'],
+  },
+];
 
 // Applied only within the capstone group, after MOVES/DROPS, replacing the
 // year bucket with one of three content-type buckets.

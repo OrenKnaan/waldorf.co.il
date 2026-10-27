@@ -57,5 +57,10 @@ pnpm-debug.log*
 # would otherwise silently drop them from every commit.
 !/mockup/pages/library-files/*.docx
 
+# ...and the triage pile's own attachments: items added directly rather than
+# scraped (mockup/manual-items/) keep their source file here for download,
+# same reason as library-files above.
+!/mockup/pages/admin/sorting-data/files/*.docx
+
 # wrangler build output
 /analytics-worker/.wrangler/
