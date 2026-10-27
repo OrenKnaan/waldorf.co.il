@@ -142,6 +142,7 @@ button{font-family:inherit;cursor:pointer}
   background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--r);font-size:.8rem;line-height:1.45;
 }
 .notice svg{width:15px;height:15px;flex:none;margin-top:2px}
+.notice a{color:inherit;font-weight:600;text-decoration:underline}
 
 /* ===== dashboard shell ===== */
 .dash{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
@@ -154,7 +155,7 @@ button{font-family:inherit;cursor:pointer}
 .nav-link{
   display:flex;align-items:center;gap:11px;padding:10px 22px;color:rgba(255,255,255,.78);
   font-size:.9rem;background:none;border:none;width:100%;text-align:start;
-  border-inline-start:3px solid transparent;transition:.15s;
+  border-inline-start:3px solid transparent;transition:.15s;text-decoration:none;
 }
 .nav-link svg{width:17px;height:17px;flex:none;opacity:.85}
 .nav-link .count{margin-inline-start:auto;font-size:.72rem;background:rgba(255,255,255,.14);padding:1px 8px;border-radius:var(--r-organic-sm);color:#fff}
@@ -186,6 +187,11 @@ button{font-family:inherit;cursor:pointer}
 .content{padding:24px 26px 48px;max-width:1080px;width:100%}
 .view[hidden]{display:none}
 .crumb{font-size:.78rem;color:var(--muted);margin-bottom:14px}
+/* links from a view to the public pages that show its content (admin-app.js, SITE_PAGES) */
+.site-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 18px;font-size:.78rem;color:var(--muted)}
+.site-links a{display:inline-flex;align-items:center;gap:6px;color:var(--brown);background:var(--sink);border:1.5px solid var(--line);border-radius:var(--r-organic-sm);padding:4px 11px;text-decoration:none;font-weight:600}
+.site-links a:hover,.site-links a:focus-visible{background:var(--hover-tint);border-color:var(--brown);color:var(--ink)}
+.site-links svg{width:13px;height:13px;flex:none}
 
 /* stats */
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
@@ -327,37 +333,37 @@ td.muted{color:var(--muted)}
         <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#C4A882"/><path d="M16 6c-6 3-8 8-8 13 5-1 9-5 10-13-1 0-1 0-2 0z" fill="#3D2B1F"/></svg>
         <div><b>מערכת הניהול</b><br><span>ולדורף · פורום ארצי</span></div>
       </div>
-      <button type="button" class="nav-link active" data-view="home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>לוח בקרה</button>
+      <a class="nav-link active" href="#home" data-view="home" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>לוח בקרה</a>
       <div class="side-sec">תוכן</div>
-      <button type="button" class="nav-link" data-view="events">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>אירועים<span class="count">4</span></button>
-      <button type="button" class="nav-link" data-view="news">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>הודעות</button>
-      <button type="button" class="nav-link" data-view="inst">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count"></span></button>
-      <button type="button" class="nav-link" data-view="lib">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count"></span></button>
-      <button type="button" class="nav-link" data-view="media">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</button>
-      <button type="button" class="nav-link" data-view="about">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>אודות הפורום</button>
+      <a class="nav-link" href="#events" data-view="events">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>אירועים<span class="count">4</span></a>
+      <a class="nav-link" href="#news" data-view="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>הודעות</a>
+      <a class="nav-link" href="#inst" data-view="inst">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count"></span></a>
+      <a class="nav-link" href="#lib" data-view="lib">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c2-1 5-1 8 .5C15 4 18 4 20 5v14c-2-1-5-1-8 .5C9 18 6 18 4 19V5z"/><path d="M12 5.5V20"/></svg>ספריית תוכן<span class="count"></span></a>
+      <a class="nav-link" href="#media" data-view="media">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg>מדיה</a>
+      <a class="nav-link" href="#about" data-view="about">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>אודות הפורום</a>
       <div class="side-sec">מדידה</div>
-      <button type="button" class="nav-link" data-view="analytics">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 21V10M11 21V4M16 21v-7M21 21v-4"/></svg>ניתוח תנועה</button>
+      <a class="nav-link" href="#analytics" data-view="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 21V10M11 21V4M16 21v-7M21 21v-4"/></svg>ניתוח תנועה</a>
       <div class="side-sec">קהילה</div>
-      <button type="button" class="nav-link" data-view="people">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</button>
-      <button type="button" class="nav-link" data-view="mod">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>מודרציה — לוחות<span class="count" id="modCount">0</span></button>
-      <button type="button" class="nav-link" data-view="nl">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר</button>
+      <a class="nav-link" href="#people" data-view="people">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</a>
+      <a class="nav-link" href="#mod" data-view="mod">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>מודרציה — לוחות<span class="count" id="modCount">0</span></a>
+      <a class="nav-link" href="#nl" data-view="nl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר</a>
       <div class="side-sec">חומר למיון (ארכיון)</div>
       <a class="nav-link" href="./sorting.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>סקירה כללית<span class="count">6</span></a>
       <div class="side-foot">
-        <button type="button" class="nav-link" data-view="set">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.6h.1A1.6 1.6 0 0 0 9 1.1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 15 2.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1A1.6 1.6 0 0 0 22.9 9H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>הגדרות</button>
+        <a class="nav-link" href="#set" data-view="set">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.6h.1A1.6 1.6 0 0 0 9 1.1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 15 2.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1A1.6 1.6 0 0 0 22.9 9H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>הגדרות</a>
       </div>
     </aside>
 
@@ -419,7 +425,7 @@ td.muted{color:var(--muted)}
           <div class="panel">
             <div class="panel-head">
               <h2>אירועים</h2>
-              <div class="tools" role="group" aria-label="סינון אירועים לפי סטטוס"><button type="button" class="chip on" aria-pressed="true">הכול</button><button type="button" class="chip" aria-pressed="false">מפורסם</button><button type="button" class="chip" aria-pressed="false">טיוטה</button><button type="button" class="chip" aria-pressed="false">הסתיים</button></div>
+              <div class="tools" role="group" aria-label="סינון אירועים לפי סטטוס"><button type="button" class="chip on" aria-pressed="true">הכול</button><button type="button" class="chip" aria-pressed="false">מפורסם</button><button type="button" class="chip" aria-pressed="false">מוקפא</button><button type="button" class="chip" aria-pressed="false">טיוטה</button><button type="button" class="chip" aria-pressed="false">הסתיים</button></div>
               <div class="grow"></div>
               <button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>אירוע חדש</button>
             </div>
@@ -529,12 +535,26 @@ td.muted{color:var(--muted)}
 (function(){
   var root=document.documentElement; root.setAttribute('dir','rtl');
   var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
-  function navTo(view,btn){
+  var BASE_TITLE=document.title;
+  /* Every view has its own address, admin-dashboard.html#<view>, so a view can be
+     reloaded, bookmarked, opened in a new tab and reached with Back. The hash is the
+     only state: the sidebar links set it and everything else follows hashchange.
+     Views that render on demand (analytics) listen for the 'adminview' event. */
+  function viewFromHash(){var v=location.hash.slice(1); return TITLES[v]?v:'home';}
+  function navTo(view,silent){
     document.querySelectorAll('#dash .view').forEach(function(v){v.hidden=v.getAttribute('data-view')!==view;});
-    document.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active');});
-    if(btn)btn.classList.add('active');
-    var t=document.getElementById('page-title'); if(TITLES[view])t.textContent=TITLES[view];
-    var c=document.querySelector('.content'); if(c)c.scrollIntoView({block:'start'});
+    document.querySelectorAll('.nav-link').forEach(function(n){
+      var on=n.getAttribute('data-view')===view;
+      n.classList.toggle('active',on);
+      if(on)n.setAttribute('aria-current','page'); else n.removeAttribute('aria-current');
+    });
+    document.getElementById('page-title').textContent=TITLES[view];
+    document.title=view==='home'?BASE_TITLE:TITLES[view]+' · '+BASE_TITLE;
+    if(silent)return;
+    // .main, not .content: the topbar is sticky, so aligning .content to the top
+    // slides its first lines (the notice, the crumb) underneath the bar.
+    var m=document.querySelector('.main'); if(m)m.scrollIntoView({block:'start'});
+    window.dispatchEvent(new CustomEvent('adminview',{detail:view}));
   }
   function toggleTheme(){
     var cur=root.getAttribute('data-theme');
@@ -545,8 +565,15 @@ td.muted{color:var(--muted)}
     var i=document.getElementById('themeIcon'); if(i)i.innerHTML=next==='dark'?sun:moon;
   }
   var th=document.getElementById('themeBtn'); if(th)th.addEventListener('click',toggleTheme);
-  document.querySelectorAll('.nav-link[data-view]').forEach(function(b){ b.addEventListener('click',function(){navTo(b.getAttribute('data-view'),b);}); });
-  document.querySelectorAll('[data-goto]').forEach(function(b){ b.addEventListener('click',function(){var v=b.getAttribute('data-goto'); navTo(v,document.querySelector('.nav-link[data-view="'+v+'"]'));}); });
+  window.addEventListener('hashchange',function(){navTo(viewFromHash());});
+  // A link to the view already showing changes no hash, so no hashchange: refresh it
+  // directly, the way clicking it did before views had addresses.
+  document.querySelectorAll('.nav-link[data-view]').forEach(function(n){ n.addEventListener('click',function(){ if(n.getAttribute('href')===location.hash)navTo(n.getAttribute('data-view')); }); });
+  document.querySelectorAll('[data-goto]').forEach(function(b){ b.addEventListener('click',function(){location.hash=b.getAttribute('data-goto');}); });
+  // Show the addressed view at once, but announce it only once every script below
+  // has had the chance to listen.
+  navTo(viewFromHash(),true);
+  document.addEventListener('DOMContentLoaded',function(){window.dispatchEvent(new CustomEvent('adminview',{detail:viewFromHash()}));});
 })();
 </script>
 <script src="../store.js"></script>

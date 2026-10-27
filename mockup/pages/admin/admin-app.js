@@ -11,10 +11,22 @@
     edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
     del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>',
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
-    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+    freeze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.2 7l15.6 10M4.2 17L19.8 7"/><path d="M9.5 3.5L12 6l2.5-2.5M9.5 20.5L12 18l2.5 2.5"/></svg>',
+    thaw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
   };
-  function actBtn(kind, label, onClick) {
-    var b = el('button', { class: 'act' + (kind === 'del' ? ' danger' : ''), 'aria-label': label, title: label, onclick: onClick });
+  // A delete is final: the API removes the row and nothing keeps a copy. So every
+  // trash button asks first, naming the row it sits on. A caller that already asks
+  // in its own words passes ownConfirm so the question is not put twice.
+  function actBtn(kind, label, onClick, ownConfirm) {
+    var handler = onClick;
+    if (kind === 'del' && !ownConfirm) handler = function () {
+      var cell = b.closest('tr') && b.closest('tr').querySelector('td.title');
+      var name = cell && cell.firstChild ? cell.firstChild.textContent.trim() : '';
+      if (!confirm((name ? 'למחוק את "' + name + '"?' : 'למחוק את הפריט?') + '\n\nהמחיקה סופית: אי אפשר לבטל אותה או לשחזר את הפריט.')) return;
+      onClick();
+    };
+    var b = el('button', { class: 'act' + (kind === 'del' ? ' danger' : ''), 'aria-label': label, title: label, onclick: handler });
     b.innerHTML = I[kind];
     return b;
   }
@@ -24,6 +36,7 @@
     return st === 'published' || st === 'approved' ? pill('מפורסם', 'ok')
       : st === 'pending' ? pill('ממתין לאישור', 'warn')
       : st === 'draft' ? pill('טיוטה', 'warn')
+      : st === 'frozen' ? pill('מוקפא', 'info')
       : st === 'active' ? pill('פעיל', 'ok')
       : st === 'inactive' ? pill('לא פעיל', 'neutral')
       : pill(st || '—', 'neutral');
@@ -165,9 +178,20 @@
     { name: 'time', label: 'שעות (למשל 09:00–13:00)' },
     { name: 'location', label: 'מיקום' },
     { name: 'registerUrl', label: 'קישור הרשמה (טופס גוגל)' },
-    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'published', t: 'מפורסם' }, { v: 'draft', t: 'טיוטה' }] },
+    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'published', t: 'מפורסם' }, { v: 'frozen', t: 'מוקפא (מוסתר מהאתר)' }, { v: 'draft', t: 'טיוטה' }] },
     { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
   ];
+  // Freezing takes a published event off the site without deleting it, and
+  // unfreezing puts it back as it was. 'frozen' is a status of its own rather than
+  // 'draft', so a paused event stays told apart from one that was never finished.
+  // The API needs nothing for it: status is free text, and public reads return
+  // 'published' only, so a frozen event is withheld from visitors by the server.
+  function freezeBtn(ev) {
+    var frozen = ev.status === 'frozen';
+    return actBtn(frozen ? 'thaw' : 'freeze', frozen ? 'ביטול הקפאה — החזרה לאתר' : 'הקפאה — הסתרה מהאתר', function () {
+      WStore.update('events', ev.id, { status: frozen ? 'published' : 'frozen' }); refreshAll();
+    });
+  }
   function renderEventsAdmin() {
     var section = $('.view[data-view="events"] .panel');
     var oldWrap = section.querySelector('.table-wrap');
@@ -175,7 +199,7 @@
     oldWrap.replaceWith(t.wrap);
     var filter = '';
     wireChips(section, function (label) {
-      return label === 'מפורסם' ? 'published' : label === 'טיוטה' ? 'draft' : label === 'הסתיים' ? 'past' : '';
+      return label === 'מפורסם' ? 'published' : label === 'מוקפא' ? 'frozen' : label === 'טיוטה' ? 'draft' : label === 'הסתיים' ? 'past' : '';
     }, function (v) { filter = v; draw(); });
     var addBtn = section.querySelector('.btn-primary');
     addBtn.addEventListener('click', function () {
@@ -194,8 +218,9 @@
           titleCell(ev.title, ev.demo),
           td(ev.location || '—', 'muted'),
           td(ev.time || '—', 'muted tnum'),
-          td(ev.date < today ? pill('הסתיים', 'neutral') : statusPill(ev.status)),
+          td(ev.status === 'frozen' ? statusPill('frozen') : ev.date < today ? pill('הסתיים', 'neutral') : statusPill(ev.status)),
           td(el('div', { class: 'row-actions' }, [
+            ev.status === 'published' || ev.status === 'frozen' ? freezeBtn(ev) : null,
             actBtn('edit', 'עריכה', function () {
               openForm(section, EVENT_FIELDS, ev, function (out) { WStore.update('events', ev.id, out); refreshAll(); });
             }),
@@ -810,7 +835,7 @@
                   alert(e && e.body && e.body.error === 'last_super_admin'
                     ? 'לא ניתן למחוק את מנהל־העל האחרון.' : 'המחיקה נכשלה.');
                 });
-              }));
+              }, true));
             }
           } else if (u.id === me.id) {
             actions.appendChild(actBtn('edit', 'שינוי סיסמה', function () { openUserForm(u, true); }));
@@ -1066,6 +1091,41 @@
     }).catch(function () { api.textContent = 'לא זמין'; });
   }
 
+  /* =============== קישורים לעמודים באתר =============== */
+  // The public pages that show each view's content, so an edit can be checked where
+  // visitors see it. Institutions link to the two lists although only the kindergarten
+  // map reads D1 today: the lists themselves are still static markup.
+  var SITE_PAGES = {
+    home: [['home.html', 'דף הבית']],
+    events: [['events.html', 'אירועים'], ['home.html', 'דף הבית'], ['forum.html', 'הפורום']],
+    news: [['news.html', 'הודעות'], ['home.html', 'דף הבית']],
+    inst: [['kinder-list.html', 'רשימת גני ילדים'], ['school-list.html', 'רשימת בתי ספר']],
+    lib: [['content-library.html', 'ספריית תוכן'], ['ebooks.html', 'ספרים אלקטרוניים']],
+    media: [['media.html', 'מדיה']],
+    about: [['forum.html', 'הפורום']],
+    mod: [['news.html', 'הודעות'], ['community-board.html', 'לוח קהילתי'], ['job-board.html', 'לוח משרות']],
+    nl: [['forum-newsletter.html', 'איגרת תקופתית']]
+  };
+  var EXT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
+  // Idempotent: renderLibAdmin empties its view at boot, so this runs again after it.
+  // Every link shares one named tab, so the next click reloads that tab with fresh
+  // content instead of piling up a tab per check.
+  function renderSiteLinks() {
+    Object.keys(SITE_PAGES).forEach(function (view) {
+      var host = $('.view[data-view="' + view + '"]');
+      if (!host || host.querySelector('.site-links')) return;
+      var row = el('div', { class: 'site-links' }, [el('span', { text: 'צפייה באתר (בלשונית נפרדת):' })]);
+      SITE_PAGES[view].forEach(function (p) {
+        var a = el('a', { href: '../' + p[0], target: 'waldorf-site', text: p[1] });
+        a.insertAdjacentHTML('beforeend', EXT_ICON);
+        row.appendChild(a);
+      });
+      var crumb = host.querySelector('.crumb');
+      host.insertBefore(row, crumb ? crumb.nextSibling : host.firstChild);
+    });
+  }
+  renderSiteLinks();
+
   /* =============== איתחול =============== */
   /* התוכן מגיע מ-D1 דרך ה-API, כלומר לא זמין באופן מיידי כמו קודם. כל הציור
      ממתין ל-WStore.ready; ללא זה כל טבלה הייתה נטענת ריקה ומדווחת שגיאה. */
@@ -1083,30 +1143,47 @@
     wireSearch();
     renderNewsletterAdmin();
     refreshCounts();
+    renderSiteLinks();
   }
 
-  function fail(err) {
-    // Log it: a silent notice tells the operator something broke but not what,
-    // and this is the only place a boot failure surfaces.
-    if (window.console) console.error('admin boot failed:', err);
-    var main = document.querySelector('.content') || document.body;
-    var box = el('div', { class: 'notice crit', style: 'margin:20px' }, [
-      el('b', { text: 'לא ניתן לטעון את התוכן מהמאגר. ' }),
-      el('span', { text: err && err.status === 401
-        ? 'נדרש מפתח ניהול — הזינו אותו במסך ההגדרות.'
-        : 'בדקו את החיבור לאינטרנט ונסו לרענן.' })
+  // How to get write access, said the way an editor would act on it: sign in with
+  // their own account. The management key is the developer's fallback and comes
+  // second, with a link, since the settings view sits at the foot of the sidebar.
+  function signInHelp() {
+    return el('span', {}, [
+      el('a', { href: './', text: 'התחברו עם הדוא״ל והסיסמה שלכם' }),
+      document.createTextNode(', או הזינו מפתח ניהול '),
+      el('a', { href: '#set', text: 'במסך ההגדרות' }),
+      document.createTextNode('.')
     ]);
-    main.insertBefore(box, main.firstChild);
+  }
+  // One notice at a time: a second failed save replaces the first rather than stacking.
+  function notify(lead, rest) {
+    var main = document.querySelector('.content') || document.body;
+    var old = document.getElementById('adminNotice');
+    if (old) old.remove();
+    main.insertBefore(el('div', { id: 'adminNotice', class: 'notice crit', role: 'alert', style: 'margin:0 0 18px' }, [
+      el('span', {}, [el('b', { text: lead + ' ' }), rest])
+    ]), main.firstChild);
+  }
+  function fail(err, saving) {
+    // Log it: a silent notice tells the operator something broke but not what,
+    // and this is the only place a boot or save failure surfaces.
+    if (window.console) console.error(saving ? 'admin save failed:' : 'admin boot failed:', err);
+    var denied = err && err.status === 401;
+    notify(saving ? 'השינוי לא נשמר.' : 'לא ניתן לטעון את התוכן מהמאגר.', denied
+      ? el('span', {}, [document.createTextNode('אינכם מחוברים למערכת הניהול, או שההתחברות פגה. '), signInHelp()])
+      : document.createTextNode(saving ? 'השרת לא אישר את השינוי. נסו שוב בעוד רגע.' : 'בדקו את החיבור לאינטרנט ונסו לרענן.'));
   }
 
-  WStore.ready.then(boot).catch(fail);
+  WStore.ready.then(boot).catch(function (err) { fail(err, false); });
 
   /* כתיבה נכשלה בשרת — הקאש נטען מחדש, אז מציירים שוב כדי לא להשאיר על המסך
      עריכה שלא נשמרה. */
   WStore.onChange(function (err) {
     if (!WStore.isLoaded()) return;
     refreshAll();
-    if (err) fail(err);
+    if (err) fail(err, true);
   });
 
   /* מי מחובר + יציאה */
@@ -1124,6 +1201,8 @@
       var keyed = WStore.hasAdminKey();
       if (who) who.textContent = keyed ? 'מפתח ניהול' : 'לא מחובר';
       if (role) role.textContent = keyed ? 'מנהל־על' : 'צפייה בלבד';
+      // Say so before the first edit, not after it bounces.
+      if (!keyed) notify('מצב צפייה בלבד:', el('span', {}, [document.createTextNode('אינכם מחוברים, ולכן שינויים לא יישמרו. '), signInHelp()]));
     }
     var out = document.querySelector('.topbar .icon-btn[title], .topbar a.icon-btn');
     document.querySelectorAll('.topbar .icon-btn').forEach(function (b) {
@@ -1162,11 +1241,13 @@
     });
   })();
 
-  /* רענון כשחוזרים לטאב (אם נערך תוכן ממקום אחר) */
-  var nlNav = $('.nav-link[data-view="nl"]');
-  if (nlNav) nlNav.addEventListener('click', function () { renderNewsletterAdmin(); });
-  var setNav = $('.nav-link[data-view="set"]');
-  if (setNav) setNav.addEventListener('click', renderSettingsAdmin);
+  // Before WStore is loaded boot() has yet to run, and it renders both itself.
+  window.addEventListener('adminview', function (e) {
+    if (!WStore.isLoaded()) return;
+    if (e.detail === 'nl') renderNewsletterAdmin();
+    else if (e.detail === 'set') renderSettingsAdmin();
+  });
 
+  /* רענון כשחוזרים לטאב (אם נערך תוכן ממקום אחר) */
   window.addEventListener('focus', function () { WStore.reload().catch(function () {}); });
 })();

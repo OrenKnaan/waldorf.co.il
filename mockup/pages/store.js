@@ -47,6 +47,10 @@
     opts.headers = headers(opts.body ? { 'content-type': 'application/json' } : {});
     return fetch(API + path, opts).then(function (r) {
       return r.json().catch(function () { return null; }).then(function (body) {
+        // A 401 while holding a session means the server no longer knows it (expired
+        // or revoked). Dropping it keeps isSignedIn() honest, which the login page
+        // trusts: otherwise it bounces straight back to a dashboard that cannot save.
+        if (r.status === 401 && session()) { try { localStorage.removeItem(KEY_SESS); } catch (e) {} }
         if (!r.ok) throw { status: r.status, body: body };
         return body;
       });

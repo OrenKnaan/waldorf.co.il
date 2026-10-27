@@ -452,8 +452,7 @@
   }
 
   window.WAnalytics = { render: renderAnalytics };
-  document.addEventListener('DOMContentLoaded', function () {
-    var btn = document.querySelector('.nav-link[data-view="analytics"]');
-    if (btn) btn.addEventListener('click', renderAnalytics);
-  });
+  // Fired by the dashboard's router whenever a view is shown, including the one a
+  // reload or a bookmark lands on, so #analytics opens already loaded.
+  window.addEventListener('adminview', function (e) { if (e.detail === 'analytics') renderAnalytics(); });
 })();
