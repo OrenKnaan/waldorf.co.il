@@ -5,7 +5,7 @@
 //
 // Set ENABLED = false and re-run to strip the entry back out of every page,
 // which is what launch cutover does: the section, its data and this entry all
-// come out together (CLAUDE.md, "Launch cutover").
+// come out together (agent-docs/launch-cutover.md).
 //
 // It patches the nav in place rather than regenerating it from build.mjs's
 // NAV_STRUCTURE, which has drifted from what the pages actually carry — the
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 // Off as of 2026-10-18: the whole חומר למיון pile moved admin-only (see
-// CLAUDE.md, "The triage section"), so the public nav no longer carries it.
+// agent-docs/triage.md), so the public nav no longer carries it.
 const ENABLED = false;
 
 const pagesDir = join(dirname(fileURLToPath(import.meta.url)), 'pages');

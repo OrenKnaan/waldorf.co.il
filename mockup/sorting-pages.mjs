@@ -1,7 +1,7 @@
 // Generates the seven "חומר למיון" pages, all of them admin-only as of
 // 2026-10-18: the forum's classification work is done, but at least two
 // subject buckets turned out to have no confirmed home on the new site yet
-// (see CLAUDE.md, "The triage section"), so the whole pile stays off the
+// (see agent-docs/triage.md), so the whole pile stays off the
 // public site and reachable only from the admin dashboard.
 //
 //   node mockup/sorting-content.mjs     # first, writes pages/admin/sorting-data/

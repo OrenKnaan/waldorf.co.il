@@ -15,7 +15,7 @@
    Only the things the tokens cannot reach are touched by hand: the nav dropdown
    (a 4-value radius cannot be dropped into a shorthand slot, so it gets its own
    token), the mobile 14px overrides, the accessibility panel (styled in px on
-   purpose - see CLAUDE.md), and two one-off literals in the scripts.
+   purpose - see agent-docs/accessibility.md), and two one-off literals in the scripts.
 
    Circles (50%), pills (--radius-pill, 999px) and hairline radii (2-4px: the
    focus ring, the hamburger bars, the scrollbar thumb) are deliberately left

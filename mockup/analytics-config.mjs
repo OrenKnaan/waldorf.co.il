@@ -12,7 +12,7 @@
 // AT LAUNCH CUTOVER: this site tracks the GitHub Pages mockup host. Cloudflare
 // has no "delete my data" button, so clearing the pre-launch numbers means
 // deleting the Web Analytics site in the dashboard and creating a fresh one for
-// waldorf.co.il — then putting the new token here. See CLAUDE.md.
+// waldorf.co.il — then putting the new token here. See agent-docs/launch-cutover.md, item 10.
 export const BEACON_TOKEN = 'e4ea3335f4ae4f55bacc328eb40c12c9';
 
 // The hostname the Web Analytics site is registered against. Cloudflare drops

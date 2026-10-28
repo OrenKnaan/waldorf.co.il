@@ -21,7 +21,7 @@
 //
 // Deliberately NOT indexed:
 //   - <span class="ph"> notes. They are open questions addressed to us and to
-//     the client, not copy for readers (see CLAUDE.md, launch cutover item 12).
+//     the client, not copy for readers (see agent-docs/launch-cutover.md, item 13).
 //     Searching "טלפון" should not surface "לא פורסמו באתר הישן, לקבל מהפורום".
 //   - The breadcrumb nav, header and footer. They repeat on all 42 pages, so
 //     indexing them makes every page a hit for every nav label.

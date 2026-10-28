@@ -3,8 +3,8 @@
 //
 //   node mockup/sorting-content.mjs
 //
-// TEMPORARY — this whole section is a triage holding area (see CLAUDE.md,
-// "Launch cutover"). It exists so nothing from waldorf.co.il is lost while the
+// TEMPORARY — this whole section is a triage holding area (see
+// agent-docs/launch-cutover.md). It exists so nothing from waldorf.co.il is lost while the
 // forum decides what keeps a place on the new site. Once every item has been
 // sorted into a real page or retired, the section, this script, its data
 // directory and its nav entry all come out together.
@@ -25,7 +25,7 @@ const pagesDir = join(__dirname, 'pages');
 const outDir = join(pagesDir, 'sorting-data');
 const itemsDir = join(outDir, 'items');
 // Announcements and articles are not up for consideration on the new site
-// (see CLAUDE.md, "The triage section"): their data moves to an admin-only
+// (see agent-docs/triage.md): their data moves to an admin-only
 // copy instead of the public one, same shape, different directory.
 const adminOutDir = join(pagesDir, 'admin', 'sorting-data');
 const adminItemsDir = join(adminOutDir, 'items');

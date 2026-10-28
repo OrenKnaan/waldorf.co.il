@@ -12,332 +12,47 @@ Redesign project for the Hebrew (RTL) institutional website of "הפורום ה�
 
 ## Commands
 
-Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.json` for the exact commands. No test suite or linter is configured yet; see "Scanning for bugs and violations" below for what to run on demand instead.
+Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.json` for the exact commands. No test suite or linter is configured yet; see `agent-docs/scanning.md` for what to run on demand instead.
 
 **Verify a dependency change with `npm ci` in an empty directory holding only `package.json` and `package-lock.json`, never with `npm run build`.** The build compiles against whatever `node_modules` already exists and never checks the lock file against `package.json`. `.github/workflows/ci.yml` runs `npm ci` on Linux, and npm resolves optional peer dependencies per platform: installing a package on macOS pruned `@emnapi/core`, which the Linux runner needs, and CI failed on a lock file that had passed a local build. `npm install --package-lock-only` re-prunes it on the same machine, so the repair is to restore the last passing lock file and add only the new package's two blocks to it.
 
 ## Deployment
 
-**Commit and push finished work to `main` without being asked.** Do not stage changes and wait for a go-ahead, and do not branch first. Pushing to `main` publishes `mockup/pages/` to the public GitHub Pages URL via `.github/workflows/pages.yml`, and that is the intended outcome: the site is an unlaunched mockup with no real users, so a bad push costs a follow-up commit and nothing else. Finish the verification the change calls for (see "Scanning for bugs and violations"), then commit and push.
+**Commit and push finished work to `main` without being asked.** Do not stage changes and wait for a go-ahead, and do not branch first. Pushing to `main` publishes `mockup/pages/` to the public GitHub Pages URL via `.github/workflows/pages.yml`, and that is the intended outcome: the site is an unlaunched mockup with no real users, so a bad push costs a follow-up commit and nothing else. Finish the verification the change calls for (see `agent-docs/scanning.md`), then commit and push.
 
 **Current actual state (verified 2026-07-26):**
 
 - GitHub repo: `OrenKnaan/waldorf.co.il` (public).
 - There is **no Cloudflare Pages project connected** — confirmed via `gh api repos/OrenKnaan/waldorf.co.il/hooks` returning `[]` (a Git-connected Pages project registers a webhook here) and no `wrangler.toml`/`_redirects`/`_headers` anywhere in the repo. Do not assume a `*.pages.dev` deployment exists.
 - What actually deploys: `.github/workflows/pages.yml` publishes the static content of `mockup/pages/` to **GitHub Pages** on every push to `main`, live (publicly, no login wall) at `https://orenknaan.github.io/waldorf.co.il/`. `.github/workflows/ci.yml` just runs `npm run build` as a check — it does not deploy anything.
-- Because of this, **most of the pre-launch lockdown below is not actually in effect** — the GitHub Pages URL is public with no Cloudflare Access wall. As of 2026-07-27 every page under `mockup/pages/` does carry `<meta name="robots" content="noindex, nofollow, noarchive">`, which is the only lever GitHub Pages gives us: `robots.txt` is read only from the origin root (`orenknaan.github.io/robots.txt`, which belongs to the whole account, not this project), and GitHub Pages can't set an `X-Robots-Tag` header. So the mockup is "shouldn't be indexed" but still fully public to anyone with the URL. Treat the access wall as an open item, not a solved one.
+- Because of this, **most of the pre-launch lockdown (see `agent-docs/launch-cutover.md`) is not actually in effect** — the GitHub Pages URL is public with no Cloudflare Access wall. As of 2026-07-27 every page under `mockup/pages/` does carry `<meta name="robots" content="noindex, nofollow, noarchive">`, which is the only lever GitHub Pages gives us: `robots.txt` is read only from the origin root (`orenknaan.github.io/robots.txt`, which belongs to the whole account, not this project), and GitHub Pages can't set an `X-Robots-Tag` header. So the mockup is "shouldn't be indexed" but still fully public to anyone with the URL. Treat the access wall as an open item, not a solved one.
 
-**Target architecture (per the PRD, section 9 — not yet built):**
+**Target architecture and the pre-launch lockdown** (Cloudflare Pages, Access wall, `robots.txt`) are not built yet; the plan is in `agent-docs/launch-cutover.md`.
 
-- A Cloudflare Pages project, Git-connected (build command `npm run build`, output directory `dist`), so every push to `main` deploys to production and every PR/branch gets an automatic preview URL.
-- **Pre-launch lockdown**: until the real domain cuts over, the site must stay off Google/AI crawlers and mostly private:
-  - `public/robots.txt` disallows everything.
-  - Every page's `<head>` should carry `<meta name="robots" content="noindex, nofollow, noarchive">` (already on all 50 `mockup/pages/*.html` and on `src/pages/index.astro` — add it to any new page you create pre-launch).
-  - A Cloudflare Access (Zero Trust) login wall sits in front of the whole `*.pages.dev` deployment as the actual access control (robots/meta are just backup signals — well-behaved crawlers only, not a real barrier on their own).
-  - **All three must be removed together at launch cutover**, at the same time the custom domain `waldorf.co.il` is attached to the Pages project and the old-site URL redirects (see below) go live.
-- The live site at waldorf.co.il is untouched throughout — the custom domain is only attached to the new Cloudflare Pages project on launch day, not before.
-- Setting up the actual Cloudflare Pages project (and deciding what to do with the currently-public GitHub Pages mockup in the meantime) is still an open task.
+## Rules that live in the topic files
 
-## Launch cutover: temporary scaffolding that must be removed
+Detail for each area is in `agent-docs/`. **Read the matching file before working in that area**; the rules below are the ones that must hold even when you have not.
 
-Everything below exists **only because this is a pre-launch mockup on GitHub Pages**. When the real site moves to Cloudflare Pages and `waldorf.co.il` is attached, each item has to be removed or replaced — not carried over. Inventory verified 2026-07-27; re-check counts before acting, they drift.
+**Launch cutover** (`agent-docs/launch-cutover.md`, the full inventory of temporary scaffolding)
+- Every page under `mockup/pages/` carries `<meta name="robots" content="noindex, nofollow, noarchive">`; add it to any new page. The crawler lockdown (that meta, a future `public/robots.txt`, a future Cloudflare Access wall) is removed **all together, on cutover day**, never piecemeal.
+- The same change that attaches `waldorf.co.il` must publish the old-URL redirects (`node migration/build-redirects.mjs --write`) and carry the DNS across (`migration/dns-records.md`).
+- Mockup-only pieces (the `store.js`/`dynamic.js` content layer, `demo: true` seed rows, the published `/admin/`, the triage section, the patch scripts, `— מוקאפ` titles) are not carried into production; the file lists what replaces each.
 
-> **On the day we migrate to Cloudflare, publish the redirects from `migration/url-map.csv` so nothing 404s.**
->
-> The old site has 431 live URLs and every one of them is linked from somewhere we do not control: Google's index, school websites, Facebook posts, printed newsletters. The moment `waldorf.co.il` points at the new site, any path without a redirect is a 404, and a 404 loses both the visitor and the search ranking that URL had built up.
->
-> Run `node migration/build-redirects.mjs --write` to generate `public/_redirects` (861 rules), and deploy it **in the same change** that attaches the custom domain. Before running it, do the two things `migration/README.md` lists: point `new_path` at the production routes if they are no longer the mockup's `.html` filenames, and answer the seven `review` rows. Afterwards, add the `www` to apex Redirect Rule on the zone, which `_redirects` cannot do, and decide what happens to `/wp-content/uploads/...`, which is every PDF and image the old site ever linked.
->
-> Verify by crawling the CSV's `old_path` column against the live site and asserting every response is a 301 to a 200. A spot check is not enough at this volume.
+**Accessibility** (`agent-docs/accessibility.md`, permanent, ports to production)
+- `accessibility.js` loads from `<head>` **without `defer`**, on purpose: it applies saved preferences before first paint.
+- Any `ResizeObserver` that toggles table `tabindex` lives in a module-scope variable, or the browser collects it and the toggling stops.
+- A clean axe run does not mean contrast is clean (gradients, images, `color-mix()`, `:hover` states are invisible to it). Read the file before changing any colour, and scan at more than one viewport width with content settled.
+- Re-running a `patch-*.mjs` must report `0 file(s) rewritten`; an edit that appends to its own anchor needs a separate `done` marker.
 
-> **Old-site links are already local (2026-10-23).** No page under `mockup/pages/` links to `waldorf.co.il` any more. The 40 attachments that library items and the newsletter point to live in `mockup/pages/wp-content/uploads/...` (and one in `papers/`) under their **original paths**, so those URLs keep working after the move with no redirect. The five newsletter issues are `nl-p*.html` (`mockup/newsletter-pages.mjs`), and `migration/url-map.csv` points their old URLs at them. After regenerating library pages run `node mockup/patch-old-site-links.mjs` (idempotent; expect `0 file(s) rewritten`). Still open: `/ליווי_יוזמות_2017/` is password-protected on the old site, so it has no body to copy. The admin triage pile (`pages/admin/sorting-data`) still links to old-site files, and `/wp-content/uploads/` has more files than the 40 copied, so the rest of that decision remains.
+**Global search** (`agent-docs/global-search.md`): after adding a page run `mockup/patch-search.mjs`, then `mockup/search-index.mjs`, in that order. Any `<a>` styled as a solid button must restate its colour on `:hover`, or the page-wide `a:hover` paints its text the colour of its background.
 
-> **The same day, carry the DNS across: `migration/dns-records.md`.**
->
-> The zone is at livedns and so is the mailbox (`MX -> mail.waldorf.co.il`). Moving nameservers to Cloudflare means recreating every record, and Cloudflare's import scan builds its list from public queries, so anything that does not currently resolve is silently not imported. Export the zone file from livedns first and diff it after. Moving DNS does not require moving the mailbox: keep the MX pointing at livedns and mail is unaffected.
->
-> That file also holds the four ActiveTrail authentication records (return-path CNAME, two DKIM CNAMEs, DMARC). As of 2026-08-24 **none of them resolve**, which does not block the signup but will put newsletter campaigns in spam folders once they start going out.
+**Newsletter** (`agent-docs/newsletter.md`): the browser never calls ActiveTrail directly; the token is a Worker secret (`npx wrangler secret put ACTIVETRAIL_TOKEN`), never a file; never pass ActiveTrail's error body to the browser.
 
-**Crawler lockdown — remove all of it together, on cutover day, at the same time the custom domain goes live and the old-URL redirects are published.** Removing any one piece early exposes an unfinished site; leaving any piece in place after launch silently keeps the real site out of Google.
+**E-books** (`agent-docs/ebooks.md`) and **the triage section** (`agent-docs/triage.md`, admin-only, and it must be sorted before the domain moves because its files still load from the old site).
 
-1. `<meta name="robots" content="noindex, nofollow, noarchive">` — in all 50 `mockup/pages/*.html` and in `src/pages/index.astro`.
-2. `public/robots.txt` disallowing everything — **not created yet** (pointless on GitHub Pages, see Deployment above; add it when the Cloudflare Pages project exists, then remove at cutover).
-3. Cloudflare Access (Zero Trust) wall over `*.pages.dev` — **not set up yet**.
+**Hero images and page hero layout** (`agent-docs/hero.md`): a new page is cloned from a finished one, never generated.
 
-**Mockup-only implementation that the production build replaces:**
-
-4. `mockup/pages/store.js` + `mockup/pages/dynamic.js`: `WStore` now reads the D1 content API at `https://waldorf-content-api.orenknaan.workers.dev/api/content` (Worker and migrations in `content-api/`). `mockup/pages/data.js` is **dead**: it is still on disk but no page loads it, so do not read it and do not treat it as the content source. The only thing still in localStorage is which noticeboard submissions came from this browser (`waldorf-mockup-mine-v1`), which is a per-device fact with no server-side identity.
-5. Invented seed records flagged `demo: true`, which render a "רשומת הדגמה" chip. They now live in D1 (seeded from `content-api/migrations/0002_seed.sql`), not in `data.js`. These are not real forum content, so do not migrate them.
-6. `mockup/pages/admin/` (`admin.html`, `admin-dashboard.html`, `admin-app.js`, `admin-analytics.js`) — admin UI against `WStore`. **Published** at `/admin/` since 2026-08-22, so it is publicly reachable with no authentication — the password box on `admin.html` is decorative, there is no auth logic behind it. That is tolerable only because `WStore` is localStorage-only: a stranger's edits change their own browser and nothing else, there is no shared state. The analytics view is the one part reading real data, and it needs `DASH_KEY` from localStorage, which strangers do not have (the Worker 401s without it). Production admin is a real app behind Cloudflare Access — **do not carry this arrangement over**. It lives under `pages/` in a subdirectory on purpose: every patcher globs `readdirSync(pagesDir)` non-recursively, so the admin never picks up the site nav CSS or the analytics beacon.
-   Two things here that production does need to carry over: every admin view has its own address (`admin-dashboard.html#events`, routed by `hashchange` in the dashboard's inline script, with views that render on demand listening for an `adminview` event), and events have a third status, `frozen`, set by the freeze toggle in the events table. A frozen event is hidden from the site but not deleted. The Worker needed no change for it, because `status` is free text and public reads return `published` only.
-7. `mockup/pages/breadcrumb.js` resolves the JSON-LD `item` URLs to absolute at runtime because the mockup and production sit on different origins. In Astro this belongs at **build time** via `Astro.site`, not in a client script — port it, don't copy it.
-8. `mockup/build.mjs`, `mockup/responsive.mjs`, `mockup/embed-assets.mjs`, `mockup/patch-*.mjs` — generator/patch scripts for the prototype only. So are `mockup/search-index.mjs` and `mockup/vendor-minisearch.mjs`, which exist because the mockup has no build step; the search behaviour they produce is permanent, the scripts are not. See "Global search" below.
-9. `.github/workflows/pages.yml` — publishes `mockup/pages/` to GitHub Pages. Decide explicitly whether to retire it or keep it as a design reference; if it stays, the GitHub Pages URL stays public.
-10. Cloudflare Web Analytics is pointed at the **mockup host** (`orenknaan.github.io`), token in `mockup/analytics-config.mjs`, injected by `mockup/patch-analytics.mjs`. Cloudflare has no "clear data" action, so at cutover: delete the Web Analytics site, create a fresh one for `waldorf.co.il`, put the new token in the config and the new site tag in `analytics-worker/wrangler.toml`, re-run the patcher. Pre-launch numbers vanish with the old site — which is the intent.
-
-11. **`חומר למיון`, the triage section.** Admin-only as of 2026-10-18: seven pages under `mockup/pages/admin/sorting*.html` (one overview plus six groups), a shared widget (`pages/sorting.js`), content items under `pages/admin/sorting-data/`, three generators (`mockup/sorting-content.mjs`, `mockup/sorting-decisions.mjs`, `mockup/sorting-pages.mjs`) and a nav patcher (`mockup/patch-sorting-nav.mjs`, currently `ENABLED = false`, having already stripped the entry from the public nav). It holds every piece of old-site content that has no home on the new site, so the forum can decide item by item what ships, where, and what is retired. See "The triage section" below. Remove the whole thing together: the `pages/admin/sorting*` files, the data directory, and the generators.
-
-
-**Placeholder content that must not ship:**
-
-12. Page titles all end in `— מוקאפ`, and the footer of all 49 content pages reads `גירסה פנימית — הפורום הארצי לחינוך ולדורף`. The `מוקאפ תוכן` header tagline was removed on 2026-08-24; its `.brand-tagline` CSS rule is still in every page's stylesheet, unused.
-13. The open questions that used to sit in the pages as visible `<span class="ph">` notes were removed on 2026-10-04 and are listed, with a link to the page each one belongs to and split into forum questions and developer tasks, in `migration/mockup-notes.md`. Each one still needs an answer. Three stand-in labels (`כותרת מאמר`, `תקציר קצר`, `מיקום`) remain in `kinder-articles.html` and `kinder-circle.html`: they hold the place of missing content rather than ask a question.
-14. The town→region lookup in `mockup/pages/kinder-list.html` is our own guess, flagged in a comment; it needs confirmation from the forum before it drives a real filter.
-
-(The generic Hebrew filler that used to be here — `[שם]`, `תוכן מלא יוכנס כאן` — is gone; it was replaced by real scraped copy. Only the specific gaps in 12–13 remain.)
-
-## Accessibility (WCAG 2.1 AA / ת"י 5568)
-
-This layer is **permanent** — it ports to production, unlike everything in the cutover inventory above.
-
-- `mockup/pages/accessibility.js` — the accessibility widget: a floating button plus a settings panel (text size, line/letter spacing, high contrast, monochrome, link/heading highlighting, readable font, big cursor, stop animations, reading guide). Preferences persist in `localStorage` under `waldorf-a11y-v1`. It also injects the skip-link styles, the `:focus-within` rule that makes the nav dropdowns keyboard-reachable, and the footer link styles.
-  Loaded from `<head>` **without `defer`, on purpose**: it applies saved preferences to `<html>` before first paint. Deferring it makes a visitor who chose 160% text watch the page render at 100% first. Don't "optimize" this into a deferred script.
-  The panel is styled in `px` with hard-coded colours rather than the site's design tokens, because it has to stay legible while the adjustments it controls are rewriting those tokens and the root font size.
-- `mockup/pages/accessibility-statement.html` — הצהרת נגישות. Israeli service-accessibility regulations require it to be reachable from every page (it is, from the footer and from the widget). Two gaps in it need real answers before launch (listed in `migration/mockup-notes.md`): the accessibility coordinator's name and contact details (mandatory), and the statement date, which should be set when a certified מורשה נגישות signs off.
-- `mockup/pages/accessibility.js` also keeps overflowing tables reachable from the keyboard. A `.table-wrap` that scrolls holds nothing focusable, so arrow keys can never reach the columns past its edge (WCAG 2.1.1). It gets `tabindex="0"`, `role="region"` and a label from its section heading, but only while it actually overflows, which a `ResizeObserver` re-checks. Toggling beats a hard-coded `tabindex`: the kindergarten table only scrolls between roughly 561px and 670px, and outside that band a permanent attribute would be a tab stop on nothing. Keep the observer in a variable at module scope, or the browser collects it and the toggling silently stops.
-- `mockup/pages/dynamic.js` underlines the links in Leaflet's map attribution. They sit inside a run of plain text and are told apart from it by colour alone, at 2.55:1, under the 3:1 WCAG 1.4.1 wants when colour is the only cue (`link-in-text-block`). Leaflet's stylesheet comes from unpkg, so the override has to live on our side.
-- `mockup/pages/tabs.js` — shared tab widget following the WAI-ARIA APG pattern (roles, roving tabindex, arrow/Home/End keys, RTL-aware arrow direction). Replaced a per-page inline click handler that left `role="tablist"` with no `role="tab"` children.
-- `mockup/patch-accessibility.mjs` — idempotent patcher wiring the layer into every page (script tag, skip link, `id`/`tabindex` on `<main>`, footer link, `tabindex` on the `<span>` nav triggers). Setting `ENABLED = false` and re-running strips it back out. Re-run it after adding a page.
-
-Verified with axe-core 4.13 at `wcag2a, wcag2aa, wcag21a, wcag21aa` across all 163 scannable pages (162 site + 3 admin, less `home-hero-light.html`, a fragment with no `<body>`, and `index.html`, a `<meta http-equiv="refresh">` stub to `home.html` that destroys axe's execution context before it can run) at 1280px, 600px and 375px, with content settled: **0 violations**, in the default state, with the search panel open on live results, and with every adjustment switched on. When changing markup, re-check rather than assuming — the audit also caught and fixed pre-existing failures (unlabelled contact-form fields, `--tan-dark` at 3.2:1 used as small body text, and the broken tablists).
-
-**A clean axe run does not mean contrast is clean.** axe reports "incomplete" rather than "violation" whenever it cannot resolve what is behind the text — a gradient, a background image, a pseudo-element, a `color-mix()`, an `oklch()` token — and it only ever measures the resting state, so a colour pair that exists only under `:hover` or `:focus-visible` is invisible to it. Both blind spots were hiding real AA failures underneath the 0-violations result above, on pages that had been reported clean for months:
-
-- Every art-hero caption over a photograph (worst 1.41:1, on `accessibility-statement.html`, the page Israeli regulations require) — fixed by `mockup/patch-hero-scrim.mjs`.
-- The footer on all 160 pages: it is the one run of body text with no opaque background of its own, so it sits straight on the two `position:fixed` layers behind the page, `.page-wash` and `.page-tex` (`watercolor-clouds.webp` at .8 opacity). `--text-muted` measured 2.73:1 there — fixed by `mockup/patch-site-contrast.mjs`, along with `.tab-btn:hover` (2.23:1) and the `.avatar` disc (1.54:1).
-- The admin: five status pills and `.side-sec` in light mode, the `.avatar` initial in both, `.chip.on` on the `prefers-color-scheme` path, and `.an-tip` on hover and focus — fixed by `mockup/patch-admin-contrast.mjs`. The admin had never been in scope at all.
-
-**An edit that appends to its own anchor is not idempotent, and the usual `includes(from)` guard will not notice.** Every `patch-*.mjs` here decides whether to act by testing for its `from` string, which works for a replacement but not for an insertion: if `to` is `from` plus new text, `from` is still there afterwards and the next run appends a second copy. Three edits in `patch-admin-contrast.mjs` did exactly that — the `--*-ink` token lines reached four copies apiece and the `.chip.on` `@media` block two — and the tally prints `3 file(s)` every run rather than `0`, which is the signal to look for. Such an edit needs a separate `done` marker present only in the applied form; the loop now also throws if a `from`/`to` pair overlaps and no `done` is given, so the next one cannot slip through quietly. **Re-running a patcher and expecting `0 file(s) rewritten` is the check**, and verify the reverse too: copy the target files to a scratch directory, point a copy of the patcher at it, and confirm `ENABLED = false` then `true` round-trips byte for byte.
-
-So contrast needs two tools axe does not give you, and the scratchpad scripts that do this are disposable — rebuild them when needed, do not look for them in the repo:
-
-1. **Pixel sampling for text over anything non-flat.** Screenshot twice, the second time with only that element's own text nodes made transparent, diff the two to get a glyph mask, then sample the second shot at exactly those coordinates. Four traps make the naive version lie: sampling the whole bounding box counts borders and rounded corners; `-webkit-text-fill-color:transparent` *inherits*, so a child badge vanishes and gets scored against its parent's colour; visually-hidden `<h1>`s clipped to 1px read as 1:1; and a `max-height:0` nav drawer still reports a box, so links inside it need an `elementFromPoint` hit-test. Judge on the share of failing glyph pixels, not the single worst one — a genuine failure darkens ~100% of them, while antialiasing along an edge lands near 1%.
-2. **Static resolution of the stylesheet's own tokens**, per theme, for every rule that sets a colour and a background together. This is the only thing that reaches `:hover`/`:focus-visible`. If you walk the CSSOM instead of the text, note that since CSS Nesting landed *every* `CSSStyleRule` carries a (usually empty) `.cssRules`, so the obvious `if (r.cssRules) { recurse; continue; }` silently skips every real rule on the page.
-
-   The tempting shortcut here — re-applying every `:hover`/`:focus-visible` rule onto its own plain selector with `!important`, then measuring pixels — **manufactures failures that do not exist.** Stripping `:hover` off `a:hover` drops its specificity, and forcing every state rule at once paints combinations the browser never renders together: it reported `a.dyn-btn` on `events.html` at 2.10:1 and `a.btn.btn-primary` on `forum-alt1.html` (which overrides `--brown` to `#8B2E33`) at 1.89:1, both at ~100% of glyph pixels, where a real pointer hover measures 13.43:1 and 13.78:1. A third false positive came from the probe itself rather than the forcing: `a.crumb.crumb-sec` on `lib-p2764.html` read 1.01:1 over 63% of its glyphs, and it really measures 6.49:1 resting and 7.40:1 hovered. That breadcrumb is injected on scroll and its label is **rewritten as you scroll** (`2. שיטת המחקר` at y=19200, `3. פרשנות` at y=19400), so any scrolling between the probe's two screenshots — `scrollIntoViewIfNeeded` alone is enough — leaves the glyph mask from the first shot pointing at freshly painted text in the second instead of at background, which scores as text on itself. **Any element whose text can change between the two shots needs its content pinned first**, not just a stable viewport. Treat a forced-state hit as a lead, never a finding: confirm it with an actual `.hover()` and `getComputedStyle` before changing any colour.
-
-**A contrast tool that hardcodes the colours it expects is wrong the moment a patcher runs.** Both blind-spot tools above must read the colours out of the live page or the stylesheet, never out of a table copied into the script. A hardcoded probe kept reporting `.tab-btn` at 2.23:1 after the patcher had already changed it, and a hardcoded admin table reported seven failures that no longer existed — the pills still listed as `--ok`/`--warn` rather than the `--*-ink` tokens that replaced them, and `.side-sec` still at `.42` alpha where the file says `.58` and the rendered text measures 17.4:1. Resolve tokens from the page, and when two tools disagree, believe the one sampling real pixels.
-
-Two measurement rules follow from the layout, not from WCAG:
-
-- **Measure at a realistic viewport height, and scroll.** `.page-wash` and `.page-tex` are `position:fixed`, so their size follows the viewport: a tall viewport stretches the texture over the whole document and gives a different answer than any visitor ever sees. It read the footer at 3.59:1 where the real worst case is 2.73:1.
-- **The admin's four cascading `:root` blocks are not interchangeable.** `--tan` and `--brown` flip meaning between them, and `[data-theme="dark"]` and `@media (prefers-color-scheme:dark)` are *separate* paths that need separate overrides — `.btn-primary` carries both, `.chip.on` carried only one and failed at 1.82:1 for anyone on a dark OS who had never touched the theme toggle. A probe that sets `data-theme` never exercises the media path at all.
-- **The two dark paths also have to agree on what a token *means*, not just carry parallel overrides.** `--brown-dark` was `#120C07` under the media query and `#F2E7D8` under the attribute, because the 2026-08-22 split into `--tip-bg` (a dark surface) and `--brown-dark` (text) was applied to the attribute block only. Every admin form label asked for it, so on first load in OS dark mode they were near-black on the `--sink` panel at **1.16:1** — and became readable the moment the visitor toggled the theme, which is what a single divergent token looks like from the outside. `patch-admin-contrast.mjs` now applies the split to both paths in all three files. Label text wants `--ink`; `--brown-dark` is heading text and `--tip-bg` is the one dark surface.
-
-## Global search
-
-Like the accessibility layer, this is **permanent**: the behaviour ports to production. The three mockup scripts that produce it do not; see below.
-
-A magnifying-glass button at the inline-end of the menu row opens a search field that suggests results as you type. It is a flex item of `.primary-nav`, so it sits with the menu links and inside their 960px column. Below 720px `.primary-nav` collapses to a `max-height:0` drawer, so the button is absolutely positioned into the header bar there instead, in the corner the hamburger does not occupy; otherwise it would be unreachable until the menu was opened. The engine is **MiniSearch 7.2** (MIT), chosen over the alternatives for concrete reasons worth keeping: Fuse.js scores fuzzily with no inverted index or real prefix semantics, Lunr forces an English stemmer, and Pagefind wants a build step and per-platform binaries the mockup has no place for. Pagefind is still the obvious candidate for the Astro build, where a build step exists.
-
-- `mockup/pages/search.js`: the widget. Injects its own `<style>` and its own button, so no page markup carries it. Loaded **deferred**, unlike `accessibility.js`: it has nothing to apply before first paint. Without JavaScript no button appears at all, which is the honest outcome for a search that is entirely client-side.
-  - The engine and the index are fetched lazily, on first open (and prefetched on hover), so a visitor who never searches pays nothing.
-  - Follows the ARIA 1.2 combobox pattern: `aria-expanded`/`aria-activedescendant` on the input, options as direct children of the listbox, arrow/Home/End/Escape, focus returned to the button on close.
-  - Styled with the site's **design tokens**, deliberately unlike the accessibility panel. This is ordinary chrome, so it should follow the palette, and it picks up `html.a11y-contrast` for free. The one hand-written exception is the high-contrast rule that puts the panel's background back, because the a11y layer blanks every background inside `.site-header`.
-- **Hebrew needs two things** the default tokenizer does not do, both in `tokenize()`/`processTerm()`. Abbreviation marks are folded away rather than treated as word breaks, so `תשפ"ז` stays one token. Final letters are folded to their medial forms, or `גן` would never prefix-match `גנים`, the single most common Hebrew search there is. Niqqud is stripped too, so unpointed typing finds pointed text.
-- `mockup/pages/minisearch.min.js`: vendored ESM bundle, 18.5 KB (5.9 KB gzipped). Committed because GitHub Pages serves `mockup/pages/` verbatim with no install step. Regenerate with `node mockup/vendor-minisearch.mjs` after bumping the dependency; do not hand-edit.
-- `mockup/patch-search.mjs`: idempotent patcher, adding the script tag plus `id="sec-…"` on every `<h2>` so a result can link to the section it matched instead of the top of a long page. `ENABLED = false` strips both back out. Re-run it after adding a page.
-- `mockup/search-index.mjs`: builds `mockup/pages/search-index.json`. **Run it after the patcher**, which owns the anchors; this script reads the ids back out of the HTML rather than recomputing them, so the two can never disagree.
-  - Indexes *sections*, not pages: one document per page intro plus one per `<h2>` card. 127 documents, 213 KB raw / 57 KB gzipped.
-  - Reads the dynamic collections from the **D1 content API**, not from `data.js` (see the content layer note in the cutover list; `data.js` is dead). Needs the network; without it the page half is still written, with a warning and a non-zero exit.
-  - Deliberately **not** indexed: `<span class="ph">` notes (questions addressed to us, not copy for readers), the breadcrumb/header/footer, and art-hero image captions.
-  - The index is therefore a **snapshot**. An item published through the admin changes D1 immediately but stays unfindable until this script runs again. In Astro that wants to be a deploy-time step, or the search moves behind a Worker querying D1 per request.
-
-Verified in headless Chrome over CDP: 30 functional checks, and axe-core 4.13 at the same four WCAG tags across all 42 pages closed, four pages with live results, the no-results state, and every accessibility adjustment switched on: **0 violations**. Re-check rather than assuming; the audit caught `--tan-dark` used as small text here too, exactly as the accessibility section warns.
-
-Two traps this feature hit, both worth knowing before touching button or highlight colours anywhere on the site:
-
-- The page stylesheet carries a bare `a:hover{color:var(--brown-dark)}`. Any `<a>` styled as a solid button has to restate its own colour on hover, because `a:hover` at (0,1,1) outranks a single class at (0,1,0). `.dyn-btn` did not, so hovering "להרשמה (טופס גוגל)" painted `--brown-dark` text on a `--brown-dark` background: **1:1, the label disappeared**. `.btn-primary` in the page stylesheet had already learned this.
-- Highlight and label colours have to be checked against the colour they land on, not the colour they were designed against. `--tan-dark` and `--text-muted` both failed AA once used as small text on the search results, in two separate rounds.
-
-**Scan at more than one viewport width.** Both of the violations that were sitting unfixed on `kinder-list.html` were invisible at 1280px: the table only overflows between roughly 561px and 670px, and the Leaflet rule only fires once the map control wraps. Scan with content settled, too; a scan that races the D1 fetch reports a page that is not the page a visitor sees.
-
-## Newsletter signup (ActiveTrail)
-
-Permanent, like the two layers above: the signup on `forum-newsletter.html` is real, not a placeholder.
-
-- `mockup/pages/newsletter.js` owns the behaviour and injects its own CSS; the form markup lives in the page. Deferred, and standalone rather than part of `store.js`, which this page does not load: `store.js` fetches every content collection the moment it runs and this page renders nothing from D1. The API base is therefore repeated in both files.
-- `POST /api/newsletter/subscribe` on the content API forwards to ActiveTrail. **The browser never calls ActiveTrail directly**, and no future page should: their API authenticates with one account-wide token that can read, edit and delete the entire contact list, so in a page script it is published to every visitor.
-- **The token is a Worker secret, never a file.** `npx wrangler secret put ACTIVETRAIL_TOKEN` from `content-api/`. `ACTIVETRAIL_GROUP_ID` and `ACTIVETRAIL_DOUBLE_OPTIN` are identifiers rather than credentials and sit in `wrangler.toml`. With the token or the group id unset the endpoint answers 503 and the form says the signup is not available yet, which is the state a fresh clone is in.
-- Double opt-in is on by default: ActiveTrail sends the confirmation mail and only subscribes an address once the link is clicked. That is what makes the list defensible under חוק התקשורת סעיף 30א, and it also means a typo or a signup with someone else's address never becomes a subscription.
-- Abuse controls, in order: a honeypot field (clipped, `aria-hidden`, `tabindex="-1"`) that answers exactly as a success does, then server-side address validation, then a per-IP throttle of 5 an hour from the `rate_limits` table (migration 0005). The table is keyed `(bucket, ip)` so the contact form can reuse it.
-- Upstream failures return a generic 502 and log the real reply, which can name the account. Never pass ActiveTrail's error body to the browser.
-
-Verified against the live ActiveTrail API with a deliberately invalid token: their 401 says specifically "invalid API Key", which confirms the path and the bare `Authorization` header (no `Bearer` prefix) are right. Also verified 405/400/429/503, the honeypot, and axe-core at the four WCAG tags at 375px, 600px and 1792px, in the default state and with an error showing: **0 violations**.
-
-## E-books showcase (ספרים אלקטרוניים)
-
-Permanent, requested by the forum on 2026-10-11 as its own page: one book is read on this
-site for free, and future e-books are bought elsewhere.
-
-- `mockup/pages/ebooks.html` hardcodes the one fully open book, "חינוך ולדורף, עקרונות
-  ויישומים" (a link to its first chapter, `lib-p2038.html`, plus a link to the full archive
-  on `content-library.html`), since there is exactly one of those and it predates this page.
-  Everything else comes from D1's `library` collection with `kind = 'ספר אלקטרוני'`, rendered
-  by `WDyn.renderEbooks` in `mockup/pages/dynamic.js`.
-- The `library` table gained a `purchase_url` column (migration `0013_library_ebooks.sql`,
-  content API field `purchaseUrl`). A row with `purchase_url` set renders a "לרכישה" link
-  that opens in a new tab (leaving the site to buy); a row with only `url` set renders a
-  same-tab "קריאה חופשית" link to its own page on this site. A row with neither is a future
-  book not yet linked to anything, and renders "בקרוב". Two rows are open today: "22 שאלות
-  ותשובות על חינוך ולדורף" (`lb-p2323`, moved here out of the general `מאמר` kind), and
-  "אמנות הדיבור" (`lb-speech-arts`, migration `0014_library_speech_arts.sql`), the subject
-  the forum found no curriculum page for and asked to put here instead (see "The triage
-  section" below). Unlike every other library item, `lib-speech-arts.html` has no single
-  WordPress post behind it: it combines five pieces from the triage archive (an intro, a
-  curriculum summary, and three age-group chapters) by hand into one page, the same way the
-  main book's cover and chapter rail are hand-built rather than generated per record.
-- `mockup/pages/library.js` excludes `kind = 'ספר אלקטרוני'` from `content-library.html`'s own
-  works/book grids, so an e-book shows up on `ebooks.html` only, not twice.
-- `mockup/patch-ebooks-nav.mjs` adds the nav entry (idempotent, `ENABLED = false` to strip).
-- Migrations `0012` through `0014` are written but **not yet applied** to the D1 database from
-  this sandbox (no network access to run `npx wrangler d1 migrations apply`); run that from
-  `content-api/` before relying on the new kind, column, or row in production.
-
-## The triage section (חומר למיון)
-
-**Admin-only as of 2026-10-18.** It used to have four public pages and two admin-only ones;
-all six groups are admin-only now, reachable only from the admin dashboard sidebar
-("חומר למיון (ארכיון)" → "סקירה כללית"), not from the public nav at all. It exists because
-the new site is a rewrite: its pages are shorter and better organised than the old ones, and
-in the process items were left behind that nobody had decided about.
-
-The forum reviewed the pile on 2026-10-11 and answered item by item (`mockup/sorting-decisions.mjs`
-records every answer, so a future re-scrape does not lose them), but "classified" turned out
-not to mean "has a confirmed home." Checking the forum's reading of **תוכניות לימודים לפי
-מקצוע** (was "מאמרים לפי מקצוע": each subject bucket *is* that subject's curriculum, not a
-separate article, per the forum) against the actual `curriculum-*.html` pages found two
-subject buckets with no match anywhere: בוטמר ומשחקים (2 items) and אמנות הדיבור (5 items,
-only a passing mention of "דקלום" in `curriculum-hebrew.html`). Everything else checked out:
-**ספרים אלקטרוניים** (was "ספרייה") and **עבודות גמר** turned out to already be fully covered
-by `content-library.html` and `ebooks.html` (built before this reorg), the other 15 subject
-categories map onto real `curriculum-*.html` content, and the "pages" group's "already on the
-new site" notes held up against `school.html`/`kinder.html`/`school-list.html`/`kinder-list.html`.
-Both gaps were put to Gilad on 2026-10-19 and are resolved now: בוטמר ומשחקים is dropped
-(`BOTHMER_NOTE` in the decisions module, no further action), and אמנות הדיבור moved to the
-e-books showcase instead of a curriculum page (`lb-speech-arts`, see "E-books showcase"
-above). Neither change brought the pile back to the public site: once moved, it stays
-admin-only regardless of how many open items remain, since nothing was deleted, only moved
-behind the admin login, so re-exposing any of it later is a nav-entry toggle, not a rebuild.
-
-- **עבודות גמר is bucketed by type, not by year.** The old year buckets are replaced by three:
-  עבודות סמינריוניות, עבודות של מורים שונים, and עבודות לתואר שני, decided by the forum rather
-  than guessed (`capstoneBucket()` in the decisions module).
-- A handful of items moved group or bucket entirely (the book's chapters gained a sibling,
-  "22 שאלות ותשובות"; a few old-site pages turned out to duplicate capstone entries already
-  in the pile and were dropped), and items the forum called "not relevant" or "already on the
-  new site" keep a short `note` field, rendered on the card by `sorting.js` so the reason stays
-  visible rather than silently vanishing from the pile.
-
-Nothing in it edits existing content. The generators only ever write `pages/admin/sorting*.html`
-and `pages/admin/sorting-data/`.
-
-- `mockup/sorting-content.mjs` — pulls the content from the old site's **WordPress REST
-  API**, the same one `migration/README.md` documents, so the inventory is complete rather
-  than crawled, then applies `sorting-decisions.mjs`. The public/admin split machinery is
-  still there (`ADMIN_ONLY_GROUPS` now lists all six groups, so the public write is a no-op)
-  rather than deleted, since a future group could again go public without rewriting this.
-  Writes `pages/admin/sorting-data/index.json` (metadata) and `items/<id>.html` (one
-  sanitised body each, fetched only when opened). Re-run it to refresh; the forum is still
-  publishing, so the counts move, but the forum's standing decisions do not.
-  - **What counts as missing.** All posts, plus the structural pages whose text the new
-    site does not carry. That second judgement is measured, not guessed: eight-word shingles
-    of the old page are looked for across all the static pages and the D1 collections, and
-    anything above 50% coverage is treated as already migrated. Pages between 15% and 50%
-    are kept and flagged, the new site carries a shortened version, and the interesting
-    part is what was cut. The same measured standard is what caught the בוטמר/אמנות הדיבור
-    gap above; the forum's "I think we already have this" is a lead, not a finding.
-  - **Sanitising.** Element ids are stripped (several bodies open on one page would collide),
-    inline handlers go, and every `<iframe>` becomes a plain link, nine third parties, one
-    of them a `javascript:` src. Two accessibility repairs happen here rather than in the
-    page: an `<img>` with no `alt` at all gets one naming the gap, and a link whose only
-    content is a decorative image is named from the file it points at. Both are failures in
-    the source HTML; fixing them downstream is not possible.
-- `mockup/sorting-decisions.mjs` — the forum's editorial decisions, kept separate from the
-  scraper so a re-run against the WordPress API does not lose them: `GROUP_TITLE_OVERRIDE`,
-  `ADMIN_ONLY_GROUPS`, `DROP_IDS`, `MOVES`, `NOTES`, and the capstone bucket rule.
-- `mockup/sorting-pages.mjs` — generates all seven pages (one overview plus the six groups)
-  with a skeleton of its own, not a clone of a public page: an admin page carries none of
-  the site's nav, accessibility layer or search, the same way `admin/set-password.html`
-  does not. `sorting.js` is loaded unmodified against the admin palette's own tokens,
-  aliased to the names its injected CSS expects (`--white`, `--text`,
-  `--radius-organic-sm`, …), rather than forking the widget's stylesheet.
-  - **The `<main>` replace used to be anchored on a bare `<main`.** `media.html`'s own
-    "hero: inset slideshow" CSS comment mentions `<main>` in prose before the real tag, and
-    a loose `/<main[\s\S]*?<\/main>/` latches onto that instead, consuming everything from
-    the comment through the real closing tag and silently writing a corrupted page. Hit once
-    while this section was still public-page based and fixed by anchoring on
-    `<main id="main-content"`; `library-pages.mjs` had the identical regex and the identical
-    latent bug, fixed the same way. Now moot for this generator, since its own skeleton has
-    no such comment, but re-check any future `<main>` replace in a generator against this
-    trap before trusting its output unseen.
-  - Template substitution is `String.replaceAll`, not `replace`: the skeleton's own
-    `{{TITLE}}` placeholder appears twice (`<title>` and `<h1>`), and `replace` silently
-    fills in only the first.
-- `mockup/patch-sorting-nav.mjs` — added the nav entry and its badge CSS to every public
-  page; `ENABLED = false` is the resting state now, having stripped both back out. Flip it
-  back to `true` and re-run only if some part of the pile goes public again.
-  - **Its CSS strip only escaped `*` and `/` before building a regex from the marker
-    string, not the parentheses in "(temporary)".** An unescaped `(...)` in a regex is a
-    capture group, not two literal characters, so the pattern never matched and
-    `ENABLED = false` had silently left the badge CSS on every page it ever ran on, since
-    this patcher was first written. Fixed with a proper escape-all-metacharacters helper;
-    confirmed by re-running and finding zero remaining `.nav-badge` rules.
-- `mockup/pages/sorting.js` — the widget: injects its own CSS (like `search.js`), renders the
-  list for whichever group `<main data-sorting-group>` names, buckets it, filters it, shows
-  an item's `note` when the forum left one, and fetches an item's body on first open. Hebrew
-  filtering folds niqqud, quote marks and final letters, for the reason the search section
-  gives. Unmodified since it was a public-facing widget; only the pages around it moved.
-  - It re-implements the overflowing-table `tabindex` toggle from `accessibility.js` for the
-    tables it injects. That file observes only the wraps present when it initialises, and
-    these arrive when somebody opens an item, the alternative was exporting a re-scan hook
-    from a permanent file, which this section must not need. Keep the `ResizeObserver` at
-    module scope, exactly as the accessibility section warns.
-
-Two things to know before relying on it:
-
-- **Files and images still load from the old site.** Every `href` and `src` resolves against
-  `waldorf.co.il`, which is live today and will not be after cutover. `migration/README.md`
-  (section "Two things the file deliberately does not cover", point 2) carries the counting
-  command and the consequence: **this pile has to be sorted before the domain moves, not
-  after**, or whatever the forum decides to keep has nowhere left to be copied from.
-- **The index is a snapshot**, like the search index. Something published on the old site
-  today does not appear until `sorting-content.mjs` runs again, and this sandbox has no
-  network access to the old site's API, so the 2026-10-11 decisions above were applied by
-  hand to the existing snapshot rather than by a fresh scrape; re-run `sorting-content.mjs`
-  itself once network access is available, to confirm it reproduces the same split.
-
-Not re-verified after the 2026-10-18 move to admin-only: the "seven pages, 364 items, 0
-console errors, 0 axe violations" audit this section used to report was run against the
-*original* public, six-group structure, two reorgs ago. Re-run the Chrome-over-CDP and
-axe-core passes described in "Scanning for bugs and violations" before trusting that result
-again.
-
-## Scanning for bugs and violations
-
-There is no test suite and no linter in `package.json`, and adding one is not the point: the tools below are run on demand, from a sandbox outside the repo so `package-lock.json` is never touched. Installing a linter into this project is what broke CI once already (see the note in Commands).
-
-    mkdir -p /tmp/scan && cd /tmp/scan && npm init -y
-    npm install eslint@9 html-validate@9 axe-core@4
-
-Nine layers, in rough order of how much they find here:
-
-1. **Server-side review by hand.** Every real security finding so far came from reading `content-api/src/index.js`, not from a tool: an authorisation check that had drifted from its own comment, a credential in a migration, a login endpoint with no throttle. Read the auth and the write paths whenever they change.
-2. **Dependency CVEs.** `npm audit`. Everything flagged so far is transitive through astro/vite and build-time only.
-3. **Secrets.** Grep the tracked files for key/token/password patterns. The repo is public, so anything committed is published, and deleting it later does not unpublish it.
-4. **JS static analysis.** ESLint with correctness rules only, no style rules. Roughly 6,000 lines of vanilla JS across `mockup/pages/`, `mockup/*.mjs` and both Workers. It has found nothing but dead variables, which is a useful thing to know.
-5. **HTML validity.** `html-validate` over `mockup/pages/*.html`. This is what caught an unclosed `<form>` in the admin and 42 unnamed nav landmarks. Ignore its `doctype-style` rule: the repo is consistently `<!doctype html>`, and HTML5 defines the doctype as case-insensitive.
-6. **Link, anchor and asset integrity.** Walk every `href` and `src` in the 50 pages, resolve relative paths on disk, and check that each `#fragment` matches an `id` on the page it points at. Cheap, and it guards the search index's deep links.
-7. **Runtime health.** Drive Chrome over CDP across all 50 pages and collect console errors and failed requests. Filter the Cloudflare beacon, which cannot pass CORS from localhost and fails on every page.
-8. **Accessibility.** axe-core, covered in its own section above.
-9. **Live endpoint probing.** Unauthenticated requests against the deployed API, checking that protected routes 401 and that an arbitrary `Origin` is not reflected.
-
-Two things that decide whether a scan finds anything:
-
-- **Scan at more than one viewport width.** Both violations that sat unfixed on `kinder-list.html` were invisible at 1280px.
-- **Let the content settle first.** The pages fill from D1 after load. A scan that races the fetch measures an empty page, and an axe run that races the render reported an open search panel as clean when six of its elements were failing.
-
-Headless Chrome has two traps worth knowing. Changing `Emulation.setDeviceMetricsOverride`, navigating, then changing it again resizes the viewport without dispatching `resize` or `ResizeObserver` at all, so resize behaviour has to be tested one override and one navigation at a time. And with no network, requests to Google Fonts and unpkg hang, so `readyState` never reaches `complete`; wait for `interactive` and carry on.
+**Scanning for bugs** (`agent-docs/scanning.md`): run tools from a sandbox outside the repo; never install a linter or test tool into this project's `package.json`, which broke CI once already.
 
 ## Migration requirement (important, don't skip)
 
@@ -346,14 +61,6 @@ Before building the new site, the entire existing site at waldorf.co.il must be 
 **The mapping table now exists**: `migration/url-map.csv`, covering all 427 URLs in the old site's sitemap plus four category pages missing from it. `migration/README.md` documents where the inventory came from (the old site is WordPress and publishes `wp-sitemap.xml` and an open REST API), what the `status` column means, the seven rows that still need the forum's answer, and the one large open question the table exposes: 169 of the 431 URLs point at `news.html` and 52 at `curriculum-capstone.html`, because the old site's two biggest categories are מודעות ופרסומים (155 posts) and עבודות גמר (51), and the new site has no per-article page.
 
 `node migration/build-redirects.mjs --write` turns the CSV into `public/_redirects` (861 rules, each path with and without its trailing slash). Two caveats worth knowing before relying on it: the `new_path` column holds the **mockup's filenames**, so it needs one pass if production moves to clean routes; and `/wp-content/uploads/...`, which is every PDF and image the old site ever linked, is deliberately not covered, because keeping those alive means copying the files to R2 first.
-
-## Repo layout
-
-- `mockup/` — the current mockup: `mockup/pages/*.html` (50 static pages, one per section/topic) is what actually publishes to GitHub Pages (see Deployment above). Generated by `mockup/build.mjs` from `content/pages/*.md`; also has `admin.html`/`admin-dashboard.html`/`admin-app.js` (local-only admin tooling, not published) and `responsive.mjs`/`patch-*.mjs` helper scripts. This is the primary reference for site structure/navigation/copy placeholders right now.
-- `docs/PRD-forum-waldorf-site.md` — the authoritative PRD (Hebrew) for the production build: architecture, page inventory, D1 schema, accessibility/security/SEO requirements, external services, open questions. Read this before scoping any real implementation work.
-- `docs/` — also contains pricing proposal PDFs/DOCX (historical, for context only).
-- `archive/` — older drafts: a previous PRD, an earlier homepage mockup (`awaldorf-homepage.html`), a brand/design-system doc (`aWaldorf_UX_UI_Design_System.md`), and `brand-assets.md`/`global-styles.css`. **These use a different color palette than the current mockup** — treat archive contents as superseded reference material, not source of truth. When in doubt, `mockup/`'s current CSS reflects the current direction.
-- `Rav Messer API.txt` — OpenAPI spec for "Responder" (responder.co.il), an Israeli email marketing platform. Relevant to the PRD's still-undecided newsletter tool choice (section 10 of the PRD).
 
 ## Adding a page to the mockup
 
@@ -369,9 +76,11 @@ Nav entries are patched in, never regenerated, for the reason `patch-sorting-nav
 
 `mockup/build.mjs` generates `mockup/pages/*.html` from `content/pages/*.md` (re-run with `node mockup/build.mjs` after editing the markdown). By default it skips pages that already exist so hand-edits to the generated HTML aren't reverted — **do not run with `FORCE=1`**, that regenerates everything from the markdown template and overwrites any hand-polished pages.
 
-The generic Hebrew filler (`[שם]`, `תוכן מלא יוכנס כאן`) is **gone** — pages now carry real copy scraped from the old site and from the client's documents. What remains is narrower: `<span class="ph">` notes on 10 pages marking information nobody has yet (see "Launch cutover" above, item 12), pending answers from the client (Gilad, per the PRD's open questions in section 3.4).
-
 There is nothing to build, lint, or test yet — open any file under `mockup/pages/` directly in a browser to preview.
+
+## Repo layout notes
+
+`archive/` holds superseded drafts that use a **different colour palette** than the current mockup; when in doubt, `mockup/`'s current CSS reflects the current direction. `docs/PRD-forum-waldorf-site.md` is the authoritative PRD for the production build (and `docs/` is gitignored).
 
 ## Key open decisions (do not assume resolved)
 
@@ -380,14 +89,6 @@ Per PRD section 3.4, these are unresolved and need client sign-off before being 
 2. Whether kindergarten extras (job board, morning circles, annual plans) are in the base scope.
 3. Whether "מדיה" (media) is its own top-level page or a subsection.
 4. Whether the curriculum page is a class×subject matrix or a flat subject list.
-
-## Hero images
-
-Gilad's picture sets live in `mockup/pages/img/slides/<set>/<set>-NN.webp` (kinder, foundations, associations, resources, forum, elementary, highschool) and `img/hero/home-NN.webp` plus `-sm` for the homepage. The art-hero pages carry **no slide markup**: `<div class="art-hero slideshow" data-art-slideshow data-art-set="…">` names a set, and `art-hero-slideshow.js` builds the slides from its `COUNTS` table, shuffled on every load, loading only the current and next picture. Adding a picture means dropping `<set>-NN.webp` in the folder and raising the count. `school` is `elementary` + `highschool` combined, used by `school*`, `curriculum*` and `teacher-training`; the two stay separate sets for pages that will want one of them (there is no high-school page yet). Without JavaScript an art-hero shows no picture. The homepage keeps its slides in markup, shuffled by a small inline script in `home.html` before first paint; `hero.js` hands later slides their images after `load`. `img/hero/hero-N*.webp` are the old homepage pictures, kept only because the `home-hero-light.html` fragment still references them.
-
-## Page hero layout
-
-The 41 pages with an `art-hero` slideshow share one layout, written as a `/* ===== hero: inset slideshow =====` block at the end of each page's stylesheet: slides 10px under the header and `--side` (up to 100px) from the page edges, rounded; the page `<h1>` lives inside the slide, bottom-centre, and the old painting caption is gone; `section.card` is a 13% tint of the page's `--cat` watercolour colour; `main` has no max-width (the homepage follows the same `--side` column through its own `--gutter`/`--hero-side` tokens, and `hero.js` measures `main` to size the hero's bleed instead of assuming a 1200px column). The breadcrumb stays inside `<main>` because `breadcrumb.js` makes it sticky against `main`; a negative top margin pulls it onto the slide and a fixed `--bar-h` lets the bottom margin give the distance back, so do not let the bar's height vary. Breadcrumbs never wrap: only the last crumb in the trail shrinks and ends in an ellipsis (`.crumb-end`, set by `markEnd()` in `breadcrumb.js`), and the pill itself is `flex-wrap:nowrap` because the page stylesheet sets `wrap` on it at narrow widths. Once the pill sticks, a brown square hamburger eases in at its start edge and opens a panel built from the header's nav groups. The title's shade is a soft oval on the `<h1>`'s own `::before`, sized from the title in `em` (so it follows the font size and the two-line titles on phones); the band along the bottom edge is gone (`.art-hero.slideshow::after{background:none}`). It is deliberately light (about .5 at the centre) and a dark halo `text-shadow` helps. Measured against all eight slides with the oval alone, the weakest 5% of pixels under the title reach 3.4:1 (desktop) to 4.0:1 (phone); the halo is not counted. Re-measure before lightening it further, and test in a browser with a cache-busting URL, because a plain reload of a locally served page showed stale CSS. The header takes the same tint family as the cards (27% of `--cat`, a little deeper) and, from 961px up, the same side padding as `main`; below that the menu needs the room and the old padding stays. The block was added by a one-off script, so a new page should be cloned from a finished one.
 
 ## Language/direction
 

@@ -72,7 +72,7 @@ const BLANKET_NOTE = 'הפורום: חלק מהרשימה הראשונית שא�
 const SCHOOL_KINDER_NOTE = 'הפורום: החומר הזה כבר קיים באתר החדש.';
 const FORUM_EVENTS_NOTE = 'הפורום: לא רלוונטי כרגע (לוח אירועים/פורום).';
 // 2026-10-18: Gilad's answer to the two subject buckets with no confirmed
-// home anywhere on the new site (see CLAUDE.md, "The triage section").
+// home anywhere on the new site (see agent-docs/triage.md).
 const BOTHMER_NOTE = 'גלעד: אפשר לוותר, לא יועבר לאתר החדש.';
 const SPEECH_ARTS_NOTE = 'גלעד: הועבר למדור הספרים האלקטרוניים (lib-speech-arts.html).';
 

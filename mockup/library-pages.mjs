@@ -23,8 +23,8 @@ import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(__dirname, 'pages');
-// sorting-data moved admin-only on 2026-10-18 (see CLAUDE.md, "The triage
-// section"); the archived bodies this script reads from moved with it.
+// sorting-data moved admin-only on 2026-10-18 (see
+// agent-docs/triage.md); the archived bodies this script reads from moved with it.
 const itemsDir = join(pagesDir, 'admin', 'sorting-data', 'items');
 
 const API = 'https://waldorf-content-api.orenknaan.workers.dev/api/content';

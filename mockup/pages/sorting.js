@@ -7,7 +7,7 @@
    הפריטים, ו-items/<id>.html עם גוף הפריט, שנטען רק כשפותחים אותו. שני
    הקבצים נוצרים ע"י mockup/sorting-content.mjs מתוך ה-API של האתר הישן.
 
-   כל המדור זמני — ראו CLAUDE.md, "Launch cutover". */
+   כל המדור זמני — ראו agent-docs/launch-cutover.md. */
 (function () {
   'use strict';
 
