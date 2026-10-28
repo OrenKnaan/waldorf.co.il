@@ -643,6 +643,7 @@ export default {
         if (!boss) return json({ error: 'forbidden' }, 403, origin);
         const body = (await request.json().catch(() => ({}))) || {};
         if (!body.name || !body.email) return json({ error: 'missing_fields' }, 400, origin);
+        if (body.password && String(body.password).length < 10) return json({ error: 'password_too_short', minimum: 10 }, 400, origin);
         // No password is the normal way to create someone: they set their own
         // through an invite link, so nobody else ever knows it. A password may
         // still be passed, for seeding a first super_admin without mail.
@@ -677,14 +678,33 @@ export default {
         if (boss && body.email !== undefined) { sets.push('email = ?'); binds.push(body.email); }
         if (boss && body.role !== undefined) { sets.push('role = ?'); binds.push(body.role); }
         if (boss && body.active !== undefined) { sets.push('active = ?'); binds.push(body.active ? 1 : 0); }
-        if (body.password) { sets.push('password_hash = ?'); binds.push(await hashPassword(body.password)); }
+        if (body.password) {
+          // The same floor as the set-password link, which this path used to skip.
+          if (String(body.password).length < 10) return json({ error: 'password_too_short', minimum: 10 }, 400, origin);
+          // Changing your own password needs the current one, so a session left
+          // open on a shared machine cannot be turned into a lockout. A
+          // super_admin setting someone else's needs only their own sign-in.
+          if (self) {
+            const cur = await env.DB.prepare('SELECT password_hash FROM users WHERE id = ?').bind(uid).first();
+            if (!cur || !(await verifyPassword(String(body.currentPassword || ''), cur.password_hash))) {
+              return json({ error: 'wrong_password' }, 403, origin);
+            }
+          }
+          sets.push('password_hash = ?'); binds.push(await hashPassword(body.password));
+        }
         if (!sets.length) return json({ error: 'nothing_to_update' }, 400, origin);
         sets.push("updated_at = strftime('%s','now')");
         binds.push(uid);
         const res = await env.DB.prepare(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
         if (!res.meta.changes) return json({ error: 'not_found' }, 404, origin);
-        // Changing a password ends every other session for that user.
-        if (body.password) await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(uid).run();
+        // Changing a password ends every other session for that user. "Other"
+        // used to include the caller's own, so changing your password signed
+        // you out mid-task; the session making the change now survives it.
+        if (body.password) {
+          const auth = request.headers.get('authorization') || '';
+          const keep = self && auth.startsWith('Bearer ') ? await sha256hex(auth.slice(7)) : '';
+          await env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').bind(uid, keep).run();
+        }
         const row = await env.DB.prepare('SELECT id,name,email,role,active,last_login FROM users WHERE id = ?').bind(uid).first();
         return json(row, 200, origin);
       }
