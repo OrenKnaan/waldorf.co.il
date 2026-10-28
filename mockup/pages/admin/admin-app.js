@@ -789,11 +789,15 @@
     if (!host) return;
     host.textContent = '';
 
-    var me = WStore.currentUser();
+    // The management key is a super_admin to the server (whoami in content-api),
+    // so it gets the roster too. It is also the way back in for someone locked
+    // out while no mail provider is configured: enter the key, then mint a
+    // reset link for yourself here.
+    var me = WStore.currentUser() || (WStore.hasAdminKey() ? { id: 'key', name: 'מפתח ניהול', role: 'super_admin' } : null);
     if (!me) {
       host.appendChild(el('div', { class: 'panel' }, [
         el('div', { class: 'panel-head' }, [el('h2', { text: 'נדרשת התחברות' })]),
-        el('p', { class: 'empty-hint', text: 'רשימת המשתמשים זמינה רק לאחר התחברות עם שם משתמש וסיסמה.' })
+        el('p', { class: 'empty-hint', text: 'רשימת המשתמשים זמינה רק לאחר התחברות עם שם משתמש וסיסמה, או אחרי הזנת מפתח הניהול במסך ההגדרות.' })
       ]));
       return;
     }
@@ -1295,6 +1299,9 @@
     if (!WStore.isLoaded()) return;
     if (e.detail === 'nl') renderNewsletterAdmin();
     else if (e.detail === 'set') renderSettingsAdmin();
+    // Redrawn on every visit: a key entered in settings, or a sign-in in another
+    // tab, changes who may see the roster.
+    else if (e.detail === 'people') renderPeopleAdmin();
   });
 
   /* רענון כשחוזרים לטאב (אם נערך תוכן ממקום אחר) */

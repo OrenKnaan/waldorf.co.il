@@ -353,7 +353,7 @@ td.muted{color:var(--muted)}
         btn.hidden = true;
         say(r && r.delivered
           ? 'נשלח קישור לכתובת ' + email + '. הקישור תקף לשימוש אחד.'
-          : 'טרם מוגדר שירות דוא"ל, ולכן לא נשלחה הודעה. בקשו ממנהל־על ליצור עבורכם קישור להגדרת סיסמה.');
+          : 'לא נשלחה הודעה: טרם מוגדר באתר שירות לשליחת דוא"ל. מנהל־על יכול ליצור עבורכם קישור להגדרת סיסמה במסך "נציגי פורום" (כפתור "קישור לאיפוס"), וכך גם מי שמחזיק במפתח הניהול, אחרי הזנתו במסך ההגדרות.');
       }).catch(function () {
         btn.disabled = false;
         say('הבקשה נכשלה. נסו שוב.', 'bad');
@@ -392,7 +392,10 @@ td.muted{color:var(--muted)}
   forgotBtn.addEventListener('click', function () {
     pwField.hidden = true;
     forgotBtn.hidden = true;
-    say('נשלח קישור לבחירת סיסמה חדשה לכתובת ' + known + '.');
+    // Nothing has been sent yet at this point: this only swaps in the button
+    // that sends it. Saying "sent" here told people to wait for mail that was
+    // never requested.
+    say('לחצו על "שליחת קישור" כדי לקבל לכתובת ' + known + ' קישור לבחירת סיסמה חדשה.');
     offerLink(known, 'שליחת קישור');
   });
 })();
