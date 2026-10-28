@@ -1263,11 +1263,12 @@
     var u = WStore.currentUser();
     var who = document.querySelector('.user .who b');
     var role = document.querySelector('.user .who span');
+    var av = document.querySelector('.user .avatar');
+    // The markup leaves the user widget blank; every state is filled in here.
+    if (av) av.textContent = u ? (u.name || '?').trim().charAt(0) : '?';
     if (u) {
       if (who) who.textContent = u.name;
       if (role) role.textContent = ROLE_NAMES[u.role] || u.role;
-      var av = document.querySelector('.user .avatar');
-      if (av) av.textContent = (u.name || '?').trim().charAt(0);
     }
     if (canWrite()) {
       var ro = document.querySelector('#adminNotice[data-kind="readonly"]');
