@@ -21,6 +21,7 @@
   function actBtn(kind, label, onClick, ownConfirm) {
     var handler = onClick;
     if (kind === 'del' && !ownConfirm) handler = function () {
+      if (!canWrite()) return needSignIn();
       var cell = b.closest('tr') && b.closest('tr').querySelector('td.title');
       var name = cell && cell.firstChild ? cell.firstChild.textContent.trim() : '';
       if (!confirm((name ? 'למחוק את "' + name + '"?' : 'למחוק את הפריט?') + '\n\nהמחיקה סופית: אי אפשר לבטל אותה או לשחזר את הפריט.')) return;
@@ -40,6 +41,25 @@
       : st === 'active' ? pill('פעיל', 'ok')
       : st === 'inactive' ? pill('לא פעיל', 'neutral')
       : pill(st || '—', 'neutral');
+  }
+
+  /* ---- הקפאה: הסתרה מהאתר בלי מחיקה ---- */
+  // Freezing takes an item off the site without deleting it, and unfreezing puts it
+  // back. 'frozen' is a status of its own rather than 'draft' or 'pending', so a
+  // paused item stays told apart from one that was never finished or approved. The
+  // server withholds it from visitors because it is outside every publicStatus.
+  // LIVE is the status a row has while visitors see it, the one freezing leaves and
+  // unfreezing returns to. Only a live or frozen row gets the toggle: a draft or a
+  // pending submission is already off the site. A row with no status at all comes
+  // from a Worker that predates migration 0015 and cannot be frozen yet, so it gets
+  // no button rather than one that fails.
+  var LIVE = { events: 'published', news: 'approved', board: 'approved', jobs: 'approved', institutions: 'active' };
+  function freezeBtn(col, it) {
+    var live = LIVE[col] || 'published', frozen = it.status === 'frozen';
+    if (!frozen && it.status !== live) return null;
+    return actBtn(frozen ? 'thaw' : 'freeze', frozen ? 'ביטול הקפאה — החזרה לאתר' : 'הקפאה — הסתרה מהאתר', function () {
+      WStore.update(col, it.id, { status: frozen ? live : 'frozen' }); refreshAll();
+    });
   }
 
   /* ---- סגנונות טפסים לאדמין ---- */
@@ -110,6 +130,8 @@
     ]));
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      // Refused here rather than after the form closes, so what was typed survives.
+      if (!canWrite()) return needSignIn();
       var out = {};
       fields.forEach(function (f) {
         var v = inputs[f.name].value.trim();
@@ -143,9 +165,11 @@
     else if (content) c.appendChild(content);
     return c;
   }
-  function titleCell(text, demo) {
+  // `it`, when given, is the row: a table with no status column marks a frozen row here.
+  function titleCell(text, demo, it) {
     var c = el('td', { class: 'title', text: text });
     if (demo) c.appendChild(el('span', { class: 'tag-demo', text: 'הדגמה' }));
+    if (it && it.status === 'frozen') { c.appendChild(document.createTextNode(' ')); c.appendChild(pill('מוקפא', 'info')); }
     return c;
   }
   function emptyRow(tbody, cols, text) {
@@ -181,17 +205,6 @@
     { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'published', t: 'מפורסם' }, { v: 'frozen', t: 'מוקפא (מוסתר מהאתר)' }, { v: 'draft', t: 'טיוטה' }] },
     { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
   ];
-  // Freezing takes a published event off the site without deleting it, and
-  // unfreezing puts it back as it was. 'frozen' is a status of its own rather than
-  // 'draft', so a paused event stays told apart from one that was never finished.
-  // The API needs nothing for it: status is free text, and public reads return
-  // 'published' only, so a frozen event is withheld from visitors by the server.
-  function freezeBtn(ev) {
-    var frozen = ev.status === 'frozen';
-    return actBtn(frozen ? 'thaw' : 'freeze', frozen ? 'ביטול הקפאה — החזרה לאתר' : 'הקפאה — הסתרה מהאתר', function () {
-      WStore.update('events', ev.id, { status: frozen ? 'published' : 'frozen' }); refreshAll();
-    });
-  }
   function renderEventsAdmin() {
     var section = $('.view[data-view="events"] .panel');
     var oldWrap = section.querySelector('.table-wrap');
@@ -220,7 +233,7 @@
           td(ev.time || '—', 'muted tnum'),
           td(ev.status === 'frozen' ? statusPill('frozen') : ev.date < today ? pill('הסתיים', 'neutral') : statusPill(ev.status)),
           td(el('div', { class: 'row-actions' }, [
-            ev.status === 'published' || ev.status === 'frozen' ? freezeBtn(ev) : null,
+            freezeBtn('events', ev),
             actBtn('edit', 'עריכה', function () {
               openForm(section, EVENT_FIELDS, ev, function (out) { WStore.update('events', ev.id, out); refreshAll(); });
             }),
@@ -243,7 +256,7 @@
     { name: 'name', label: 'שם המוסד' },
     { name: 'town', label: 'יישוב' },
     { name: 'stage', label: 'שלב', type: 'select', options: STAGES },
-    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'active', t: 'פעיל' }, { v: 'pending', t: 'ממתין לאישור' }, { v: 'inactive', t: 'לא פעיל' }] },
+    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'active', t: 'פעיל' }, { v: 'frozen', t: 'מוקפא (מוסתר מהאתר)' }, { v: 'pending', t: 'ממתין לאישור' }, { v: 'inactive', t: 'לא פעיל' }] },
     { name: 'url', label: 'אתר המוסד (כתובת)' },
     { name: 'contact', label: 'איש קשר / טלפון' },
     { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
@@ -273,6 +286,7 @@
           td(STAGE_LABEL[it.stage] || it.stage || '—', 'muted'),
           td(statusPill(it.status)),
           td(el('div', { class: 'row-actions' }, [
+            freezeBtn('institutions', it),
             actBtn('edit', 'עריכה', function () { openForm(section, INST_FIELDS, it, function (out) { WStore.update('institutions', it.id, out); refreshAll(); }); }),
             actBtn('del', 'מחיקה', function () { WStore.remove('institutions', it.id); refreshAll(); })
           ]))
@@ -290,7 +304,7 @@
     { name: 'section', label: 'מדור', type: 'select', options: ['מאמרים', 'מודעות ופרסומים', 'איגרת', 'מוסדות', 'כללי'] },
     { name: 'contact', label: 'שם ופרטי קשר של המפרסם' },
     { name: 'link', label: 'קישור (לא חובה)' },
-    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'approved', t: 'מפורסם' }, { v: 'pending', t: 'ממתין לאישור' }] },
+    { name: 'status', label: 'סטטוס', type: 'select', options: [{ v: 'approved', t: 'מפורסם' }, { v: 'frozen', t: 'מוקפא (מוסתר מהאתר)' }, { v: 'pending', t: 'ממתין לאישור' }] },
     { name: 'summary', label: 'תוכן ההודעה', type: 'textarea', wide: true }
   ];
   function renderNewsAdmin() {
@@ -313,6 +327,7 @@
         if (n.status === 'pending') {
           actions.push(actBtn('ok', 'אישור ופרסום', function () { WStore.update('news', n.id, { status: 'approved' }); refreshAll(); }));
         }
+        actions.push(freezeBtn('news', n));
         actions.push(actBtn('edit', 'עריכה', function () { openForm(section, NEWS_FIELDS, n, function (out) { WStore.update('news', n.id, out); refreshAll(); }); }));
         actions.push(actBtn('del', 'מחיקה', function () { WStore.remove('news', n.id); refreshAll(); }));
         t.tbody.appendChild(el('tr', {}, [
@@ -347,18 +362,18 @@
       { name: 'url', label: 'קישור למסמך', placeholder: 'https://…',
         hint: 'הדביקו כתובת של קובץ PDF או של מסמך ב-Google Drive. העלאת קובץ ישירות מהמחשב תתאפשר רק אחרי שיחובר אחסון קבצים (R2) — כרגע אין לאן לשמור אותו.' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['סוג', 'כותרת', 'מחבר/ת', 'שנה', ''], row: function (it) { return [td(it.kind, 'muted'), titleCell(it.title, it.demo), td(it.author || '—', 'muted'), td(it.date || '—', 'muted')]; } },
+    ], cols: ['סוג', 'כותרת', 'מחבר/ת', 'שנה', ''], row: function (it) { return [td(it.kind, 'muted'), titleCell(it.title, it.demo, it), td(it.author || '—', 'muted'), td(it.date || '—', 'muted')]; } },
     { col: 'teaching', title: 'חומרי הוראה', fields: [
       { name: 'title', label: 'כותרת' },
       { name: 'group', label: 'קבוצה', type: 'select', options: ['סיפורים, שירים ודקלומים', 'דפי עבודה להדפסה', 'מצגות ותמונות להוראה', 'חומרי העשרה לתיכון'] },
       { name: 'url', label: 'קישור לקובץ' }
-    ], cols: ['קבוצה', 'כותרת', 'קובץ', ''], row: function (it) { return [td(it.group, 'muted'), titleCell(it.title, it.demo), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } },
+    ], cols: ['קבוצה', 'כותרת', 'קובץ', ''], row: function (it) { return [td(it.group, 'muted'), titleCell(it.title, it.demo, it), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } },
     { col: 'forms', title: 'מאגר טפסים', fields: [
       { name: 'title', label: 'שם הטופס' },
       { name: 'category', label: 'קטגוריה', type: 'select', options: ['הרשמה', 'בקשות', 'אישורים'] },
       { name: 'url', label: 'קישור לקובץ' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['קטגוריה', 'שם', 'קובץ', ''], row: function (it) { return [td(it.category, 'muted'), titleCell(it.title, it.demo), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } }
+    ], cols: ['קטגוריה', 'שם', 'קובץ', ''], row: function (it) { return [td(it.category, 'muted'), titleCell(it.title, it.demo, it), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } }
   ];
   function renderLibAdmin() {
     var view = $('.view[data-view="lib"]');
@@ -383,6 +398,7 @@
         items.forEach(function (it) {
           t.tbody.appendChild(el('tr', {}, cfg.row(it).concat([
             td(el('div', { class: 'row-actions' }, [
+              freezeBtn(cfg.col, it),
               actBtn('edit', 'עריכה', function () { openForm(panel, cfg.fields, it, function (out) { WStore.update(cfg.col, it.id, out); refreshAll(); }); }),
               actBtn('del', 'מחיקה', function () { WStore.remove(cfg.col, it.id); refreshAll(); })
             ]))
@@ -400,7 +416,7 @@
       { name: 'title', label: 'כותרת' },
       { name: 'youtubeId', label: 'מזהה יוטיוב (למשל dQw4w9WgXcQ)' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['כותרת', 'יוטיוב', ''], row: function (it) { return [titleCell(it.title, it.demo), td(it.youtubeId || 'חסר', 'muted tnum')]; } },
+    ], cols: ['כותרת', 'יוטיוב', ''], row: function (it) { return [titleCell(it.title, it.demo, it), td(it.youtubeId || 'חסר', 'muted tnum')]; } },
     { col: 'podcast', title: 'פרקי פודקאסט', fields: [
       { name: 'num', label: 'מספר פרק', type: 'number' },
       { name: 'title', label: 'כותרת' },
@@ -413,7 +429,7 @@
         hint: 'הדביקו את כתובת הפרק מ-Spotify (כפתור Share ← Copy link), או את המזהה בלבד. זו הדרך היחידה להוסיף פרק כרגע.',
         clean: function (v) { return WDyn.spotifyEpisodeId(v); } },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
-    ], cols: ['פרק', 'כותרת', 'תאריך', 'Spotify', ''], row: function (it) { return [td(String(it.num || '—'), 'muted tnum'), titleCell(it.title, it.demo), td(fmtDate(it.date), 'muted tnum'), td(it.spotifyId ? 'מקושר' : 'חסר', 'muted')]; } }
+    ], cols: ['פרק', 'כותרת', 'תאריך', 'Spotify', ''], row: function (it) { return [td(String(it.num || '—'), 'muted tnum'), titleCell(it.title, it.demo, it), td(fmtDate(it.date), 'muted tnum'), td(it.spotifyId ? 'מקושר' : 'חסר', 'muted')]; } }
   ];
   function renderMediaAdmin() {
     var host = $('#mediaAdmin');
@@ -437,6 +453,7 @@
         items.forEach(function (it) {
           t.tbody.appendChild(el('tr', {}, cfg.row(it).concat([
             td(el('div', { class: 'row-actions' }, [
+              freezeBtn(cfg.col, it),
               actBtn('edit', 'עריכה', function () { openForm(panel, cfg.fields, it, function (out) { WStore.update(cfg.col, it.id, out); refreshAll(); }); }),
               actBtn('del', 'מחיקה', function () { WStore.remove(cfg.col, it.id); refreshAll(); })
             ]))
@@ -477,6 +494,7 @@
           if (it.status === 'pending') {
             actions.push(actBtn('ok', 'אישור ופרסום', function () { WStore.update(cfg.col, it.id, { status: 'approved' }); refreshAll(); }));
           }
+          actions.push(freezeBtn(cfg.col, it));
           actions.push(actBtn('del', 'מחיקה', function () { WStore.remove(cfg.col, it.id); refreshAll(); }));
           t.tbody.appendChild(el('tr', {}, cfg.row(it).concat([td(el('div', { class: 'row-actions' }, actions))])));
         });
@@ -651,10 +669,11 @@
       pts.forEach(function (p) {
         t.tbody.appendChild(el('tr', {}, [
           td(p.town, 'muted'),
-          titleCell(p.name),
+          titleCell(p.name, false, p),
           td(String(p.count || 1), 'muted tnum'),
           td((p.lat != null ? p.lat : '—') + ', ' + (p.lng != null ? p.lng : '—'), 'muted tnum'),
           td(el('div', { class: 'row-actions' }, [
+            freezeBtn('mapPoints', p),
             actBtn('edit', 'עריכה', function () { openForm(panel, MAP_FIELDS, p, function (out) { WStore.update('mapPoints', p.id, out); refreshAll(); }); }),
             actBtn('del', 'מחיקה', function () { WStore.remove('mapPoints', p.id); refreshAll(); })
           ]))
@@ -1158,14 +1177,29 @@
     ]);
   }
   // One notice at a time: a second failed save replaces the first rather than stacking.
-  function notify(lead, rest) {
+  // It sits at the top of the content, so a notice answering something the editor just
+  // did is scrolled into view: one that appears off-screen reads as nothing happening.
+  function notify(lead, rest, kind, show) {
     var main = document.querySelector('.content') || document.body;
     var old = document.getElementById('adminNotice');
     if (old) old.remove();
-    main.insertBefore(el('div', { id: 'adminNotice', class: 'notice crit', role: 'alert', style: 'margin:0 0 18px' }, [
+    main.insertBefore(el('div', { id: 'adminNotice', 'data-kind': kind, class: 'notice crit', role: 'alert', style: 'margin:0 0 18px' }, [
       el('span', {}, [el('b', { text: lead + ' ' }), rest])
     ]), main.firstChild);
+    if (show) { var m = document.querySelector('.main'); if (m) m.scrollIntoView({ block: 'start' }); }
   }
+  // Writes are optimistic: the screen changes first and is put back if the server
+  // refuses. Signed out, every write is refused, so the editor saw a delete or a
+  // freeze take effect and then undo itself a moment later. Refusing up front, before
+  // the screen changes, says what is wrong at the moment it matters.
+  function canWrite() { return WStore.isSignedIn() || WStore.hasAdminKey(); }
+  function needSignIn() {
+    notify('השינוי לא נשמר:', el('span', {}, [document.createTextNode('אינכם מחוברים למערכת הניהול. '), signInHelp()]), 'signin', true);
+  }
+  ['add', 'update', 'remove'].forEach(function (m) {
+    var write = WStore[m];
+    WStore[m] = function () { if (!canWrite()) { needSignIn(); return null; } return write.apply(WStore, arguments); };
+  });
   function fail(err, saving) {
     // Log it: a silent notice tells the operator something broke but not what,
     // and this is the only place a boot or save failure surfaces.
@@ -1173,7 +1207,10 @@
     var denied = err && err.status === 401;
     notify(saving ? 'השינוי לא נשמר.' : 'לא ניתן לטעון את התוכן מהמאגר.', denied
       ? el('span', {}, [document.createTextNode('אינכם מחוברים למערכת הניהול, או שההתחברות פגה. '), signInHelp()])
-      : document.createTextNode(saving ? 'השרת לא אישר את השינוי. נסו שוב בעוד רגע.' : 'בדקו את החיבור לאינטרנט ונסו לרענן.'));
+      : document.createTextNode(saving ? 'השרת לא אישר את השינוי. נסו שוב בעוד רגע.' : 'בדקו את החיבור לאינטרנט ונסו לרענן.'),
+      'fail', saving);
+    // A refused save has also dropped a session the server no longer accepts.
+    if (denied) showUser();
   }
 
   WStore.ready.then(boot).catch(function (err) { fail(err, false); });
@@ -1187,7 +1224,7 @@
   });
 
   /* מי מחובר + יציאה */
-  (function showUser() {
+  function showUser() {
     var u = WStore.currentUser();
     var who = document.querySelector('.user .who b');
     var role = document.querySelector('.user .who span');
@@ -1196,24 +1233,35 @@
       if (role) role.textContent = ROLE_NAMES[u.role] || u.role;
       var av = document.querySelector('.user .avatar');
       if (av) av.textContent = (u.name || '?').trim().charAt(0);
-    } else {
+    }
+    if (canWrite()) {
+      var ro = document.querySelector('#adminNotice[data-kind="readonly"]');
+      if (ro) ro.remove();
+    }
+    if (!u) {
       // A management key is a full login with no personal account behind it.
       var keyed = WStore.hasAdminKey();
       if (who) who.textContent = keyed ? 'מפתח ניהול' : 'לא מחובר';
       if (role) role.textContent = keyed ? 'מנהל־על' : 'צפייה בלבד';
       // Say so before the first edit, not after it bounces.
-      if (!keyed) notify('מצב צפייה בלבד:', el('span', {}, [document.createTextNode('אינכם מחוברים, ולכן שינויים לא יישמרו. '), signInHelp()]));
-    }
-    var out = document.querySelector('.topbar .icon-btn[title], .topbar a.icon-btn');
-    document.querySelectorAll('.topbar .icon-btn').forEach(function (b) {
-      if (/יציאה|logout/i.test(b.getAttribute('title') || b.getAttribute('aria-label') || '')) {
-        b.addEventListener('click', function (e) {
-          e.preventDefault();
-          WStore.logout().then(function () { location.href = './'; });
-        });
+      if (!keyed && !document.querySelector('#adminNotice[data-kind="signin"], #adminNotice[data-kind="fail"]')) {
+        notify('מצב צפייה בלבד:', el('span', {}, [document.createTextNode('אינכם מחוברים, ולכן שינויים לא יישמרו. '), signInHelp()]), 'readonly');
       }
-    });
-  })();
+    }
+  }
+  showUser();
+  // A stored session can outlive the server's copy of it (expired, or signed out
+  // elsewhere). Asking the server now drops a dead one (store.js does that on 401),
+  // so the page says "signed out" on arrival instead of after the first refused edit.
+  if (WStore.isSignedIn()) WStore.me().catch(function () { showUser(); });
+  document.querySelectorAll('.topbar .icon-btn').forEach(function (b) {
+    if (/יציאה|logout/i.test(b.getAttribute('title') || b.getAttribute('aria-label') || '')) {
+      b.addEventListener('click', function (e) {
+        e.preventDefault();
+        WStore.logout().then(function () { location.href = './'; });
+      });
+    }
+  });
 
   /* מפתח הניהול — נשמר בדפדפן בלבד, לא בקוד (המאגר ציבורי ב-GitHub). */
   (function wireAdminKey() {
@@ -1227,6 +1275,7 @@
       WStore.setAdminKey(v).then(function () {
         input.value = ''; input.placeholder = '•••••••• (מפתח שמור)';
         if (msg) msg.textContent = 'המפתח נשמר — התוכן נטען מחדש';
+        showUser();
         refreshAll();
       }).catch(function () {
         WStore.setAdminKey('');
@@ -1236,7 +1285,7 @@
     if (clear) clear.addEventListener('click', function () {
       WStore.setAdminKey('').then(function () {
         input.value = ''; input.placeholder = 'הדביקו כאן את המפתח';
-        if (msg) msg.textContent = 'המפתח נמחק מהדפדפן'; refreshAll();
+        if (msg) msg.textContent = 'המפתח נמחק מהדפדפן'; showUser(); refreshAll();
       });
     });
   })();

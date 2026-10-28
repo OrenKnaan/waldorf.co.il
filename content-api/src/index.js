@@ -250,35 +250,38 @@ async function whoami(request, env) {
   return null;
 }
 
+// 'frozen' is on every collection the site renders: the admin's freeze toggle
+// hides an item from visitors without deleting it (migration 0015). It is never
+// in publicStatus, so the public read withholds it like a draft.
 const COLLECTIONS = {
-  events:   { table: 'events',     order: 'date DESC',      statuses: ['draft', 'published'], publicStatus: ['published'],
+  events:   { table: 'events',     order: 'date DESC',      statuses: ['draft', 'published', 'frozen'], publicStatus: ['published'],
               fields: { title: 'title', date: 'date', time: 'time', location: 'location', description: 'description', registerUrl: 'register_url', status: 'status', demo: 'demo' } },
   // News is moderated like the boards, not drafted like events: the seed and the
   // admin's own status dropdown both use pending/approved. Filtering it on
   // 'published' returned zero rows and would have emptied the homepage feed.
-  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved'], publicStatus: ['approved'],
+  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'],
               fields: { title: 'title', date: 'date', section: 'section', summary: 'summary', link: 'link', status: 'status', demo: 'demo' } },
-  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved'], publicStatus: ['approved'], publicSubmit: true,
+  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'], publicSubmit: true,
               fields: { title: 'title', category: 'category', description: 'description', region: 'region', contact: 'contact', date: 'date', status: 'status', demo: 'demo' } },
-  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved'], publicStatus: ['approved'], publicSubmit: true,
+  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'], publicSubmit: true,
               fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', description: 'description', date: 'date', status: 'status', demo: 'demo' } },
-  library:  { table: 'library',    order: 'position ASC',
-              fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', purchaseUrl: 'purchase_url', author: 'author', date: 'date', demo: 'demo' } },
-  teaching: { table: 'teaching',   order: 'position ASC',
-              fields: { title: 'title', group: 'grp', url: 'url', demo: 'demo' } },
-  forms:    { table: 'forms',      order: 'position ASC',
-              fields: { title: 'title', category: 'category', description: 'description', url: 'url', demo: 'demo' } },
-  mapPoints:{ table: 'map_points', order: 'position ASC',
-              fields: { name: 'name', town: 'town', count: 'count', lat: 'lat', lng: 'lng', url: 'url', demo: 'demo' } },
-  institutions: { table: 'institutions', order: 'position ASC, name ASC', statuses: ['pending', 'active', 'inactive'], publicStatus: ['active'],
+  library:  { table: 'library',    order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+              fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', purchaseUrl: 'purchase_url', author: 'author', date: 'date', status: 'status', demo: 'demo' } },
+  teaching: { table: 'teaching',   order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+              fields: { title: 'title', group: 'grp', url: 'url', status: 'status', demo: 'demo' } },
+  forms:    { table: 'forms',      order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+              fields: { title: 'title', category: 'category', description: 'description', url: 'url', status: 'status', demo: 'demo' } },
+  mapPoints:{ table: 'map_points', order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+              fields: { name: 'name', town: 'town', count: 'count', lat: 'lat', lng: 'lng', url: 'url', status: 'status', demo: 'demo' } },
+  institutions: { table: 'institutions', order: 'position ASC, name ASC', statuses: ['pending', 'active', 'inactive', 'frozen'], publicStatus: ['active'],
               fields: { name: 'name', town: 'town', stage: 'stage', status: 'status', url: 'url', contact: 'contact', description: 'description', demo: 'demo' } },
-  videos:   { table: 'videos',     order: 'position ASC',
-              fields: { title: 'title', youtubeId: 'youtube_id', description: 'description', demo: 'demo' } },
-  podcast:  { table: 'podcast',    order: 'num DESC',
+  videos:   { table: 'videos',     order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+              fields: { title: 'title', youtubeId: 'youtube_id', description: 'description', status: 'status', demo: 'demo' } },
+  podcast:  { table: 'podcast',    order: 'num DESC',          statuses: ['published', 'frozen'], publicStatus: ['published'],
               // spotifyId holds a bare episode id, like videos.youtubeId. `url` stays
               // exposed so the three legacy columns remain readable, but the admin no
               // longer offers it - see migration 0010.
-              fields: { title: 'title', num: 'num', date: 'date', duration: 'duration', description: 'description', spotifyId: 'spotify_id', url: 'url', demo: 'demo' } },
+              fields: { title: 'title', num: 'num', date: 'date', duration: 'duration', description: 'description', spotifyId: 'spotify_id', url: 'url', status: 'status', demo: 'demo' } },
 };
 
 const SINGLETONS = ['about'];

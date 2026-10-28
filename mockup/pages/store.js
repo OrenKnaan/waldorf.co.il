@@ -33,8 +33,15 @@
 
   function adminKey() { try { return localStorage.getItem(KEY_ADMIN) || ''; } catch (e) { return ''; } }
   function session() { return readLS(KEY_SESS); }
+  // Credentials go only from the admin. The site shares its origin, and so its
+  // localStorage, with the admin, so a signed-in editor's session used to ride
+  // along on every public page too: the server answered with drafts, pending
+  // posts and frozen items, and the editor checking a change on the site saw a
+  // page no visitor sees. Public pages now always read as a visitor.
+  var ADMIN_PAGE = /\/admin\//.test(location.pathname);
   function headers(extra) {
     var h = extra || {};
+    if (!ADMIN_PAGE) return h;
     var s = session();
     if (s && s.token) h['authorization'] = 'Bearer ' + s.token;
     var k = adminKey();
@@ -85,6 +92,8 @@
     /* ---- login ---- */
     currentUser: function () { var s = session(); return s ? s.user : null; },
     isSignedIn: function () { return Boolean(session()); },
+    // Who the server says this browser is. A 401 here also drops a dead session (req).
+    me: function () { return req('/api/auth/me'); },
     login: function (email, password) {
       return req('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: email, password: password }) })
         .then(function (r) {
