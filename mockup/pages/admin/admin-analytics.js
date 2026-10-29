@@ -17,6 +17,15 @@
   // once and remembered locally rather than committed to a public repo.
   var DEFAULT_WORKER_URL = 'https://waldorf-analytics.orenknaan.workers.dev';
   var TIP_KEY = 'waldorf-analytics-tips-v1';
+  // The range last picked, so the view reopens on it. 30 days by default: on a
+  // site this quiet a week holds a few dozen views, mostly our own testing, and
+  // read as if countries and devices were missing from the report.
+  var RANGE_KEY = 'waldorf-analytics-days-v1';
+  var DEFAULT_DAYS = 30;
+  function savedDays() {
+    var d = Number(localStorage.getItem(RANGE_KEY));
+    return [1, 7, 30, 90].indexOf(d) !== -1 ? d : DEFAULT_DAYS;
+  }
 
   /* ---------- שמות דפים בעברית במקום כתובות ---------- */
   var PAGE_NAMES = {
@@ -324,7 +333,7 @@
         if (o[0] === days) op.setAttribute('selected', 'selected');
         rangeSel.appendChild(op);
       });
-    rangeSel.addEventListener('change', function () { reload(Number(rangeSel.value)); });
+    rangeSel.addEventListener('change', function () { localStorage.setItem(RANGE_KEY, rangeSel.value); reload(Number(rangeSel.value)); });
 
     var tipBtn = el('button', {
       type: 'button', class: 'btn btn-ghost btn-sm an-tips-toggle',
@@ -348,7 +357,10 @@
 
     mount.appendChild(el('p', { class: 'an-updated', text:
       'הנתונים מ-' + data.range.from + ' עד ' + data.range.to +
-      ' · עודכן ב-' + new Date(data.generatedAt).toLocaleString('he-IL') }));
+      ' · עודכן ב-' + new Date(data.generatedAt).toLocaleString('he-IL') +
+      // Cloudflare keeps every event for 7 days and a sample after that, so a
+      // longer range comes back in round tens. Said, so it does not read as a bug.
+      (days > 7 ? ' · בטווח של יותר מ-7 ימים Cloudflare מחזירה נתוני מדגם, ולכן המספרים מעוגלים לעשרות.' : '') }));
 
     // מדדים ראשיים
     mount.appendChild(el('div', { class: 'an-kpis' }, [
@@ -436,19 +448,19 @@
         render(mount, data, days, go);
       }).catch(function (e) {
         mount.textContent = '';
-        if (e.kind === 'unconfigured') { setupScreen(mount, function () { go(7); }); return; }
+        if (e.kind === 'unconfigured') { setupScreen(mount, function () { go(savedDays()); }); return; }
         mount.appendChild(panel('לא ניתן להציג נתונים כרגע', 'מה השתבש והיכן לתקן.',
           el('div', {}, [
             el('p', { class: 'an-empty', text: describeError(e) }),
             (function () {
               var b = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'שינוי הגדרות החיבור' });
-              b.addEventListener('click', function () { mount.textContent = ''; setupScreen(mount, function () { go(7); }); });
+              b.addEventListener('click', function () { mount.textContent = ''; setupScreen(mount, function () { go(savedDays()); }); });
               return b;
             })()
           ])));
       });
     }
-    go(7);
+    go(savedDays());
   }
 
   window.WAnalytics = { render: renderAnalytics };
