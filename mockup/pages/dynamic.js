@@ -43,6 +43,16 @@
     '.dyn-toolbar input[type=search]{flex:1;min-width:170px}',
     '.dyn-toolbar input[type=search]:focus,.dyn-toolbar select:focus{outline:none;border-color:var(--tan)}',
     '.dyn-empty{background:var(--beige);border-radius:var(--radius-lg);padding:22px;text-align:center;color:var(--text-muted);font-size:.92rem}',
+    /* While the content store loads (see loading()). It fades in after a beat, so
+       a fast load shows nothing rather than a flash. Without motion, by the
+       visitor's system setting or the site's own "stop animations" switch, it
+       is a still ring beside the word. */
+    '.dyn-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:22px;color:var(--text-muted);font-size:.92rem;animation:dyn-appear .2s .15s both}',
+    '.dyn-spinner{flex:none;width:20px;height:20px;border-radius:50%;border:3px solid var(--beige);border-top-color:var(--brown);animation:dyn-spin .8s linear infinite}',
+    '@keyframes dyn-spin{to{transform:rotate(360deg)}}',
+    '@keyframes dyn-appear{from{opacity:0}to{opacity:1}}',
+    '@media (prefers-reduced-motion:reduce){.dyn-loading{animation:none}.dyn-spinner{animation:none;border-top-color:var(--tan)}}',
+    'html.a11y-stopanim .dyn-spinner{border-top-color:var(--tan)}',
     '.dyn-item{background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-lg);padding:14px 18px;margin:0 0 12px;box-shadow:var(--shadow)}',
     '.dyn-item h3{margin:0 0 4px;font-family:var(--font-head);font-size:1.05rem;color:var(--brown-dark)}',
     '.dyn-item p{margin:4px 0;font-size:.9rem}',
@@ -509,17 +519,37 @@
   }
 
   window.WStore = WStore;
+  /* A spinner in an empty mount until the content store has loaded. Every
+     renderer empties its mount before drawing, so drawing is what takes it
+     away. A mount that already holds something (static text the data replaces)
+     keeps it. aria-busy rather than a live region: a page with five lists
+     loading would otherwise announce "טוען" five times. */
+  function loading(mount) {
+    if (!(mount instanceof HTMLElement) || mount.children.length || WStore.isLoaded()) return;
+    injectCSS();
+    mount.setAttribute('aria-busy', 'true');
+    mount.appendChild(el('div', { class: 'dyn-loading' }, [
+      el('span', { class: 'dyn-spinner', 'aria-hidden': 'true' }),
+      document.createTextNode('טוען…')
+    ]));
+  }
+  function loaded(mount) { if (mount instanceof HTMLElement) mount.removeAttribute('aria-busy'); }
+
   /* Every renderer mounts into an element and returns nothing, so deferring one
      is invisible to the caller: the 43 pages calling WDyn.renderX(mount, ...)
-     inline did not have to change. On failure the mount says so in Hebrew
+     inline did not have to change. Each element argument gets a spinner while
+     it waits (renderEvents takes two). On failure the mount says so in Hebrew
      rather than staying mysteriously empty. */
   function deferred(fn) {
     return function () {
       var args = arguments, self = this;
       var mount = args[0] instanceof HTMLElement ? args[0] : null;
+      var mounts = Array.prototype.filter.call(args, function (a) { return a instanceof HTMLElement; });
+      mounts.forEach(loading);
       return WStore.ready.then(function () {
         return fn.apply(self, args);
-      }).catch(function (err) {
+      }).then(function (r) { mounts.forEach(loaded); return r; }).catch(function (err) {
+        mounts.forEach(function (m) { loaded(m); if (m !== mount) m.textContent = ''; });
         if (mount) {
           mount.textContent = '';
           mount.appendChild(el('div', { class: 'dyn-empty',
@@ -532,6 +562,8 @@
 
   window.WDyn = {
     injectCSS: injectCSS,
+    loading: loading,
+    loaded: loaded,
     renderEvents: deferred(renderEvents),
     renderNews: deferred(renderNews),
     boardWidget: deferred(boardWidget),

@@ -122,11 +122,26 @@ query Dash($account: String!, $site: String!, $start: Time!, $end: Time!, $start
   }
 }`;
 
+// Our own visits from before the team's browsers were marked #notrack (see
+// mockup/patch-analytics.mjs): the owner's Mac and iPhone, which show as
+// Indonesia, and our test browsers, which showed as the United States.
+// Cloudflare cannot delete single events, so they are left out of every figure
+// instead. Only up to the cutoff: a real visitor from either place afterwards
+// is counted like anyone else.
+const OWN_TRAFFIC_UNTIL = '2026-10-31T00:00:00Z';
+const NOT_OURS = `AND: [
+  { OR: [{ countryName_neq: "ID" }, { userAgentOS_notin: ["MacOSX", "iOS"] }, { datetime_geq: "${OWN_TRAFFIC_UNTIL}" }] },
+  { OR: [{ countryName_neq: "US" }, { datetime_geq: "${OWN_TRAFFIC_UNTIL}" }] }
+]`;
+
 // Narrowed to one country: every group gains the filter, and the variable is
 // declared only then, since GraphQL refuses a declared variable left unused.
-const queryFor = (country) => country
-  ? QUERY.replace('$endDate: Date!)', '$endDate: Date!, $country: string!)').replace(/bot: 0 \}/g, 'bot: 0, countryName: $country }')
-  : QUERY;
+const queryFor = (country) => {
+  const q = QUERY.replace(/bot: 0 \}/g, `bot: 0, ${NOT_OURS} }`);
+  return country
+    ? q.replace('$endDate: Date!)', '$endDate: Date!, $country: string!)').replace(/bot: 0, /g, 'bot: 0, countryName: $country, ')
+    : q;
+};
 
 /** Collapses a grouped result into [{name, views, visits}], newest concerns first. */
 const rows = (list, key) =>

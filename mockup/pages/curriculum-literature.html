@@ -715,9 +715,32 @@
 <script src="./tabs.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>
-<!-- Cloudflare Web Analytics -->
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"e4ea3335f4ae4f55bacc328eb40c12c9"}'></script>
-<!-- End Cloudflare Web Analytics -->
 <script src="./art-hero-slideshow.js" defer></script>
+<!-- Cloudflare Web Analytics -->
+<script>
+(function () {
+  var KEY = 'waldorf-notrack';
+  try {
+    var h = location.hash + location.search, note = '';
+    if (/[#?&]notrack\b/.test(h)) { localStorage.setItem(KEY, '1'); note = 'הדפדפן הזה סומן: הביקורים בו לא ייספרו בניתוח התנועה.'; }
+    else if (/[#?&]track\b/.test(h)) { localStorage.removeItem(KEY); note = 'הסימון הוסר: הביקורים בדפדפן הזה ייספרו שוב.'; }
+    if (note) {
+      var n = document.createElement('p');
+      n.setAttribute('role', 'status');
+      n.textContent = note;
+      n.style.cssText = 'position:fixed;inset-block-end:16px;inset-inline:16px;margin:0 auto;max-width:28rem;padding:10px 16px;border-radius:12px;background:#3D2B1F;color:#FBF6EE;font-size:.9rem;text-align:center;z-index:9999';
+      document.body.appendChild(n);
+      setTimeout(function () { n.remove(); }, 6000);
+    }
+    if (localStorage.getItem(KEY)) return;
+  } catch (e) {}
+  var s = document.createElement('script');
+  s.defer = true;
+  s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  s.setAttribute('data-cf-beacon', '{"token":"e4ea3335f4ae4f55bacc328eb40c12c9"}');
+  document.body.appendChild(s);
+})();
+</script>
+<!-- End Cloudflare Web Analytics -->
 </body>
 </html>

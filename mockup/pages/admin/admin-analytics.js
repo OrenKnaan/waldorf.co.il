@@ -414,7 +414,30 @@
         el('li', { text: 'לחיצות על כפתורים וקישורים — Cloudflare Web Analytics מודד פתיחת דפים בלבד.' }),
         el('li', { text: 'זהות הגולשים — לא נאספים שמות, כתובות IP או עוגיות. אי אפשר לדעת מי ביקר.' }),
         el('li', { text: 'גולשים עם חוסם פרסומות — חלקם לא נספרים, כמו בכל מערכת מדידה מבוססת דפדפן.' }),
-        el('li', { text: 'הנתונים מתעדכנים בהשהיה קצרה — ביקור שקרה ממש עכשיו עשוי להופיע רק בעוד כמה דקות.' })
+        el('li', { text: 'הנתונים מתעדכנים בהשהיה קצרה — ביקור שקרה ממש עכשיו עשוי להופיע רק בעוד כמה דקות.' }),
+        el('li', { text: 'מספר האנשים השונים (גולשים ייחודיים): הכלי לא שומר שום מזהה של גולש, ולכן הוא סופר צפיות וביקורים, לא אנשים.' })
+      ])));
+
+    // The team's own browsers are marked once each and then never counted
+    // (the loader patch-analytics.mjs puts on every page reads the mark). The
+    // mark lives in the site's storage, on the device, so it is set by opening
+    // the site there, not from here.
+    var site = window.WAdminConfig ? window.WAdminConfig.site : '..';
+    var mark = new URL(site + '/home.html#notrack', location.href).href;
+    var unmark = new URL(site + '/home.html#track', location.href).href;
+    var markField = el('input', { type: 'text', readonly: 'readonly', value: mark, 'aria-label': 'קישור הסימון', dir: 'ltr', class: 'an-mark-url' });
+    markField.addEventListener('focus', function () { markField.select(); });
+    mount.appendChild(panel('הביקורים שלנו',
+      'כדי שהנתונים ישקפו גולשים אמיתיים ולא את מי שבונה ובודק את האתר.',
+      el('div', { class: 'an-mark' }, [
+        el('p', { text: 'ביקורים מדפדפן מסומן לא נספרים. פתחו את הקישור פעם אחת בכל מכשיר ובכל דפדפן שאתם גולשים בו לאתר, גם בטלפון: אפשר להעתיק אותו ולשלוח לעצמכם. בפתיחה מופיעה הודעה קצרה שהסימון נקלט.' }),
+        markField,
+        el('p', {}, [
+          el('a', { href: mark, target: '_blank', rel: 'noopener', text: 'סימון הדפדפן הזה' }),
+          document.createTextNode(' · '),
+          el('a', { href: unmark, target: '_blank', rel: 'noopener', text: 'ביטול הסימון' })
+        ]),
+        el('p', { class: 'an-note', text: 'ביקורי הצוות מלפני 31.10.2026 (המחשב והאייפון שנראו באינדונזיה, ודפדפני הבדיקה שנראו בארצות הברית) כבר הוסרו מכל הנתונים במסך הזה.' })
       ])));
 
     applyTipVisibility(mount);

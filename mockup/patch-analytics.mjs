@@ -24,12 +24,35 @@ const END = '<!-- End Cloudflare Web Analytics -->';
 // never converged and every run showed up as a diff.
 const BLOCK_RE = /\n*<!-- Cloudflare Web Analytics -->[\s\S]*?<!-- End Cloudflare Web Analytics -->\n*/;
 
-const snippet = BEACON_TOKEN
-  // Byte-for-byte the snippet Cloudflare hands out in the dashboard, token
-  // substituted. type="module" (not defer) is what they currently issue.
-  ? `${START}\n<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" ` +
-    `data-cf-beacon='${JSON.stringify({ token: BEACON_TOKEN })}'></script>\n${END}`
-  : '';
+// The forum's own visits are not counted. A browser opened once at any page
+// with #notrack is remembered as one of ours (localStorage, this site only) and
+// never loads the beacon; #track undoes it. The admin's analytics view links to
+// it. So the beacon is no longer Cloudflare's static tag but this loader, which
+// adds the same script with the same token when the browser is not marked.
+// The note it shows on marking is the only sign a team member gets that it took.
+const LOADER = `(function () {
+  var KEY = 'waldorf-notrack';
+  try {
+    var h = location.hash + location.search, note = '';
+    if (/[#?&]notrack\\b/.test(h)) { localStorage.setItem(KEY, '1'); note = 'הדפדפן הזה סומן: הביקורים בו לא ייספרו בניתוח התנועה.'; }
+    else if (/[#?&]track\\b/.test(h)) { localStorage.removeItem(KEY); note = 'הסימון הוסר: הביקורים בדפדפן הזה ייספרו שוב.'; }
+    if (note) {
+      var n = document.createElement('p');
+      n.setAttribute('role', 'status');
+      n.textContent = note;
+      n.style.cssText = 'position:fixed;inset-block-end:16px;inset-inline:16px;margin:0 auto;max-width:28rem;padding:10px 16px;border-radius:12px;background:#3D2B1F;color:#FBF6EE;font-size:.9rem;text-align:center;z-index:9999';
+      document.body.appendChild(n);
+      setTimeout(function () { n.remove(); }, 6000);
+    }
+    if (localStorage.getItem(KEY)) return;
+  } catch (e) {}
+  var s = document.createElement('script');
+  s.defer = true;
+  s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  s.setAttribute('data-cf-beacon', '${JSON.stringify({ token: BEACON_TOKEN })}');
+  document.body.appendChild(s);
+})();`;
+const snippet = BEACON_TOKEN ? `${START}\n<script>\n${LOADER}\n</script>\n${END}` : '';
 
 let added = 0, removed = 0, unchanged = 0;
 

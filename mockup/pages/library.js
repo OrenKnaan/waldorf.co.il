@@ -55,6 +55,12 @@
     '.lib-body{max-width:68ch;margin-inline:auto;padding:26px 30px;background:var(--white);border:1px solid var(--tan-dark);border-radius:var(--radius-lg);box-shadow:var(--shadow)}',
     '.lib-body h2{font-size:1.35rem;margin:26px 0 10px}',
     '.lib-loading{max-width:68ch;margin:40px auto;text-align:center;color:var(--brown)}',
+    /* The shell's "loading" line carries a spinner until it says something
+       else (unavailable, or failed), when loadItem marks it .done. */
+    '.lib-loading:not(.done)::before{content:"";display:inline-block;vertical-align:middle;width:18px;height:18px;margin-inline-end:10px;border-radius:50%;border:3px solid var(--beige);border-top-color:var(--brown);animation:lib-spin .8s linear infinite}',
+    '@keyframes lib-spin{to{transform:rotate(360deg)}}',
+    '@media (prefers-reduced-motion:reduce){.lib-loading::before{animation:none!important;border-top-color:var(--tan)!important}}',
+    'html.a11y-stopanim .lib-loading::before{border-top-color:var(--tan)!important}',
     '.lib-preview-note{max-width:72ch;margin:0 auto 14px;padding:9px 14px;border-radius:var(--radius-lg);background:color-mix(in oklab,var(--wash-gold) 30%,var(--white));color:var(--brown-dark);font-size:.86rem;text-align:center}',
     '.lib-body h3{font-size:1.1rem;margin:22px 0 8px;font-family:var(--font-head);color:var(--brown)}',
     '.lib-body h4,.lib-body h5,.lib-body h6{font-size:1rem;margin:18px 0 6px;font-family:var(--font-head);color:var(--brown)}',
@@ -718,6 +724,7 @@
           if (target) target.scrollIntoView();
         } else {
           var msg = main.querySelector('.lib-loading');
+          msg.classList.add('done');
           msg.textContent = data === false
             ? 'לא ניתן לטעון את הפריט כרגע. בדקו את החיבור ונסו לרענן את העמוד.'
             : 'הפריט אינו זמין: הוא הוסר מהאתר, או שהקישור שגוי. ';
@@ -745,7 +752,12 @@
 
   var mounts = document.querySelectorAll('[data-lib-archive]');
   if (!mounts.length || !window.WStore) return;
+  // The same spinner the dynamic.js lists show while the store loads.
+  if (window.WDyn) Array.prototype.forEach.call(mounts, window.WDyn.loading);
   window.WStore.ready.then(function () {
-    Array.prototype.forEach.call(mounts, initArchive);
+    Array.prototype.forEach.call(mounts, function (m) {
+      initArchive(m);
+      if (window.WDyn) window.WDyn.loaded(m);
+    });
   });
 })();
