@@ -6,9 +6,10 @@
  *   admin   (X-Admin-Key)  everything, including drafts and pending submissions.
  *
  * Write rules:
- *   Anyone may POST to `board` and `jobs` — that is the public noticeboard
- *   submission on the live pages, and it is forced to status 'pending' no
- *   matter what the caller sends. Everything else needs the admin key.
+ *   Anyone may POST to `news`, `board` and `jobs`: those are the public
+ *   submission forms on the live pages, and a post is forced to status
+ *   'pending' no matter what the caller sends. Everything else needs a
+ *   signed-in user or the admin key.
  *
  * Columns are snake_case in SQLite and camelCase over the wire, because the
  * renderers and the admin were written against the old JS object shape and
@@ -136,6 +137,62 @@ async function sendSetupLink(env, email, token, kind, origin) {
   }
 }
 
+/* ---------------- rejection notices ---------------- */
+// What a submitter is told when a moderator turns their post down with an
+// explanation. The fixed paragraph always goes; the moderator's own words, when
+// there are any, come after it. Built here rather than in the admin so the text
+// a moderator sees in the mailto fallback is the text the mail would carry.
+const REJECT_DEFAULT =
+  'בדקנו את הפרסום ששלחתם, וכרגע הוא אינו מתאים ללוח שלנו. אם נראה לכם שנפלה טעות, אפשר להשיב למייל הזה.';
+// Written with the preposition: "ב" + "הלוח" is "בלוח", not "בהלוח".
+const BOARD_IN = { news: 'בלוח ההודעות', board: 'בלוח הקהילתי', jobs: 'בלוח המשרות' };
+
+function rejectNotice(collection, title, message) {
+  const extra = String(message || '').trim();
+  const subject = `לגבי הפרסום "${title}" ${BOARD_IN[collection]} של הפורום הארצי לחינוך ולדורף`;
+  const text = 'שלום,\n\n' + REJECT_DEFAULT + (extra ? '\n\n' + extra : '') +
+    '\n\nבברכה,\nצוות הפורום הארצי לחינוך ולדורף';
+  return { subject, text };
+}
+
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/** Sends the notice through Resend. False when no provider is set or it fails;
+ *  the admin then offers the same text through the moderator's own mail app. */
+async function sendRejectNotice(env, to, notice) {
+  if (!env.RESEND_API_KEY || !env.MAIL_FROM) return false;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: env.MAIL_FROM,
+        to: [to],
+        // "Reply to this mail" has to reach a person: REPLY_TO is the forum's
+        // inbox, and MAIL_FROM is usually a no-reply sender.
+        reply_to: env.REPLY_TO || undefined,
+        subject: notice.subject,
+        text: notice.text,
+        html: `<div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;color:#3D2B1F">` +
+          notice.text.split('\n\n').map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`).join('') + `</div>`,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// The address a notice goes to: the one the form collected for it, or failing
+// that an address the submitter wrote into the public contact line. Older posts
+// predate the separate field and only have the second.
+function submitterAddress(row) {
+  const own = String(row.submitter_email || '').trim();
+  if (isEmail(own)) return own;
+  const m = String(row.contact || '').match(/[^\s@,;:<>()]+@[^\s@,;:<>()]+\.[^\s@,;:<>()]{2,}/);
+  return m ? m[0] : null;
+}
+
 /** The row behind a token, or null if it is unknown, spent or expired. */
 async function readSetupToken(env, token) {
   if (!token) return null;
@@ -253,23 +310,37 @@ async function whoami(request, env) {
 // 'frozen' is on every collection the site renders: the admin's freeze toggle
 // hides an item from visitors without deleting it (migration 0015). It is never
 // in publicStatus, so the public read withholds it like a draft.
+//
+// 'archived' and 'rejected' are the archive (migration 0016): removed by an
+// editor, or turned down by a moderator. Withheld the same way, and deleted for
+// good only from the archive.
+//
+// `moderated` marks the three public boards: they take a reject with an optional
+// notice to the submitter, and their per-user read marks. `private` fields are
+// stripped from every non-admin read: the submitter's address is collected to
+// answer them, not to publish.
 const COLLECTIONS = {
   events:   { table: 'events',     order: 'date DESC',      statuses: ['draft', 'published', 'frozen'], publicStatus: ['published'],
               fields: { title: 'title', date: 'date', time: 'time', location: 'location', description: 'description', registerUrl: 'register_url', status: 'status', demo: 'demo' } },
   // News is moderated like the boards, not drafted like events: the seed and the
   // admin's own status dropdown both use pending/approved. Filtering it on
   // 'published' returned zero rows and would have emptied the homepage feed.
-  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'],
-              fields: { title: 'title', date: 'date', section: 'section', summary: 'summary', link: 'link', status: 'status', demo: 'demo' } },
-  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'], publicSubmit: true,
-              fields: { title: 'title', category: 'category', description: 'description', region: 'region', contact: 'contact', date: 'date', status: 'status', demo: 'demo' } },
-  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen'], publicStatus: ['approved'], publicSubmit: true,
-              fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', description: 'description', date: 'date', status: 'status', demo: 'demo' } },
-  library:  { table: 'library',    order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+  // news.html invites anyone to post, so it takes public submissions like the
+  // boards; without publicSubmit every visitor's post was refused with a 401.
+  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+              private: ['submitterEmail', 'rejectNote'],
+              fields: { title: 'title', date: 'date', section: 'section', summary: 'summary', link: 'link', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', status: 'status', demo: 'demo' } },
+  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+              private: ['submitterEmail', 'rejectNote'],
+              fields: { title: 'title', category: 'category', description: 'description', region: 'region', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', date: 'date', status: 'status', demo: 'demo' } },
+  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+              private: ['submitterEmail', 'rejectNote'],
+              fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', description: 'description', date: 'date', status: 'status', demo: 'demo' } },
+  library:  { table: 'library',    order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
               fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', purchaseUrl: 'purchase_url', author: 'author', date: 'date', status: 'status', demo: 'demo' } },
-  teaching: { table: 'teaching',   order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+  teaching: { table: 'teaching',   order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
               fields: { title: 'title', group: 'grp', url: 'url', status: 'status', demo: 'demo' } },
-  forms:    { table: 'forms',      order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+  forms:    { table: 'forms',      order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
               fields: { title: 'title', category: 'category', description: 'description', url: 'url', status: 'status', demo: 'demo' } },
   mapPoints:{ table: 'map_points', order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
               fields: { name: 'name', town: 'town', count: 'count', lat: 'lat', lng: 'lng', url: 'url', status: 'status', demo: 'demo' } },
@@ -332,9 +403,10 @@ const newId = () => 'x' + Date.now().toString(36) + Math.random().toString(36).s
 
 /** DB row -> the camelCase object the renderers expect. Nulls are dropped so
  *  `if (item.link)` keeps behaving the way it did with the old seed objects. */
-function toApi(row, spec) {
+function toApi(row, spec, admin) {
   const out = { id: row.id };
   for (const [api, col] of Object.entries(spec.fields)) {
+    if (!admin && spec.private && spec.private.includes(api)) continue;
     let v = row[col];
     if (v === null || v === undefined) continue;
     if (api === 'demo') { if (v) out.demo = true; continue; }
@@ -355,7 +427,7 @@ async function listAll(env, admin) {
     }
     sql += ` ORDER BY ${spec.order}`;
     const { results } = await env.DB.prepare(sql).bind(...binds).all();
-    out[name] = results.map((r) => toApi(r, spec));
+    out[name] = results.map((r) => toApi(r, spec, admin));
   }
   for (const key of SINGLETONS) {
     const row = await env.DB.prepare('SELECT value FROM singletons WHERE key = ?').bind(key).first();
@@ -780,8 +852,12 @@ export default {
                ON CONFLICT(key) DO UPDATE SET draft_value=excluded.draft_value, updated_at=excluded.updated_at`,
         ).bind(...(publish ? [key, value] : [key, key, value])).run();
 
-        // Every save is a version, so nothing an editor typed is ever lost.
-        await env.DB.prepare(
+        // Every save is a version, so nothing an editor typed is ever lost. A save
+        // with every field empty is the exception: it holds nothing to restore,
+        // and publishing one is how the page goes back to its fixed text.
+        const doc = JSON.parse(value);
+        const empty = !doc || typeof doc !== 'object' || Object.values(doc).every((v) => !String(v == null ? '' : v).trim());
+        if (!empty) await env.DB.prepare(
           `INSERT INTO singleton_versions (key,value,status,note,author,created_at)
            VALUES (?,?,?,?,?,strftime('%s','now'))`,
         ).bind(key, value, publish ? 'published' : 'draft', note, user ? user.name : null).run();
@@ -810,6 +886,13 @@ export default {
       if (request.method === 'DELETE' && sub === 'draft') {
         await env.DB.prepare('UPDATE singletons SET draft_value = NULL WHERE key = ?').bind(key).run();
         return json({ ok: true }, 200, origin);
+      }
+      // DELETE /api/singleton/about/versions/:id : drop one history record. The
+      // published text is untouched; only the record of an earlier save goes.
+      if (request.method === 'DELETE' && sub === 'versions' && parts[4]) {
+        const res = await env.DB.prepare('DELETE FROM singleton_versions WHERE id = ? AND key = ?').bind(Number(parts[4]), key).run();
+        if (!res.meta.changes) return json({ error: 'version_not_found' }, 404, origin);
+        return json({ ok: true, id: Number(parts[4]) }, 200, origin);
       }
       return json({ error: 'method_not_allowed' }, 405, origin);
     }
@@ -846,6 +929,32 @@ export default {
       return json(merged.slice(0, 12), 200, origin);
     }
 
+    // ---- read marks: which moderated submissions the caller has opened ----
+    // GET  /api/reads                          -> { news: [id…], board: [...], jobs: [...] }
+    // POST /api/reads {collection, ids, read}  -> mark read (default) or unread
+    if (parts[0] === 'api' && parts[1] === 'reads') {
+      if (!user) return json({ error: 'unauthorized' }, 401, origin);
+      if (request.method === 'GET') {
+        const { results } = await env.DB.prepare('SELECT collection, item_id FROM item_reads WHERE user_id = ?').bind(user.id).all();
+        const out = {};
+        for (const [name, spec] of Object.entries(COLLECTIONS)) if (spec.moderated) out[name] = [];
+        results.forEach((r) => { if (out[r.collection]) out[r.collection].push(r.item_id); });
+        return json(out, 200, origin);
+      }
+      if (request.method === 'POST') {
+        const body = (await request.json().catch(() => ({}))) || {};
+        const spec = COLLECTIONS[body.collection];
+        const ids = Array.isArray(body.ids) ? body.ids.map(String).slice(0, 500) : [];
+        if (!spec || !spec.moderated || !ids.length) return json({ error: 'bad_body' }, 400, origin);
+        const stmt = body.read === false
+          ? env.DB.prepare('DELETE FROM item_reads WHERE user_id = ? AND collection = ? AND item_id = ?')
+          : env.DB.prepare(`INSERT OR IGNORE INTO item_reads (user_id,collection,item_id,read_at) VALUES (?,?,?,strftime('%s','now'))`);
+        await env.DB.batch(ids.map((i) => stmt.bind(user.id, body.collection, i)));
+        return json({ ok: true }, 200, origin);
+      }
+      return json({ error: 'method_not_allowed' }, 405, origin);
+    }
+
     if (parts[0] !== 'api' || parts[1] !== 'content') return json({ error: 'not_found' }, 404, origin);
 
     // ---- GET /api/content  (everything, one round trip) ----
@@ -858,6 +967,31 @@ export default {
     if (!spec) return json({ error: 'unknown_collection', name }, 404, origin);
     const id = parts[3];
 
+    // ---- POST /api/content/:collection/:id/reject {notify, message} ----
+    // Turns a submission down: it moves to the archive as 'rejected'. With
+    // notify, the submitter is sent the fixed notice plus the moderator's words.
+    // `mailed` says whether a provider actually sent it; when it did not, the
+    // reply carries the address and text so the admin can hand them to the
+    // moderator's own mail app instead of claiming a mail went out.
+    if (request.method === 'POST' && id && parts[4] === 'reject') {
+      if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      if (!spec.moderated) return json({ error: 'not_moderated' }, 400, origin);
+      const body = (await request.json().catch(() => ({}))) || {};
+      const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
+      if (!row) return json({ error: 'not_found', id }, 404, origin);
+      let notice = null;
+      if (body.notify) {
+        const to = submitterAddress(row);
+        if (!to) return json({ error: 'no_address' }, 400, origin);
+        notice = { to, ...rejectNotice(name, row.title || row.role, body.message) };
+        notice.mailed = await sendRejectNotice(env, to, notice);
+      }
+      await env.DB.prepare(`UPDATE ${spec.table} SET status = 'rejected', reject_note = ?, updated_at = strftime('%s','now') WHERE id = ?`)
+        .bind(notice ? notice.text : null, id).run();
+      const saved = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
+      return json({ item: toApi(saved, spec, true), notice }, 200, origin);
+    }
+
     // ---- GET /api/content/:collection ----
     if (request.method === 'GET' && !id) {
       let sql = `SELECT * FROM ${spec.table}`;
@@ -868,7 +1002,7 @@ export default {
       }
       sql += ` ORDER BY ${spec.order}`;
       const { results } = await env.DB.prepare(sql).bind(...binds).all();
-      return json(results.map((r) => toApi(r, spec)), 200, origin);
+      return json(results.map((r) => toApi(r, spec, admin)), 200, origin);
     }
 
     // ---- POST /api/content/:collection ----
@@ -880,7 +1014,11 @@ export default {
 
       const rec = { ...body, id: body.id || newId() };
       // A visitor cannot publish itself onto the site, whatever it posts.
-      if (!admin) { rec.status = 'pending'; rec.demo = false; }
+      if (!admin) { rec.status = 'pending'; rec.demo = false; delete rec.rejectNote; }
+      // An address that cannot be one is dropped rather than stored, so a
+      // rejection never tries to mail it.
+      if (rec.submitterEmail !== undefined && !isEmail(String(rec.submitterEmail).trim().toLowerCase())) delete rec.submitterEmail;
+      else if (rec.submitterEmail !== undefined) rec.submitterEmail = String(rec.submitterEmail).trim().toLowerCase();
 
       const cols = ['id'], vals = ['?'], binds = [rec.id];
       for (const [api, col] of Object.entries(spec.fields)) {
@@ -892,8 +1030,14 @@ export default {
       cols.push('created_at', 'updated_at'); vals.push("strftime('%s','now')", "strftime('%s','now')");
 
       await env.DB.prepare(`INSERT INTO ${spec.table} (${cols.join(',')}) VALUES (${vals.join(',')})`).bind(...binds).run();
+      // An editor has read what they wrote themselves, so it does not land in
+      // their own unread pile.
+      if (user && spec.moderated) {
+        await env.DB.prepare(`INSERT OR IGNORE INTO item_reads (user_id,collection,item_id,read_at) VALUES (?,?,?,strftime('%s','now'))`)
+          .bind(user.id, name, rec.id).run();
+      }
       const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(rec.id).first();
-      return json(toApi(row, spec), 201, origin);
+      return json(toApi(row, spec, admin), 201, origin);
     }
 
     // ---- PATCH /api/content/:collection/:id ----
@@ -916,7 +1060,7 @@ export default {
       const res = await env.DB.prepare(`UPDATE ${spec.table} SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
       if (!res.meta.changes) return json({ error: 'not_found', id }, 404, origin);
       const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
-      return json(toApi(row, spec), 200, origin);
+      return json(toApi(row, spec, admin), 200, origin);
     }
 
     // ---- DELETE /api/content/:collection/:id ----
@@ -924,6 +1068,7 @@ export default {
       if (!admin) return json({ error: 'unauthorized' }, 401, origin);
       const res = await env.DB.prepare(`DELETE FROM ${spec.table} WHERE id = ?`).bind(id).run();
       if (!res.meta.changes) return json({ error: 'not_found', id }, 404, origin);
+      if (spec.moderated) await env.DB.prepare('DELETE FROM item_reads WHERE collection = ? AND item_id = ?').bind(name, id).run();
       return json({ ok: true, id }, 200, origin);
     }
 

@@ -675,7 +675,8 @@ WDyn.boardWidget(document.getElementById('dyn-board'),{
     {name:'title',label:'כותרת המודעה',required:true},
     {name:'category',label:'קטגוריה',type:'select',options:['ציוד','לימוד','חוגים','שונות']},
     {name:'region',label:'אזור',type:'select',options:['צפון','מרכז','ירושלים','דרום']},
-    {name:'contact',label:'יצירת קשר (טלפון/מייל)'},
+    {name:'contact',label:'יצירת קשר (טלפון/מייל, יפורסם במודעה)'},
+    {name:'submitterEmail',label:'דוא״ל לעדכון על המודעה (לא יפורסם)',type:'email'},
     {name:'description',label:'תיאור',type:'textarea',wide:true}
   ]
 });

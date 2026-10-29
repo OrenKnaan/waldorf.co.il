@@ -13,7 +13,11 @@
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
     freeze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.2 7l15.6 10M4.2 17L19.8 7"/><path d="M9.5 3.5L12 6l2.5-2.5M9.5 20.5L12 18l2.5 2.5"/></svg>',
-    thaw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+    thaw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    archive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg>',
+    restore: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+    reject: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>',
+    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L20 3M16 7l3 3M18 5l2 2"/></svg>'
   };
   // A delete is final: the API removes the row and nothing keeps a copy. So every
   // trash button asks first, naming the row it sits on. A caller that already asks
@@ -40,7 +44,48 @@
       : st === 'frozen' ? pill('מוקפא', 'info')
       : st === 'active' ? pill('פעיל', 'ok')
       : st === 'inactive' ? pill('לא פעיל', 'neutral')
+      : st === 'rejected' ? pill('נדחה', 'crit')
+      : st === 'archived' ? pill('הוסר', 'neutral')
       : pill(st || '—', 'neutral');
+  }
+
+  /* ---- ארכיון: הסרה בלי מחיקה, ומחיקה לצמיתות רק משם ---- */
+  // 'archived' is what an editor removed, 'rejected' what a moderator turned
+  // down. Both are off the site and out of the working list; the archive under
+  // each list shows them, puts one back, or deletes it for good. A rejected
+  // submission goes back to the approval queue rather than onto the site,
+  // since nobody ever approved it.
+  var ARCHIVE = ['archived', 'rejected'];
+  function inArchive(it) { return ARCHIVE.indexOf(it.status) !== -1; }
+  function archiveBtn(col, it) {
+    return actBtn('archive', 'הסרה לארכיון', function () { WStore.update(col, it.id, { status: 'archived' }); refreshAll(); });
+  }
+  function makeArchive(col) {
+    var t = makeTable(['כותרת', 'מצב', '']);
+    var sum = el('summary', { text: 'ארכיון' });
+    var box = el('details', { class: 'archive' }, [
+      sum,
+      el('p', { class: 'empty-hint', text: 'פריטים שהוסרו או נדחו. הם אינם מוצגים באתר; אפשר להחזיר אותם, או למחוק אותם לצמיתות.' }),
+      t.wrap
+    ]);
+    return { node: box, draw: function (items) {
+      sum.textContent = 'ארכיון (' + items.length + ')';
+      t.tbody.textContent = '';
+      if (!items.length) return emptyRow(t.tbody, 3, 'הארכיון ריק');
+      items.forEach(function (it) {
+        var title = titleCell(it.title || it.role || it.name, it.demo);
+        if (it.rejectNote) { title.appendChild(document.createTextNode(' ')); title.appendChild(el('span', { class: 'pill info', title: it.rejectNote, text: 'נכתב הסבר' })); }
+        var back = it.status === 'rejected' ? 'pending' : (LIVE[col] || 'published');
+        t.tbody.appendChild(el('tr', {}, [
+          title,
+          td(statusPill(it.status)),
+          td(el('div', { class: 'row-actions' }, [
+            actBtn('restore', it.status === 'rejected' ? 'החזרה לתור האישור' : 'החזרה לאתר', function () { WStore.update(col, it.id, { status: back }); refreshAll(); }),
+            actBtn('del', 'מחיקה לצמיתות', function () { WStore.remove(col, it.id); refreshAll(); })
+          ]))
+        ]));
+      });
+    } };
   }
 
   /* ---- הקפאה: הסתרה מהאתר בלי מחיקה ---- */
@@ -94,7 +139,34 @@
     '.search-results .none{padding:10px;color:var(--muted);font-size:.84rem}',
     '.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;padding:14px 20px 18px;font-size:.88rem}',
     '.kv dt{color:var(--muted)}.kv dd{margin:0;color:var(--ink)}',
-    '.tag-demo{font-size:.7rem;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-pill);padding:1px 8px;margin-inline-start:6px}'
+    '.tag-demo{font-size:.7rem;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-pill);padding:1px 8px;margin-inline-start:6px}',
+    '.archive{border-top:1px solid var(--line)}',
+    '.archive summary{cursor:pointer;padding:12px 20px;font-size:.86rem;font-weight:600;color:var(--muted)}',
+    '.archive summary:hover{color:var(--brown)}',
+    '.archive .empty-hint{padding-top:0}',
+    // clip, not hidden: hidden makes the panel a scroll container, and the
+    // floating "unread only" button can then never stick to the viewport.
+    '.mod-panel{overflow:clip}',
+    '.mod-title{background:none;border:0;padding:0;font:inherit;color:inherit;text-align:start;cursor:pointer}',
+    '.mod-title:hover{color:var(--brown);text-decoration:underline}',
+    'tr.unread .mod-title{font-weight:700}',
+    'tr.unread .mod-title::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--info-ink);margin-inline-end:8px;vertical-align:middle}',
+    '.mod-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}',
+    'tr.mod-detail td,tr.mod-reject td{background:var(--sink)}',
+    '.mod-detail .kv{padding:6px 4px}',
+    '.mod-detail dd{white-space:pre-wrap}',
+    '.mod-foot{display:flex;justify-content:center;gap:10px;padding:12px 20px}',
+    '.mod-foot[hidden]{display:none}',
+    '.mod-foot.floating{position:sticky;bottom:14px;z-index:5;pointer-events:none}',
+    '.mod-foot.floating .btn{pointer-events:auto;box-shadow:var(--shadow)}',
+    '.mod-msg{margin:12px 20px 0}',
+    '.reject-box{display:grid;gap:10px;padding:6px 4px;font-size:.86rem;color:var(--ink)}',
+    '.reject-box .btns{display:flex;gap:8px;flex-wrap:wrap}',
+    '.reject-box blockquote{margin:0;padding:8px 12px;border-inline-start:3px solid var(--line);color:var(--muted);white-space:pre-wrap}',
+    '.reject-box textarea{min-height:80px;resize:vertical;font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--paper);color:var(--ink)}',
+    '.hist-note{font-weight:600;color:var(--ink);margin-bottom:2px}',
+    '.hist-field+.hist-field{border-top:1px dashed var(--line);margin-top:4px;padding-top:4px}',
+    '.hist-field b{color:var(--ink)}'
   ].join('\n');
   document.head.appendChild(st);
 
@@ -316,7 +388,7 @@
       openForm(section, NEWS_FIELDS, { date: WDyn.todayISO(), status: 'approved' }, function (out) { WStore.add('news', out); refreshAll(); });
     });
     function draw() {
-      var items = WStore.get('news').slice().sort(function (a, b) {
+      var items = WStore.get('news').filter(function (n) { return !inArchive(n); }).sort(function (a, b) {
         var ap = a.status === 'pending' ? 0 : 1, bp = b.status === 'pending' ? 0 : 1;
         if (ap !== bp) return ap - bp;
         return a.date < b.date ? 1 : -1;
@@ -330,7 +402,8 @@
         }
         actions.push(freezeBtn('news', n));
         actions.push(actBtn('edit', 'עריכה', function () { openForm(section, NEWS_FIELDS, n, function (out) { WStore.update('news', n.id, out); refreshAll(); }); }));
-        actions.push(actBtn('del', 'מחיקה', function () { WStore.remove('news', n.id); refreshAll(); }));
+        // Same archive as the moderation view, which is where it is shown.
+        actions.push(archiveBtn('news', n));
         t.tbody.appendChild(el('tr', {}, [
           td(fmtDate(n.date), 'muted tnum'),
           titleCell(n.title, n.demo),
@@ -385,15 +458,19 @@
       var addBtn = el('button', { class: 'btn btn-primary btn-sm', style: 'width:auto' });
       addBtn.innerHTML = I.plus;
       addBtn.appendChild(document.createTextNode('פריט חדש'));
+      var archive = makeArchive(cfg.col);
       var panel = el('div', { class: 'panel' }, [
         el('div', { class: 'panel-head' }, [el('h2', { text: cfg.title }), el('div', { class: 'grow' }), addBtn]),
-        t.wrap
+        t.wrap,
+        archive.node
       ]);
       addBtn.addEventListener('click', function () {
         openForm(panel, cfg.fields, null, function (out) { WStore.add(cfg.col, out); refreshAll(); });
       });
       cfg._draw = function () {
-        var items = WStore.get(cfg.col);
+        var all = WStore.get(cfg.col);
+        var items = all.filter(function (it) { return !inArchive(it); });
+        archive.draw(all.filter(inArchive));
         t.tbody.textContent = '';
         if (!items.length) return emptyRow(t.tbody, cfg.cols.length, 'אין פריטים');
         items.forEach(function (it) {
@@ -401,7 +478,7 @@
             td(el('div', { class: 'row-actions' }, [
               freezeBtn(cfg.col, it),
               actBtn('edit', 'עריכה', function () { openForm(panel, cfg.fields, it, function (out) { WStore.update(cfg.col, it.id, out); refreshAll(); }); }),
-              actBtn('del', 'מחיקה', function () { WStore.remove(cfg.col, it.id); refreshAll(); })
+              archiveBtn(cfg.col, it)
             ]))
           ])));
         });
@@ -466,38 +543,152 @@
     });
   }
 
-  /* =============== מודרציה: לוח קהילתי + לוח משרות =============== */
+  /* =============== מודרציה: הודעות, לוח קהילתי, לוח משרות =============== */
+  // `detail` is what a moderator reads before deciding, shown when a row is
+  // opened. Opening a row is also what marks it read.
   var MOD_PANELS = [
     { col: 'news', title: 'הודעות (לוח פתוח לציבור)', cols: ['תאריך', 'כותרת', 'מדור', 'מפרסם', 'סטטוס', ''],
-      row: function (it) { return [td(fmtDate(it.date), 'muted tnum'), titleCell(it.title, it.demo), td(it.section || '—', 'muted'), td(it.contact || '—', 'muted'), td(statusPill(it.status || 'approved'))]; } },
+      detail: [['summary', 'תוכן ההודעה'], ['link', 'קישור'], ['contact', 'פרטי קשר (מתפרסמים)']],
+      row: function (it, title) { return [td(fmtDate(it.date), 'muted tnum'), title, td(it.section || '—', 'muted'), td(it.contact || '—', 'muted'), td(statusPill(it.status || 'approved'))]; } },
     { col: 'board', title: 'לוח קהילתי', cols: ['תאריך', 'כותרת', 'קטגוריה', 'אזור', 'סטטוס', ''],
-      row: function (it) { return [td(fmtDate(it.date), 'muted tnum'), titleCell(it.title, it.demo), td(it.category || '—', 'muted'), td(it.region || '—', 'muted'), td(statusPill(it.status))]; } },
+      detail: [['description', 'תיאור'], ['contact', 'פרטי קשר (מתפרסמים)']],
+      row: function (it, title) { return [td(fmtDate(it.date), 'muted tnum'), title, td(it.category || '—', 'muted'), td(it.region || '—', 'muted'), td(statusPill(it.status))]; } },
     { col: 'jobs', title: 'לוח משרות', cols: ['תאריך', 'תפקיד', 'מוסד', 'קטגוריה', 'סטטוס', ''],
-      row: function (it) { return [td(fmtDate(it.date), 'muted tnum'), titleCell(it.role, it.demo), td(it.institution || '—', 'muted'), td(it.category || '—', 'muted'), td(statusPill(it.status))]; } }
+      detail: [['description', 'תיאור'], ['scope', 'היקף'], ['region', 'אזור'], ['contact', 'פרטי קשר (מתפרסמים)']],
+      row: function (it, title) { return [td(fmtDate(it.date), 'muted tnum'), title, td(it.institution || '—', 'muted'), td(it.category || '—', 'muted'), td(statusPill(it.status))]; } }
   ];
+  // A list shows every unread item, and tops up with read ones to this many.
+  var MOD_LIMIT = 15;
+
+  // Read marks are per user and live on the server. null means there is nobody
+  // to keep them for (signed out), and the lists then show no unread state.
+  var READS = null;
+  function loadReads() {
+    if (!canWrite()) { READS = null; drawMod(); return Promise.resolve(); }
+    return WStore.reads().then(function (r) {
+      READS = {};
+      Object.keys(r).forEach(function (c) { READS[c] = {}; r[c].forEach(function (id) { READS[c][id] = true; }); });
+    }, function () { READS = null; }).then(drawMod);
+  }
+  function drawMod() { MOD_PANELS.forEach(function (c) { if (c._draw) c._draw(); }); }
+  function isRead(col, id) { return Boolean(READS && READS[col] && READS[col][id]); }
+  function setRead(col, ids, read) {
+    if (!READS || !ids.length) return;
+    READS[col] = READS[col] || {};
+    ids.forEach(function (id) { if (read) READS[col][id] = true; else delete READS[col][id]; });
+    WStore.markRead(col, ids, read).catch(function () {});
+  }
+  // The same pattern the Worker uses when a post has no separate address field.
+  function addressOf(it) {
+    if (it.submitterEmail) return it.submitterEmail;
+    var m = String(it.contact || '').match(/[^\s@,;:<>()]+@[^\s@,;:<>()]+\.[^\s@,;:<>()]{2,}/);
+    return m ? m[0] : '';
+  }
+  // Shown to the moderator before sending. The Worker holds the same paragraph
+  // (REJECT_DEFAULT in content-api/src/index.js) and is what actually sends it.
+  var REJECT_DEFAULT = 'בדקנו את הפרסום ששלחתם, וכרגע הוא אינו מתאים ללוח שלנו. אם נראה לכם שנפלה טעות, אפשר להשיב למייל הזה.';
+
   function renderModAdmin() {
     var host = $('#modAdmin');
     host.textContent = '';
     MOD_PANELS.forEach(function (cfg) {
+      var mode = 'default';   // 'default' | 'all' | 'unread'
+      var open = {};          // ids whose details are showing
+      // Read during this visit: kept in the unread part until the view changes,
+      // so a row does not jump away the moment it is opened or approved.
+      var held = {};
       var t = makeTable(cfg.cols);
-      var panel = el('div', { class: 'panel' }, [
-        el('div', { class: 'panel-head' }, [el('h2', { text: cfg.title }), el('div', { class: 'grow' })]),
-        t.wrap
+      var unreadPill = el('span', { class: 'pill info' });
+      var markAll = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'סימון הכול כנקרא' });
+      var hint = el('p', { class: 'empty-hint', text: 'סימון הודעות שלא נקראו זמין לאחר התחברות.' });
+      var msg = el('div', { class: 'mod-msg', role: 'status' });
+      var foot = el('div', { class: 'mod-foot' });
+      var archive = makeArchive(cfg.col);
+      var panel = el('div', { class: 'panel mod-panel' }, [
+        el('div', { class: 'panel-head' }, [el('h2', { text: cfg.title }), unreadPill, el('div', { class: 'grow' }), markAll]),
+        msg, hint, t.wrap, foot, archive.node
       ]);
+      function setMode(m) { mode = m; held = {}; cfg._draw(); }
+      function readNow(id) { held[id] = true; setRead(cfg.col, [id], true); }
+      function footBtn(text, primary, onClick) {
+        return el('button', { class: 'btn btn-sm ' + (primary ? 'btn-primary' : 'btn-ghost'), type: 'button', style: 'width:auto', text: text, onclick: onClick });
+      }
+      // Pending first, then newest. Applied to the unread and the read part apart,
+      // so the unread ones always lead.
+      function rank(a, b) {
+        var ap = a.status === 'pending' ? 0 : 1, bp = b.status === 'pending' ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        return (a.date || '') < (b.date || '') ? 1 : -1;
+      }
+
       cfg._draw = function () {
-        var items = WStore.get(cfg.col).slice().sort(function (a, b) {
-          return (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1);
-        });
+        var all = WStore.get(cfg.col);
+        var live = all.filter(function (it) { return !inArchive(it); });
+        archive.draw(all.filter(inArchive));
+        var tracking = READS !== null;
+        var first = function (it) { return !isRead(cfg.col, it.id) || held[it.id]; };
+        var unread = tracking ? live.filter(first).sort(rank) : [];
+        var read = live.filter(function (it) { return !tracking || !first(it); }).sort(rank);
+        var unreadCount = unread.filter(function (it) { return !isRead(cfg.col, it.id); }).length;
+        var shown = mode === 'all' ? unread.concat(read)
+          : mode === 'unread' ? unread
+          : unread.concat(read.slice(0, Math.max(0, MOD_LIMIT - unread.length)));
+
+        unreadPill.hidden = !tracking;
+        unreadPill.textContent = unreadCount ? unreadCount + ' לא נקראו' : 'הכול נקרא';
+        markAll.hidden = !tracking || !unreadCount;
+        markAll.onclick = function () { setRead(cfg.col, unread.map(function (it) { return it.id; }), true); held = {}; cfg._draw(); };
+        hint.hidden = tracking;
+
+        foot.textContent = '';
+        foot.classList.remove('floating');
+        if (mode === 'default' && shown.length < live.length) {
+          foot.appendChild(footBtn('הצגת הכול (' + live.length + ')', false, function () { setMode('all'); }));
+        } else if (mode === 'all' && tracking && unreadCount) {
+          // Sticks to the bottom of the screen for as long as the long list is
+          // in view, so the way back to the short list is never a scroll away.
+          foot.classList.add('floating');
+          foot.appendChild(footBtn('הצגת הלא נקראות בלבד (' + unreadCount + ')', true, function () {
+            setMode('unread');
+            panel.scrollIntoView({ block: 'start' });
+          }));
+        } else if (mode === 'unread' && shown.length < live.length) {
+          foot.appendChild(footBtn('הצגת הכול (' + live.length + ')', false, function () { setMode('all'); }));
+        }
+        foot.hidden = !foot.firstChild;
+
         t.tbody.textContent = '';
-        if (!items.length) return emptyRow(t.tbody, cfg.cols.length, 'אין פריטים');
-        items.forEach(function (it) {
+        if (!shown.length) return emptyRow(t.tbody, cfg.cols.length, mode === 'unread' ? 'אין פריטים שלא נקראו' : 'אין פריטים');
+        shown.forEach(function (it) {
+          var unseen = tracking && !isRead(cfg.col, it.id);
+          var titleBtn = el('button', { type: 'button', class: 'mod-title', 'aria-expanded': open[it.id] ? 'true' : 'false', text: it.title || it.role,
+            onclick: function () {
+              open[it.id] = !open[it.id];
+              if (open[it.id] && unseen) readNow(it.id);
+              cfg._draw();
+            } });
+          var title = el('td', { class: 'title' }, [titleBtn]);
+          if (unseen) title.appendChild(el('span', { class: 'mod-sr', text: ' (לא נקרא)' }));
+          if (it.demo) title.appendChild(el('span', { class: 'tag-demo', text: 'הדגמה' }));
+
           var actions = [];
+          var tr = el('tr', { class: unseen ? 'unread' : '' });
           if (it.status === 'pending') {
-            actions.push(actBtn('ok', 'אישור ופרסום', function () { WStore.update(cfg.col, it.id, { status: 'approved' }); refreshAll(); }));
+            actions.push(actBtn('ok', 'אישור ופרסום', function () {
+              readNow(it.id);
+              WStore.update(cfg.col, it.id, { status: 'approved' }); refreshAll();
+            }));
+            actions.push(actBtn('reject', 'דחייה', function () {
+              if (!canWrite()) return needSignIn();
+              openReject(cfg, it, tr, msg);
+            }));
+          } else {
+            actions.push(freezeBtn(cfg.col, it));
+            actions.push(archiveBtn(cfg.col, it));
           }
-          actions.push(freezeBtn(cfg.col, it));
-          actions.push(actBtn('del', 'מחיקה', function () { WStore.remove(cfg.col, it.id); refreshAll(); }));
-          t.tbody.appendChild(el('tr', {}, cfg.row(it).concat([td(el('div', { class: 'row-actions' }, actions))])));
+          cfg.row(it, title).concat([td(el('div', { class: 'row-actions' }, actions))]).forEach(function (c) { tr.appendChild(c); });
+          t.tbody.appendChild(tr);
+          if (open[it.id]) t.tbody.appendChild(detailRow(cfg, it, function () { open[it.id] = false; delete held[it.id]; setRead(cfg.col, [it.id], false); cfg._draw(); }));
         });
       };
       cfg._draw();
@@ -505,10 +696,121 @@
     });
   }
 
+  function detailRow(cfg, it, markUnread) {
+    var kv = [];
+    cfg.detail.forEach(function (d) {
+      if (!it[d[0]]) return;
+      kv.push(el('dt', { text: d[1] }));
+      kv.push(el('dd', {}, [d[0] === 'link' ? el('a', { href: it[d[0]], target: '_blank', rel: 'noopener', text: it[d[0]] }) : document.createTextNode(it[d[0]])]));
+    });
+    kv.push(el('dt', { text: 'דוא״ל לעדכונים (לא מתפרסם)' }));
+    kv.push(el('dd', {}, [it.submitterEmail ? el('bdi', { text: it.submitterEmail }) : document.createTextNode('לא נמסר')]));
+    var kids = [el('dl', { class: 'kv' }, kv)];
+    if (READS !== null) kids.push(el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'סימון כלא נקרא', onclick: markUnread }));
+    return el('tr', { class: 'mod-detail' }, [el('td', { colspan: String(cfg.cols.length) }, kids)]);
+  }
+
+  // Rejecting asks one question first: tell the submitter, or not. Telling them
+  // sends the fixed paragraph, plus whatever the moderator adds.
+  function openReject(cfg, it, tr, msg) {
+    var old = tr.parentNode.querySelector('.mod-reject');
+    if (old) old.remove();
+    var name = it.title || it.role;
+    var to = addressOf(it);
+    var box = el('div', { class: 'reject-box' });
+    var row = el('tr', { class: 'mod-reject' }, [el('td', { colspan: String(cfg.cols.length) }, [box])]);
+    tr.after(row);
+    function close() { row.remove(); }
+    function go(notify, extra, buttons) {
+      buttons.forEach(function (b) { b.disabled = true; });
+      WStore.reject(cfg.col, it.id, notify, extra).then(function (r) {
+        setRead(cfg.col, [it.id], true);
+        close();
+        msg.textContent = '';
+        msg.className = 'mod-msg';
+        if (!r.notice) {
+          msg.appendChild(document.createTextNode('"' + name + '" נדחה והועבר לארכיון.'));
+        } else if (r.notice.mailed) {
+          msg.appendChild(document.createTextNode('"' + name + '" נדחה, וההסבר נשלח אל '));
+          // <bdi>: an address inside a Hebrew sentence is otherwise reordered.
+          msg.appendChild(el('bdi', { text: r.notice.to }));
+          msg.appendChild(document.createTextNode('.'));
+        } else {
+          // No mail provider is set up yet (RESEND_API_KEY on the Worker), so the
+          // notice goes out through the moderator's own mail app instead.
+          msg.className = 'mod-msg notice';
+          msg.appendChild(el('span', {}, [
+            document.createTextNode('"' + name + '" נדחה, אבל ההסבר לא נשלח: שליחת דוא״ל מהשרת עוד לא הוגדרה. '),
+            el('a', { href: 'mailto:' + encodeURIComponent(r.notice.to) + '?subject=' + encodeURIComponent(r.notice.subject) + '&body=' + encodeURIComponent(r.notice.text),
+                      text: 'פתיחת ההודעה המוכנה בתוכנת הדואר' })
+          ]));
+        }
+        refreshAll();
+      }).catch(function (e) {
+        buttons.forEach(function (b) { b.disabled = false; });
+        fail(e, true);
+      });
+    }
+    function ask() {
+      box.textContent = '';
+      var silent = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'דחייה בלי הודעה' });
+      var explain = el('button', { class: 'btn btn-primary btn-sm', type: 'button', style: 'width:auto', text: 'דחייה עם הסבר…' });
+      var cancel = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'ביטול', onclick: close });
+      silent.onclick = function () { go(false, '', [silent, explain, cancel]); };
+      explain.onclick = compose;
+      if (!to) explain.disabled = true;
+      box.appendChild(el('p', { text: 'לדחות את "' + name + '"? הפרסום יעבור לארכיון ולא יוצג באתר.' }));
+      if (!to) box.appendChild(el('p', { class: 'muted', text: 'למפרסם אין כתובת דוא״ל שמורה, ולכן אי אפשר לשלוח לו הסבר.' }));
+      box.appendChild(el('div', { class: 'btns' }, [silent, explain, cancel]));
+      silent.focus();
+    }
+    function compose() {
+      box.textContent = '';
+      var area = el('textarea', { id: 'rejectExtra' + it.id, 'aria-describedby': 'rejectBase' + it.id });
+      var send = el('button', { class: 'btn btn-primary btn-sm', type: 'button', style: 'width:auto', text: 'דחייה ושליחה' });
+      var back = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'חזרה', onclick: ask });
+      send.onclick = function () { go(true, area.value, [send, back]); };
+      box.appendChild(el('p', {}, [document.createTextNode('יישלח אל '), el('bdi', { text: to }), document.createTextNode('. הנוסח הקבוע:')]));
+      box.appendChild(el('blockquote', { id: 'rejectBase' + it.id, text: REJECT_DEFAULT }));
+      box.appendChild(el('label', { for: 'rejectExtra' + it.id, text: 'תוספת אישית (לא חובה). אם תישאר ריקה, יישלח רק הנוסח הקבוע.' }));
+      box.appendChild(area);
+      box.appendChild(el('div', { class: 'btns' }, [send, back]));
+      area.focus();
+    }
+    ask();
+  }
+
   /* =============== אודות הפורום =============== */
   var ABOUT_DEFAULT_HINT = 'ריק = יוצג הטקסט הקבוע של העמוד. שורות שמתחילות ב"- " יהפכו לרשימה.';
   /* =============== אודות הפורום — טיוטה, פרסום, היסטוריה ושחזור =============== */
   var ABOUT_SECTIONS = [['intro', 'מבוא'], ['activities', 'פעילויות שוטפות'], ['admission', 'קבלת בתי ספר לארגון']];
+  function aboutHasText(obj) {
+    return Boolean(obj) && ABOUT_SECTIONS.some(function (p) { return String(obj[p[0]] || '').trim(); });
+  }
+  function excerpt(text, max) {
+    text = String(text || '').trim();
+    if (text.length <= max) return text;
+    var cut = text.slice(0, max);
+    return cut.slice(0, cut.lastIndexOf(' ') > max * 0.6 ? cut.lastIndexOf(' ') : max) + '...';
+  }
+  // The page's fixed text, read out of forum.html itself, so the admin never
+  // keeps a second copy that drifts from the page. A list comes back in the
+  // same "- " form the editor turns into a list.
+  function aboutOriginal() {
+    return fetch('../forum.html').then(function (r) { return r.text(); }).then(function (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var out = {};
+      ABOUT_SECTIONS.forEach(function (p) {
+        var node = doc.getElementById('about-' + p[0]);
+        if (!node) return;
+        var lis = node.querySelectorAll('li');
+        out[p[0]] = lis.length
+          ? [].map.call(lis, function (li) { return '- ' + li.textContent.trim(); }).join('\n')
+          : [].map.call(node.querySelectorAll('p'), function (x) { return x.textContent.trim(); }).join('\n\n');
+      });
+      return out;
+    }).catch(function () { return {}; });
+  }
 
   function renderAboutAdmin() {
     var host = $('#aboutAdmin');
@@ -541,6 +843,7 @@
     var btnDraft = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'שמירה כטיוטה' });
     var btnPublish = el('button', { class: 'btn btn-primary btn-sm', type: 'button', style: 'width:auto', text: 'פרסום' });
     var btnDiscard = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'ביטול הטיוטה' });
+    var btnOriginal = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'שחזור הטקסט המקורי' });
     statusPillEl = el('span', { class: 'pill neutral', text: '—' });
     msgEl = el('span', { class: 'empty-hint', style: 'align-self:center' });
 
@@ -549,8 +852,9 @@
         el('h2', { text: 'תוכן העמוד' }), statusPillEl, el('div', { class: 'grow' })
       ]),
       editor,
+      el('p', { class: 'empty-hint', style: 'padding-top:0', text: ABOUT_DEFAULT_HINT }),
       el('div', { class: 'actions', style: 'padding:0 20px 18px;display:flex;gap:10px;flex-wrap:wrap' },
-         [btnPublish, btnDraft, btnDiscard, msgEl])
+         [btnPublish, btnDraft, btnDiscard, btnOriginal, msgEl])
     ]);
     var historyPanel = el('div', { class: 'panel' }, [
       el('div', { class: 'panel-head' }, [el('h2', { text: 'היסטוריית שינויים' }), el('div', { class: 'grow' })])
@@ -560,14 +864,21 @@
     host.appendChild(panel);
     host.appendChild(historyPanel);
 
+    // An empty field shows the start of the text the site carries in its place.
+    aboutOriginal().then(function (orig) {
+      ABOUT_SECTIONS.forEach(function (p) { if (orig[p[0]]) areas[p[0]].placeholder = excerpt(orig[p[0]], 160); });
+    });
+
     function refreshState() {
       return WStore.aboutState().then(function (st) {
         // A draft, if one exists, is what the editor should be working on —
         // otherwise you would silently overwrite it with the published text.
         fill(st.hasDraft ? st.draft : st.published);
-        statusPillEl.textContent = st.hasDraft ? 'יש טיוטה שלא פורסמה' : (st.published ? 'מפורסם' : 'לא נכתב עדיין');
-        statusPillEl.className = 'pill ' + (st.hasDraft ? 'warn' : st.published ? 'ok' : 'neutral');
+        var custom = aboutHasText(st.published);
+        statusPillEl.textContent = st.hasDraft ? 'יש טיוטה שלא פורסמה' : (custom ? 'מפורסם' : 'מוצג הטקסט המקורי');
+        statusPillEl.className = 'pill ' + (st.hasDraft ? 'warn' : custom ? 'ok' : 'neutral');
         btnDiscard.style.display = st.hasDraft ? '' : 'none';
+        btnOriginal.style.display = custom || st.hasDraft ? '' : 'none';
       });
     }
 
@@ -583,9 +894,13 @@
         var tb = t.tbody;
         list.forEach(function (v) {
           var when = new Date(v.created_at * 1000);
-          var preview = ABOUT_SECTIONS.map(function (p) { return v.value && v.value[p[0]]; })
-            .filter(Boolean).join(' · ').slice(0, 60) || '(ריק)';
-          var restore = actBtn('edit', 'שחזור', function () {
+          // One line per field, under its own name, so three texts never run
+          // together into one string.
+          var fields = ABOUT_SECTIONS.filter(function (p) { return v.value && String(v.value[p[0]] || '').trim(); })
+            .map(function (p) { return el('div', { class: 'hist-field' }, [el('b', { text: p[1] + ': ' }), document.createTextNode(excerpt(v.value[p[0]], 70))]); });
+          var preview = el('td', { class: 'muted' }, (v.note ? [el('div', { class: 'hist-note', text: v.note })] : [])
+            .concat(fields.length ? fields : [document.createTextNode('(ריק)')]));
+          var restore = actBtn('restore', 'שחזור', function () {
             if (!confirm('לשחזר את הגרסה הזו ולפרסם אותה? הגרסה הנוכחית תישמר בהיסטוריה.')) return;
             WStore.restoreAbout(v.id).then(function () {
               say('הגרסה שוחזרה ופורסמה', '');
@@ -597,8 +912,12 @@
             td(el('span', { class: 'pill ' + (v.status === 'published' ? 'ok' : 'neutral'),
                             text: v.status === 'published' ? 'פורסם' : 'טיוטה' })),
             td(v.author || '—', 'muted'),
-            td(v.note ? v.note + ' — ' + preview : preview, 'muted'),
-            td(el('div', { class: 'row-actions' }, [restore]))
+            preview,
+            td(el('div', { class: 'row-actions' }, [restore, actBtn('del', 'מחיקת הרשומה', function () {
+              if (!canWrite()) return needSignIn();
+              if (!confirm('למחוק את הרשומה הזו מההיסטוריה? הטקסט שבאתר לא ישתנה.\n\nהמחיקה סופית: אי אפשר לשחזר את הרשומה.')) return;
+              WStore.deleteAboutVersion(v.id).then(refreshHistory).catch(function () { say('מחיקת הרשומה נכשלה', 'crit'); });
+            }, true)]))
           ]));
         });
         historyBody.appendChild(t.wrap);
@@ -621,6 +940,17 @@
         say('פורסם — העמוד באתר עודכן');
         return Promise.all([refreshState(), refreshHistory()]);
       }).catch(function () { say('הפרסום נכשל — נדרשת התחברות', 'crit'); });
+    });
+    // Publishing an empty document is what puts the page's fixed text back:
+    // the site shows its own text wherever a field is empty.
+    btnOriginal.addEventListener('click', function () {
+      if (!canWrite()) return needSignIn();
+      if (!confirm('להחזיר לעמוד את הטקסט המקורי? הטקסט המותאם יוסר מהאתר, וגרסאות קודמות יישארו בהיסטוריה.')) return;
+      say('משחזר…');
+      WStore.publishAbout({}).then(function () {
+        say('העמוד מציג שוב את הטקסט המקורי');
+        return Promise.all([refreshState(), refreshHistory()]);
+      }).catch(function () { say('השחזור נכשל: נדרשת התחברות', 'crit'); });
     });
     btnDiscard.addEventListener('click', function () {
       if (!confirm('לבטל את הטיוטה ולחזור לגרסה המפורסמת?')) return;
@@ -692,7 +1022,8 @@
     var today = WDyn.todayISO();
     var events = WStore.get('events');
     var upcoming = events.filter(function (e) { return e.status === 'published' && e.date >= today; }).length;
-    var libTotal = WStore.get('library').length + WStore.get('teaching').length + WStore.get('forms').length;
+    var libTotal = WStore.get('library').concat(WStore.get('teaching'), WStore.get('forms'))
+      .filter(function (i) { return !inArchive(i); }).length;
     var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs'))
       .filter(function (i) { return i.status === 'pending'; }).length;
     var institutions = WStore.get('institutions').length;
@@ -848,7 +1179,7 @@
             actions.appendChild(actBtn('edit', 'עריכה', function () { openUserForm(u); }));
             // The delivery path that works while no mail provider is
             // configured: mint the link here and hand it over.
-            actions.appendChild(actBtn('edit', u.hasPassword ? 'קישור לאיפוס' : 'קישור להגדרת סיסמה', function () {
+            actions.appendChild(actBtn('key', u.hasPassword ? 'קישור לאיפוס' : 'קישור להגדרת סיסמה', function () {
               WStore.inviteUser(u.id).then(function (r) { showInviteLink(formHost, u, r); })
                 .catch(function () { alert('יצירת הקישור נכשלה.'); });
             }));
@@ -1198,6 +1529,7 @@
     renderNewsletterAdmin();
     refreshCounts();
     renderSiteLinks();
+    loadReads();
   }
 
   // How to get write access, said the way an editor would act on it: sign in with
@@ -1265,7 +1597,7 @@
     var role = document.querySelector('.user .who span');
     var av = document.querySelector('.user .avatar');
     // The markup leaves the user widget blank; every state is filled in here.
-    if (av) av.textContent = u ? (u.name || '?').trim().charAt(0) : '?';
+    if (av) av.textContent = u ? (u.name || '?').trim().charAt(0) : WStore.hasAdminKey() ? 'מ' : '?';
     if (u) {
       if (who) who.textContent = u.name;
       if (role) role.textContent = ROLE_NAMES[u.role] || u.role;
@@ -1313,6 +1645,7 @@
         if (msg) msg.textContent = 'המפתח נשמר — התוכן נטען מחדש';
         showUser();
         refreshAll();
+        loadReads();
       }).catch(function () {
         WStore.setAdminKey('');
         if (msg) msg.textContent = 'המפתח נדחה — בדקו שהעתקתם אותו במלואו';
@@ -1321,7 +1654,7 @@
     if (clear) clear.addEventListener('click', function () {
       WStore.setAdminKey('').then(function () {
         input.value = ''; input.placeholder = 'הדביקו כאן את המפתח';
-        if (msg) msg.textContent = 'המפתח נמחק מהדפדפן'; showUser(); refreshAll();
+        if (msg) msg.textContent = 'המפתח נמחק מהדפדפן'; showUser(); refreshAll(); loadReads();
       });
     });
   })();

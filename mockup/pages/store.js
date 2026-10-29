@@ -152,6 +152,27 @@
         .then(function (r) { if (cache) cache.about = r.value; emit(); return r; });
     },
     discardAboutDraft: function () { return req('/api/singleton/about/draft', { method: 'DELETE' }); },
+    deleteAboutVersion: function (versionId) {
+      return req('/api/singleton/about/versions/' + encodeURIComponent(versionId), { method: 'DELETE' });
+    },
+
+    /* ---- moderation ---- */
+    // Which submissions the signed-in user has opened, per moderated collection.
+    reads: function () { return req('/api/reads'); },
+    markRead: function (col, ids, read) {
+      return req('/api/reads', { method: 'POST', body: JSON.stringify({ collection: col, ids: ids, read: read !== false }) });
+    },
+    // Not optimistic like update(): the answer says whether a notice was mailed,
+    // and the admin words what happened from it.
+    reject: function (col, id, notify, message) {
+      return req('/api/content/' + col + '/' + encodeURIComponent(id) + '/reject',
+        { method: 'POST', body: JSON.stringify({ notify: Boolean(notify), message: message || '' }) })
+        .then(function (r) {
+          (cache[col] || []).forEach(function (it, i, arr) { if (it.id === id) arr[i] = r.item; });
+          emit();
+          return r;
+        });
+    },
 
     hasAdminKey: function () { return Boolean(adminKey()); },
     setAdminKey: function (k) {

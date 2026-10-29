@@ -234,8 +234,11 @@
       var fields = cfg2.fields.map(function (f) {
         var input = f.type === 'textarea' ? el('textarea', { name: f.name })
           : f.type === 'select' ? el('select', { name: f.name }, f.options.map(function (o) { return el('option', { value: o, text: o }); }))
-          : el('input', { type: 'text', name: f.name, required: f.required ? '' : null });
-        if (input.getAttribute('required') === null) input.removeAttribute('required');
+          : el('input', { type: f.type === 'email' ? 'email' : 'text', name: f.name, required: f.required ? '' : null, autocomplete: f.type === 'email' ? 'email' : null });
+        // el() writes a null attribute as the string "null", so an optional field
+        // came out required. Removed by what the field asks for, not by its value.
+        if (!f.required) input.removeAttribute('required');
+        if (f.type !== 'email') input.removeAttribute('autocomplete');
         inputs[f.name] = input;
         return el('label', { class: f.wide ? 'wide' : '' }, [document.createTextNode(f.label), input]);
       });

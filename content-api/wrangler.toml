@@ -50,3 +50,16 @@ ACTIVETRAIL_DOUBLE_OPTIN = "true"
 # and empty from anything else, so a link minted by a script or destined for an
 # email comes out relative and unusable.
 ADMIN_BASE_URL = "https://orenknaan.github.io/waldorf.co.il"
+
+# ---------------------------------------------------------------------------
+# Outgoing mail (Resend): set-password links and rejection notices
+#
+# Not configured yet. Until it is, a set-password link is shown to the
+# super_admin to hand over, and a rejection notice opens prefilled in the
+# moderator's own mail app. To switch it on:
+#
+#     npx wrangler secret put RESEND_API_KEY
+#
+# and add under [vars] MAIL_FROM (a sender on a domain verified in Resend,
+# e.g. "הפורום הארצי לחינוך ולדורף <no-reply@waldorf.co.il>") and REPLY_TO
+# (the forum inbox a submitter's reply should reach, e.g. info@waldorf.co.il).
