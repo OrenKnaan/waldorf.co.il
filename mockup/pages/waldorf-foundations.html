@@ -579,7 +579,10 @@
   main .hero-title::before{content:"";position:absolute;z-index:-1;inset:-2em -4.6em;pointer-events:none;
     background:radial-gradient(ellipse closest-side,rgba(20,10,8,.5) 0%,rgba(20,10,8,.4) 50%,rgba(20,10,8,.16) 80%,rgba(20,10,8,0) 100%)}
   main .ah-play{top:auto;bottom:16px;inset-inline-start:auto;inset-inline-end:16px}
-  main > .pagebanner{height:var(--bar-h);padding-block:0;white-space:nowrap;
+  main > .pagebanner{height:var(--bar-h);padding-block:0;white-space:nowrap}
+  main > .pagebanner:first-child{margin-block-start:0}
+  /* Only a slide gives the bar something to sit on: without one it stays in the flow. */
+  main > .art-hero + .pagebanner{
     margin:calc(var(--bar-gap) - var(--hero-h)) var(--bar-gap)
            calc(var(--hero-h) - var(--bar-gap) - var(--bar-h) + 24px)}
 </style>

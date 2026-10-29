@@ -43,6 +43,13 @@ const ICON_BACK = '<svg class="icon-inline" viewBox="0 0 24 24" fill="none" stro
 
 const skeleton = readFileSync(join(pagesDir, 'media.html'), 'utf8');
 
+// The skeleton's stylesheet lays the page out around an art-hero (the breadcrumb sits
+// on the slide, the h1 inside it), so each issue gets one: the forum's pictures, as
+// on the archive page it belongs to, with the issue's title in it.
+const parentHero = readFileSync(join(pagesDir, 'forum-newsletter.html'), 'utf8')
+  .match(/<div class="art-hero slideshow"[\s\S]*?<h1 class="hero-title">[^<]*<\/h1>\n<\/div>/)[0];
+const hero = (title) => parentHero.replace(/(<h1 class="hero-title">)[^<]*/, `$1${esc(title)}`);
+
 function schema(title, file) {
   const items = [['דף הבית', './home.html'], ['הפורום', './forum.html'], ['איגרת תקופתית', './forum-newsletter.html'], [title, `./${file}`]];
   return `<script type="application/ld+json">
@@ -62,8 +69,12 @@ for (const id of ISSUES) {
   const title = decode(rec.title);
   let body = readFileSync(join(dataDir, 'items', `${id}.html`), 'utf8').replace(/<object[\s\S]*?<\/object>/gi, '');
   body = withAnchors(demote(body)).trim();
+  // The site's scroller, so a wide table (p2488's contact list, whose e-mail
+  // addresses cannot wrap) scrolls inside the card instead of widening the page.
+  body = body.replace(/<table\b[\s\S]*?<\/table>/gi, (t) => `<div class="table-wrap">${t}</div>`);
 
   const main = `<main id="main-content" tabindex="-1" data-lib-item="${id}">
+  ${hero(title)}
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
@@ -76,7 +87,6 @@ for (const id of ISSUES) {
 </span>
   </nav>
   <div class="lib-head">
-    <h1>${esc(title)}</h1>
     <div class="lib-meta">
       <span class="dyn-chip cat">איגרת</span>
       <span class="dyn-chip"><time datetime="${rec.date}">${fmt(rec.date)}</time></span>
