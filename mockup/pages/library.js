@@ -68,6 +68,9 @@
     '.lib-body table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.9rem}',
     '.lib-body th,.lib-body td{border:1px solid var(--beige);padding:7px 10px;text-align:start}',
     '.lib-body sup{font-size:.7em}',
+    // WordPress "preformatted" blocks hold prose here (p2479), not code: unwrapped
+    // they ran the page out to 1620px on a phone.
+    '.lib-body pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:0 0 14px}',
     /* --- the book's chapter rail ---
        The rail is taken out of flow so the chapter keeps the page's own centred
        measure instead of being pushed off-centre by a reserved column. The
@@ -352,7 +355,23 @@
     measure();
   }
 
+  // The site's scroller around each table in the text, so a wide one (p2479's
+  // runs to 1620px) scrolls inside the card instead of widening the page.
+  // accessibility.js makes a wrapper a tab stop while it overflows.
+  function wrapTables() {
+    var tables = document.querySelectorAll('.lib-body table');
+    for (var i = 0; i < tables.length; i += 1) {
+      var t = tables[i];
+      if (t.parentNode.classList && t.parentNode.classList.contains('table-wrap')) continue;
+      var wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+      t.parentNode.insertBefore(wrap, t);
+      wrap.appendChild(t);
+    }
+  }
+
   function initItemPage() {
+    wrapTables();
     initProgress();
     var btn = document.querySelector('[data-lib-download]');
     if (!btn) return;

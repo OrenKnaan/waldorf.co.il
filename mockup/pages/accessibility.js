@@ -596,14 +596,18 @@
     }
     // Observing each wrapper catches both a viewport resize and a reflow from
     // the text-size adjustments above, without a resize listener firing on
-    // every page whether or not it has a table.
-    tableObserver = new ResizeObserver(function () { syncScrollableTables(); });
+    // every page whether or not it has a table. Called again for wrappers that
+    // arrive later, so one observer; observing an element twice is a no-op.
+    if (!tableObserver) tableObserver = new ResizeObserver(function () { syncScrollableTables(); });
     for (var i = 0; i < wraps.length; i += 1) tableObserver.observe(wraps[i]);
   }
 
   function init() {
     build();
     watchScrollableTables();
+    // A library work's text comes from the content API after this has run, and
+    // library.js wraps its tables then; it fires lib:loaded when it is done.
+    document.addEventListener('lib:loaded', watchScrollableTables);
   }
 
   if (document.readyState === 'loading') {
