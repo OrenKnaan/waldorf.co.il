@@ -78,7 +78,7 @@ query Dash($account: String!, $site: String!, $start: Time!, $end: Time!, $start
 
       topPages: rumPageloadEventsAdaptiveGroups(
         filter: { siteTag: $site, datetime_geq: $start, datetime_leq: $end, bot: 0 }
-        limit: 20, orderBy: [count_DESC]
+        limit: 50, orderBy: [count_DESC]
       ) { count sum { visits } dimensions { requestPath } }
 
       referrers: rumPageloadEventsAdaptiveGroups(
@@ -122,6 +122,12 @@ query Dash($account: String!, $site: String!, $start: Time!, $end: Time!, $start
   }
 }`;
 
+// Narrowed to one country: every group gains the filter, and the variable is
+// declared only then, since GraphQL refuses a declared variable left unused.
+const queryFor = (country) => country
+  ? QUERY.replace('$endDate: Date!)', '$endDate: Date!, $country: string!)').replace(/bot: 0 \}/g, 'bot: 0, countryName: $country }')
+  : QUERY;
+
 /** Collapses a grouped result into [{name, views, visits}], newest concerns first. */
 const rows = (list, key) =>
   (list || []).map((r) => ({
@@ -160,6 +166,11 @@ export default {
       return json({ error: 'bad_days', allowed: ALLOWED_DAYS }, 400, origin);
     }
 
+    // Optional: one country's traffic only, as its two-letter code ("US").
+    // Checked against the pattern, so nothing but a code reaches the query.
+    const country = (url.searchParams.get('country') || '').toUpperCase();
+    if (country && !/^[A-Z]{2}$/.test(country)) return json({ error: 'bad_country' }, 400, origin);
+
     const end = new Date();
     const start = new Date(end.getTime() - days * 864e5);
     const iso = (d) => d.toISOString().replace(/\.\d{3}Z$/, 'Z');
@@ -174,8 +185,9 @@ export default {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          query: QUERY,
+          query: queryFor(country),
           variables: {
+            ...(country ? { country } : {}),
             account: env.CF_ACCOUNT_ID,
             site: env.CF_SITE_TAG,
             start: iso(start),
@@ -204,7 +216,7 @@ export default {
 
     return json(
       {
-        range: { days, from: day(start), to: day(end) },
+        range: { days, from: day(start), to: day(end), country: country || null },
         totals: {
           views: Number(totals?.count || 0),
           visits: Number(totals?.sum?.visits || 0),

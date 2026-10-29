@@ -27,78 +27,62 @@
     return [1, 7, 30, 90].indexOf(d) !== -1 ? d : DEFAULT_DAYS;
   }
 
-  /* ---------- שמות דפים בעברית במקום כתובות ---------- */
-  var PAGE_NAMES = {
-      "community-board.html": "לוח קהילתי",
-      "contact.html": "צור קשר",
-      "content-library.html": "ספריית תוכן",
-      "curriculum-capstone.html": "פרויקט גמר ומסע בוגרים",
-      "curriculum-crafts.html": "אמנויות יישומיות",
-      "curriculum-drama.html": "תיאטרון והצגות כיתה",
-      "curriculum-eurythmy.html": "אאוריתמיה",
-      "curriculum-form-drawing.html": "ציור טופסי ורישום",
-      "curriculum-gardening.html": "גינון וחקלאות",
-      "curriculum-geography.html": "גיאוגרפיה",
-      "curriculum-handwork.html": "עבודת יד ומלאכה",
-      "curriculum-hebrew.html": "שפה עברית",
-      "curriculum-history.html": "היסטוריה",
-      "curriculum-languages.html": "שפות זרות",
-      "curriculum-literature.html": "ספרות ומקורות",
-      "curriculum-math.html": "מתמטיקה",
-      "curriculum-music.html": "מוזיקה",
-      "curriculum-painting.html": "ציור בצבעי מים",
-      "curriculum-pe.html": "חינוך גופני",
-      "curriculum-science.html": "מדעי הטבע",
-      "curriculum-woodwork.html": "נגרות ועבודות עץ",
-      "curriculum.html": "תוכניות לימודים",
-      "events.html": "אירועים",
-      "forum-newsletter.html": "איגרת תקופתית",
-      "forum-roles.html": "נציגי הפורום",
-      "forum-workgroups.html": "קבוצות עבודה",
-      "forum.html": "הפורום",
-      "home.html": "דף הבית",
-      "index.html": "הפורום הארצי לחינוך ולדורף",
-      "job-board.html": "לוח משרות",
-      "kinder-articles.html": "מאמרים וחומרי קריאה",
-      "kinder-circle.html": "מעגל הגנים הארצי",
-      "kinder-list.html": "רשימת גני ילדים",
-      "kinder.html": "גני ילדים",
-      "links.html": "קישורים לאתרים אחרים",
-      "media.html": "מדיה",
-      "news.html": "הודעות",
-      "school-list.html": "רשימת בתי ספר",
-      "school.html": "בית הספר",
-      "teacher-training.html": "הכשרת מורים",
-      "waldorf-characteristics.html": "אפיונים מרכזיים",
-      "waldorf-foundations.html": "יסודות חינוך וולדורף"
-  };
-
-  /* Cloudflare's countryName dimension returns an ISO code ("IL", "ID"), which
-     means nothing to a Hebrew reader. Covers the countries this site plausibly
-     sees; anything else falls through to the raw code rather than guessing. */
-  var COUNTRY_NAMES = {
-    IL: 'ישראל', US: 'ארצות הברית', GB: 'בריטניה', DE: 'גרמניה', FR: 'צרפת',
-    NL: 'הולנד', CH: 'שווייץ', AT: 'אוסטריה', BE: 'בלגיה', SE: 'שוודיה',
-    NO: 'נורווגיה', DK: 'דנמרק', FI: 'פינלנד', IT: 'איטליה', ES: 'ספרד',
-    PT: 'פורטוגל', PL: 'פולין', CZ: 'צ׳כיה', HU: 'הונגריה', RO: 'רומניה',
-    RU: 'רוסיה', UA: 'אוקראינה', CA: 'קנדה', AU: 'אוסטרליה', NZ: 'ניו זילנד',
-    BR: 'ברזיל', AR: 'ארגנטינה', MX: 'מקסיקו', ZA: 'דרום אפריקה',
-    IN: 'הודו', ID: 'אינדונזיה', TH: 'תאילנד', JP: 'יפן', CN: 'סין',
-    KR: 'קוריאה הדרומית', SG: 'סינגפור', TR: 'טורקיה', GR: 'יוון',
-    CY: 'קפריסין', IE: 'אירלנד', EE: 'אסטוניה', LV: 'לטביה', LT: 'ליטא'
-  };
-  function prettyCountry(code) {
-    if (!code) return 'לא ידוע';
-    return COUNTRY_NAMES[String(code).toUpperCase()] || code;
+  /* ---------- page names, from the site itself ---------- */
+  // The site's search index (search-index.json, rebuilt on every deploy) lists
+  // every page it publishes with its Hebrew title, a work page under the work's
+  // own title. It is the one list of what is a page, so a path missing from it
+  // (an old design prototype, a triage page since moved into the admin, a work
+  // taken off the site) is left out of "most viewed" rather than shown as a bare
+  // file name. Fetched once per visit; on failure every path is shown as it is.
+  var pagesP = null;
+  function sitePages() {
+    if (!pagesP) {
+      var site = window.WAdminConfig ? window.WAdminConfig.site : '..';
+      pagesP = fetch(site + '/search-index.json').then(function (r) { return r.json(); }).then(function (j) {
+        var names = {};
+        (j.docs || []).forEach(function (d) {
+          var file = String(d.url || '').split('#')[0].replace(/^\.\//, '');
+          if (!/\.html$/.test(file) || names[file]) return;
+          names[file] = /^lib-/.test(file) ? d.title : d.page;
+        });
+        return names;
+      }).catch(function () { pagesP = null; return null; });
+    }
+    return pagesP;
+  }
+  function fileOf(path) {
+    var file = String(path || '').split('?')[0].split('#')[0].replace(/\/+$/, '');
+    file = file.slice(file.lastIndexOf('/') + 1);
+    // The bare address and index.html both land on the homepage.
+    return !file || file === 'index.html' || file === 'waldorf.co.il' ? 'home.html' : file;
+  }
+  /** Views per page under its Hebrew name, merged by file, non-pages dropped. */
+  function pageRows(rows, names) {
+    var byFile = {}, order = [];
+    (rows || []).forEach(function (r) {
+      var file = fileOf(r.name);
+      if (names && !names[file]) return;
+      if (!byFile[file]) { byFile[file] = { name: names ? names[file] : file.replace(/\.html?$/, ''), path: r.name, views: 0 }; order.push(file); }
+      byFile[file].views += r.views;
+    });
+    return order.map(function (f) { return byFile[f]; }).sort(function (a, b) { return b.views - a.views; }).slice(0, 20);
   }
 
-  function prettyPage(path) {
-    if (!path) return 'לא ידוע';
-    var file = String(path).split('?')[0].split('#')[0].replace(/\/+$/, '');
-    file = file.slice(file.lastIndexOf('/') + 1) || 'index.html';
-    if (PAGE_NAMES[file]) return PAGE_NAMES[file];
-    if (file === '' || file === 'index.html') return 'דף הבית';
-    return file.replace(/\.html?$/, '');
+  /* ---------- countries: Hebrew name and flag ---------- */
+  // Cloudflare reports an ISO code ("IL", "ID"). The browser names any of them
+  // in Hebrew (Intl.DisplayNames), and the flag is the code itself spelled in
+  // regional-indicator letters, which every current system draws as a flag.
+  var regionNames = null;
+  try { regionNames = new Intl.DisplayNames(['he'], { type: 'region' }); } catch (e) {}
+  function flag(code) {
+    return code.replace(/./g, function (ch) { return String.fromCodePoint(0x1F1E6 + ch.charCodeAt(0) - 65); });
+  }
+  function prettyCountry(code) {
+    code = String(code || '').toUpperCase();
+    if (!/^[A-Z]{2}$/.test(code)) return 'לא ידוע';
+    var name = code;
+    try { name = (regionNames && regionNames.of(code)) || code; } catch (e) {}
+    return flag(code) + ' ' + name;
   }
 
   /* ---------- עזרי DOM ---------- */
@@ -319,7 +303,7 @@
   }
 
   /* ---------- ציור המסך ---------- */
-  function render(mount, data, days, reload) {
+  function render(mount, data, days, reload, names) {
     mount.textContent = '';
 
     var perVisit = data.totals.visits ? (data.totals.views / data.totals.visits) : 0;
@@ -382,7 +366,7 @@
     // דפים
     mount.appendChild(panel('הדפים הנצפים ביותר',
       'אילו דפים באתר נפתחו הכי הרבה פעמים. עוזר להבין מה מעניין את הקהל ומה פחות.',
-      barList(data.topPages, prettyPage)));
+      barList(pageRows(data.topPages, names))));
 
     // מקורות
     var refs = (data.referrers || []).map(function (r) {
@@ -443,9 +427,9 @@
 
     function go(days) {
       mount.textContent = '';
-      mount.appendChild(el('p', { class: 'an-empty', text: 'טוען נתונים…' }));
-      load(days).then(function (data) {
-        render(mount, data, days, go);
+      mount.appendChild(el('p', { class: 'an-loading', role: 'status' }, [el('span', { class: 'an-spinner', 'aria-hidden': 'true' }), document.createTextNode('טוען נתונים…')]));
+      Promise.all([load(days), sitePages()]).then(function (res) {
+        render(mount, res[0], days, go, res[1]);
       }).catch(function (e) {
         mount.textContent = '';
         if (e.kind === 'unconfigured') { setupScreen(mount, function () { go(savedDays()); }); return; }

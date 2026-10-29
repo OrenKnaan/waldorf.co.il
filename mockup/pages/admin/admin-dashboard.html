@@ -279,6 +279,11 @@ td.muted{color:var(--muted)}
   .an-panel .panel-head{gap:6px}
   .an-note{margin:12px 20px 0;color:var(--muted);font-size:.82rem}
   .an-empty{margin:18px 20px;color:var(--muted);font-size:.9rem}
+  .an-loading{display:flex;align-items:center;gap:12px;margin:40px 20px;color:var(--muted);font-size:.9rem}
+  .an-spinner{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brown);animation:an-spin .8s linear infinite}
+  @keyframes an-spin{to{transform:rotate(360deg)}}
+  /* Without motion, a still ring with the text beside it says the same thing. */
+  @media (prefers-reduced-motion:reduce){.an-spinner{animation:none;border-top-color:var(--line)}}
   .an-chart-wrap{padding:16px 20px 6px}
   .an-chart{width:100%;height:auto;display:block}
   .an-chart-bar{fill:var(--tan)}
