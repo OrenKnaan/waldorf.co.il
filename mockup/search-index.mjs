@@ -124,16 +124,14 @@ const skipped = [];
 let sectionCount = 0;
 let unanchored = 0;
 
-// A ספריית תוכן item page is one work, not a page of cards: its <h2>s are the
-// chapters of a single argument, and splitting a 30,000-character paper into
-// twenty documents would bury every other page on the site under it. Index each
-// as one document, with the text capped. Two thousand characters covers the
-// abstract and opening of every work here, which is what tells a searcher this
-// is the one; the item page is where it then gets read. Uncapped, the 104 items
-// took the index from 57 KB gzipped to 196 KB, all of it downloaded on a
-// visitor's first search.
+// A ספריית תוכן item page is a shell now (library-shells.mjs): its text lives in
+// D1 and is read below from /api/library-text, which returns published works
+// only, so a work hidden in the admin drops out of the index on the next build
+// (pages.yml rebuilds it on every deploy and once a day). Each work is one
+// document, capped at the Worker's 2,000 characters: the abstract and opening
+// tell a searcher this is the one, and the uncapped text of all of them took the
+// index from 57 KB gzipped to 196 KB.
 const isLibraryItem = (file) => /^lib-.*\.html$/.test(file);
-const ITEM_TEXT_CAP = 2000;
 
 for (const file of pageFiles) {
   const page = readPage(file);
@@ -142,19 +140,7 @@ for (const file of pageFiles) {
     continue;
   }
 
-  if (isLibraryItem(file)) {
-    const whole = [page.intro, ...page.sections.map((s) => `${s.heading} ${s.body}`)]
-      .join(' ').replace(/\s+/g, ' ').trim().slice(0, ITEM_TEXT_CAP);
-    pushDoc({
-      url: `./${file}`,
-      page: page.title,
-      crumbs: page.crumbs,
-      heading: '',
-      title: page.h1,
-      text: whole,
-    });
-    continue;
-  }
+  if (isLibraryItem(file)) continue;
 
   // The page itself, so a query matching only the title still finds it even
   // when the page has no intro text above its first card.
@@ -269,6 +255,30 @@ for (const c of COLLECTIONS) {
     });
     recordCount += 1;
   }
+}
+
+// ---- library works, from D1 -------------------------------------------------
+// LIBRARY_JSON=path reads a saved copy of /api/library-text, for the same reason
+// CONTENT_JSON exists above.
+let works = [];
+try {
+  works = process.env.LIBRARY_JSON
+    ? JSON.parse(readFileSync(process.env.LIBRARY_JSON, 'utf8'))
+    : await (await fetch(API.replace(/\/content$/, '/library-text'), { signal: AbortSignal.timeout(20000) })).json();
+  if (!Array.isArray(works)) throw new Error('unexpected reply');
+} catch (err) {
+  apiError = apiError || err.message;
+  works = [];
+}
+for (const w of works) {
+  pushDoc({
+    url: `./lib-${w.id.replace(/^lb-/, '')}.html`,
+    page: 'ספריית תוכן',
+    crumbs: `ספריית תוכן / ${w.title}`,
+    heading: '',
+    title: w.title,
+    text: w.text,
+  });
 }
 
 const out = { generated: new Date().toISOString().slice(0, 10), docs };

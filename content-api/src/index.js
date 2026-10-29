@@ -193,6 +193,36 @@ function submitterAddress(row) {
   return m ? m[0] : null;
 }
 
+/* ---------------- public submissions ---------------- */
+// Five posts an hour from one address, across all three boards: far more than a
+// person posts, far fewer than a script wants. Same counter as the newsletter
+// (rate_limits), its own bucket.
+const SUBMIT_MAX = 5;
+const SUBMIT_WINDOW = 60 * 60;
+
+/* ---------------- hidden works ---------------- */
+const PREVIEW_MINUTES = 30;
+// How much of a work the search index carries: the abstract and opening, which
+// is what tells a searcher this is the one (see mockup/search-index.mjs).
+const LIBRARY_TEXT_CAP = 2000;
+
+// Placeholder notes (<span class="ph">) are questions to the forum, not text.
+const plainText = (html) => String(html || '')
+  .replace(/<span class="ph">[\s\S]*?<\/span>/g, ' ')
+  .replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/\s+/g, ' ').trim();
+
+/** Whether a preview pass opens this one item. */
+async function previewAllowed(env, token, collection, itemId) {
+  if (!token) return false;
+  const row = await env.DB.prepare(
+    "SELECT 1 FROM preview_tokens WHERE token_hash = ? AND collection = ? AND item_id = ? AND expires_at > strftime('%s','now')",
+  ).bind(await sha256hex(token), collection, itemId).first();
+  return Boolean(row);
+}
+
 /** The row behind a token, or null if it is unknown, spent or expired. */
 async function readSetupToken(env, token) {
   if (!token) return null;
@@ -311,44 +341,51 @@ async function whoami(request, env) {
 // hides an item from visitors without deleting it (migration 0015). It is never
 // in publicStatus, so the public read withholds it like a draft.
 //
-// 'archived' and 'rejected' are the archive (migration 0016): removed by an
-// editor, or turned down by a moderator. Withheld the same way, and deleted for
-// good only from the archive.
+// 'deleted' and 'rejected' are the recycle bin (migrations 0016, 0017): removed
+// by an editor, or turned down by a moderator. Withheld the same way, deleted
+// for good from the bin by hand, and purged by the daily cron BIN_DAYS after
+// they went in (updated_at is when; nothing edits a binned row).
 //
 // `moderated` marks the three public boards: they take a reject with an optional
-// notice to the submitter, and their per-user read marks. `private` fields are
-// stripped from every non-admin read: the submitter's address is collected to
-// answer them, not to publish.
+// notice to the submitter, per-user read marks, and an expiry date after which
+// the site stops showing a post. `private` fields are stripped from every
+// non-admin read: the submitter's address is collected to answer them, not to
+// publish.
+const BIN = ['deleted', 'rejected'];
+const BIN_DAYS = 30;
 const COLLECTIONS = {
-  events:   { table: 'events',     order: 'date DESC',      statuses: ['draft', 'published', 'frozen'], publicStatus: ['published'],
+  events:   { table: 'events',     order: 'date DESC',      statuses: ['draft', 'published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { title: 'title', date: 'date', time: 'time', location: 'location', description: 'description', registerUrl: 'register_url', status: 'status', demo: 'demo' } },
   // News is moderated like the boards, not drafted like events: the seed and the
   // admin's own status dropdown both use pending/approved. Filtering it on
   // 'published' returned zero rows and would have emptied the homepage feed.
   // news.html invites anyone to post, so it takes public submissions like the
   // boards; without publicSubmit every visitor's post was refused with a 401.
-  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
               private: ['submitterEmail', 'rejectNote'],
-              fields: { title: 'title', date: 'date', section: 'section', summary: 'summary', link: 'link', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', status: 'status', demo: 'demo' } },
-  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+              fields: { title: 'title', date: 'date', expires: 'expires', section: 'section', summary: 'summary', link: 'link', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', status: 'status', demo: 'demo' } },
+  board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
               private: ['submitterEmail', 'rejectNote'],
-              fields: { title: 'title', category: 'category', description: 'description', region: 'region', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', date: 'date', status: 'status', demo: 'demo' } },
-  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'archived'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+              fields: { title: 'title', category: 'category', description: 'description', region: 'region', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', date: 'date', expires: 'expires', status: 'status', demo: 'demo' } },
+  jobs:     { table: 'jobs',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
               private: ['submitterEmail', 'rejectNote'],
-              fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', description: 'description', date: 'date', status: 'status', demo: 'demo' } },
-  library:  { table: 'library',    order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
+              fields: { role: 'role', institution: 'institution', category: 'category', region: 'region', scope: 'scope', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', description: 'description', date: 'date', expires: 'expires', status: 'status', demo: 'demo' } },
+  // page_html, the full text of a work (migration 0017), is deliberately not a
+  // field: it is megabytes across 104 rows and only ever read one at a time,
+  // through /api/content/library/:id/page, which enforces the status itself.
+  library:  { table: 'library',    order: 'position ASC',      statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { title: 'title', kind: 'kind', description: 'description', url: 'url', purchaseUrl: 'purchase_url', author: 'author', date: 'date', status: 'status', demo: 'demo' } },
-  teaching: { table: 'teaching',   order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
+  teaching: { table: 'teaching',   order: 'position ASC',      statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { title: 'title', group: 'grp', url: 'url', status: 'status', demo: 'demo' } },
-  forms:    { table: 'forms',      order: 'position ASC',      statuses: ['published', 'frozen', 'archived'], publicStatus: ['published'],
+  forms:    { table: 'forms',      order: 'position ASC',      statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { title: 'title', category: 'category', description: 'description', url: 'url', status: 'status', demo: 'demo' } },
-  mapPoints:{ table: 'map_points', order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+  mapPoints:{ table: 'map_points', order: 'position ASC',      statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { name: 'name', town: 'town', count: 'count', lat: 'lat', lng: 'lng', url: 'url', status: 'status', demo: 'demo' } },
-  institutions: { table: 'institutions', order: 'position ASC, name ASC', statuses: ['pending', 'active', 'inactive', 'frozen'], publicStatus: ['active'],
+  institutions: { table: 'institutions', order: 'position ASC, name ASC', statuses: ['pending', 'active', 'inactive', 'frozen', 'deleted'], publicStatus: ['active'],
               fields: { name: 'name', town: 'town', stage: 'stage', status: 'status', url: 'url', contact: 'contact', description: 'description', demo: 'demo' } },
-  videos:   { table: 'videos',     order: 'position ASC',      statuses: ['published', 'frozen'], publicStatus: ['published'],
+  videos:   { table: 'videos',     order: 'position ASC',      statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               fields: { title: 'title', youtubeId: 'youtube_id', description: 'description', status: 'status', demo: 'demo' } },
-  podcast:  { table: 'podcast',    order: 'num DESC',          statuses: ['published', 'frozen'], publicStatus: ['published'],
+  podcast:  { table: 'podcast',    order: 'num DESC',          statuses: ['published', 'frozen', 'deleted'], publicStatus: ['published'],
               // spotifyId holds a bare episode id, like videos.youtubeId. `url` stays
               // exposed so the three legacy columns remain readable, but the admin no
               // longer offers it - see migration 0010.
@@ -357,16 +394,33 @@ const COLLECTIONS = {
 
 const SINGLETONS = ['about'];
 
+/* ---------------- roles ---------------- */
+// editor edits content; admin also moderates (approve, reject, bin a submission)
+// and deletes for good; super_admin also manages users. The management key is a
+// super_admin. Checked here, not only hidden in the admin, because a button the
+// UI does not draw is still a request anyone signed in can send.
+const RANK = { editor: 1, admin: 2, super_admin: 3 };
+const atLeast = (user, role) => Boolean(user) && (RANK[user.role] || 0) >= RANK[role];
+
+// Today in Israel, as YYYY-MM-DD. A post's expiry date is the last day it shows,
+// and "today" has to be the forum's day, not UTC's, or a post would vanish at
+// two or three in the morning the day before.
+const todayIL = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem' }).format(new Date());
+
 // Origins allowed to call this API from a browser. An allowlist, not a mirror:
 // reflecting whatever Origin arrives means any page on the web can script calls
 // against this API using a visitor's browser. Credentials are not sent
 // cross-origin here, so the old behaviour was not an account-takeover hole, but
 // it does hand out the whole surface for free.
 //
+// The admin has an origin of its own (admin-site/), so its session token and
+// management key sit in a localStorage no public page shares.
+//
 // *.pages.dev is matched by pattern because Cloudflare Pages mints a new
 // hostname for every branch and PR preview, which is where this is heading.
 const ALLOWED_ORIGINS = [
   'https://orenknaan.github.io',
+  'https://waldorf-admin.orenknaan.workers.dev',
   'https://waldorf.co.il',
   'https://www.waldorf.co.il',
 ];
@@ -387,7 +441,8 @@ const cors = (origin) => {
     // 'authorization' matters: session logins send a bearer token, and a header
     // missing from this list makes the browser fail the preflight before the
     // request is ever sent, which reads as "login is broken", not "CORS".
-    'Access-Control-Allow-Headers': 'content-type,x-admin-key,authorization',
+    // x-preview-token is the admin's one-off pass to a hidden work's page.
+    'Access-Control-Allow-Headers': 'content-type,x-admin-key,authorization,x-preview-token',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
   };
@@ -402,7 +457,8 @@ const json = (body, status, origin) =>
 const newId = () => 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 /** DB row -> the camelCase object the renderers expect. Nulls are dropped so
- *  `if (item.link)` keeps behaving the way it did with the old seed objects. */
+ *  `if (item.link)` keeps behaving the way it did with the old seed objects.
+ *  An admin read also gets updatedAt, which the recycle bin counts down from. */
 function toApi(row, spec, admin) {
   const out = { id: row.id };
   for (const [api, col] of Object.entries(spec.fields)) {
@@ -413,27 +469,55 @@ function toApi(row, spec, admin) {
     out[api] = v;
   }
   if (row.position !== undefined) out.position = row.position;
+  if (admin && row.updated_at !== undefined) out.updatedAt = row.updated_at;
   return out;
+}
+
+// The columns a list read selects: the spec's, never SELECT *, so a heavy
+// column like library.page_html is not pulled for every row of every request.
+const listCols = (spec) => ['id', 'position', 'updated_at', ...new Set(Object.values(spec.fields))].join(',');
+
+/** One collection, the way the caller may see it: a visitor gets live, unexpired rows. */
+async function listOne(env, spec, admin) {
+  let sql = `SELECT ${listCols(spec)} FROM ${spec.table}`;
+  const binds = [];
+  if (!admin && spec.publicStatus) {
+    sql += ` WHERE status IN (${spec.publicStatus.map(() => '?').join(',')})`;
+    binds.push(...spec.publicStatus);
+    if (spec.moderated) { sql += ' AND (expires IS NULL OR expires = \'\' OR expires >= ?)'; binds.push(todayIL()); }
+  }
+  sql += ` ORDER BY ${spec.order}`;
+  const { results } = await env.DB.prepare(sql).bind(...binds).all();
+  return results.map((r) => toApi(r, spec, admin));
 }
 
 async function listAll(env, admin) {
   const out = {};
-  for (const [name, spec] of Object.entries(COLLECTIONS)) {
-    let sql = `SELECT * FROM ${spec.table}`;
-    const binds = [];
-    if (!admin && spec.publicStatus) {
-      sql += ` WHERE status IN (${spec.publicStatus.map(() => '?').join(',')})`;
-      binds.push(...spec.publicStatus);
-    }
-    sql += ` ORDER BY ${spec.order}`;
-    const { results } = await env.DB.prepare(sql).bind(...binds).all();
-    out[name] = results.map((r) => toApi(r, spec, admin));
-  }
+  for (const [name, spec] of Object.entries(COLLECTIONS)) out[name] = await listOne(env, spec, admin);
   for (const key of SINGLETONS) {
     const row = await env.DB.prepare('SELECT value FROM singletons WHERE key = ?').bind(key).first();
     out[key] = row ? JSON.parse(row.value) : null;
   }
   return out;
+}
+
+/** Empties the recycle bin of everything older than BIN_DAYS. Run by the cron. */
+async function purgeBin(env) {
+  const cutoff = Math.floor(Date.now() / 1000) - BIN_DAYS * 86400;
+  let purged = 0;
+  for (const [name, spec] of Object.entries(COLLECTIONS)) {
+    const binds = [...BIN, cutoff];
+    const where = `status IN (${BIN.map(() => '?').join(',')}) AND updated_at < ?`;
+    if (spec.moderated) {
+      await env.DB.prepare(`DELETE FROM item_reads WHERE collection = ? AND item_id IN (SELECT id FROM ${spec.table} WHERE ${where})`)
+        .bind(name, ...binds).run();
+    }
+    const res = await env.DB.prepare(`DELETE FROM ${spec.table} WHERE ${where}`).bind(...binds).run();
+    purged += res.meta.changes || 0;
+  }
+  // Spent and expired preview passes go with it.
+  await env.DB.prepare("DELETE FROM preview_tokens WHERE expires_at < strftime('%s','now')").run();
+  return purged;
 }
 
 export default {
@@ -955,6 +1039,27 @@ export default {
       return json({ error: 'method_not_allowed' }, 405, origin);
     }
 
+    // ---- GET /api/admin/config ----
+    // Settings the admin words things from: the fixed paragraph a rejection
+    // notice opens with, whether the server can mail it at all, and how long the
+    // recycle bin keeps things. One source each, so the admin cannot drift from
+    // what the Worker actually does.
+    if (parts[0] === 'api' && parts[1] === 'admin' && parts[2] === 'config' && request.method === 'GET') {
+      if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      return json({ rejectDefault: REJECT_DEFAULT, mailConfigured: Boolean(env.RESEND_API_KEY && env.MAIL_FROM), binDays: BIN_DAYS }, 200, origin);
+    }
+
+    // ---- GET /api/library-text ----
+    // The opening of every published work as plain text, for the site search
+    // index (mockup/search-index.mjs). Published only: a hidden work's text is
+    // exactly what must not reach the public index.
+    if (parts[0] === 'api' && parts[1] === 'library-text' && request.method === 'GET') {
+      const { results } = await env.DB.prepare(
+        "SELECT id, title, page_html FROM library WHERE status = 'published' AND page_html IS NOT NULL ORDER BY position",
+      ).all();
+      return json(results.map((r) => ({ id: r.id, title: r.title, text: plainText(r.page_html).slice(0, LIBRARY_TEXT_CAP) })), 200, origin);
+    }
+
     if (parts[0] !== 'api' || parts[1] !== 'content') return json({ error: 'not_found' }, 404, origin);
 
     // ---- GET /api/content  (everything, one round trip) ----
@@ -966,15 +1071,44 @@ export default {
     const spec = COLLECTIONS[name];
     if (!spec) return json({ error: 'unknown_collection', name }, 404, origin);
     const id = parts[3];
+    const one = (rid) => env.DB.prepare(`SELECT ${listCols(spec)} FROM ${spec.table} WHERE id = ?`).bind(rid).first();
+
+    // ---- GET /api/content/library/:id/page ----
+    // A work's full text. Its page on the site is a shell that asks for it here,
+    // so a work taken off the site is off it for real: the text is no longer in
+    // a static file anyone can fetch. A visitor gets it only while the work is
+    // published; an admin, or a page holding a preview pass the admin minted,
+    // gets it whatever the status.
+    if (request.method === 'GET' && name === 'library' && id && parts[4] === 'page') {
+      const row = await env.DB.prepare('SELECT id, title, status, page_html FROM library WHERE id = ?').bind(id).first();
+      let allowed = row && (row.status === 'published' || admin);
+      if (row && !allowed) allowed = await previewAllowed(env, request.headers.get('x-preview-token'), 'library', id);
+      if (!row || !allowed || !row.page_html) return json({ error: 'not_found' }, 404, origin);
+      return json({ id: row.id, title: row.title, status: row.status, html: row.page_html }, 200, origin);
+    }
+
+    // ---- POST /api/content/library/:id/preview ----
+    // Mints a short-lived pass to one hidden work's page, so a signed-in editor
+    // can check it on the real site, with its real styling, without that page
+    // ever holding their credentials. Hashed at rest like a session token.
+    if (request.method === 'POST' && name === 'library' && id && parts[4] === 'preview') {
+      if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      const token = crypto.randomUUID().replace(/-/g, '');
+      await env.DB.prepare(
+        `INSERT INTO preview_tokens (token_hash, collection, item_id, expires_at) VALUES (?, 'library', ?, strftime('%s','now') + ?)`,
+      ).bind(await sha256hex(token), id, PREVIEW_MINUTES * 60).run();
+      return json({ token, expiresInMinutes: PREVIEW_MINUTES }, 200, origin);
+    }
 
     // ---- POST /api/content/:collection/:id/reject {notify, message} ----
-    // Turns a submission down: it moves to the archive as 'rejected'. With
+    // Turns a submission down: it moves to the recycle bin as 'rejected'. With
     // notify, the submitter is sent the fixed notice plus the moderator's words.
     // `mailed` says whether a provider actually sent it; when it did not, the
     // reply carries the address and text so the admin can hand them to the
     // moderator's own mail app instead of claiming a mail went out.
     if (request.method === 'POST' && id && parts[4] === 'reject') {
       if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      if (!atLeast(user, 'admin')) return json({ error: 'forbidden' }, 403, origin);
       if (!spec.moderated) return json({ error: 'not_moderated' }, 400, origin);
       const body = (await request.json().catch(() => ({}))) || {};
       const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
@@ -988,21 +1122,12 @@ export default {
       }
       await env.DB.prepare(`UPDATE ${spec.table} SET status = 'rejected', reject_note = ?, updated_at = strftime('%s','now') WHERE id = ?`)
         .bind(notice ? notice.text : null, id).run();
-      const saved = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
-      return json({ item: toApi(saved, spec, true), notice }, 200, origin);
+      return json({ item: toApi(await one(id), spec, true), notice }, 200, origin);
     }
 
     // ---- GET /api/content/:collection ----
     if (request.method === 'GET' && !id) {
-      let sql = `SELECT * FROM ${spec.table}`;
-      const binds = [];
-      if (!admin && spec.publicStatus) {
-        sql += ` WHERE status IN (${spec.publicStatus.map(() => '?').join(',')})`;
-        binds.push(...spec.publicStatus);
-      }
-      sql += ` ORDER BY ${spec.order}`;
-      const { results } = await env.DB.prepare(sql).bind(...binds).all();
-      return json(results.map((r) => toApi(r, spec, admin)), 200, origin);
+      return json(await listOne(env, spec, admin), 200, origin);
     }
 
     // ---- POST /api/content/:collection ----
@@ -1012,9 +1137,21 @@ export default {
       const body = await request.json().catch(() => null);
       if (!body || typeof body !== 'object') return json({ error: 'bad_body' }, 400, origin);
 
+      if (!admin) {
+        // Honeypot: a field a person never sees, so only a form-filling bot fills
+        // it. It is answered like a success, or the bot learns what tripped it.
+        if (body.website) return json({ id: newId(), status: 'pending' }, 201, origin);
+        const wait = await rateLimit(env, 'submit', clientIp(request), SUBMIT_MAX, SUBMIT_WINDOW);
+        if (wait) return tooMany(wait, origin);
+      }
+
       const rec = { ...body, id: body.id || newId() };
-      // A visitor cannot publish itself onto the site, whatever it posts.
+      delete rec.website;
+      // A visitor cannot publish itself onto the site, whatever it posts, and an
+      // editor's own post on a board waits for a moderator like anyone's.
       if (!admin) { rec.status = 'pending'; rec.demo = false; delete rec.rejectNote; }
+      else if (spec.moderated && !atLeast(user, 'admin')) rec.status = 'pending';
+      if (rec.status !== undefined && !spec.statuses.includes(rec.status)) return json({ error: 'bad_status' }, 400, origin);
       // An address that cannot be one is dropped rather than stored, so a
       // rejection never tries to mail it.
       if (rec.submitterEmail !== undefined && !isEmail(String(rec.submitterEmail).trim().toLowerCase())) delete rec.submitterEmail;
@@ -1036,8 +1173,7 @@ export default {
         await env.DB.prepare(`INSERT OR IGNORE INTO item_reads (user_id,collection,item_id,read_at) VALUES (?,?,?,strftime('%s','now'))`)
           .bind(user.id, name, rec.id).run();
       }
-      const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(rec.id).first();
-      return json(toApi(row, spec, admin), 201, origin);
+      return json(toApi(await one(rec.id), spec, admin), 201, origin);
     }
 
     // ---- PATCH /api/content/:collection/:id ----
@@ -1045,6 +1181,18 @@ export default {
       if (!admin) return json({ error: 'unauthorized' }, 401, origin);
       const body = await request.json().catch(() => null);
       if (!body || typeof body !== 'object') return json({ error: 'bad_body' }, 400, origin);
+      if (body.status !== undefined) {
+        if (!spec.statuses.includes(body.status)) return json({ error: 'bad_status' }, 400, origin);
+        // On a board, every status change is a moderation decision: approving,
+        // freezing, binning, restoring. An editor may still edit the text.
+        if (spec.moderated && !atLeast(user, 'admin')) return json({ error: 'forbidden' }, 403, origin);
+      }
+      // Approval is publication, so a board post's date becomes the day it went
+      // up, unless the moderator set one in the same request.
+      if (spec.moderated && body.status === 'approved' && body.date === undefined) {
+        const cur = await env.DB.prepare(`SELECT status FROM ${spec.table} WHERE id = ?`).bind(id).first();
+        if (cur && cur.status === 'pending') body.date = todayIL();
+      }
 
       const sets = [], binds = [];
       for (const [api, col] of Object.entries(spec.fields)) {
@@ -1059,13 +1207,14 @@ export default {
 
       const res = await env.DB.prepare(`UPDATE ${spec.table} SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
       if (!res.meta.changes) return json({ error: 'not_found', id }, 404, origin);
-      const row = await env.DB.prepare(`SELECT * FROM ${spec.table} WHERE id = ?`).bind(id).first();
-      return json(toApi(row, spec, admin), 200, origin);
+      return json(toApi(await one(id), spec, admin), 200, origin);
     }
 
     // ---- DELETE /api/content/:collection/:id ----
+    // Deleting for good, as opposed to binning, is an admin's call.
     if (request.method === 'DELETE' && id) {
       if (!admin) return json({ error: 'unauthorized' }, 401, origin);
+      if (!atLeast(user, 'admin')) return json({ error: 'forbidden' }, 403, origin);
       const res = await env.DB.prepare(`DELETE FROM ${spec.table} WHERE id = ?`).bind(id).run();
       if (!res.meta.changes) return json({ error: 'not_found', id }, 404, origin);
       if (spec.moderated) await env.DB.prepare('DELETE FROM item_reads WHERE collection = ? AND item_id = ?').bind(name, id).run();
@@ -1073,5 +1222,11 @@ export default {
     }
 
     return json({ error: 'method_not_allowed' }, 405, origin);
+  },
+
+  // Daily (wrangler.toml [triggers]): empties the recycle bin of anything that
+  // has sat in it for BIN_DAYS.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(purgeBin(env).then((n) => console.log(`recycle bin: ${n} row(s) purged`)));
   },
 };

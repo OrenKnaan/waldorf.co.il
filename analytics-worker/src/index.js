@@ -29,7 +29,10 @@ const ALLOWED_DAYS = [1, 7, 30, 90];
 //
 // *.pages.dev is matched by pattern because Cloudflare Pages mints a new
 // hostname for every branch and PR preview, which is where this is heading.
+// The admin, the only caller that holds DASH_KEY, has an origin of its own
+// (admin-site/); the site's own origins stay for the transition.
 const ALLOWED_ORIGINS = [
+  'https://waldorf-admin.orenknaan.workers.dev',
   'https://orenknaan.github.io',
   'https://waldorf.co.il',
   'https://www.waldorf.co.il',

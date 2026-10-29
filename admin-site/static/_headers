@@ -1,0 +1,11 @@
+# Security headers for every admin response. The CSP is the second half of the
+# move to an origin of its own: scripts only from here (plus the inline blocks
+# the pages carry), and network calls only to the two Workers and to the public
+# site, which the about editor reads its fixed text from.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://waldorf-content-api.orenknaan.workers.dev https://waldorf-analytics.orenknaan.workers.dev https://orenknaan.github.io; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'
+  X-Robots-Tag: noindex, nofollow, noarchive
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

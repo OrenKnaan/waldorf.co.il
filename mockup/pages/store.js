@@ -7,7 +7,7 @@
  * record the public pages render, instead of a copy in one person's browser.
  *
  * Keeping get() synchronous is deliberate. Every call site in dynamic.js and
- * admin-app.js was written against a synchronous store, so instead of making
+ * the admin (admin/js/) was written against a synchronous store, so instead of making
  * them all async we load every collection once into memory and let get() read
  * from that cache. Callers wait on WStore.ready, which the renderers do for
  * them, so page code did not have to change.
@@ -38,7 +38,17 @@
   // along on every public page too: the server answered with drafts, pending
   // posts and frozen items, and the editor checking a change on the site saw a
   // page no visitor sees. Public pages now always read as a visitor.
-  var ADMIN_PAGE = /\/admin\//.test(location.pathname);
+  //
+  // The admin now has an origin of its own (admin-site/), so a session can no
+  // longer sit in the public site's localStorage at all. Credentials go only from
+  // that origin, or from localhost, where both are served together for testing.
+  // On any other origin, anything an older admin left behind is cleared.
+  var ADMIN_ORIGIN = 'https://waldorf-admin.orenknaan.workers.dev';
+  var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var ADMIN_PAGE = /\/admin\//.test(location.pathname) && (location.origin === ADMIN_ORIGIN || LOCAL);
+  if (location.origin !== ADMIN_ORIGIN && !LOCAL) {
+    try { localStorage.removeItem(KEY_SESS); localStorage.removeItem(KEY_ADMIN); } catch (e) {}
+  }
   function headers(extra) {
     var h = extra || {};
     if (!ADMIN_PAGE) return h;
@@ -157,6 +167,9 @@
     },
 
     /* ---- moderation ---- */
+    adminConfig: function () { return req('/api/admin/config'); },
+    // A short-lived pass to one hidden work's page on the site (#preview=<token>).
+    previewWork: function (id) { return req('/api/content/library/' + encodeURIComponent(id) + '/preview', { method: 'POST', body: '{}' }); },
     // Which submissions the signed-in user has opened, per moderated collection.
     reads: function () { return req('/api/reads'); },
     markRead: function (col, ids, read) {
@@ -202,6 +215,17 @@
         })
         .catch(function (e) { reload().finally(function () { emit(e); }); });
       return rec;
+    },
+
+    /** A visitor's post from a public form. Not optimistic like add(): the form
+     *  has to say whether it went through, and the server may refuse it (too
+     *  many posts from one address, 429). Resolves with the saved row. */
+    submit: function (col, item) {
+      return req('/api/content/' + col, { method: 'POST', body: JSON.stringify(item) }).then(function (saved) {
+        if (cache) (cache[col] = cache[col] || []).unshift(saved);
+        emit();
+        return saved;
+      });
     },
 
     update: function (col, id, patch) {

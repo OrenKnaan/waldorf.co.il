@@ -138,6 +138,7 @@ h2{font-family:var(--font-head);font-size:1.15rem;margin:22px 0 8px}
 <p class="note">זמני ופנימי: לא חלק מהאתר הציבורי, ולא מופיע בתפריט הניווט.</p>
 {{BODY}}
 </div>
+<script src="./js/config.js"></script>
 <script src="../sorting.js" defer></script>
 </body>
 </html>

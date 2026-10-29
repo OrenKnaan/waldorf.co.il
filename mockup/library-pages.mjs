@@ -3,8 +3,10 @@
 // and the accessibility and search layers verbatim.
 //
 //   node mockup/library-pages.mjs         # writes pages/lib-<id>.html
-//   node mockup/patch-search.mjs          # then — no-op over these, see below
-//   node mockup/search-index.mjs          # then — indexes them
+//   node mockup/patch-old-site-links.mjs  # then, rewrites their old-site links
+//   node mockup/library-shells.mjs        # then, moves the text into D1 and
+//                                         # leaves each page a shell (see there)
+//   node mockup/search-index.mjs          # then, indexes the text from D1
 //
 // Why pages and not an accordion: an archive item needs an address. The old
 // site's 66 article URLs currently redirect to the library index, which drops a
@@ -371,4 +373,4 @@ console.log(`${written} library item page(s) written, ${withFiles} with attached
 if (deadLinks) console.log(`${deadLinks} footnote link(s) whose target is missing from the archive were unlinked.`);
 if (oldNav) console.log(`${oldNav} cross-site "קדימה" link(s) replaced by the local chapter pager.`);
 if (covers) console.log(`${covers} book cover lifted out of the text into a framed title card.`);
-console.log('Now run: node mockup/patch-old-site-links.mjs && node mockup/patch-search.mjs && node mockup/search-index.mjs');
+console.log('Now run: node mockup/patch-old-site-links.mjs && node mockup/library-shells.mjs, load its SQL into D1, then node mockup/search-index.mjs');

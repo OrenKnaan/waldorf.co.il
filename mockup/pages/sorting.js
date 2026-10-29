@@ -169,7 +169,10 @@
     }
     if (item.redirectsTo) {
       var to = el('a', null, 'ההפניה מובילה כיום אל ' + item.redirectsTo.replace(/^\//, ''));
-      to.href = '.' + item.redirectsTo;
+      // The new page, on the public site: these pages live on the admin's own
+      // origin (admin-site/), where a relative link would point into the admin.
+      to.href = (window.WAdminConfig ? window.WAdminConfig.site : '..') + item.redirectsTo;
+      to.target = 'waldorf-site';
       links.appendChild(to);
     }
     li.appendChild(links);

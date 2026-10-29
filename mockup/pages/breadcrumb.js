@@ -22,6 +22,15 @@
     });
   } catch (e) { /* לא קריטי — שאר העמוד ממשיך לעבוד */ }
 
+  // A library item page fills <main> in from the API (library.js), so the
+  // crumbs and headings this reads are not there yet when it first runs.
+  if (document.querySelector('main[data-lib-pending]')) {
+    document.addEventListener('lib:loaded', crumbsAndTracking, { once: true });
+    return;
+  }
+  crumbsAndTracking();
+
+  function crumbsAndTracking() {
   var banner = document.querySelector('main .pagebanner');
   if (!banner) return;
   var crumbs = banner.querySelector('.crumbs');
@@ -408,5 +417,6 @@
       }
     });
     mo.observe(main, { childList: true, subtree: true });
+  }
   }
 })();

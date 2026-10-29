@@ -8,6 +8,11 @@ name = "waldorf-content-api"
 main = "src/index.js"
 compatibility_date = "2026-08-01"
 
+# Daily at 02:30 UTC: empty the recycle bin of anything older than 30 days
+# (BIN_DAYS in src/index.js).
+[triggers]
+crons = ["30 2 * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "waldorf-content"
@@ -49,7 +54,7 @@ ACTIVETRAIL_DOUBLE_OPTIN = "true"
 # Without it the Worker falls back to the caller's Origin, right from a browser
 # and empty from anything else, so a link minted by a script or destined for an
 # email comes out relative and unusable.
-ADMIN_BASE_URL = "https://orenknaan.github.io/waldorf.co.il"
+ADMIN_BASE_URL = "https://waldorf-admin.orenknaan.workers.dev"
 
 # ---------------------------------------------------------------------------
 # Outgoing mail (Resend): set-password links and rejection notices

@@ -1,0 +1,68 @@
+/* admin.css: styles for what the admin's scripts build (js/). The dashboard's
+   own layout and tokens are in admin-dashboard.html. */
+
+/* ---- the add/edit form ---- */
+.aform{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--sink)}
+/* --ink, not --brown-dark: label text, and --ink is the label ink in all four
+   :root blocks, the same token .field label uses. --brown-dark once meant two
+   things on the two dark paths, which left these labels near-black on dark. */
+.aform label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--ink)}
+.aform .wide{grid-column:1/-1}
+.aform input,.aform select,.aform textarea{font-family:inherit;font-size:.88rem;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:9px 12px}
+/* The focus ring has to show against the field it rings: --tan measured 2.27:1
+   on --paper, under the 3:1 WCAG 1.4.11 asks of a focus indicator. --tan-dark
+   plus a ring of its own survives both dark paths too. */
+.aform input:focus-visible,.aform select:focus-visible,.aform textarea:focus-visible{outline:none;border-color:var(--tan-dark);box-shadow:0 0 0 3px color-mix(in oklab,var(--tan-dark) 45%,transparent)}
+.aform textarea{min-height:70px;resize:vertical}
+.aform .field-hint{font-size:.74rem;font-weight:400;color:var(--muted);line-height:1.45}
+.aform .actions{grid-column:1/-1;display:flex;gap:10px}
+
+/* ---- top-bar search ---- */
+.search{position:relative}
+.search-results{position:absolute;inset-inline:0;top:calc(100% + 6px);z-index:30;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);max-height:340px;overflow:auto;padding:4px}
+.search-results[hidden]{display:none}
+.search-results button{display:flex;width:100%;gap:8px;align-items:baseline;justify-content:space-between;text-align:start;background:none;border:0;border-radius:var(--r);padding:8px 10px;font:inherit;font-size:.84rem;color:var(--ink);cursor:pointer}
+.search-results button:hover,.search-results button:focus-visible,.search-results button[aria-selected=true]{background:var(--sink);outline:none}
+.search-results small{color:var(--muted);font-size:.74rem;white-space:nowrap}
+.search-results .none{padding:10px;color:var(--muted);font-size:.84rem}
+
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;padding:14px 20px 18px;font-size:.88rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;color:var(--ink)}
+.tag-demo{font-size:.7rem;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-pill);padding:1px 8px;margin-inline-start:6px}
+
+/* ---- recycle bin, past posts ---- */
+.archive{border-top:1px solid var(--line)}
+.archive summary{cursor:pointer;padding:12px 20px;font-size:.86rem;font-weight:600;color:var(--muted)}
+.archive summary:hover{color:var(--brown)}
+.archive .empty-hint{padding-top:0}
+
+/* ---- moderation ---- */
+/* clip, not hidden: hidden makes the panel a scroll container, and the floating
+   "unread only" button can then never stick to the viewport. */
+.mod-panel{overflow:clip}
+.mod-title{background:none;border:0;padding:0;font:inherit;color:inherit;text-align:start;cursor:pointer}
+.mod-title:hover{color:var(--brown);text-decoration:underline}
+tr.unread .mod-title{font-weight:700}
+tr.unread .mod-title::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--info-ink);margin-inline-end:8px;vertical-align:middle}
+.mod-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+tr.mod-detail td,tr.mod-reject td{background:var(--sink)}
+.mod-detail .kv{padding:6px 4px}
+.mod-detail dd{white-space:pre-wrap}
+.mod-foot,.mod-pager{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:12px 20px}
+.mod-foot[hidden],.mod-pager[hidden]{display:none}
+.mod-pager{border-top:1px solid var(--line)}
+.mod-pager .btn[aria-current]{pointer-events:none}
+.mod-foot.floating{position:sticky;bottom:14px;z-index:5;pointer-events:none}
+.mod-foot.floating .btn{pointer-events:auto;box-shadow:var(--shadow)}
+.mod-msg{margin:12px 20px 0}
+.mod-msg:empty{display:none}
+.reject-box{display:grid;gap:10px;padding:6px 4px;font-size:.86rem;color:var(--ink)}
+.reject-box .btns{display:flex;gap:8px;flex-wrap:wrap}
+.reject-box blockquote{margin:0;padding:8px 12px;border-inline-start:3px solid var(--line);color:var(--muted);white-space:pre-wrap}
+.reject-box textarea{min-height:80px;resize:vertical;font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--paper);color:var(--ink)}
+
+/* ---- about: history ---- */
+.hist-note{font-weight:600;color:var(--ink);margin-bottom:2px}
+.hist-field+.hist-field{border-top:1px dashed var(--line);margin-top:4px;padding-top:4px}
+.hist-field b{color:var(--ink)}

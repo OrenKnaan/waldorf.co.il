@@ -1,0 +1,23 @@
+# The admin, on an origin of its own.
+#
+# It used to be published with the site on GitHub Pages, at /admin/. One origin
+# means one localStorage, so the session token and the management key the admin
+# keeps there were readable by any script running on any public page: a single
+# script bug on the site was an account takeover. Here no public page shares the
+# origin. pages.yml now publishes redirects in place of the old /admin/ pages.
+#
+# Static assets only, no Worker code. Built from mockup/pages/admin plus the
+# three shared scripts it loads from one level up:
+#
+#     node admin-site/build.mjs
+#     cd admin-site && npx wrangler@4 deploy
+#
+# Production should also put Cloudflare Access in front of this hostname
+# (Workers & Pages -> waldorf-admin -> Settings -> Domains & Routes -> workers.dev
+# -> enable Cloudflare Access), so the login page is not the only door.
+name = "waldorf-admin"
+compatibility_date = "2026-08-01"
+
+[assets]
+directory = "./dist"
+html_handling = "auto-trailing-slash"

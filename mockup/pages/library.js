@@ -54,6 +54,8 @@
        styles come to it instead of the element changing to suit the selector. */
     '.lib-body{max-width:68ch;margin-inline:auto;padding:26px 30px;background:var(--white);border:1px solid var(--tan-dark);border-radius:var(--radius-lg);box-shadow:var(--shadow)}',
     '.lib-body h2{font-size:1.35rem;margin:26px 0 10px}',
+    '.lib-loading{max-width:68ch;margin:40px auto;text-align:center;color:var(--brown)}',
+    '.lib-preview-note{max-width:72ch;margin:0 auto 14px;padding:9px 14px;border-radius:var(--radius-lg);background:color-mix(in oklab,var(--wash-gold) 30%,var(--white));color:var(--brown-dark);font-size:.86rem;text-align:center}',
     '.lib-body h3{font-size:1.1rem;margin:22px 0 8px;font-family:var(--font-head);color:var(--brown)}',
     '.lib-body h4,.lib-body h5,.lib-body h6{font-size:1rem;margin:18px 0 6px;font-family:var(--font-head);color:var(--brown)}',
     '.lib-body p{margin:0 0 14px}',
@@ -664,11 +666,61 @@
     draw();
   }
 
+  /* ---------- an item page's text, from the content API ---------- */
+  // The page is a shell (mockup/library-shells.mjs): the text lives in D1 and
+  // the Worker hands it over only while the work is published, or to a page
+  // holding a preview pass the admin minted (#preview=<token>). That is what
+  // makes hiding a work real; a check in this script alone would only hide what
+  // the file still carried. Same Worker as store.js, which an item page does not
+  // load because it fetches every collection on arrival.
+  var API = 'https://waldorf-content-api.orenknaan.workers.dev';
+  function loadItem(main) {
+    var pass = /(?:^|[#&])preview=([a-f0-9]+)/.exec(location.hash);
+    var id = 'lb-' + main.getAttribute('data-lib-item');
+    return fetch(API + '/api/content/library/' + encodeURIComponent(id) + '/page',
+      { headers: pass ? { 'x-preview-token': pass[1] } : {} })
+      .then(function (r) { return r.ok ? r.json() : null; }, function () { return false; })
+      .then(function (data) {
+        main.removeAttribute('data-lib-pending');
+        if (data && data.html) {
+          // Markup the build wrote (library-shells.mjs), never anything a user
+          // typed: page_html is not a field the API lets anyone edit.
+          main.innerHTML = data.html;
+          document.title = data.title + ' ' + document.title.replace(/^ספריית תוכן\s*/, '');
+          if (data.status !== 'published') {
+            var note = document.createElement('p');
+            note.className = 'lib-preview-note';
+            note.setAttribute('role', 'note');
+            note.textContent = 'תצוגה מקדימה: הפריט אינו מוצג באתר, והקישור הזה פתוח רק למי שקיבל אותו ממערכת הניהול.';
+            main.insertBefore(note, main.querySelector('.lib-head'));
+          }
+          initItemPage();
+          var target = !pass && location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+          if (target) target.scrollIntoView();
+        } else {
+          var msg = main.querySelector('.lib-loading');
+          msg.textContent = data === false
+            ? 'לא ניתן לטעון את הפריט כרגע. בדקו את החיבור ונסו לרענן את העמוד.'
+            : 'הפריט אינו זמין: הוא הוסר מהאתר, או שהקישור שגוי. ';
+          if (data !== false) {
+            var back = document.createElement('a');
+            back.href = './content-library.html';
+            back.textContent = 'לספריית התוכן';
+            msg.appendChild(back);
+          }
+        }
+        // breadcrumb.js waits for this before it reads <main>.
+        document.dispatchEvent(new Event('lib:loaded'));
+      });
+  }
+
   /* ---------- boot ---------- */
   injectCSS();
 
-  if (document.querySelector('main[data-lib-item]')) {
-    initItemPage();
+  var itemMain = document.querySelector('main[data-lib-item]');
+  if (itemMain) {
+    if (itemMain.hasAttribute('data-lib-pending')) loadItem(itemMain);
+    else initItemPage();
     return;
   }
 

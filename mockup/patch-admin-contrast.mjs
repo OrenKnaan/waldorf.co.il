@@ -99,7 +99,7 @@ const EDITS = [
   // var(--brown-dark) and got #120C07 on the --sink #251C15 panel - 1.16:1,
   // invisible - but only until the visitor touched the theme toggle, because the
   // attribute block had already been corrected and the media block had not. That
-  // rule now reads var(--ink) (admin-app.js), the same token .field label uses;
+  // rule now reads var(--ink) (admin/admin.css), the same token .field label uses;
   // these edits remove the divergence that let one token mean two things.
   //
   // 2026-08-22 split the old --brown-dark in two - --tip-bg for the one dark

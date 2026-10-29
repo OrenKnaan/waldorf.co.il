@@ -8,6 +8,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily, so the search index follows D1: a work hidden in the admin drops out
+  # of it, and a newly approved post becomes findable, within a day even when
+  # nothing is pushed.
+  schedule:
+    - cron: '45 2 * * *'
 
 permissions:
   contents: read
@@ -28,6 +33,27 @@ jobs:
       - uses: actions/checkout@v4
       - name: Drop internal probe/harness files from the published preview
         run: rm -f mockup/pages/_*.html
+      # Rebuilt from D1 at deploy time rather than trusted from the commit. If
+      # the API cannot be reached, the committed index ships instead of a
+      # partial one (search-index.mjs exits non-zero in that case).
+      - name: Rebuild the search index
+        run: node mockup/search-index.mjs || git checkout -- mockup/pages/search-index.json
+      # The admin has its own origin (admin-site/, waldorf-admin.orenknaan.workers.dev),
+      # so no public page shares its localStorage, where the session token and the
+      # management key live. Here each admin page becomes a redirect to the same
+      # path there, query and hash included, so bookmarks and set-password links
+      # minted before the move still land. The triage data goes with it: it is
+      # admin-only and was never meant to be public.
+      - name: Replace the admin with redirects to its own origin
+        run: |
+          cd mockup/pages/admin
+          for f in *.html; do
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive"><title>מערכת הניהול</title>' \
+              "<script>location.replace('https://waldorf-admin.orenknaan.workers.dev/admin/$f' + location.search + location.hash);</script>" \
+              "<a href=\"https://waldorf-admin.orenknaan.workers.dev/admin/$f\">מערכת הניהול עברה לכתובת חדשה</a>" > "$f.stub"
+          done
+          find . -mindepth 1 ! -name '*.stub' -exec rm -rf {} +
+          for f in *.stub; do mv "$f" "${f%.stub}"; done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

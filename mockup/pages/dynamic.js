@@ -82,6 +82,9 @@
     '.dyn-form textarea{min-height:74px;resize:vertical}',
     '.dyn-form .actions{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
     '.dyn-form .ok-msg{color:var(--brown-dark);background:#E7EEDF;border-radius:var(--radius-organic,999px);padding:6px 15px;font-size:.84rem;font-weight:600}',
+    '.dyn-form .ok-msg.err{background:#F1DED7}',
+    '.dyn-form .ok-msg:empty{display:none}',
+    '.dyn-hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%)}',
     '.dyn-note{font-size:.8rem;color:var(--text-muted);margin:2px 0 14px}',
     '.dyn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}',
     '.dyn-video{background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}',
@@ -229,12 +232,14 @@
       });
     }
     function submitForm(cfg2, after) {
-      var msg = el('span', { class: 'ok-msg', text: cfg2.okText || 'המודעה נשלחה ותוצג לאחר אישור מנהל.', hidden: '' });
+      // Always in the page and empty until there is news, so a screen reader
+      // announces what lands in it.
+      var msg = el('span', { class: 'ok-msg', role: 'status' });
       var inputs = {};
       var fields = cfg2.fields.map(function (f) {
         var input = f.type === 'textarea' ? el('textarea', { name: f.name })
           : f.type === 'select' ? el('select', { name: f.name }, f.options.map(function (o) { return el('option', { value: o, text: o }); }))
-          : el('input', { type: f.type === 'email' ? 'email' : 'text', name: f.name, required: f.required ? '' : null, autocomplete: f.type === 'email' ? 'email' : null });
+          : el('input', { type: f.type === 'email' || f.type === 'date' ? f.type : 'text', name: f.name, required: f.required ? '' : null, autocomplete: f.type === 'email' ? 'email' : null });
         // el() writes a null attribute as the string "null", so an optional field
         // came out required. Removed by what the field asks for, not by its value.
         if (!f.required) input.removeAttribute('required');
@@ -242,26 +247,41 @@
         inputs[f.name] = input;
         return el('label', { class: f.wide ? 'wide' : '' }, [document.createTextNode(f.label), input]);
       });
+      // Honeypot, the same one the newsletter form carries: out of sight and out
+      // of the tab order, so only a form-filling bot fills it in. The Worker
+      // answers such a post like a success and stores nothing.
+      var hp = el('input', { name: 'website', type: 'text', tabindex: '-1', autocomplete: 'off', id: 'hp-' + cfg2.collection });
+      var send = el('button', { class: 'dyn-btn', type: 'submit', text: cfg2.submitLabel });
       var d = el('details', { class: 'dyn-form' }, [
         el('summary', { text: cfg2.formTitle }),
         el('form', {
           class: 'fields',
           onsubmit: function (e) {
             e.preventDefault();
-            var item = { date: todayISO(), status: 'pending' };
+            var form = e.target;
+            var item = { date: todayISO(), status: 'pending', website: hp.value };
             cfg2.fields.forEach(function (f) { item[f.name] = inputs[f.name].value.trim(); });
             if (!item[cfg2.fields[0].name]) return;
-            var added = WStore.add(cfg2.collection, item);
-            WStore.markMine(added.id);
-            e.target.reset();
-            msg.hidden = false;
-            after();
+            send.disabled = true;
+            msg.textContent = '';
+            // Waits for the server: a post refused (too many from this address,
+            // or the network) must not be reported as sent.
+            WStore.submit(cfg2.collection, item).then(function (saved) {
+              WStore.markMine(saved.id);
+              form.reset();
+              msg.textContent = cfg2.okText || 'המודעה נשלחה ותוצג לאחר אישור מנהל.';
+              msg.className = 'ok-msg';
+              after();
+            }, function (err) {
+              msg.textContent = err && err.status === 429
+                ? 'נשלחו יותר מדי פרסומים מהחיבור הזה בשעה האחרונה. נסו שוב מאוחר יותר.'
+                : 'השליחה נכשלה. בדקו את החיבור ונסו שוב; מה שכתבתם נשמר בטופס.';
+              msg.className = 'ok-msg err';
+            }).then(function () { send.disabled = false; });
           }
         }, fields.concat([
-          el('div', { class: 'actions' }, [
-            el('button', { class: 'dyn-btn', type: 'submit', text: cfg2.submitLabel }),
-            msg
-          ])
+          el('div', { class: 'dyn-hp', 'aria-hidden': 'true' }, [el('label', { for: 'hp-' + cfg2.collection, text: 'אתר' }), hp]),
+          el('div', { class: 'actions' }, [send, msg])
         ]))
       ]);
       return d;

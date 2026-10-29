@@ -188,7 +188,7 @@ button{font-family:inherit;cursor:pointer}
 .content{padding:24px 26px 48px;max-width:1080px;width:100%}
 .view[hidden]{display:none}
 .crumb{font-size:.78rem;color:var(--muted);margin-bottom:14px}
-/* links from a view to the public pages that show its content (admin-app.js, SITE_PAGES) */
+/* links from a view to the public pages that show its content (js/home.js, SITE_PAGES) */
 .site-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 18px;font-size:.78rem;color:var(--muted)}
 .site-links a{display:inline-flex;align-items:center;gap:6px;color:var(--brown);background:var(--sink);border:1.5px solid var(--line);border-radius:var(--r-organic-sm);padding:4px 11px;text-decoration:none;font-weight:600}
 .site-links a:hover,.site-links a:focus-visible{background:var(--hover-tint);border-color:var(--brown);color:var(--ink)}
@@ -325,6 +325,7 @@ td.muted{color:var(--muted)}
     .an-tip-bubble{transition:none}
   }
 </style>
+<link rel="stylesheet" href="./admin.css">
 </head>
 <body style="margin:0">
 <div id="app">
@@ -566,6 +567,23 @@ td.muted{color:var(--muted)}
 <script src="../store.js"></script>
 <script src="../dynamic.js"></script>
 <script src="./admin-analytics.js"></script>
-<script src="./admin-app.js"></script>
+<!-- The admin, one file per view (js/core.js explains the shape). Order matters:
+     config and core first, then the shared list and bin, the views, boot last. -->
+<script src="./js/config.js"></script>
+<script src="./js/core.js"></script>
+<script src="./js/bin.js"></script>
+<script src="./js/list.js"></script>
+<script src="./js/events.js"></script>
+<script src="./js/news.js"></script>
+<script src="./js/inst.js"></script>
+<script src="./js/lib.js"></script>
+<script src="./js/media.js"></script>
+<script src="./js/mod.js"></script>
+<script src="./js/about.js"></script>
+<script src="./js/people.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/newsletter.js"></script>
+<script src="./js/home.js"></script>
+<script src="./js/boot.js"></script>
 </body>
 </html>
