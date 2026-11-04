@@ -501,7 +501,7 @@
 
   function initArchive(mount) {
     var scope = mount.getAttribute('data-lib-archive');   // 'works' | 'book'
-    // 'ספר אלקטרוני' has its own showcase, ebooks.html, and never belongs here.
+    // 'ספר אלקטרוני' has its own showcase, books.html, and never belongs here.
     var all = window.WStore.get('library').filter(function (r) {
       if (r.kind === 'ספר אלקטרוני') return false;
       return scope === 'book' ? r.kind === 'ספר' : r.kind !== 'ספר';

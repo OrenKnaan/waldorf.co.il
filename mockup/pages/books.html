@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzNEMkIxRiIvPjxwYXRoIGQ9Ik0xNiA2Yy02IDMtOCA4LTggMTMgNS0xIDktNSAxMC0xMy0xIDAtMSAwLTIgMHoiIGZpbGw9IiNDNEE4ODIiLz48L3N2Zz4=">
-<title>ספרים אלקטרוניים — מוקאפ</title>
+<title>ספרים — מוקאפ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -450,6 +450,18 @@
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
 
+  /* ===== page overrides ===== */
+  /* The featured book leads the open-books list: its cover framed the way
+     library.js frames it on the book's own pages (.lib-cover), text beside it. */
+  .book-feature{display:flex;flex-wrap:wrap;align-items:center;gap:20px;margin:0 0 16px;padding:20px 22px;border-radius:var(--radius-organic);background:radial-gradient(90% 120% at 88% 0%,color-mix(in oklab,var(--wash-gold) 26%,transparent),transparent 62%),radial-gradient(80% 120% at 6% 100%,color-mix(in oklab,var(--wash-sage) 20%,transparent),transparent 60%),var(--beige)}
+  .book-feature .shot{flex:none;display:block;padding:7px;background:var(--white);border-radius:var(--radius-organic-sm);box-shadow:var(--shadow-lg)}
+  .book-feature .shot img{display:block;border-radius:2px;margin:0}
+  .book-feature .bf-body{flex:1 1 260px;min-width:0}
+  .book-feature .bf-tag{display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:var(--radius-organic-sm);background:var(--brown);color:var(--white);font-size:.74rem;font-weight:600}
+  .book-feature h3{margin:0 0 4px;font-family:var(--font-head);font-size:1.25rem;line-height:1.3;color:var(--brown-dark)}
+  .book-feature .bf-by{margin:0 0 8px;font-size:.86rem;color:var(--text-muted)}
+  .book-feature p{margin:0 0 12px}
+
   /* ===== shape: plain rounded corners for text containers and images, the
      organic blob for everything else =====
      The rest of the site already runs every button, badge, dropdown and
@@ -586,8 +598,8 @@
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "ספרים אלקטרוניים",
-      "item": "./ebooks.html"
+      "name": "ספרים",
+      "item": "./books.html"
     }
   ]
 }
@@ -638,7 +650,7 @@
 <a class="dropdown-link" href="./news.html">הודעות</a>
 <a class="dropdown-link" href="./events.html">אירועים</a>
 <a class="dropdown-link" href="./content-library.html">ספריית תוכן</a>
-<a class="dropdown-link" href="./ebooks.html">ספרים אלקטרוניים</a>
+<a class="dropdown-link" href="./books.html">ספרים</a>
 <a class="dropdown-link" href="./media.html">מדיה</a>
 <div class="dropdown-sep"></div>
 <div class="dropdown-head">לוח מודעות</div>
@@ -651,7 +663,7 @@
 </div></nav>
 </header>
 <script>(function(){var header=document.querySelector('.site-header');var toggle=header&&header.querySelector('.nav-toggle');var nav=document.getElementById('primary-nav');if(!header||!toggle||!nav)return;var mq=window.matchMedia('(max-width:720px)');function close(){header.classList.remove('nav-open');toggle.setAttribute('aria-expanded','false');}toggle.addEventListener('click',function(){var open=header.classList.toggle('nav-open');toggle.setAttribute('aria-expanded',open?'true':'false');toggle.setAttribute('aria-label',open?'סגירת תפריט':'פתיחת תפריט');});nav.addEventListener('click',function(e){if(!mq.matches)return;var link=e.target.closest('.nav-link');if(!link)return;var item=link.closest('.nav-item');if(!item||!item.querySelector('.dropdown')||item.classList.contains('open'))return;e.preventDefault();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});item.classList.add('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});mq.addEventListener('change',function(){close();nav.querySelectorAll('.nav-item.open').forEach(function(o){o.classList.remove('open');});});})();</script>
-<script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|ebooks|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
+<script>(function(){var here=(location.pathname.split('/').pop()||'home.html').toLowerCase();document.querySelectorAll('.primary-nav a[href]').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop().toLowerCase();if(h===here){a.classList.add('active');var it=a.closest('.nav-item');var t=it&&it.querySelector('.nav-link');if(t)t.classList.add('active');}});var g=null;if(/^forum/.test(here))g='forum';else if(/^waldorf/.test(here))g='waldorf';else if(/^(kinder|school|curriculum|teacher-training|associations)/.test(here))g='inst';else if(/^(news|content-library|books|media|community-board|job-board|links)/.test(here))g='resources';else if(/^contact/.test(here))g='contact';else if(here===''||/^home/.test(here))g='home';if(g){var p=document.querySelector('.primary-nav [data-nav="'+g+'"]');if(p)p.classList.add('active');}})();</script>
 <main id="main-content" tabindex="-1">
   <div class="art-hero slideshow" data-art-slideshow data-art-set="resources">
 <div class="ah-media" aria-hidden="true">
@@ -660,28 +672,38 @@
 <svg class="ico-pause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
 <svg class="ico-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>
 </button>
-<h1 class="hero-title">ספרים אלקטרוניים</h1>
+<h1 class="hero-title">ספרים</h1>
 </div>
   <nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<span class="crumb current" aria-current="page">ספרים אלקטרוניים</span>
+<span class="crumb current" aria-current="page">ספרים</span>
 </span>
   </nav>
-<p>ספר אחד פתוח לקריאה חינם באתר, ולצדו ספרים אלקטרוניים שאפשר לרכוש באתר חיצוני. העבודות והמאמרים שאינם ספרים נמצאים בספריית התוכן, לא כאן.</p>
 <section class="card">
-<h2 id="sec-15gspj2"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> הספר הפתוח לקריאה</h2>
-<p>הספר "חינוך ולדורף, עקרונות ויישומים" נכתב על ידי מורי בית הספר ולדורף הרדוף בסתיו 2000, ופתוח לקריאה חינם, פרק אחר פרק.</p>
+<h2 id="sec-246gbd"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg> ספרים אלקטרוניים פתוחים לקריאה</h2>
+<div class="book-feature">
+<span class="shot"><img src="./wp-content/uploads/2016/12/%D7%94%D7%A1%D7%A4%D7%A8.jpg" alt="כריכת הספר &quot;חינוך ולדורף, עקרונות ויישומים&quot;" width="162" height="157" loading="lazy" decoding="async"></span>
+<div class="bf-body">
+<span class="bf-tag">ספר מומלץ</span>
+<h3>חינוך ולדורף, עקרונות ויישומים</h3>
+<p class="bf-by">מורי בית הספר ולדורף הרדוף, סתיו 2000</p>
+<p>הספר מציג את חינוך ולדורף כפי שהתפתח ומיושם בבתי הספר ולדורף בארץ, ופתוח לקריאה חינם, פרק אחר פרק.</p>
 <div class="btn-row">
 <a class="btn btn-primary" href="./lib-p2038.html">קריאה חופשית בספר</a>
 <a class="btn btn-ghost" href="./content-library.html">כל פרקי הספר בספריית התוכן</a>
 </div>
+</div>
+</div>
+<div id="dyn-ebooks"></div>
 </section>
 <section class="card">
-<h2 id="sec-uihayy"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M6 17h13M9 3v7l2.5-1.6L14 10V3"/></svg> ספרים נוספים</h2>
-<p>ספרים פתוחים לקריאה חינם באתר מופיעים עם קישור לקריאה; ספרים הנרכשים באתר חיצוני מופיעים עם קישור לרכישה, שנפתח בחלון חדש.</p>
-<div id="dyn-ebooks"></div>
+<h2 id="sec-152n7zs"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg> חנות ספרים</h2>
+<p>ספרים בהוצאת הפורום הארצי לחינוך ולדורף, לרכישה בחנות המקוונת של הפורום.</p>
+<div class="btn-row">
+<a class="btn btn-primary" href="https://pay.sumit.co.il/539e34/53mo9d/" target="_blank" rel="noopener">לחנות הספרים <span aria-hidden="true">←</span><span class="sr-only"> (נפתח בחלון חדש)</span></a>
+</div>
 </section>
 
 </main>

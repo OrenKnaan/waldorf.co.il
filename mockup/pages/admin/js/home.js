@@ -146,7 +146,7 @@
     events: [['events.html', 'אירועים'], ['home.html', 'דף הבית'], ['forum.html', 'הפורום']],
     news: [['news.html', 'הודעות'], ['home.html', 'דף הבית']],
     inst: [['kinder-list.html', 'רשימת גני ילדים'], ['school-list.html', 'רשימת בתי ספר']],
-    lib: [['content-library.html', 'ספריית תוכן'], ['ebooks.html', 'ספרים אלקטרוניים']],
+    lib: [['content-library.html', 'ספריית תוכן'], ['books.html', 'ספרים']],
     media: [['media.html', 'מדיה']],
     about: [['forum.html', 'הפורום']],
     mod: [['news.html', 'הודעות'], ['community-board.html', 'לוח קהילתי'], ['job-board.html', 'לוח משרות']],

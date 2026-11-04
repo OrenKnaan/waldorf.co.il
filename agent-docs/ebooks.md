@@ -1,17 +1,23 @@
-# E-books showcase
+# Books page (e-books and the book store)
 
 Moved out of the root `CLAUDE.md` (2026-10-28) so it loads only when a task needs it. The root file keeps the rules; this is the detail behind them.
 
-## E-books showcase (ספרים אלקטרוניים)
+## Books page (ספרים)
 
 Permanent, requested by the forum on 2026-10-11 as its own page: one book is read on this
-site for free, and future e-books are bought elsewhere.
+site for free, and future e-books are bought elsewhere. On 2026-11-04 the forum renamed it
+from "ספרים אלקטרוניים" (`ebooks.html`) to "ספרים" (`books.html`), merged its two sections
+into one, "ספרים אלקטרוניים פתוחים לקריאה", and added a second, "חנות ספרים", a single link
+to the forum's own store for the books it publishes (`pay.sumit.co.il/539e34/53mo9d/`).
+Nothing redirects from `ebooks.html`: the mockup had no visitors to keep.
 
-- `mockup/pages/ebooks.html` hardcodes the one fully open book, "חינוך ולדורף, עקרונות
-  ויישומים" (a link to its first chapter, `lib-p2038.html`, plus a link to the full archive
-  on `content-library.html`), since there is exactly one of those and it predates this page.
-  Everything else comes from D1's `library` collection with `kind = 'ספר אלקטרוני'`, rendered
-  by `WDyn.renderEbooks` in `mockup/pages/dynamic.js`.
+- `mockup/pages/books.html` hardcodes the one fully open book, "חינוך ולדורף, עקרונות
+  ויישומים", as the featured first entry (`.book-feature`, its cover framed like
+  `library.js`'s `.lib-cover`; CSS below the page's `page overrides` marker), with a link
+  to its first chapter, `lib-p2038.html`, plus a link to the full archive on
+  `content-library.html`, since there is exactly one of those and it predates this page.
+  Everything after it comes from D1's `library` collection with `kind = 'ספר אלקטרוני'`,
+  rendered by `WDyn.renderEbooks` in `mockup/pages/dynamic.js`.
 - The `library` table gained a `purchase_url` column (migration `0013_library_ebooks.sql`,
   content API field `purchaseUrl`). A row with `purchase_url` set renders a "לרכישה" link
   that opens in a new tab (leaving the site to buy); a row with only `url` set renders a
@@ -24,8 +30,13 @@ site for free, and future e-books are bought elsewhere.
   WordPress post behind it: it combines five pieces from the triage archive (an intro, a
   curriculum summary, and three age-group chapters) by hand into one page, the same way the
   main book's cover and chapter rail are hand-built rather than generated per record.
+- Those two rows' `page_html` carries a breadcrumb and a "חזרה לספרים" button back to
+  `books.html`. It lives in D1 and in `content-api/seed/library-pages.sql`, and
+  `library-shells.mjs` cannot regenerate it (it skips pages that are already shells), so a
+  change to either link is a hand edit to the seed plus the same `replace()` run against
+  the remote database.
 - `mockup/pages/library.js` excludes `kind = 'ספר אלקטרוני'` from `content-library.html`'s own
-  works/book grids, so an e-book shows up on `ebooks.html` only, not twice.
-- `mockup/patch-ebooks-nav.mjs` adds the nav entry (idempotent, `ENABLED = false` to strip).
+  works/book grids, so an e-book shows up on `books.html` only, not twice.
+- `mockup/patch-books-nav.mjs` adds the nav entry (idempotent, `ENABLED = false` to strip).
 - Migrations `0012` through `0014` are applied to the production D1 database (confirmed
   2026-10-28, when `wrangler d1 migrations list --remote` showed only `0015` pending).

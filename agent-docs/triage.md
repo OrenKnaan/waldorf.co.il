@@ -18,7 +18,7 @@ separate article, per the forum) against the actual `curriculum-*.html` pages fo
 subject buckets with no match anywhere: בוטמר ומשחקים (2 items) and אמנות הדיבור (5 items,
 only a passing mention of "דקלום" in `curriculum-hebrew.html`). Everything else checked out:
 **ספרים אלקטרוניים** (was "ספרייה") and **עבודות גמר** turned out to already be fully covered
-by `content-library.html` and `ebooks.html` (built before this reorg), the other 15 subject
+by `content-library.html` and `books.html` (built before this reorg), the other 15 subject
 categories map onto real `curriculum-*.html` content, and the "pages" group's "already on the
 new site" notes held up against `school.html`/`kinder.html`/`school-list.html`/`kinder-list.html`.
 Both gaps were put to Gilad on 2026-10-19 and are resolved now: בוטמר ומשחקים is dropped

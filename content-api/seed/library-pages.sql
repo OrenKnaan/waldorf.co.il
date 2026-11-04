@@ -1972,7 +1972,7 @@ UPDATE library SET page_html = '<nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./ebooks.html">ספרים אלקטרוניים</a>
+<a class="crumb" href="./books.html">ספרים</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
 <span class="crumb current" aria-current="page">22 שאלות ותשובות על חינוך ולדורף</span>
 </span>
@@ -1986,7 +1986,7 @@ UPDATE library SET page_html = '<nav class="pagebanner" aria-label="breadcrumb">
     </div>
     <div class="btn-row lib-actions">
       <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
-      <a class="btn btn-ghost" href="./ebooks.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספרים אלקטרוניים</a>
+      <a class="btn btn-ghost" href="./books.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספרים</a>
     </div>
   </div>
 
@@ -20632,7 +20632,7 @@ UPDATE library SET page_html = '<nav class="pagebanner" aria-label="breadcrumb">
     <span class="crumbs">
 <a class="crumb" href="./home.html">דף הבית</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
-<a class="crumb" href="./ebooks.html">ספרים אלקטרוניים</a>
+<a class="crumb" href="./books.html">ספרים</a>
 <span class="crumb-sep" aria-hidden="true">/</span>
 <span class="crumb current" aria-current="page">אמנות הדיבור</span>
 </span>
@@ -20644,7 +20644,7 @@ UPDATE library SET page_html = '<nav class="pagebanner" aria-label="breadcrumb">
     </div>
     <div class="btn-row lib-actions">
       <button type="button" class="btn btn-primary" data-lib-download><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg> הורדת הפריט</button>
-      <a class="btn btn-ghost" href="./ebooks.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספרים אלקטרוניים</a>
+      <a class="btn btn-ghost" href="./books.html"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg> חזרה לספרים</a>
     </div>
   </div>
 

@@ -1,6 +1,6 @@
 // Idempotent. The "hero: inset slideshow" block pulls the breadcrumb up onto the
 // slide by the slide's height and gives that height back underneath. On a page with
-// no art-hero (the newsletter issues and ebooks.html shipped that way) the same
+// no art-hero (the newsletter issues and books.html shipped that way) the same
 // margins lifted the bar over the header and left an empty slide-sized gap. This
 // scopes the pull to a bar that follows an art-hero; without one the bar stays in
 // the flow, 10px under the header like a slide would be.

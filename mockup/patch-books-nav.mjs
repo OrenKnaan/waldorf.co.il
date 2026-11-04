@@ -1,9 +1,9 @@
-// Adds the "ספרים אלקטרוניים" entry to the "מידע ומשאבים" dropdown of every
-// page, right after "ספריית תוכן". Idempotent, same pattern as
-// patch-associations-nav.mjs: set ENABLED = false and re-run to strip it back
-// out.
+// Adds the "ספרים" entry to the "מידע ומשאבים" dropdown of every page, right
+// after "ספריית תוכן". Idempotent, same pattern as patch-associations-nav.mjs:
+// set ENABLED = false and re-run to strip it back out. (Until 2026-11-04 the
+// page was ebooks.html, "ספרים אלקטרוניים"; the rename was a one-off rewrite.)
 //
-//   node mockup/patch-ebooks-nav.mjs
+//   node mockup/patch-books-nav.mjs
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -13,14 +13,14 @@ const ENABLED = true;
 const pagesDir = join(dirname(fileURLToPath(import.meta.url)), 'pages');
 
 const ANCHOR = '<a class="dropdown-link" href="./content-library.html">ספריית תוכן</a>\n';
-const LINK = '<a class="dropdown-link" href="./ebooks.html">ספרים אלקטרוניים</a>\n';
+const LINK = '<a class="dropdown-link" href="./books.html">ספרים</a>\n';
 const BLOCK = ANCHOR + LINK;
 
 // The inline nav script lights the parent "מידע ומשאבים" tab by matching the
-// filename against a group regex. Without "ebooks" in it, ebooks.html itself
+// filename against a group regex. Without "books" in it, books.html itself
 // loses the "you are here" cue.
 const GRP_OLD = '/^(news|content-library|media|community-board|job-board|links)/';
-const GRP_NEW = '/^(news|content-library|ebooks|media|community-board|job-board|links)/';
+const GRP_NEW = '/^(news|content-library|books|media|community-board|job-board|links)/';
 
 let placed = 0, already = 0, removed = 0, skipped = [], regrouped = 0;
 

@@ -50,7 +50,7 @@ Detail for each area is in `agent-docs/`. **Read the matching file before workin
 
 **Newsletter** (`agent-docs/newsletter.md`): the browser never calls ActiveTrail directly; the token is a Worker secret (`npx wrangler secret put ACTIVETRAIL_TOKEN`), never a file; never pass ActiveTrail's error body to the browser.
 
-**E-books** (`agent-docs/ebooks.md`) and **the triage section** (`agent-docs/triage.md`, admin-only, and it must be sorted before the domain moves because its files still load from the old site).
+**The books page** (`agent-docs/ebooks.md`, `books.html`) and **the triage section** (`agent-docs/triage.md`, admin-only, and it must be sorted before the domain moves because its files still load from the old site).
 
 **Hero images and page hero layout** (`agent-docs/hero.md`): a new page is cloned from a finished one, never generated.
 
