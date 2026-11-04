@@ -115,6 +115,16 @@
     '.crumb-menu a:focus-visible{outline:none}',
     // The trigger gets no focus box; keyboard focus shows as the underline instead.
     '.pagebanner button.crumb:focus-visible{outline:none;text-decoration:underline;color:var(--brown)}',
+    // In-page menu (section 4 below): the page's sections as a row of pills under
+    // the hero, wrapping onto more rows rather than scrolling sideways, so none hides.
+    '.page-toc{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 18px}',
+    '.page-toc-label{font-size:.82rem;font-weight:600;color:var(--brown-dark)}',
+    '.page-toc ul{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}',
+    '.page-toc a{display:inline-flex;align-items:center;min-height:34px;box-sizing:border-box;padding:5px 14px;',
+    '  border:1.5px solid var(--beige);border-radius:var(--radius-organic-sm);background:var(--white);',
+    '  box-shadow:var(--shadow);font-size:.86rem;font-weight:500;color:var(--brown-dark);text-decoration:none;transition:border-color .15s,background .15s}',
+    '.page-toc a:hover{border-color:var(--tan);background:var(--beige);color:var(--brown-dark)}',
+    '@media (max-width:560px){.page-toc a{min-height:44px}}',
     // The resting gap is 8px at every breakpoint, so the sticky offset is too:
     // at 6px the pill rose 2px here for the same reason it dropped 2px above.
     '@media (max-width:560px){.pagebanner{top:8px}}'
@@ -315,6 +325,60 @@
     for (var i = 0; i < all.length; i++) all[i].classList.toggle('crumb-end', all[i] === last);
   }
 
+  /* ---------- 4. תפריט ניווט בעמוד ----------
+     On a page with an art-hero and more than one visible <h2>, a row of links to
+     those sections sits under the hero: after the pill on the slideshow layout,
+     after the <h1> on the older one, where the hero is a picture and the title
+     follows it. Hidden headings (sr-only labels, inactive tabs) are left out.
+     Rebuilt only when the list of sections changes, because inserting it is itself
+     a change to <main> that the observer at the bottom reports. */
+  var hero = main.querySelector(':scope > .art-hero');
+  var toc = null, tocSig = null;
+
+  function buildToc() {
+    if (!hero) return;
+    var secs = headings.filter(function (h) {
+      return h.tagName === 'H2' && h.offsetWidth > 1 && h.offsetHeight > 1;
+    });
+    var sig = secs.map(function (h) { return h.id + '|' + h.textContent.trim(); }).join('\n');
+    if (sig === tocSig) return;
+    tocSig = sig;
+    if (toc) { toc.remove(); toc = null; }
+    if (secs.length < 2) return;
+
+    toc = document.createElement('nav');
+    toc.className = 'page-toc';
+    toc.setAttribute('aria-label', 'ניווט בעמוד');
+    var label = document.createElement('span');
+    label.className = 'page-toc-label';
+    label.setAttribute('aria-hidden', 'true');
+    label.textContent = 'בעמוד זה:';
+    var list = document.createElement('ul');
+    secs.forEach(function (h) {
+      var a = document.createElement('a');
+      a.href = '#' + encodeURIComponent(h.id);
+      a.textContent = h.textContent.trim();
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        goToHeading(h);
+        // Focus follows the jump, so the next Tab continues from the section.
+        if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+        h.focus({ preventScroll: true });
+      });
+      var li = document.createElement('li');
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+    toc.appendChild(label);
+    toc.appendChild(list);
+
+    var after = banner;
+    [hero, main.querySelector(':scope > h1')].forEach(function (el) {
+      if (el && after.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) after = el;
+    });
+    after.parentNode.insertBefore(toc, after.nextSibling);
+  }
+
   /* ---------- hamburger: appears when the pill sticks ---------- */
   var navRoot = document.querySelector('.primary-nav');
   var menuBtn = null, menuPanel = null;
@@ -404,6 +468,7 @@
   }
 
   collect();
+  buildToc();
   markEnd();
   schedule();
   window.addEventListener('scroll', schedule, { passive: true });
@@ -413,7 +478,7 @@
   if (window.MutationObserver) {
     var mo = new MutationObserver(function (muts) {
       for (var i = 0; i < muts.length; i++) {
-        if (!banner.contains(muts[i].target)) { collect(); schedule(); return; }
+        if (!banner.contains(muts[i].target)) { collect(); buildToc(); schedule(); return; }
       }
     });
     mo.observe(main, { childList: true, subtree: true });
