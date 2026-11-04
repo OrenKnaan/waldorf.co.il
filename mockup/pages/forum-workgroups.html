@@ -450,6 +450,13 @@
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
   /* ===== page overrides ===== */
+  /* The intro and Steiner's words share one panel, each part set apart by space
+     and a hairline; the quote in the heading face so it reads as his voice. */
+  .quote-panel{margin:0 0 16px;padding:18px 22px;background:#FCEFD9;border-inline-start:4px solid var(--tan-dark);border-radius:var(--radius);color:var(--brown-dark)}
+  .quote-panel>p{margin:0}
+  .quote-panel>blockquote{display:block;margin:0;padding:0;background:none;border:0;border-radius:0;font-family:var(--font-head);font-size:1.04rem;line-height:1.8}
+  /* After the blockquote reset above, which has the same weight as *+blockquote. */
+  .quote-panel>*+*,.quote-panel>*+blockquote{margin-top:16px;padding-top:16px;border-top:1px solid color-mix(in oklab,var(--tan-dark) 40%,transparent)}
   /* .form caps at two 420px columns, so inside a full-width card it sat hard
      against the inline edge with a third of the row empty beside it, and the
      submit button ended up far from where the last field left the eye. The card
@@ -688,8 +695,10 @@
 <span class="crumb current" aria-current="page">קבוצות עבודה</span>
 </span>
   </nav>
+<div class="quote-panel">
 <p>קבוצות העבודה מהוות זירה ללימוד והעמקה, כמו גם עידוד תקשורת ושיתוף בין מורי ולדורף בישראל. המורים המשתייכים לקבוצת עבודה מתקשרים בערוצים מגוונים — שיחות זום, קבוצת דיון, קבוצת וואטסאפ, דוא"ל ועוד — ככלים שמטרתם לשרת את התרומה ההדדית בין חברי הקבוצה.</p>
 <blockquote>"בקהילה של בני אדם הפועלים ביחד תהיה רווחתה של הקהילה גדולה יותר ככל שהיחיד ימעט לתבוע לעצמו את פרי עבודתו... ככל שהוא מוסר את מה שהוא מייצר לרעיו ולקהילה וככל שצרכיו מסופקים, לא מעבודתו שלו, כי אם בעבודתם של אחרים." — רודולף שטיינר, החוק החברתי היסודי</blockquote>
+</div>
 <section class="card">
 <h2 id="sec-jw1tw3">קבוצות פעילות</h2>
 <ul>

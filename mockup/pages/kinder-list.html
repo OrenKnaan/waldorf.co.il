@@ -459,6 +459,9 @@
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
   /* ===== page overrides ===== */
+  /* The link to the associations sits on the watercolour, not in a card, so it
+     needs a fill of its own; transparent, the texture showed through it. */
+  main>p>.btn-ghost{background:var(--white);box-shadow:var(--shadow)}
   /* A row arrived at from the associations page has to be findable in a list of
      this length, so it is tinted until the reader moves on. Tint only, no colour
      change on the text, which keeps every cell at its audited contrast. */

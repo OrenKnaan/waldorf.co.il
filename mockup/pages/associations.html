@@ -461,6 +461,12 @@
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
   /* ===== page overrides ===== */
+  /* Intro text set in a pale panel of the page's own colour instead of straight
+     on the watercolour, at a comfortable measure and line height. */
+  .page-lead{margin:0 0 22px;padding:20px 26px;border-radius:var(--radius-organic);background:color-mix(in oklab,var(--white) 86%,var(--cat));border:1px solid color-mix(in oklab,var(--cat) 45%,var(--white));border-inline-start:4px solid color-mix(in oklab,var(--cat) 60%,var(--brown));box-shadow:var(--shadow);color:var(--text);font-size:1.02rem;line-height:1.85}
+  .page-lead p{margin:0;max-width:75ch}
+  .page-lead p+p{margin-top:14px;padding-top:14px;border-top:1px solid color-mix(in oklab,var(--cat) 50%,transparent)}
+  @media (max-width:560px){.page-lead{padding:16px 18px}}
   /* Each association opens to the institutions it runs. <details> is used as
      it comes: the browser's own disclosure widget is already a button that
      announces its state and points its marker the right way in RTL, so
@@ -693,7 +699,9 @@
 <span class="crumb current" aria-current="page">עמותות מפעילות</span>
 </span>
   </nav>
+<div class="page-lead">
 <p>רוב בתי ספר ולדורף בארץ וחלק גדול מהגנים פועלים כמוסדות ממלכתיים, רשמיים לכל דבר. יחד עם זאת, חלק מבתי הספר והגנים מאוגדים בעמותות הורים. עמותות אלו מסייעות לגנים ובתי הספר בצורות שונות ומבוססות לרוב על תשלומי רשות או תרומות של הורים וידידי המוסדות.</p>
+</div>
 <div class="divider" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M0 6 C 20 0, 40 12, 60 6 S 100 0, 120 6 S 160 12, 180 6 S 200 0, 200 6" /></svg></div><section class="card">
 <h2 id="sec-14ndzwp">רשימת העמותות</h2>
 <p class="assoc-links"><a class="btn btn-ghost btn-sm" href="./school-list.html">רשימת בתי הספר <span aria-hidden="true">←</span></a><a class="btn btn-ghost btn-sm" href="./kinder-list.html">רשימת גני הילדים <span aria-hidden="true">←</span></a></p>

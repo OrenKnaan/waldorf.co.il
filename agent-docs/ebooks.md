@@ -14,8 +14,9 @@ Nothing redirects from `ebooks.html`: the mockup had no visitors to keep.
 - `mockup/pages/books.html` hardcodes the one fully open book, "חינוך ולדורף, עקרונות
   ויישומים", as the featured first entry (`.book-feature`, its cover framed like
   `library.js`'s `.lib-cover`; CSS below the page's `page overrides` marker), with a link
-  to its first chapter, `lib-p2038.html`, plus a link to the full archive on
-  `content-library.html`, since there is exactly one of those and it predates this page.
+  to its first chapter, `lib-p2038.html`, since there is exactly one of those and it predates
+  this page. (A "ספר מומלץ" badge and a link to its chapters on `content-library.html` were
+  removed at the forum's request the same day.)
   Everything after it comes from D1's `library` collection with `kind = 'ספר אלקטרוני'`,
   rendered by `WDyn.renderEbooks` in `mockup/pages/dynamic.js`.
 - The `library` table gained a `purchase_url` column (migration `0013_library_ebooks.sql`,

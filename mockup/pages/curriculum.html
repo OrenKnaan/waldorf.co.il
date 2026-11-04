@@ -469,6 +469,12 @@
      visible ring there is no way to tell where you are in them. */
   :focus-visible{outline:2px solid var(--brown);outline-offset:2px;border-radius:4px}
   /* ===== page overrides ===== */
+  /* Intro text set in a pale panel of the page's own colour instead of straight
+     on the watercolour, at a comfortable measure and line height. */
+  .page-lead{margin:0 0 22px;padding:20px 26px;border-radius:var(--radius-organic);background:color-mix(in oklab,var(--white) 86%,var(--cat));border:1px solid color-mix(in oklab,var(--cat) 45%,var(--white));border-inline-start:4px solid color-mix(in oklab,var(--cat) 60%,var(--brown));box-shadow:var(--shadow);color:var(--text);font-size:1.02rem;line-height:1.85}
+  .page-lead p{margin:0;max-width:75ch}
+  .page-lead p+p{margin-top:14px;padding-top:14px;border-top:1px solid color-mix(in oklab,var(--cat) 50%,transparent)}
+  @media (max-width:560px){.page-lead{padding:16px 18px}}
   /* Page-specific responsive tweaks. patch-responsive.mjs stops rewriting at the
      marker above, so anything below here survives a re-run. */
 
@@ -736,8 +742,10 @@
 <span class="crumb current" aria-current="page">תוכניות לימודים</span>
 </span>
   </nav>
-<p>תוכנית הלימודים המפורטת באתר מקורה בתוכנית הלימודים לבתי ספר ולדורף שהוצאה באנגלית (Rawson, R. &amp; Richter, T. — *The Educational Tasks and Content of the Steiner Waldorf Curriculum*, Steiner Schools Fellowship Publications), בעיבוד צוות מורים מבתי ספר ולדורף בארץ להתאמה לתרבות ולתנאים של ישראל. תוכנית הלימודים המובאת כאן מהווה <strong>המלצה בלבד</strong> לנושאי לימוד — כיוונים ומראי דרך, ולא תוכנית מחייבת ושרירותית: לכל ילדה וילד, לכל כיתה ולכל בית ספר יש בסופו של דבר את תוכנית הלימודים ומתודות ההוראה המתאימים להם.</p>
+<div class="page-lead">
+<p>תוכנית הלימודים המפורטת באתר מקורה בתוכנית הלימודים לבתי ספר ולדורף שהוצאה באנגלית (<span lang="en" dir="ltr">Rawson, R. &amp; Richter, T., <cite>The Educational Tasks and Content of the Steiner Waldorf Curriculum</cite>, Steiner Schools Fellowship Publications</span>), בעיבוד צוות מורים מבתי ספר ולדורף בארץ להתאמה לתרבות ולתנאים של ישראל. תוכנית הלימודים המובאת כאן מהווה <strong>המלצה בלבד</strong> לנושאי לימוד — כיוונים ומראי דרך, ולא תוכנית מחייבת ושרירותית: לכל ילדה וילד, לכל כיתה ולכל בית ספר יש בסופו של דבר את תוכנית הלימודים ומתודות ההוראה המתאימים להם.</p>
 <p>תוכנית הלימודים של בית הספר ולדורף בנויה כמארג של מקצועות הנפרשים על פני כל שנות הלימוד, א'-י"ב, כל אחד בקצב ובעומק המתאימים לשלב ההתפתחותי.</p>
+</div>
 <section class="card">
 <h2 id="sec-13esdvd">מבנה התוכנית</h2>
 <p>כל מקצוע מלווה את התלמיד לאורך שנים רבות, כשהתכנים מתעצבים מחדש בכל שכבת גיל. הבחירה כאן היא בהצגת התוכנית <strong>לפי מקצוע</strong> — לחצו על מקצוע לפרטים, כולל טווח הכיתות הרלוונטי.</p>

@@ -143,13 +143,13 @@
     return parseFloat(window.getComputedStyle(banner).top) || 0;
   }
 
-  function scrollToY(y) {
-    window.scrollTo({ top: Math.max(0, y), behavior: reduceMotion ? 'auto' : 'smooth' });
+  function scrollToY(y, instant) {
+    window.scrollTo({ top: Math.max(0, y), behavior: reduceMotion || instant ? 'auto' : 'smooth' });
   }
 
-  function goToHeading(h) {
+  function goToHeading(h, instant) {
     var offset = banner.getBoundingClientRect().height + stickyTop() + 16;
-    scrollToY(window.pageYOffset + h.getBoundingClientRect().top - offset);
+    scrollToY(window.pageYOffset + h.getBoundingClientRect().top - offset, instant);
   }
 
   /* ---------- 1. פירור העמוד הנוכחי: לחיצה מחזירה לראש העמוד ---------- */
@@ -331,9 +331,19 @@
      after the <h1> on the older one, where the hero is a picture and the title
      follows it. Hidden headings (sr-only labels, inactive tabs) are left out.
      Rebuilt only when the list of sections changes, because inserting it is itself
-     a change to <main> that the observer at the bottom reports. */
+     a change to <main> that the observer at the bottom reports.
+     Each link puts the section's name in the URL (#ניהול-וארגון-בית-ספר-ולדורף), not
+     the heading's id: the ids are search-index hashes (sec-106bf1n), the names are
+     what someone sharing the link can read. The browser cannot jump to a name no
+     element carries, so tocTarget() resolves it on load. */
   var hero = main.querySelector(':scope > .art-hero');
-  var toc = null, tocSig = null;
+  var toc = null, tocSig = null, tocNames = {};
+
+  function tocTarget() {
+    var name = '';
+    try { name = decodeURIComponent(location.hash.slice(1)); } catch (e) { return null; }
+    return name && !document.getElementById(name) ? tocNames[name] || null : null;
+  }
 
   function buildToc() {
     if (!hero) return;
@@ -354,12 +364,20 @@
     label.setAttribute('aria-hidden', 'true');
     label.textContent = 'בעמוד זה:';
     var list = document.createElement('ul');
+    tocNames = {};
     secs.forEach(function (h) {
+      var base = slug(h.textContent) || h.id, name = base, n = 2;
+      while (tocNames[name]) { name = base + '-' + n; n++; }
+      tocNames[name] = h;
+      var hash = '#' + encodeURIComponent(name);
       var a = document.createElement('a');
-      a.href = '#' + encodeURIComponent(h.id);
+      a.href = hash;
       a.textContent = h.textContent.trim();
       a.addEventListener('click', function (e) {
         e.preventDefault();
+        // pushState, so Back returns to where the reader was; it fires no
+        // hashchange and no native jump, which would fight the offset below.
+        if (location.hash !== hash) history.pushState(null, '', hash);
         goToHeading(h);
         // Focus follows the jump, so the next Tab continues from the section.
         if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
@@ -471,6 +489,12 @@
   buildToc();
   markEnd();
   schedule();
+  // A section name arriving in the URL: jump now, and again once images and
+  // fonts have loaded, since either can move the heading after the first jump.
+  if (tocTarget()) {
+    goToHeading(tocTarget(), true);
+    window.addEventListener('load', function () { var h = tocTarget(); if (h) goToHeading(h, true); }, { once: true });
+  }
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
 
