@@ -43,7 +43,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 ## A. Decisions, before any build work
 
-- [ ] **A1 [Oren] Canonical host: keep `www`.** Recommendation: keep `https://www.waldorf.co.il`
+- [x] **A1 [Oren] Canonical host: keep `www`.** Decided 2026-11-05. Recommendation: keep `https://www.waldorf.co.il`
   as canonical and redirect the apex to it, which is what the old site does. Switching to
   the apex would change the host of every indexed URL on top of the path changes.
   (The older docs said "www to apex"; corrected to follow this item.)
@@ -69,7 +69,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **A7 [forum] The seven `review` rows** in `migration/url-map.csv` (`migration/README.md`).
 - [ ] **A8 [forum] The 206 articles** (155 announcements, 51 capstone works): migrate into D1
   or retire. Affects their redirect targets, not whether they get one.
-- [ ] **A9 [forum + Oren] Contact and work-group forms.** Build a sending endpoint (B8), or
+- [ ] **A9 [forum + Oren] Contact and work-group forms.** Decided 2026-11-05: fixed after launch, so they ship not sending. Build a sending endpoint (B8), or
   replace the forms with the email address. Shipping forms that discard what people type is
   the one option that should not reach launch.
 - [ ] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
@@ -95,7 +95,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   `url-map.csv`.
 
 ### DNS and mail authentication
-- [ ] **B3 [Oren] Export the zone file from livedns** and keep it. Compare against the list
+- [x] **B3 [Oren] Export the zone file from livedns** and keep it. Done 2026-11-05, in `migration/dns-records.md`; it adds `teach.waldorf.co.il`. Compare against the list
   above: apex, `www`, `mail` A records, the MX, and anything not publicly visible.
 - [ ] **B4 [Oren] Create the Cloudflare zone** (free plan), let it import, diff against B3.
   `mail` and the MX stay **DNS only (grey cloud)**, pointing at 62.219.78.151. Do not change
