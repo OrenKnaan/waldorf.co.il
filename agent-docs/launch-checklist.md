@@ -43,6 +43,8 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 ## A. Decisions, before any build work
 
+- [ ] **A00 [forum] Hosting ends about 2026-11-12** (Oren, 2026-11-05: "in a week"). Extend it
+  by a month: the old site, the mail server and the only full backup are all on it (E6).
 - [ ] **A0 [Oren] Renew the domain.** ISOC's whois shows `validity: 13-11-2026` (checked
   2026-11-05). If it lapses, the site and the mail both stop.
 
@@ -76,7 +78,11 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   replace the forms with the email address. Shipping forms that discard what people type is
   the one option that should not reach launch.
 - [ ] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
-  in real use. The site publishes `haforumwaldorf@gmail.com`. This decides whether the livedns
+  in real use. Oren, 2026-11-05: yes, in use. `info@waldorf.co.il` is published on the old
+  site and on the new one (`forum.html`, `forum-sidebar.html`, the error messages in
+  `newsletter.js`), while `contact.html` shows `haforumwaldorf@gmail.com`. The mailbox list
+  is in cPanel (`https://www.waldorf.co.il:2083`, Email Accounts and Forwarders), not in the
+  livedns panel. The site publishes `haforumwaldorf@gmail.com`. This decides whether the livedns
   hosting can ever be cancelled (E6).
 - [ ] **A11 [forum] Privacy policy page.** The site collects names, emails and phone numbers
   (newsletter, noticeboard submissions, the forms). A privacy page is likely required under
