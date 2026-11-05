@@ -1,0 +1,228 @@
+# Launch checklist: from mockup to waldorf.co.il
+
+Written 2026-11-05 from the repo and from live checks run that day (DNS, the old site's
+sitemap and headers, Worker secrets). `agent-docs/launch-cutover.md` is the inventory of
+temporary scaffolding; this file is the order of work. Items are tagged with who acts:
+**[forum]**, **[Oren]** (accounts, dashboards, registrar), **[code]** (a repo change).
+
+Each item has an id (A1, B4…) so it can be referred to. Tick it when done and verified.
+
+## What the live checks found (2026-11-05)
+
+- The old site's canonical host is **`https://www.waldorf.co.il/`**: the homepage carries
+  `<link rel="canonical" href="https://www.waldorf.co.il/">` and `https://waldorf.co.il/`
+  answers 301 to `www`. Google has indexed the `www` URLs.
+- DNS at livedns: `A` for the apex, `www` and `mail` all point to **62.219.78.151**, the
+  same shared-hosting server that runs WordPress. `MX 0 mail.waldorf.co.il`. No TXT records
+  at all (no SPF, no DMARC, none of the ActiveTrail or Resend records), no CAA, and **no DS
+  record, so DNSSEC is off** and changing nameservers needs no DNSSEC step.
+- The old sitemap now lists 63 pages, 334 posts, 27 categories, 5 program categories and
+  1 calendar entry. **Three posts published since the inventory are missing from
+  `migration/url-map.csv`**: ids 3248 (`אסופה-לחגי-תשרי`), 3251 and 3254 (newest dated
+  2026-10-24).
+- `waldorf-co-il-backup-2026-07-26.zip` in the repo root is **not** a backup of the old
+  site. It holds 194 files of this repository. No WordPress backup (files and database)
+  exists here.
+- Cloudflare static assets, with the default `html_handling`, answer `/file.html` with a
+  **307** to `/file`. Every `new_path` in the URL map and every internal link ends in
+  `.html`, so with the default setting each redirect would become 301 then 307, and every
+  internal click would cost a temporary redirect.
+- `mockup/pages/index.html` is a meta refresh to `home.html`, so the most valuable URL on
+  the site, `/`, has no content of its own.
+- The contact form (`contact.html`) and the work-group form (`forum-workgroups.html`) are
+  `onsubmit="return false"`: **they send nothing**.
+- SEO tags across the 158 pages: canonical on 1 (`index.html`, relative), meta description
+  on 0, Open Graph on 0, no `sitemap.xml`, no 404 page, no privacy policy page.
+- `mockup/pages/robots.txt` says `Disallow: /`. GitHub Pages ignores it because it is not
+  at the origin root. **On waldorf.co.il it will be at the root and will block all of Google.**
+- Worker secrets: `content-api` has `ACTIVETRAIL_TOKEN` and `ADMIN_KEY`, but **no
+  `RESEND_API_KEY`**, so invitation, password-reset and rejection mails are not sent.
+- WordPress also answers `/?p=<id>` URLs, and the old pages advertise `wp.me` shortlinks
+  (`wp.me/6Dn2d`) that resolve to them. `_redirects` cannot match a query string, so on the
+  new site those would all land on the homepage with a 200.
+
+## A. Decisions, before any build work
+
+- [ ] **A1 [Oren] Canonical host: keep `www`.** Recommendation: keep `https://www.waldorf.co.il`
+  as canonical and redirect the apex to it, which is what the old site does. Switching to
+  the apex would change the host of every indexed URL on top of the path changes.
+  (The older docs said "www to apex"; corrected to follow this item.)
+- [ ] **A2 [Oren] URL form.** Either (a) keep the `.html` URLs and set
+  `html_handling = "none"` on the site Worker, which needs no change to any page, or
+  (b) move to clean URLs, which means rewriting `new_path`, every internal link, the links
+  built in `store.js`/`dynamic.js`/`library.js` and the search index. Recommendation: (a).
+  Whichever is chosen is permanent: changing it later is a second migration for Google.
+- [ ] **A3 [Oren] Homepage at `/`.** Serve the home page content as `index.html`, 301
+  `/home.html` to `/`, and point internal links to `./` instead of `home.html`.
+- [ ] **A4 [Oren] Hosting.** Recommendation: a Workers static-assets project, the same kind
+  as `waldorf-admin`. It supports `_redirects`, `_headers`, a 404 page and a configurable
+  `html_handling` (Pages cannot turn off the `.html` redirect). Either way the apex needs the
+  zone on Cloudflare, so the nameservers move (C4).
+- [ ] **A5 [Oren] GitHub Pages after launch.** Recommendation: switch it off, so there is no
+  second public copy of the site. The daily search-index rebuild, the `_*.html` drop and the
+  admin-redirect step in `pages.yml` move into the new deploy (B9).
+- [ ] **A6 [forum + Oren] `/wp-content/uploads/`.** Recommendation: copy the whole uploads
+  directory out of the WordPress backup (B1) and serve it at its original paths. That keeps
+  every PDF and image link from Google, Facebook and school sites alive with no redirect,
+  and covers the 205 triage files. Static assets cap a single file at 25 MiB, so anything
+  larger goes to R2.
+- [ ] **A7 [forum] The seven `review` rows** in `migration/url-map.csv` (`migration/README.md`).
+- [ ] **A8 [forum] The 206 articles** (155 announcements, 51 capstone works): migrate into D1
+  or retire. Affects their redirect targets, not whether they get one.
+- [ ] **A9 [forum + Oren] Contact and work-group forms.** Build a sending endpoint (B8), or
+  replace the forms with the email address. Shipping forms that discard what people type is
+  the one option that should not reach launch.
+- [ ] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
+  in real use. The site publishes `haforumwaldorf@gmail.com`. This decides whether the livedns
+  hosting can ever be cancelled (E6).
+- [ ] **A11 [forum] Privacy policy page.** The site collects names, emails and phone numbers
+  (newsletter, noticeboard submissions, the forms). A privacy page is likely required under
+  the Privacy Protection Law; the wording is the forum's (or their lawyer's).
+- [ ] **A12 [forum] Accessibility statement**: postal address, the exemption from appointing a
+  coordinator, and the audit by a certified auditor (`migration/mockup-notes.md`, forum item 2
+  and developer item 1).
+- [ ] **A13 [forum] The open content questions** in `migration/mockup-notes.md` (18 forum items)
+  and the triage section (`agent-docs/triage.md`), which must be sorted before C4 because its
+  files load from the old server.
+
+## B. Preparation (no public effect, can start now)
+
+### Old site
+- [ ] **B1 [Oren] Full WordPress backup from livedns**: files (including all of
+  `wp-content/uploads`) and a database export. Store it outside the repo.
+- [ ] **B2 [forum + code] Content freeze** on the old WordPress from an agreed date, then
+  re-pull the sitemap and add the missing rows (3248, 3251, 3254 and anything newer) to
+  `url-map.csv`.
+
+### DNS and mail authentication
+- [ ] **B3 [Oren] Export the zone file from livedns** and keep it. Compare against the list
+  above: apex, `www`, `mail` A records, the MX, and anything not publicly visible.
+- [ ] **B4 [Oren] Create the Cloudflare zone** (free plan), let it import, diff against B3.
+  `mail` and the MX stay **DNS only (grey cloud)**, pointing at 62.219.78.151. Do not change
+  nameservers yet.
+- [ ] **B5 [Oren] Lower TTLs to 300 seconds** at livedns a day before C4, so a rollback (F1)
+  takes effect in minutes.
+- [ ] **B6 [Oren] Mail authentication records**, in the Cloudflare zone (and at livedns if they
+  are wanted before the move):
+  - B6.i ActiveTrail: the four records in `migration/dns-records.md`.
+  - B6.ii Resend: the DKIM and `send.` MX/SPF records Resend shows when the domain is added.
+  - B6.iii Apex SPF for the livedns mailbox: ask livedns for their include, e.g.
+    `v=spf1 a mx include:<livedns> ~all`. Only one SPF record per name.
+  - B6.iv DMARC: `v=DMARC1; p=none; rua=mailto:<forum inbox>` so reports arrive.
+- [ ] **B7 [Oren] Resend**: account, add and verify `waldorf.co.il`,
+  `npx wrangler secret put RESEND_API_KEY` in `content-api/`, add `MAIL_FROM` and `REPLY_TO`
+  under `[vars]`, deploy.
+
+### Code
+- [ ] **B8 [code] Contact and work-group endpoint** (if A9 says build): `POST` on the content API,
+  sending through Resend to the A10 inbox with `Reply-To` set to the visitor. Reuse the
+  newsletter's honeypot, validation and the `rate_limits` table; never pass the provider's
+  error body to the browser.
+- [ ] **B9 [code] Production deploy**: a `wrangler.toml` and a workflow for the site Worker.
+  It copies `mockup/pages/` without `_*.html`, replaces `admin/` with redirect stubs (or drops
+  it), drops the triage data, rebuilds `search-index.json` from D1, and sets `html_handling`
+  (A2) and `not_found_handling = "404-page"`. Keep the daily schedule.
+- [ ] **B10 [code] `404.html`**, cloned from a finished page (`agent-docs/hero.md`), with search
+  and links to the main sections.
+- [ ] **B11 [code] `sitemap.xml` generator**: every public page plus the **published** `lib-*`
+  works, absolute URLs on the A1 host, rebuilt on each deploy and daily with the search index.
+- [ ] **B12 [code] Production `robots.txt`**: `Allow: /` plus `Sitemap: https://www.waldorf.co.il/sitemap.xml`,
+  replacing the `Disallow: /` file at C2.
+- [ ] **B13 [code] Absolute `<link rel="canonical">` on every page**, on the A1 host.
+- [ ] **B14 [code] Meta description and Open Graph tags** (`og:title`, `og:description`,
+  `og:image`, `og:url`) at least on the main section pages. Facebook is a large referrer
+  for this site, and today a shared link shows no image or summary.
+- [ ] **B15 [code] Library work pages**: the text of each `lib-*` page loads from D1 by script.
+  Google renders scripts, but later and less reliably than plain HTML. Recommendation:
+  write published works into the HTML at deploy time (as `launch-cutover.md` 6b already
+  plans), or at least check a few with URL Inspection after launch (E3).
+- [ ] **B16 [code] `/?p=<id>` redirects**: one Cloudflare redirect rule or a few lines in a
+  Worker mapping post ids (all known from the REST API) to their `new_path`. Optional but
+  cheap, and it rescues every `wp.me` link shared on Facebook.
+- [ ] **B17 [code] `_headers`** for the site: long cache on fonts and images, short on HTML.
+- [ ] **B18 [code] Addresses that change** (`launch-cutover.md` 6a): `WAdminConfig.site`,
+  `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (both already allow `waldorf.co.il` and
+  `www`), the admin CSP and the admin redirect step.
+- [ ] **B19 [Oren] Cloudflare Access on the admin** hostname (`admin-site/wrangler.toml`).
+  Optional: an `admin.waldorf.co.il` custom domain, which adds a pass over B18.
+- [ ] **B20 [code] Placeholder removal, prepared as a script ready for C2**:
+  the `מוקאפ` suffix in 157 titles, the `גירסה פנימית` footer on 156 pages, the stand-in labels in
+  `kinder-articles.html` and `kinder-circle.html`, and the `demo: true` rows in D1.
+- [ ] **B21 [Oren] Web Analytics**: create the `waldorf.co.il` site now so the token is ready
+  for C9 (`launch-cutover.md` item 10).
+- [ ] **B22 [Oren] Search Console access**: find out who owns the existing property for
+  `waldorf.co.il`. If nobody can be found, verify a **Domain property** by DNS TXT. A newly
+  verified property still shows the history Google holds for the site.
+- [ ] **B23 [code] Rehearsal on the Worker's `workers.dev` URL**, with `noindex` still on: run
+  the full redirect crawl (every `old_path` gives one 301 to a 200), the internal-link crawl,
+  and the scans in `agent-docs/scanning.md`. Fix everything here, before the domain moves.
+
+## C. Cutover day, in this order
+
+- [ ] **C1** Confirm the old site is frozen and B2's rows are complete; regenerate
+  `public/_redirects` (`node migration/build-redirects.mjs --write`) into the deploy.
+- [ ] **C2 [code]** In one commit: remove the `noindex` meta from all pages (and
+  `src/pages/index.astro`), replace `robots.txt` (B12), apply B20, add the redirects. Deploy
+  to the Worker (still only on `workers.dev`) and re-run the B23 crawl.
+- [ ] **C3 [Oren]** Mail check before the switch: send and receive one message on each
+  `@waldorf.co.il` mailbox in use, as a baseline.
+- [ ] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
+  A records still point at 62.219.78.151, so the old site keeps serving while the change
+  spreads. Wait for the zone to show Active.
+- [ ] **C5 [Oren]** Attach `www.waldorf.co.il` and `waldorf.co.il` as custom domains of the site
+  Worker. Cloudflare issues the certificates.
+- [ ] **C6 [Oren]** Redirect rule apex to `www` (path and query kept), and turn on
+  Always Use HTTPS.
+- [ ] **C7 [code]** Live redirect crawl against `https://www.waldorf.co.il` and the apex:
+  every `old_path` gives one 301 to a 200 on `www`. Internal-link crawl: no 404s and no
+  redirects. Spot-check `/wp-content/uploads/...` (A6) and `/?p=` (B16).
+- [ ] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
+  `mail.waldorf.co.il` from a public resolver.
+- [ ] **C9 [code]** New Web Analytics token and site tag (B21), re-run `patch-analytics.mjs`.
+- [ ] **C10 [code]** Deploy `content-api` and the admin with the B18 addresses.
+- [ ] **C11 [Oren]** Switch off GitHub Pages (A5).
+
+## D. Email tests (after C8; check inbox **and** spam, and read the headers)
+
+For each mail below, open it in Gmail and use "Show original" to confirm SPF, DKIM and
+DMARC all say PASS.
+
+- [ ] **D1** Newsletter: sign up on `forum-newsletter.html` with a real address, receive
+  ActiveTrail's confirmation, click it, and see the contact in group 715085.
+- [ ] **D2** An ActiveTrail test campaign to Gmail, Outlook and one Israeli provider, sent
+  from a `waldorf.co.il` address. Check its score on a tester such as mail-tester.com.
+- [ ] **D3** Admin invitation: create a user, receive the set-password mail through Resend,
+  and confirm the link opens the admin's origin and works only once.
+- [ ] **D4** Password reset request.
+- [ ] **D5** A noticeboard rejection notice reaches the submitter, and replying to it reaches
+  the forum inbox (`REPLY_TO`).
+- [ ] **D6** Contact form and work-group form (B8) reach the forum inbox; replying reaches
+  the visitor.
+- [ ] **D7** After two to four weeks of clean DMARC reports, raise `p=none` to `p=quarantine`.
+
+## E. Search Console and the weeks after
+
+- [ ] **E1** Submit `https://www.waldorf.co.il/sitemap.xml`. Also submit a sitemap of the
+  **old** URLs (generated from `url-map.csv`) for the first weeks: it makes Google recrawl
+  the old URLs sooner and see the 301s, which Google's own site-move guide recommends.
+- [ ] **E2** Do **not** use the Change of Address tool. It is for moving to a different domain;
+  this move keeps the domain.
+- [ ] **E3** URL Inspection on the homepage, the main section pages and two or three `lib-*`
+  works (B15): check the rendered HTML contains the text, then Request Indexing.
+- [ ] **E4** Weekly for six weeks: the Pages report (Not found, Page with redirect, Duplicate
+  without user-selected canonical) and the Worker's 404 paths. Add a redirect for any 404
+  that had traffic.
+- [ ] **E5** Keep the redirects permanently. They cost nothing; Google asks for at least a year.
+- [ ] **E6** Keep the livedns hosting account until A10 is settled: `mail.waldorf.co.il` is on
+  the same server as the old WordPress, so cancelling the hosting very likely ends the mailbox.
+- [ ] **E7** Bing Webmaster Tools: import the property from Search Console.
+- [ ] **E8** Update the links the forum controls (Facebook page, YouTube, ActiveTrail
+  templates, Google business profile) to the new URLs. They redirect anyway, so this is low
+  priority.
+- [ ] **E9** Update the accessibility statement's date after the audit (A12).
+
+## F. Rollback
+
+- [ ] **F1** If C7 fails badly: detach the custom domains and set the apex and `www` A records
+  back to 62.219.78.151 (DNS only). With B5's TTLs the old WordPress is back within minutes,
+  as long as the hosting account (E6) and the content freeze (B2) are still in place.

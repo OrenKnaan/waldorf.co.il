@@ -35,7 +35,7 @@ Standard Astro CLI scripts (`npm run dev`/`build`/`preview`) — see `package.js
 
 Detail for each area is in `agent-docs/`. **Read the matching file before working in that area**; the rules below are the ones that must hold even when you have not.
 
-**Launch cutover** (`agent-docs/launch-cutover.md`, the full inventory of temporary scaffolding)
+**Launch cutover** (`agent-docs/launch-checklist.md`, the ordered launch plan; `agent-docs/launch-cutover.md`, the full inventory of temporary scaffolding)
 - Every page under `mockup/pages/` carries `<meta name="robots" content="noindex, nofollow, noarchive">`; add it to any new page. The crawler lockdown (that meta, a future `public/robots.txt`, a future Cloudflare Access wall) is removed **all together, on cutover day**, never piecemeal.
 - The same change that attaches `waldorf.co.il` must publish the old-URL redirects (`node migration/build-redirects.mjs --write`) and carry the DNS across (`migration/dns-records.md`).
 - Mockup-only pieces (the `store.js`/`dynamic.js` content layer, `demo: true` seed rows, the published `/admin/`, the triage section, the patch scripts, `— מוקאפ` titles) are not carried into production; the file lists what replaces each.

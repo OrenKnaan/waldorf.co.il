@@ -81,7 +81,8 @@ Pages allows 2,100 static rules, so there is room.
 
 Two things the file deliberately does not cover:
 
-1. **`www.waldorf.co.il` to the apex.** Host canonicalisation is a Redirect Rule on the
+1. **The apex to `www.waldorf.co.il`.** The old site's canonical host is `www` (the apex
+   301s to it), so the new site keeps it. Host canonicalisation is a Redirect Rule on the
    zone in the Cloudflare dashboard, not a Pages `_redirects` entry.
 2. **`/wp-admin/`, `/wp-content/`, `/wp-json/`, `/feed/`.** WordPress internals with no
    counterpart. Let them 404 rather than sending people somewhere misleading. Note that

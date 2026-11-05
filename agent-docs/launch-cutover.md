@@ -2,6 +2,8 @@
 
 Moved out of the root `CLAUDE.md` (2026-10-28) so it loads only when a task needs it. The root file keeps the rules; this is the detail behind them.
 
+The ordered launch plan (decisions, preparation, cutover day, email tests, Search Console) is `agent-docs/launch-checklist.md`; this file is the inventory it draws on.
+
 ## Launch cutover: temporary scaffolding that must be removed
 
 Everything below exists **only because this is a pre-launch mockup on GitHub Pages**. When the real site moves to Cloudflare Pages and `waldorf.co.il` is attached, each item has to be removed or replaced — not carried over. Inventory verified 2026-07-27; re-check counts before acting, they drift.
@@ -10,7 +12,7 @@ Everything below exists **only because this is a pre-launch mockup on GitHub Pag
 >
 > The old site has 431 live URLs and every one of them is linked from somewhere we do not control: Google's index, school websites, Facebook posts, printed newsletters. The moment `waldorf.co.il` points at the new site, any path without a redirect is a 404, and a 404 loses both the visitor and the search ranking that URL had built up.
 >
-> Run `node migration/build-redirects.mjs --write` to generate `public/_redirects` (861 rules), and deploy it **in the same change** that attaches the custom domain. Before running it, do the two things `migration/README.md` lists: point `new_path` at the production routes if they are no longer the mockup's `.html` filenames, and answer the seven `review` rows. Afterwards, add the `www` to apex Redirect Rule on the zone, which `_redirects` cannot do, and decide what happens to `/wp-content/uploads/...`, which is every PDF and image the old site ever linked.
+> Run `node migration/build-redirects.mjs --write` to generate `public/_redirects` (861 rules), and deploy it **in the same change** that attaches the custom domain. Before running it, do the two things `migration/README.md` lists: point `new_path` at the production routes if they are no longer the mockup's `.html` filenames, and answer the seven `review` rows. Afterwards, add the apex to `www` Redirect Rule on the zone (`www` is the old site's canonical host, see `agent-docs/launch-checklist.md` A1), which `_redirects` cannot do, and decide what happens to `/wp-content/uploads/...`, which is every PDF and image the old site ever linked.
 >
 > Verify by crawling the CSV's `old_path` column against the live site and asserting every response is a 301 to a 200. A spot check is not enough at this volume.
 
