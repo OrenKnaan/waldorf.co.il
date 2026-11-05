@@ -26,18 +26,22 @@ Copied from the livedns zone editor by Oren on 2026-11-05, before the nameserver
 | `waldorf.co.il` | A | `62.219.78.151` | 3600 | copy, DNS only |
 | `www.waldorf.co.il` | A | `62.219.78.151` | 3600 | copy, DNS only |
 | `mail.waldorf.co.il` | A | `62.219.78.151` | 3600 | copy, DNS only, always |
-| `teach.waldorf.co.il` | A | `45.33.80.14` | 3600 | copy, DNS only |
+| `teach.waldorf.co.il` | A | `45.33.80.14` | 3600 | delete (Oren, 2026-11-05: old, can go) |
 | `waldorf.co.il` | MX | `0 mail.waldorf.co.il` | 3600 | copy |
 | `_acme-challenge.waldorf.co.il` | TXT | Let's Encrypt token | 1800 | skip |
 | `_acme-challenge.www.waldorf.co.il` | TXT | Let's Encrypt token | 1800 | skip |
 | `waldorf.co.il` | NS | `park1/park2.livedns.co.il` | 14400 | replaced by Cloudflare's pair |
 
 `teach.waldorf.co.il` points at a different server (45.33.80.14), not livedns. Port 443
-accepts connections there but answered no HTTP request on 2026-11-05; nobody here knows what
-it is. Copy it so whatever uses it keeps working.
+accepts connections there but answered no HTTP request on 2026-11-05. Oren: old, can go.
+
+The nameservers moved to `karina.ns.cloudflare.com` and `terin.ns.cloudflare.com` on
+2026-11-05 (ISOC whois shows them the same day).
 
 The `_acme-challenge` records are the proof livedns used to get the old site's Let's
 Encrypt certificate, which covers the apex, `www` **and `mail`** and expires **2027-01-08**.
+The mail server presents the same certificate (`CN=www.waldorf.co.il`) on ports 993, 465
+and 587, so mail clients depend on it.
 If livedns renews it through those DNS records, renewal fails once the zone is on Cloudflare.
 The web side stops mattering when the new site goes live; `mail.waldorf.co.il` does not.
 Check in mid-December that the certificate renewed:

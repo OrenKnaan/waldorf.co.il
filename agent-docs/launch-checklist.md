@@ -43,11 +43,14 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 ## A. Decisions, before any build work
 
+- [ ] **A0 [Oren] Renew the domain.** ISOC's whois shows `validity: 13-11-2026` (checked
+  2026-11-05). If it lapses, the site and the mail both stop.
+
 - [x] **A1 [Oren] Canonical host: keep `www`.** Decided 2026-11-05. Recommendation: keep `https://www.waldorf.co.il`
   as canonical and redirect the apex to it, which is what the old site does. Switching to
   the apex would change the host of every indexed URL on top of the path changes.
   (The older docs said "www to apex"; corrected to follow this item.)
-- [ ] **A2 [Oren] URL form.** Either (a) keep the `.html` URLs and set
+- [x] **A2 [Oren] URL form.** Decided 2026-11-05: (a), keep `.html`, `html_handling = "none"`. Either (a) keep the `.html` URLs and set
   `html_handling = "none"` on the site Worker, which needs no change to any page, or
   (b) move to clean URLs, which means rewriting `new_path`, every internal link, the links
   built in `store.js`/`dynamic.js`/`library.js` and the search index. Recommendation: (a).
@@ -97,7 +100,8 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 ### DNS and mail authentication
 - [x] **B3 [Oren] Export the zone file from livedns** and keep it. Done 2026-11-05, in `migration/dns-records.md`; it adds `teach.waldorf.co.il`. Compare against the list
   above: apex, `www`, `mail` A records, the MX, and anything not publicly visible.
-- [ ] **B4 [Oren] Create the Cloudflare zone** (free plan), let it import, diff against B3.
+- [x] **B4 [Oren] Create the Cloudflare zone** Done 2026-11-05; nameservers `karina` and
+  `terin.ns.cloudflare.com`, accepted by the registry the same day (that is C4, done early). (free plan), let it import, diff against B3.
   `mail` and the MX stay **DNS only (grey cloud)**, pointing at 62.219.78.151. Do not change
   nameservers yet.
 - [ ] **B5 [Oren] Lower TTLs to 300 seconds** at livedns a day before C4, so a rollback (F1)
