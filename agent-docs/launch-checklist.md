@@ -217,8 +217,12 @@ DMARC all say PASS.
   without user-selected canonical) and the Worker's 404 paths. Add a redirect for any 404
   that had traffic.
 - [ ] **E5** Keep the redirects permanently. They cost nothing; Google asks for at least a year.
-- [ ] **E6** Keep the livedns hosting account until A10 is settled: `mail.waldorf.co.il` is on
-  the same server as the old WordPress, so cancelling the hosting very likely ends the mailbox.
+- [ ] **E6 [forum + Oren] Cancel the livedns hosting only after all of these**: the new site has
+  been live for two weeks without a rollback (F1); the full WordPress backup and the uploads
+  are downloaded (B1, A6); and the mail on `mail.waldorf.co.il`, which runs on the same server,
+  is either unused or moved (A10). The forum said on 2026-11-05 it will stop paying for the
+  hosting. **The domain registration is a separate payment and must continue**: Cloudflare's
+  registrar does not sell `.il`, so the domain stays with an ISOC-accredited registrar.
 - [ ] **E7** Bing Webmaster Tools: import the property from Search Console.
 - [ ] **E8** Update the links the forum controls (Facebook page, YouTube, ActiveTrail
   templates, Google business profile) to the new URLs. They redirect anyway, so this is low
