@@ -421,6 +421,7 @@ const todayIL = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusal
 const ALLOWED_ORIGINS = [
   'https://orenknaan.github.io',
   'https://waldorf-admin.orenknaan.workers.dev',
+  'https://waldorf-site.orenknaan.workers.dev',   // the site Worker's rehearsal address
   'https://waldorf.co.il',
   'https://www.waldorf.co.il',
 ];
@@ -477,15 +478,19 @@ function toApi(row, spec, admin) {
 // column like library.page_html is not pulled for every row of every request.
 const listCols = (spec) => ['id', 'position', 'updated_at', ...new Set(Object.values(spec.fields))].join(',');
 
-/** One collection, the way the caller may see it: a visitor gets live, unexpired rows. */
+/** One collection, the way the caller may see it: a visitor gets live, unexpired rows,
+ *  and, once HIDE_DEMO is on (the site is live), none of the invented demo rows. */
 async function listOne(env, spec, admin) {
   let sql = `SELECT ${listCols(spec)} FROM ${spec.table}`;
   const binds = [];
+  const where = [];
   if (!admin && spec.publicStatus) {
-    sql += ` WHERE status IN (${spec.publicStatus.map(() => '?').join(',')})`;
+    where.push(`status IN (${spec.publicStatus.map(() => '?').join(',')})`);
     binds.push(...spec.publicStatus);
-    if (spec.moderated) { sql += ' AND (expires IS NULL OR expires = \'\' OR expires >= ?)'; binds.push(todayIL()); }
+    if (spec.moderated) { where.push('(expires IS NULL OR expires = \'\' OR expires >= ?)'); binds.push(todayIL()); }
   }
+  if (!admin && env.HIDE_DEMO === '1') where.push('demo = 0');
+  if (where.length) sql += ` WHERE ${where.join(' AND ')}`;
   sql += ` ORDER BY ${spec.order}`;
   const { results } = await env.DB.prepare(sql).bind(...binds).all();
   return results.map((r) => toApi(r, spec, admin));

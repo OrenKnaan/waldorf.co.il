@@ -56,6 +56,12 @@ ACTIVETRAIL_DOUBLE_OPTIN = "true"
 # email comes out relative and unusable.
 ADMIN_BASE_URL = "https://waldorf-admin.orenknaan.workers.dev"
 
+# The demo rows (demo = 1: invented events, videos, podcasts, a job ad, a board
+# post) are hidden from visitors from launch on (launch-checklist B20). The
+# admin still sees them, so they can be deleted there or replaced with real
+# ones. "0" shows them again.
+HIDE_DEMO = "1"
+
 # ---------------------------------------------------------------------------
 # Outgoing mail (Resend): set-password links and rejection notices
 #
