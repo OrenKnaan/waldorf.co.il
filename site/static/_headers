@@ -1,0 +1,29 @@
+# Response headers for www.waldorf.co.il (launch-checklist B17).
+# Nothing here is fingerprinted, so pages, scripts and the search index are
+# revalidated often; pictures and the old site's files can be kept longer.
+# Cloudflare joins the values when two rules set the same header, so each
+# Cache-Control below covers files no other rule covers.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.js
+  Cache-Control: public, max-age=3600
+
+/*.json
+  Cache-Control: public, max-age=3600
+
+/img/*
+  Cache-Control: public, max-age=2592000
+
+/wp-content/*
+  Cache-Control: public, max-age=2592000
+
+/library-files/*
+  Cache-Control: public, max-age=2592000

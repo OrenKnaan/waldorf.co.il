@@ -1,0 +1,39 @@
+# The public site, www.waldorf.co.il (launch-checklist A4, B9).
+#
+# A Worker with static assets, like waldorf-admin, rather than Cloudflare
+# Pages: Pages cannot turn off the .html -> clean-URL redirect, and every
+# address on this site ends in .html (A2). Built from mockup/pages:
+#
+#     node site/build.mjs
+#     cd site && npx wrangler@4 deploy
+#
+# Pushing to main does not deploy it; the deploy is by hand, like the other
+# Workers. The rehearsal address is https://waldorf-site.orenknaan.workers.dev.
+name = "waldorf-site"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+workers_dev = true
+
+# The domain itself (C5), switched on only after the rehearsal on workers.dev
+# passes (B23). Attaching a custom domain makes Cloudflare create its DNS
+# record and certificate; www is the canonical host, the apex redirects to it
+# in src/index.js.
+# routes = [
+#   { pattern = "www.waldorf.co.il", custom_domain = true },
+#   { pattern = "waldorf.co.il", custom_domain = true },
+# ]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Keep the .html addresses exactly as written (A2): the default would answer
+# /page.html with a 307 to /page, a second hop after every 301 in _redirects.
+html_handling = "none"
+not_found_handling = "404-page"
+# The Worker runs first for the www redirect, the ?p= links and the uploads.
+run_worker_first = true
+
+# Copy of the old site's /wp-content/uploads/ (A6).
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "waldorf-uploads"
