@@ -185,11 +185,10 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [x] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
   A records still point at 62.219.78.151, so the old site keeps serving while the change
   spreads. Wait for the zone to show Active.
-- [x] **C5 [Oren]** Done 2026-11-06, the other way round: both hostnames were attached as
-  custom domains of the empty Pages project `waldorf-co-il`, so the site answered 404. The
-  Worker now sits in front through zone routes (`site/wrangler.toml`), and the Pages
-  project's two domains must stay until they are replaced by custom domains on the Worker
-  (needs DNS edit rights).
+- [x] **C5 [Oren]** Done 2026-11-06. Both hostnames had first been attached to the empty
+  Pages project `waldorf-co-il` (404); they are now custom domains of the Worker
+  `waldorf-site`, the Pages project has none, the bridging routes are gone, and Always Use
+  HTTPS is on. Re-checked after the move: 1,264 of 1,264.
 - [x] **C6 [Oren]** Redirect rule apex to `www` (path and query kept), and turn on **Done 2026-11-06 in the Worker instead of a zone rule (the session token cannot edit zone rules): apex and http 301 to `https://www.waldorf.co.il`, path and query kept.**
   Always Use HTTPS.
 - [x] **C7 [code]** Done 2026-11-06: 434 old paths, 1,264 checks, all one 301 to a 200 on
