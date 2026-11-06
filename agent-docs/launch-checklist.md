@@ -57,16 +57,16 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   (b) move to clean URLs, which means rewriting `new_path`, every internal link, the links
   built in `store.js`/`dynamic.js`/`library.js` and the search index. Recommendation: (a).
   Whichever is chosen is permanent: changing it later is a second migration for Google.
-- [ ] **A3 [Oren] Homepage at `/`.** Serve the home page content as `index.html`, 301
+- [x] **A3 [Oren] Homepage at `/`.** Serve the home page content as `index.html`, 301 **Done 2026-11-06: `site/build.mjs` serves `home.html` as `index.html`, rewrites every `./home.html` link to `./`; the Worker 301s `/home.html` and `/index.html` to `/`.**
   `/home.html` to `/`, and point internal links to `./` instead of `home.html`.
-- [ ] **A4 [Oren] Hosting.** Recommendation: a Workers static-assets project, the same kind
+- [x] **A4 [Oren] Hosting.** Recommendation: a Workers static-assets project, the same kind **Decided and built 2026-11-06: the Worker `waldorf-site` (`site/`), static assets with `html_handling = "none"`, `not_found_handling = "404-page"`, and a script that runs first.**
   as `waldorf-admin`. It supports `_redirects`, `_headers`, a 404 page and a configurable
   `html_handling` (Pages cannot turn off the `.html` redirect). Either way the apex needs the
   zone on Cloudflare, so the nameservers move (C4).
 - [ ] **A5 [Oren] GitHub Pages after launch.** Recommendation: switch it off, so there is no
   second public copy of the site. The daily search-index rebuild, the `_*.html` drop and the
   admin-redirect step in `pages.yml` move into the new deploy (B9).
-- [ ] **A6 [forum + Oren] `/wp-content/uploads/`.** Recommendation: copy the whole uploads
+- [x] **A6 [forum + Oren] `/wp-content/uploads/`.** Recommendation: copy the whole uploads **Done 2026-11-06: `migration/mirror-uploads.mjs` copied all 430 files (215 MiB) from the media library; they are in the R2 bucket `waldorf-uploads` and the Worker serves them at their original paths. Posts and pages link no other uploads. Files put on the server outside WordPress are not covered (B1 still needed for those).**
   directory out of the WordPress backup (B1) and serve it at its original paths. That keeps
   every PDF and image link from Google, Facebook and school sites alive with no redirect,
   and covers the 205 triage files. Static assets cap a single file at 25 MiB, so anything
@@ -99,7 +99,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 ### Old site
 - [ ] **B1 [Oren] Full WordPress backup from livedns**: files (including all of
   `wp-content/uploads`) and a database export. Store it outside the repo.
-- [ ] **B2 [forum + code] Content freeze** on the old WordPress from an agreed date, then
+- [x] **B2 [forum + code] Content freeze** on the old WordPress from an agreed date, then **Rows added 2026-11-06 for 3248, 3251, 3254 (the sitemap had no others). The freeze itself is the forum's: anything posted on WordPress from now on is not on the new site.**
   re-pull the sitemap and add the missing rows (3248, 3251, 3254 and anything newer) to
   `url-map.csv`.
 
@@ -128,34 +128,34 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   sending through Resend to the A10 inbox with `Reply-To` set to the visitor. Reuse the
   newsletter's honeypot, validation and the `rate_limits` table; never pass the provider's
   error body to the browser.
-- [ ] **B9 [code] Production deploy**: a `wrangler.toml` and a workflow for the site Worker.
+- [x] **B9 [code] Production deploy**: a `wrangler.toml` and a workflow for the site Worker. **Done 2026-11-06, by hand (`node site/build.mjs && cd site && npx wrangler@4 deploy`), not a workflow: a workflow needs a Cloudflare API token as a GitHub secret (Oren). The daily search-index rebuild still runs only in `pages.yml`.**
   It copies `mockup/pages/` without `_*.html`, replaces `admin/` with redirect stubs (or drops
   it), drops the triage data, rebuilds `search-index.json` from D1, and sets `html_handling`
   (A2) and `not_found_handling = "404-page"`. Keep the daily schedule.
-- [ ] **B10 [code] `404.html`**, cloned from a finished page (`agent-docs/hero.md`), with search
+- [x] **B10 [code] `404.html`**, cloned from a finished page (`agent-docs/hero.md`), with search **Done 2026-11-06: `mockup/pages/404.html`, cloned from `accessibility-statement.html`; the build makes its references absolute so it works at any depth.**
   and links to the main sections.
-- [ ] **B11 [code] `sitemap.xml` generator**: every public page plus the **published** `lib-*`
+- [x] **B11 [code] `sitemap.xml` generator**: every public page plus the **published** `lib-*` **Done 2026-11-06, rebuilt on every `site/build.mjs` run (155 URLs), not daily.**
   works, absolute URLs on the A1 host, rebuilt on each deploy and daily with the search index.
-- [ ] **B12 [code] Production `robots.txt`**: `Allow: /` plus `Sitemap: https://www.waldorf.co.il/sitemap.xml`,
+- [x] **B12 [code] Production `robots.txt`**: `Allow: /` plus `Sitemap: https://www.waldorf.co.il/sitemap.xml`, **Done 2026-11-06: `site/static/robots.txt`.**
   replacing the `Disallow: /` file at C2.
-- [ ] **B13 [code] Absolute `<link rel="canonical">` on every page**, on the A1 host.
-- [ ] **B14 [code] Meta description and Open Graph tags** (`og:title`, `og:description`,
+- [x] **B13 [code] Absolute `<link rel="canonical">` on every page**, on the A1 host. **Done 2026-11-06, in the build.**
+- [x] **B14 [code] Meta description and Open Graph tags** (`og:title`, `og:description`, **Done 2026-11-06 on every page, in the build: description from the page's first paragraph (library works: their own), one shared 1200x630 image `site/static/img/og-default.jpg`. Per-section images are still open.**
   `og:image`, `og:url`) at least on the main section pages. Facebook is a large referrer
   for this site, and today a shared link shows no image or summary.
 - [ ] **B15 [code] Library work pages**: the text of each `lib-*` page loads from D1 by script.
   Google renders scripts, but later and less reliably than plain HTML. Recommendation:
   write published works into the HTML at deploy time (as `launch-cutover.md` 6b already
   plans), or at least check a few with URL Inspection after launch (E3).
-- [ ] **B16 [code] `/?p=<id>` redirects**: one Cloudflare redirect rule or a few lines in a
+- [x] **B16 [code] `/?p=<id>` redirects**: one Cloudflare redirect rule or a few lines in a **Done 2026-11-06: `migration/build-post-ids.mjs` -> `site/post-ids.json` (396 ids), read by the Worker.**
   Worker mapping post ids (all known from the REST API) to their `new_path`. Optional but
   cheap, and it rescues every `wp.me` link shared on Facebook.
-- [ ] **B17 [code] `_headers`** for the site: long cache on fonts and images, short on HTML.
+- [x] **B17 [code] `_headers`** for the site: long cache on fonts and images, short on HTML. **Done 2026-11-06: `site/static/_headers`.**
 - [ ] **B18 [code] Addresses that change** (`launch-cutover.md` 6a): `WAdminConfig.site`,
   `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (both already allow `waldorf.co.il` and
   `www`), the admin CSP and the admin redirect step.
 - [ ] **B19 [Oren] Cloudflare Access on the admin** hostname (`admin-site/wrangler.toml`).
   Optional: an `admin.waldorf.co.il` custom domain, which adds a pass over B18.
-- [ ] **B20 [code] Placeholder removal, prepared as a script ready for C2**:
+- [x] **B20 [code] Placeholder removal, prepared as a script ready for C2**: **Done 2026-11-06, in the build rather than a script (the mockup keeps its markers): titles, footer, the stand-in labels. Demo rows: hidden from visitors by `HIDE_DEMO = "1"` in `content-api`, not deleted, so the admin can delete or replace them.**
   the `מוקאפ` suffix in 157 titles, the `גירסה פנימית` footer on 156 pages, the stand-in labels in
   `kinder-articles.html` and `kinder-circle.html`, and the `demo: true` rows in D1.
 - [ ] **B21 [Oren] Web Analytics**: create the `waldorf.co.il` site now so the token is ready
@@ -163,7 +163,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **B22 [Oren] Search Console access**: find out who owns the existing property for
   `waldorf.co.il`. If nobody can be found, verify a **Domain property** by DNS TXT. A newly
   verified property still shows the history Google holds for the site.
-- [ ] **B23 [code] Rehearsal on the Worker's `workers.dev` URL**, with `noindex` still on: run
+- [x] **B23 [code] Rehearsal on the Worker's `workers.dev` URL**, with `noindex` still on: run **Done 2026-11-06 on `https://waldorf-site.orenknaan.workers.dev`: 906 of 906 old addresses (plus 40 lowercase-encoded variants) give one 301 to a 200, 98 of 98 internal targets answer 200, key pages without script errors at 1440 and 390 px.**
   the full redirect crawl (every `old_path` gives one 301 to a 200), the internal-link crawl,
   and the scans in `agent-docs/scanning.md`. Fix everything here, before the domain moves.
 
@@ -171,7 +171,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 - [ ] **C1** Confirm the old site is frozen and B2's rows are complete; regenerate
   `public/_redirects` (`node migration/build-redirects.mjs --write`) into the deploy.
-- [ ] **C2 [code]** In one commit: remove the `noindex` meta from all pages (and
+- [x] **C2 [code]** In one commit: remove the `noindex` meta from all pages (and **Done 2026-11-06, in the build: the mockup keeps `noindex` for the GitHub Pages preview, the deployed copy has none.**
   `src/pages/index.astro`), replace `robots.txt` (B12), apply B20, add the redirects. Deploy
   to the Worker (still only on `workers.dev`) and re-run the B23 crawl.
 - [ ] **C3 [Oren]** Mail check before the switch: send and receive one message on each
@@ -179,9 +179,9 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
   A records still point at 62.219.78.151, so the old site keeps serving while the change
   spreads. Wait for the zone to show Active.
-- [ ] **C5 [Oren]** Attach `www.waldorf.co.il` and `waldorf.co.il` as custom domains of the site
+- [ ] **C5 [Oren]** **Blocked on Oren (2026-11-06):** the Workers API refuses while the zone still has the A records for the apex and `www` (`100117`), and the session token cannot edit DNS. Delete those two (keep `mail` and the MX), then attach. Attach `www.waldorf.co.il` and `waldorf.co.il` as custom domains of the site
   Worker. Cloudflare issues the certificates.
-- [ ] **C6 [Oren]** Redirect rule apex to `www` (path and query kept), and turn on
+- [x] **C6 [Oren]** Redirect rule apex to `www` (path and query kept), and turn on **Done 2026-11-06 in the Worker instead of a zone rule (the session token cannot edit zone rules): apex and http 301 to `https://www.waldorf.co.il`, path and query kept.**
   Always Use HTTPS.
 - [ ] **C7 [code]** Live redirect crawl against `https://www.waldorf.co.il` and the apex:
   every `old_path` gives one 301 to a 200 on `www`. Internal-link crawl: no 404s and no
