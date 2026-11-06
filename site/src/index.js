@@ -6,6 +6,14 @@ import POST_IDS from '../post-ids.json';
 const CANONICAL = 'www.waldorf.co.il';
 const UPLOADS = '/wp-content/uploads/';
 
+// The workers.dev address serves the same pages without the noindex meta, so
+// it says noindex in a header instead: one public copy for Google, not two.
+const noindex = (res) => {
+  const out = new Response(res.body, res);
+  out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return out;
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -53,9 +61,10 @@ export default {
         obj.writeHttpMetadata(headers);
         headers.set('etag', obj.httpEtag);
         headers.set('cache-control', 'public, max-age=31536000, immutable');
-        return new Response(request.method === 'HEAD' ? null : obj.body, { headers });
+        const file = new Response(request.method === 'HEAD' ? null : obj.body, { headers });
+        return onDomain ? file : noindex(file);
       }
     }
-    return res;
+    return onDomain ? res : noindex(res);
   },
 };

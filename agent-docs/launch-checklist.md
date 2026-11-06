@@ -176,7 +176,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   to the Worker (still only on `workers.dev`) and re-run the B23 crawl.
 - [ ] **C3 [Oren]** Mail check before the switch: send and receive one message on each
   `@waldorf.co.il` mailbox in use, as a baseline.
-- [ ] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
+- [x] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
   A records still point at 62.219.78.151, so the old site keeps serving while the change
   spreads. Wait for the zone to show Active.
 - [ ] **C5 [Oren]** **Blocked on Oren (2026-11-06):** the Workers API refuses while the zone still has the A records for the apex and `www` (`100117`), and the session token cannot edit DNS. Delete those two (keep `mail` and the MX), then attach. Attach `www.waldorf.co.il` and `waldorf.co.il` as custom domains of the site
@@ -219,7 +219,9 @@ DMARC all say PASS.
   this move keeps the domain.
 - [ ] **E3** URL Inspection on the homepage, the main section pages and two or three `lib-*`
   works (B15): check the rendered HTML contains the text, then Request Indexing.
-- [ ] **E4** Weekly for six weeks: the Pages report (Not found, Page with redirect, Duplicate
+- [ ] **E4** Weekly for six weeks: the Worker's daily request count (`run_worker_first` makes
+  every file, not only every page, a Worker request: about 9 per page view against the free
+  plan's 100,000 a day), and the Pages report (Not found, Page with redirect, Duplicate
   without user-selected canonical) and the Worker's 404 paths. Add a redirect for any 404
   that had traffic.
 - [ ] **E5** Keep the redirects permanently. They cost nothing; Google asks for at least a year.
