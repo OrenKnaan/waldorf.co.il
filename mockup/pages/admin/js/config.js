@@ -7,5 +7,5 @@
  * and by the triage pages (sorting.js).
  */
 window.WAdminConfig = {
-  site: /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '..' : 'https://orenknaan.github.io/waldorf.co.il'
+  site: /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '..' : 'https://www.waldorf.co.il'
 };

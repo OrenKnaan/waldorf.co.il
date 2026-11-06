@@ -142,6 +142,14 @@ const today = new Date().toISOString().slice(0, 10);
 writeFileSync(join(dist, 'sitemap.xml'), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
   + sitemap.sort().map((u) => `  <url><loc>${u}</loc><lastmod>${today}</lastmod></url>`).join('\n') + '\n</urlset>\n');
 
+// The old site's addresses as a sitemap of their own (E1), submitted in Search
+// Console for the first weeks after the move so Google recrawls them sooner
+// and finds the 301s. Not listed in robots.txt: it is not this site's content.
+const oldPaths = readFileSync(join(root, 'migration', 'url-map.csv'), 'utf8').trim().split('\n').slice(1)
+  .map((l) => l.split(',')[0]).filter((p) => p.startsWith('/') && p !== '/');
+writeFileSync(join(dist, 'old-urls-sitemap.xml'), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+  + oldPaths.map((p) => `  <url><loc>https://www.waldorf.co.il${p.split('/').map(encodeURIComponent).join('/')}</loc></url>`).join('\n') + '\n</urlset>\n');
+
 // The old site's addresses (C1). The table maps / to /home.html; the
 // homepage is / now (A3), so that row would loop.
 const redirects = execFileSync('node', [join(root, 'migration', 'build-redirects.mjs')], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })

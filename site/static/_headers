@@ -27,3 +27,8 @@
 
 /library-files/*
   Cache-Control: public, max-age=2592000
+
+# The admin's about editor reads the forum page's fixed text from here
+# (mockup/pages/admin/js/about.js), from its own origin.
+/forum.html
+  Access-Control-Allow-Origin: https://waldorf-admin.orenknaan.workers.dev
