@@ -198,9 +198,9 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
   `mail.waldorf.co.il` from a public resolver.
 - [ ] **C9 [code]** New Web Analytics token and site tag (B21), re-run `patch-analytics.mjs`.
-  **Waiting on Oren (2026-11-06):** neither the API token nor the wrangler login may manage
-  Web Analytics, so the site is created in the dashboard. Until then the live site's beacons
-  carry the mockup's token, registered for `orenknaan.github.io`, and Cloudflare drops them.
+  **Beacon done 2026-11-06:** Oren created the site in the dashboard (token `7e15f3…`, now in
+  `mockup/analytics-config.mjs` and all 159 pages, live). Still open: its **site tag** for
+  `CF_SITE_TAG` in `analytics-worker/wrangler.toml`, so the admin's analytics view reads it.
 - [x] **C10 [code]** Deploy `content-api` and the admin with the B18 addresses. Done 2026-11-06:
   `WAdminConfig.site` and the admin CSP name `https://www.waldorf.co.il`; the site sends
   `Access-Control-Allow-Origin` for `forum.html`, which the about editor reads (GitHub
@@ -227,7 +227,7 @@ DMARC all say PASS.
 
 ## E. Search Console and the weeks after
 
-- [ ] **E1** Submit `https://www.waldorf.co.il/sitemap.xml`. Also submit a sitemap of the
+- [x] **E1** Done 2026-11-06: both sitemaps read by Google (155 and 433 URLs). Submit `https://www.waldorf.co.il/sitemap.xml`. Also submit a sitemap of the
   **old** URLs (built as `https://www.waldorf.co.il/old-urls-sitemap.xml`, 433 URLs, since 2026-11-06) for the first weeks: it makes Google recrawl
   the old URLs sooner and see the 301s, which Google's own site-move guide recommends.
 - [ ] **E2** Do **not** use the Change of Address tool. It is for moving to a different domain;

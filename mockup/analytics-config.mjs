@@ -9,13 +9,14 @@
 // To change it: edit here, then `node mockup/patch-analytics.mjs`.
 // To remove the beacon entirely: set the token to '' and re-run the patcher.
 //
-// AT LAUNCH CUTOVER: this site tracks the GitHub Pages mockup host. Cloudflare
-// has no "delete my data" button, so clearing the pre-launch numbers means
-// deleting the Web Analytics site in the dashboard and creating a fresh one for
-// waldorf.co.il — then putting the new token here. See agent-docs/launch-cutover.md, item 10.
-export const BEACON_TOKEN = 'e4ea3335f4ae4f55bacc328eb40c12c9';
+// Since 2026-11-06 this is the Web Analytics site for the live domain. The
+// GitHub Pages mockup carries the same snippet, and Cloudflare drops its
+// beacons because the host does not match, so only real visits count. The
+// pre-launch site (token e4ea3335…, host orenknaan.github.io) still exists in
+// the dashboard with the mockup's numbers.
+export const BEACON_TOKEN = '7e15f3d1556a44e9bc57bdef860a9c0e';
 
 // The hostname the Web Analytics site is registered against. Cloudflare drops
 // beacons whose Referer host doesn't match (postfix match), so a mismatch here
 // is the usual reason "it's installed but there's no data".
-export const BEACON_HOST = 'orenknaan.github.io';
+export const BEACON_HOST = 'www.waldorf.co.il';
