@@ -117,7 +117,8 @@ const docs = [];
 const pushDoc = (doc) => docs.push({ id: docs.length, ...doc });
 
 const pageFiles = readdirSync(pagesDir)
-  .filter((f) => f.endsWith('.html') && f !== 'index.html')
+  // 404.html is the not-found page and shape-test.html a layout test: neither is content.
+  .filter((f) => f.endsWith('.html') && !['index.html', '404.html', 'shape-test.html'].includes(f))
   .sort();
 
 const skipped = [];
