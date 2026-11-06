@@ -70,3 +70,6 @@ admin-site/dist/
 
 # Copy of the old site's /wp-content/uploads/ (migration/mirror-uploads.mjs); served from R2, not git
 migration/uploads-mirror/
+
+# Old WordPress content from its public REST API (2026-11-06); a copy is in R2 at wp-export/
+migration/wp-export/

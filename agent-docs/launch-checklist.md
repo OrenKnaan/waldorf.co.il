@@ -43,7 +43,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 ## A. Decisions, before any build work
 
-- [ ] **A00 [forum] Hosting ends about 2026-11-12** (Oren, 2026-11-05: "in a week"). Extend it
+- [ ] **A00 [forum] Hosting ends about 2026-11-12, not extended (Oren, 2026-11-06)** (Oren, 2026-11-05: "in a week"). Extend it
   by a month: the old site, the mail server and the only full backup are all on it (E6).
 - [ ] **A0 [Oren] Renew the domain.** ISOC's whois shows `validity: 13-11-2026` (checked
   2026-11-05). If it lapses, the site and the mail both stop.
@@ -110,6 +110,12 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   `terin.ns.cloudflare.com`, accepted by the registry the same day (that is C4, done early). (free plan), let it import, diff against B3.
   `mail` and the MX stay **DNS only (grey cloud)**, pointing at 62.219.78.151. Do not change
   nameservers yet.
+  **2026-11-06:** Oren cannot download it and has asked livedns; the hosting will **not** be
+  extended. Stopgap: everything the public REST API gives (334 posts, 62 pages, 278 media
+  records, 26 comments, 31 categories) is in `migration/wp-export/` (gitignored) and in R2 at
+  `waldorf-uploads/wp-export/wp-export-2026-11-06.zip`, which the site Worker never serves.
+  Not in it: the database, user accounts, drafts, and the Jetpack contact-form entries
+  (post type `feedback`), which need a login.
 - [ ] **B5 [Oren] Lower TTLs to 300 seconds** at livedns a day before C4, so a rollback (F1)
   takes effect in minutes.
 - [ ] **B6 [Oren] Mail authentication records**, in the Cloudflare zone (and at livedns if they
