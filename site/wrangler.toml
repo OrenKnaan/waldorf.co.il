@@ -14,14 +14,19 @@ main = "src/index.js"
 compatibility_date = "2026-08-01"
 workers_dev = true
 
-# The domain itself (C5), switched on only after the rehearsal on workers.dev
-# passes (B23). Attaching a custom domain makes Cloudflare create its DNS
-# record and certificate; www is the canonical host, the apex redirects to it
-# in src/index.js.
-# routes = [
-#   { pattern = "www.waldorf.co.il", custom_domain = true },
-#   { pattern = "waldorf.co.il", custom_domain = true },
-# ]
+# The domain itself (C5). Both hostnames were attached on 2026-11-06 as custom
+# domains of the Pages project waldorf-co-il, which publishes an empty folder,
+# so the site answered 404. These routes put this Worker in front of them: a
+# route runs on any proxied hostname of the zone, ahead of what the DNS record
+# points at. While they are the way in, the Pages project's two custom domains
+# (and the proxied records they created) must stay; removing them leaves the
+# routes with no DNS name to run on. The tidier end state is custom domains on
+# this Worker instead, which needs the Pages domains and their DNS records
+# deleted first (DNS edit rights the wrangler login does not have).
+routes = [
+  { pattern = "www.waldorf.co.il/*", zone_name = "waldorf.co.il" },
+  { pattern = "waldorf.co.il/*", zone_name = "waldorf.co.il" },
+]
 
 [assets]
 directory = "./dist"

@@ -185,11 +185,15 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [x] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
   A records still point at 62.219.78.151, so the old site keeps serving while the change
   spreads. Wait for the zone to show Active.
-- [ ] **C5 [Oren]** **Blocked on Oren (2026-11-06):** the Workers API refuses while the zone still has the A records for the apex and `www` (`100117`), and the session token cannot edit DNS. Delete those two (keep `mail` and the MX), then attach. Attach `www.waldorf.co.il` and `waldorf.co.il` as custom domains of the site
-  Worker. Cloudflare issues the certificates.
+- [x] **C5 [Oren]** Done 2026-11-06, the other way round: both hostnames were attached as
+  custom domains of the empty Pages project `waldorf-co-il`, so the site answered 404. The
+  Worker now sits in front through zone routes (`site/wrangler.toml`), and the Pages
+  project's two domains must stay until they are replaced by custom domains on the Worker
+  (needs DNS edit rights).
 - [x] **C6 [Oren]** Redirect rule apex to `www` (path and query kept), and turn on **Done 2026-11-06 in the Worker instead of a zone rule (the session token cannot edit zone rules): apex and http 301 to `https://www.waldorf.co.il`, path and query kept.**
   Always Use HTTPS.
-- [ ] **C7 [code]** Live redirect crawl against `https://www.waldorf.co.il` and the apex:
+- [x] **C7 [code]** Done 2026-11-06: 434 old paths, 1,264 checks, all one 301 to a 200 on
+  `www`; PDF from R2 200; sitemap 155 URLs on `www`. Live redirect crawl against `https://www.waldorf.co.il` and the apex:
   every `old_path` gives one 301 to a 200 on `www`. Internal-link crawl: no 404s and no
   redirects. Spot-check `/wp-content/uploads/...` (A6) and `/?p=` (B16).
 - [ ] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
