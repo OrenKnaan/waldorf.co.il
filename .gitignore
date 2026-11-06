@@ -67,3 +67,6 @@ pnpm-debug.log*
 
 # admin-site/build.mjs output, rebuilt on every deploy.
 admin-site/dist/
+
+# Copy of the old site's /wp-content/uploads/ (migration/mirror-uploads.mjs); served from R2, not git
+migration/uploads-mirror/
