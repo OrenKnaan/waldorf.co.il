@@ -8,9 +8,9 @@
 //
 // Two things it deliberately does NOT handle, because `_redirects` cannot:
 //
-//   1. www.waldorf.co.il -> waldorf.co.il. Host canonicalisation is a Redirect
-//      Rule in the Cloudflare dashboard (or a Bulk Redirect list), applied to
-//      the zone rather than to the Pages project.
+//   1. waldorf.co.il -> www.waldorf.co.il (www is canonical, launch-checklist
+//      A1). The site Worker does it (site/src/index.js), along with http ->
+//      https and the /?p=<id> links.
 //   2. Anything under /wp-admin/, /wp-content/, /wp-json/ or /feed/. Those are
 //      WordPress internals with no counterpart; let them 404 rather than
 //      pointing them somewhere misleading.
@@ -75,7 +75,7 @@ const header = [
   `# ${rows.length} mapped URLs from the old WordPress site, ${lines.length} rules.`,
   '#',
   '# Cloudflare Pages allows 2,100 static rules; this is well inside that.',
-  '# Host canonicalisation (www -> apex) is a zone Redirect Rule, not this file.',
+  '# Host canonicalisation (apex -> www) is in the site Worker, not this file.',
   '',
 ].join('\n');
 
