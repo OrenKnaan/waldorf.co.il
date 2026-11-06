@@ -48,6 +48,13 @@ Check in mid-December that the certificate renewed:
 
     echo | openssl s_client -connect mail.waldorf.co.il:443 -servername mail.waldorf.co.il 2>/dev/null | openssl x509 -noout -enddate
 
+## Google Search Console (2026-11-06)
+
+`TXT waldorf.co.il "google-site-verification=lAfiJRAb-…"`, added by Cloudflare when Oren
+verified the Domain property through "Domain name provider". Google re-checks it; deleting
+it removes the Search Console access. Keep it when adding the SPF record (B6.iii): both are
+TXT records on the apex, which is allowed, but there must be only one `v=spf1` among them.
+
 ## ActiveTrail records
 
 Supplied by Oren on 2026-08-24, as ActiveTrail specifies them:
