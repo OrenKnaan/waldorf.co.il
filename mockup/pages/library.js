@@ -710,7 +710,8 @@
         if (data && data.html) {
           // Markup the build wrote (library-shells.mjs), never anything a user
           // typed: page_html is not a field the API lets anyone edit.
-          main.innerHTML = data.html;
+          // The stored text links the homepage as ./home.html; on the live site that is ./ .
+          main.innerHTML = data.html.replace(/href="\.\/home\.html"/g, 'href="./"');
           document.title = data.title + ' ' + document.title.replace(/^ספריית תוכן\s*/, '');
           if (data.status !== 'published') {
             var note = document.createElement('p');

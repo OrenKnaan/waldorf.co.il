@@ -173,7 +173,7 @@
     upcomingMount.textContent = '';
     pastMount.textContent = '';
     if (up.length) up.forEach(function (e) { upcomingMount.appendChild(eventCard(e, false)); });
-    else upcomingMount.appendChild(emptyBox('אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'));
+    else upcomingMount.appendChild(emptyBox('אין כרגע אירועים קרובים.'));
     if (past.length) past.forEach(function (e) { pastMount.appendChild(eventCard(e, true)); });
     else pastMount.appendChild(emptyBox('ארכיון האירועים ריק.'));
   }
@@ -303,7 +303,7 @@
   function libItem(node) {
     var a = node.url ? el('a', { class: 'dyn-lib-item', href: node.url, target: '_blank', rel: 'noopener' }) : el('div', { class: 'dyn-lib-item' });
     a.appendChild(el('b', { text: node.title }));
-    var metaBits = [node.kind || node.group || node.category, node.demo ? 'רשומת הדגמה' : '', node.url ? '' : 'הקובץ יעלה דרך ממשק הניהול'].filter(Boolean).join(' · ');
+    var metaBits = [node.kind || node.group || node.category, node.demo ? 'רשומת הדגמה' : ''].filter(Boolean).join(' · ');
     a.appendChild(el('small', { text: (node.description ? node.description + ' — ' : '') + metaBits }));
     return a;
   }
@@ -354,7 +354,7 @@
   function renderEbooks(mount) {
     var items = WStore.get('library').filter(function (r) { return r.kind === 'ספר אלקטרוני'; });
     mount.textContent = '';
-    if (!items.length) { mount.appendChild(emptyBox('אין כרגע ספרים אלקטרוניים נוספים. ספרים נוספים יתווספו דרך ממשק הניהול.')); return; }
+    if (!items.length) { mount.appendChild(emptyBox('אין כרגע ספרים אלקטרוניים נוספים.')); return; }
     items.forEach(function (it) { mount.appendChild(ebookItem(it)); });
   }
 
@@ -362,7 +362,7 @@
   function renderVideos(mount) {
     var vids = WStore.get('videos');
     mount.textContent = '';
-    if (!vids.length) { mount.appendChild(emptyBox('אין סרטונים כרגע — הגלריה מתעדכנת דרך ממשק הניהול.')); return; }
+    if (!vids.length) { mount.appendChild(emptyBox('אין סרטונים כרגע.')); return; }
     var grid = el('div', { class: 'dyn-grid' });
     vids.forEach(function (v) {
       var thumb = el('button', { class: 'thumb', type: 'button', 'aria-label': 'ניגון: ' + v.title }, [
@@ -383,7 +383,7 @@
         el('div', { class: 'info' }, [
           el('h3', { text: v.title }),
           el('p', { text: v.description || '' }),
-          el('div', { class: 'dyn-meta' }, [demoChip(v), v.youtubeId ? null : chip('הסרטון יקושר דרך ממשק הניהול')])
+          el('div', { class: 'dyn-meta' }, [demoChip(v)])
         ])
       ]));
     });
@@ -408,7 +408,7 @@
   function renderPodcast(mount) {
     var eps = WStore.get('podcast').slice().sort(function (a, b) { return (b.num || 0) - (a.num || 0); });
     mount.textContent = '';
-    if (!eps.length) { mount.appendChild(emptyBox('אין פרקים כרגע — הפודקאסט מתעדכן דרך ממשק הניהול.')); return; }
+    if (!eps.length) { mount.appendChild(emptyBox('אין פרקים כרגע.')); return; }
     eps.forEach(function (p) {
       var body = el('div', { class: 'body', style: 'flex:1;min-width:200px' }, [
         el('h3', { text: 'פרק ' + p.num + ' · ' + p.title }),
@@ -429,9 +429,7 @@
         var audio = el('audio', { controls: '', preload: 'none', style: 'width:100%;margin-top:6px' });
         audio.appendChild(el('source', { src: p.url }));
         body.appendChild(audio);
-      } else {
-        body.appendChild(el('div', { class: 'dyn-meta' }, [chip('הנגן יופעל עם קישור הפרק ב-Spotify מממשק הניהול')]));
-      }
+      }   // an episode without a link yet shows no player and no note
       mount.appendChild(el('div', { class: 'dyn-item dyn-episode' }, [
         el('div', { class: 'num', text: String(p.num) }), body
       ]));
@@ -443,7 +441,7 @@
     var box = el('div', { class: 'dyn-map', role: 'application', 'aria-label': 'מפת גני ולדורף' });
     mount.textContent = '';
     mount.appendChild(box);
-    mount.appendChild(el('p', { class: 'dyn-note', text: 'המיקומים מקורבים (ברמת יישוב) — הנקודות מנוהלות דרך ממשק הניהול.' }));
+    mount.appendChild(el('p', { class: 'dyn-note', text: 'המיקומים מקורבים, ברמת יישוב.' }));
     var link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -451,6 +449,10 @@
     var s = document.createElement('script');
     s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     s.onload = function () {
+      // Leaflet works out the pin images' folder from its stylesheet, which is
+      // loaded alongside and is sometimes not there yet: it then asks for
+      // .../distmarker-icon.png and the pins come out broken. Name the folder.
+      L.Icon.Default.imagePath = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
       var map = L.map(box, { scrollWheelZoom: false }).setView([31.9, 34.95], 8);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 17, attribution: '&copy; OpenStreetMap'
