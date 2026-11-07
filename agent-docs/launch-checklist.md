@@ -130,6 +130,13 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   under `[vars]`, deploy.
 
 ### Code
+  **Alternative checked 2026-11-07:** ActiveTrail can send single emails through
+  `POST /api/OperationalMessage/Message` (from-address = a sending profile, `user_profile_id`),
+  and the Worker already holds its token. Per their docs, every recipient is "created as a
+  contact" in the account, so invitees and rejected submitters would land in the marketing
+  system. It is an API only, so it cannot be Gmail's "send mail as" server; Resend has SMTP.
+  Email Routing (2026-11-07): destination `haforumwaldorf@gmail.com` added, waiting for its
+  confirmation click; then rules for `info@` and the catch-all, then the MX switch.
 - [ ] **B8 [code] Contact and work-group endpoint** (if A9 says build): `POST` on the content API,
   sending through Resend to the A10 inbox with `Reply-To` set to the visitor. Reuse the
   newsletter's honeypot, validation and the `rate_limits` table; never pass the provider's
