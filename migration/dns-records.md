@@ -79,7 +79,12 @@ What each one does:
   them to do nothing when a message fails. Worth tightening to `quarantine` once the SPF and
   DKIM records above are actually in place and reports come back clean.
 
-## Status: not published (verified 2026-08-24)
+## Status: published 2026-11-07
+
+Added on Cloudflare on 2026-11-07 (DNS only); Google's public resolver returns all four,
+and the DKIM chain ends in ActiveTrail's `v=DKIM1` key. The section below is the earlier state.
+
+## Earlier status: not published (verified 2026-08-24)
 
 None of the four resolve. Checked against Google's public resolver rather than a local one,
 for `CNAME`, `A` and `ANY`:

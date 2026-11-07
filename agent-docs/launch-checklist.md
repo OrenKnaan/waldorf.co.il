@@ -120,7 +120,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   takes effect in minutes.
 - [ ] **B6 [Oren] Mail authentication records**, in the Cloudflare zone (and at livedns if they
   are wanted before the move):
-  - B6.i ActiveTrail: the four records in `migration/dns-records.md`.
+  - B6.i ActiveTrail: the four records in `migration/dns-records.md`. **Done 2026-11-07.**
   - B6.ii Resend: the DKIM and `send.` MX/SPF records Resend shows when the domain is added.
   - B6.iii Apex SPF for the livedns mailbox: ask livedns for their include, e.g.
     `v=spf1 a mx include:<livedns> ~all`. Only one SPF record per name.
