@@ -197,10 +197,11 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   redirects. Spot-check `/wp-content/uploads/...` (A6) and `/?p=` (B16).
 - [ ] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
   `mail.waldorf.co.il` from a public resolver.
-- [ ] **C9 [code]** New Web Analytics token and site tag (B21), re-run `patch-analytics.mjs`.
+- [x] **C9 [code]** New Web Analytics token and site tag (B21), re-run `patch-analytics.mjs`.
   **Beacon done 2026-11-06:** Oren created the site in the dashboard (token `7e15f3…`, now in
-  `mockup/analytics-config.mjs` and all 159 pages, live). Still open: its **site tag** for
-  `CF_SITE_TAG` in `analytics-worker/wrangler.toml`, so the admin's analytics view reads it.
+  `mockup/analytics-config.mjs` and all 159 pages, live). Site tag `59343587…` in
+  `analytics-worker/wrangler.toml` (`CF_SITE_TAG`), deployed 2026-11-07, so the admin's
+  analytics view reads the live site.
 - [x] **C10 [code]** Deploy `content-api` and the admin with the B18 addresses. Done 2026-11-06:
   `WAdminConfig.site` and the admin CSP name `https://www.waldorf.co.il`; the site sends
   `Access-Control-Allow-Origin` for `forum.html`, which the about editor reads (GitHub
