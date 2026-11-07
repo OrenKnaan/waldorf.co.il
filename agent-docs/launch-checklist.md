@@ -125,7 +125,8 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   - B6.iii Apex SPF for the livedns mailbox: ask livedns for their include, e.g.
     `v=spf1 a mx include:<livedns> ~all`. Only one SPF record per name.
   - B6.iv DMARC: `v=DMARC1; p=none; rua=mailto:<forum inbox>` so reports arrive.
-- [ ] **B7 [Oren] Resend**: account, add and verify `waldorf.co.il`,
+- [ ] **B7 [Oren] Resend**: chosen 2026-11-07. `MAIL_FROM` and `REPLY_TO` are set and deployed;
+  still needed: the account, the domain verified, the `RESEND_API_KEY` secret. Account, add and verify `waldorf.co.il`,
   `npx wrangler secret put RESEND_API_KEY` in `content-api/`, add `MAIL_FROM` and `REPLY_TO`
   under `[vars]`, deploy.
 

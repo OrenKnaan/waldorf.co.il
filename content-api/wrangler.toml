@@ -65,12 +65,17 @@ HIDE_DEMO = "1"
 # ---------------------------------------------------------------------------
 # Outgoing mail (Resend): set-password links and rejection notices
 #
-# Not configured yet. Until it is, a set-password link is shown to the
-# super_admin to hand over, and a rejection notice opens prefilled in the
-# moderator's own mail app. To switch it on:
+# Chosen 2026-11-07 (over ActiveTrail's operational messages, which turn every
+# recipient into a contact in the marketing account). Both settings below are
+# needed, plus the RESEND_API_KEY secret; until all three exist, a set-password
+# link is shown to the super_admin to hand over, and a rejection notice opens
+# prefilled in the moderator's own mail app. The key is set without it passing
+# through a terminal or a chat, from the clipboard:
 #
-#     npx wrangler secret put RESEND_API_KEY
+#     pbpaste | npx wrangler@4 secret put RESEND_API_KEY
 #
-# and add under [vars] MAIL_FROM (a sender on a domain verified in Resend,
-# e.g. "הפורום הארצי לחינוך ולדורף <no-reply@waldorf.co.il>") and REPLY_TO
-# (the forum inbox a submitter's reply should reach, e.g. info@waldorf.co.il).
+# MAIL_FROM must be on a domain verified in Resend (waldorf.co.il). REPLY_TO is
+# where a submitter's reply goes: info@, which Cloudflare Email Routing
+# forwards to the forum's Gmail.
+MAIL_FROM = "הפורום הארצי לחינוך ולדורף <no-reply@waldorf.co.il>"
+REPLY_TO = "info@waldorf.co.il"
