@@ -77,13 +77,16 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **A9 [forum + Oren] Contact and work-group forms.** Decided 2026-11-05: fixed after launch, so they ship not sending. Build a sending endpoint (B8), or
   replace the forms with the email address. Shipping forms that discard what people type is
   the one option that should not reach launch.
-- [ ] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
+- [x] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
   in real use. Oren, 2026-11-05: yes, in use. `info@waldorf.co.il` is published on the old
   site and on the new one (`forum.html`, `forum-sidebar.html`, the error messages in
   `newsletter.js`), while `contact.html` shows `haforumwaldorf@gmail.com`. The mailbox list
   is in cPanel (`https://www.waldorf.co.il:2083`, Email Accounts and Forwarders), not in the
   livedns panel. The site publishes `haforumwaldorf@gmail.com`. This decides whether the livedns
   hosting can ever be cancelled (E6).
+  **Settled 2026-11-08:** Cloudflare Email Routing receives the domain's mail; `info@` and a
+  catch-all forward to `haforumwaldorf@gmail.com` (`migration/dns-records.md`). Tested the
+  same day: mail to `info@` and to a made-up address both arrived.
 - [ ] **A11 [forum] Privacy policy page.** The site collects names, emails and phone numbers
   (newsletter, noticeboard submissions, the forms). A privacy page is likely required under
   the Privacy Protection Law; the wording is the forum's (or their lawyer's).
