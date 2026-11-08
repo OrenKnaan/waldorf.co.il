@@ -48,6 +48,21 @@ Check in mid-December that the certificate renewed:
 
     echo | openssl s_client -connect mail.waldorf.co.il:443 -servername mail.waldorf.co.il 2>/dev/null | openssl x509 -noout -enddate
 
+## Mail: Cloudflare Email Routing (2026-11-08)
+
+Since 2026-11-08 the domain's mail is received by Cloudflare Email Routing, not by livedns:
+MX `route1/2/3.mx.cloudflare.net`, an apex SPF `v=spf1 include:_spf.mx.cloudflare.net ~all`,
+and DKIM `cf2024-1._domainkey`, all added and locked by Cloudflare. Two rules: `info@` and a
+catch-all (every other address), both forwarding to `haforumwaldorf@gmail.com`, confirmed by
+the forum the same day. It only receives; nothing sends as `@waldorf.co.il` through it.
+
+`mail.waldorf.co.il` (A, 62.219.78.151) is now unused by the MX and only reaches the old
+cPanel until the hosting ends (about 2026-11-12); delete it then. Mail stored in the old
+`info@` mailbox stays on that server and goes with it.
+
+When Resend is added, its SPF lives on `send.waldorf.co.il`, not on the apex, so the apex
+keeps exactly one `v=spf1` record.
+
 ## Google Search Console (2026-11-06)
 
 `TXT waldorf.co.il "google-site-verification=lAfiJRAb-…"`, added by Cloudflare when Oren
