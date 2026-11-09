@@ -79,3 +79,8 @@ HIDE_DEMO = "1"
 # forwards to the forum's Gmail.
 MAIL_FROM = "הפורום הארצי לחינוך ולדורף <no-reply@waldorf.co.il>"
 REPLY_TO = "info@waldorf.co.il"
+
+# Where the contact form and the work-group form send each submission
+# (POST /api/forms/contact and /api/forms/workgroup), with Reply-To set to the
+# visitor. The forum's Gmail, the same inbox info@ forwards to.
+FORMS_TO = "haforumwaldorf@gmail.com"

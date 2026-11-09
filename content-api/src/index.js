@@ -183,6 +183,54 @@ async function sendRejectNotice(env, to, notice) {
   }
 }
 
+/* ---------------- site forms (contact, work groups) ---------------- */
+// The two forms that write to the forum rather than to a board: nothing is
+// stored, each submission becomes one mail to FORMS_TO, with Reply-To set to
+// the visitor so answering it in Gmail reaches them. Fields are whitelisted per
+// form, with a length cap each, and anything else in the body is ignored.
+const SITE_FORMS = {
+  contact: {
+    subject: (f) => `פנייה מהאתר: ${f.subject}`,
+    fields: [['name', 'שם', 120, true], ['email', 'דוא"ל', 254, true], ['phone', 'טלפון', 40, false],
+             ['subject', 'נושא', 120, true], ['message', 'הודעה', 5000, true]],
+  },
+  workgroup: {
+    subject: (f) => `בקשת הצטרפות לקבוצת עבודה: ${f.group}`,
+    fields: [['name', 'שם', 120, true], ['email', 'דוא"ל', 254, true], ['institution', 'מוסד', 160, true],
+             ['group', 'קבוצה מבוקשת', 120, true], ['note', 'הערה', 3000, false]],
+  },
+};
+const FORMS_MAX = 5;
+const FORMS_WINDOW = 60 * 60;
+
+/** Sends one form submission to the forum. False when no provider is set or it fails. */
+async function sendFormMail(env, form, f) {
+  if (!env.RESEND_API_KEY || !env.MAIL_FROM || !env.FORMS_TO) return false;
+  const text = form.fields.filter(([k]) => f[k]).map(([k, label]) => `${label}: ${f[k]}`).join('\n\n')
+    + '\n\nנשלח מטופס באתר www.waldorf.co.il. תשובה למייל הזה תגיע ישירות לפונה.';
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: env.MAIL_FROM,
+        to: [env.FORMS_TO],
+        reply_to: f.email,
+        // One line, whatever the visitor typed into the subject field.
+        subject: form.subject(f).replace(/\s+/g, ' ').slice(0, 200),
+        text,
+        html: `<div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;color:#3D2B1F">` +
+          text.split('\n\n').map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`).join('') + `</div>`,
+      }),
+    });
+    if (!res.ok) console.error('forms: Resend rejected', res.status, (await res.text().catch(() => '')).slice(0, 300));
+    return res.ok;
+  } catch (e) {
+    console.error('forms: Resend unreachable', String(e));
+    return false;
+  }
+}
+
 // The address a notice goes to: the one the form collected for it, or failing
 // that an address the submitter wrote into the public contact line. Older posts
 // predate the separate field and only have the second.
@@ -659,6 +707,35 @@ export default {
         return json({ error: 'upstream_failed' }, 502, origin);
       }
       return json({ ok: true, doubleOptin }, 200, origin);
+    }
+
+    // ---- POST /api/forms/contact, /api/forms/workgroup ----
+    //
+    // Public, like the newsletter signup, and guarded the same way: honeypot,
+    // address check, per-IP throttle. See SITE_FORMS for the fields.
+    if (parts[0] === 'api' && parts[1] === 'forms' && SITE_FORMS[parts[2]]) {
+      if (request.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, origin);
+      const form = SITE_FORMS[parts[2]];
+      const body = (await request.json().catch(() => ({}))) || {};
+      if (body.website) return json({ ok: true }, 200, origin);
+
+      const f = {};
+      for (const [key, , max, required] of form.fields) {
+        const v = String(body[key] || '').trim().slice(0, max);
+        if (required && !v) return json({ error: 'missing_fields', field: key }, 400, origin);
+        f[key] = v;
+      }
+      if (!isEmail(f.email)) return json({ error: 'bad_email' }, 400, origin);
+
+      const wait = await rateLimit(env, 'forms', clientIp(request), FORMS_MAX, FORMS_WINDOW);
+      if (wait) return tooMany(wait, origin);
+
+      if (!env.RESEND_API_KEY || !env.MAIL_FROM || !env.FORMS_TO) {
+        console.error('forms: RESEND_API_KEY, MAIL_FROM or FORMS_TO is not set');
+        return json({ error: 'not_configured' }, 503, origin);
+      }
+      if (!(await sendFormMail(env, form, f))) return json({ error: 'upstream_failed' }, 502, origin);
+      return json({ ok: true }, 200, origin);
     }
 
     // ---- auth ----

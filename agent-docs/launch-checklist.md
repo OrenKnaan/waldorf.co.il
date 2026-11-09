@@ -74,7 +74,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [ ] **A7 [forum] The seven `review` rows** in `migration/url-map.csv` (`migration/README.md`).
 - [ ] **A8 [forum] The 206 articles** (155 announcements, 51 capstone works): migrate into D1
   or retire. Affects their redirect targets, not whether they get one.
-- [ ] **A9 [forum + Oren] Contact and work-group forms.** Decided 2026-11-05: fixed after launch, so they ship not sending. Build a sending endpoint (B8), or
+- [x] **A9 [forum + Oren] Contact and work-group forms.** Decided 2026-11-05: fixed after launch, so they ship not sending. Build a sending endpoint (B8), or
   replace the forms with the email address. Shipping forms that discard what people type is
   the one option that should not reach launch.
 - [x] **A10 [forum] Which inbox receives mail**, and whether any `@waldorf.co.il` mailbox is
@@ -142,7 +142,10 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   system. It is an API only, so it cannot be Gmail's "send mail as" server; Resend has SMTP.
   Email Routing (2026-11-07): destination `haforumwaldorf@gmail.com` added, waiting for its
   confirmation click; then rules for `info@` and the catch-all, then the MX switch.
-- [ ] **B8 [code] Contact and work-group endpoint** (if A9 says build): `POST` on the content API,
+- [x] **B8 [code] Contact and work-group endpoint** Done 2026-11-09: `POST /api/forms/contact`
+  and `/api/forms/workgroup` mail each submission through Resend to `FORMS_TO`
+  (`haforumwaldorf@gmail.com`) with Reply-To the visitor; `mockup/pages/forms.js` drives both
+  forms. Tested in a browser on the live domain: empty submit refused, real submit sent. (if A9 says build): `POST` on the content API,
   sending through Resend to the A10 inbox with `Reply-To` set to the visitor. Reuse the
   newsletter's honeypot, validation and the `rate_limits` table; never pass the provider's
   error body to the browser.

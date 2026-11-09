@@ -720,13 +720,15 @@
 <section class="card card-form">
 <h2 id="sec-t1gsk2">הצטרפות לקבוצת עבודה</h2>
 <p>מוזמנים להצטרף! פרטים ליצירת קשר עם רכז/ת כל קבוצה — דרך <a href="./forum-roles.html">נציגי הפורום</a>.</p>
-<form class="form" onsubmit="return false">
+<form class="form" data-site-form="workgroup" novalidate>
 <div class="field"><label for="wg-name">שם מלא <span class="req">*</span></label><input id="wg-name" name="name" type="text" required autocomplete="name" placeholder="שם פרטי ומשפחה"></div>
 <div class="field"><label for="wg-email">כתובת מייל <span class="req">*</span></label><input id="wg-email" name="email" type="email" required autocomplete="email" placeholder="name@example.com"></div>
 <div class="field"><label for="wg-inst">מוסד <span class="req">*</span></label><input id="wg-inst" name="institution" type="text" required autocomplete="organization" placeholder="בית הספר או הגן שבו אתם מלמדים"></div>
 <div class="field"><label for="wg-group">קבוצה מבוקשת <span class="req">*</span></label><select id="wg-group" name="group" required><option>מורי א'–ב'</option><option>מורי ג'–ד'</option><option>מורי ה'–ו'</option><option>מורי ז'–ח'</option><option>אוריתמיה</option><option>אומנות / ציור</option><option>אנגלית</option><option>הוראה תומכת ותרפיות</option><option>חנ"ג ובוטמר</option><option>ייעוץ חינוכי</option><option>מלאכות ועבודה בעץ</option><option>מוזיקה</option><option>מתמטיקה</option><option>מנהלניות</option><option>מנהלי בתי ספר</option><option>אחר</option></select></div>
 <div class="field col-2"><label for="wg-note">הערה</label><textarea id="wg-note" name="note" rows="4" placeholder="תפקיד, שכבת גיל, או כל דבר שיעזור לרכז/ת הקבוצה"></textarea></div>
 <div class="field col-2"><div class="btn-row"><button type="submit" class="btn btn-primary">שליחת הבקשה</button><span style="align-self:center;font-size:.78rem;color:var(--text-muted)">* שדות חובה</span></div></div>
+<div class="fm-hp" aria-hidden="true"><label for="wo-website">אתר</label><input id="wo-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+<p class="fm-status" role="status" aria-live="polite"></p>
 </form>
 </section>
 
@@ -735,6 +737,7 @@
 <script src="./tabs.js" defer></script>
 <script src="./breadcrumb.js" defer></script>
 <script src="./scroll-top.js" defer></script>
+<script src="./forms.js" defer></script>
 <script src="./art-hero-slideshow.js" defer></script>
 <!-- Cloudflare Web Analytics -->
 <script>
