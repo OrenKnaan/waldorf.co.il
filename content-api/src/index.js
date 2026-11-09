@@ -671,7 +671,8 @@ export default {
       const doubleOptin = String(env.ACTIVETRAIL_DOUBLE_OPTIN || 'true') !== 'false';
       const payload = {
         email,
-        status: doubleOptin ? 'None' : 'Subscribe',
+        // ActiveTrail's values are None, Subscribed, Unsubscribed and Pending.
+        status: doubleOptin ? 'None' : 'Subscribed',
         subscribe_ip: ip === 'unknown' ? undefined : ip,
       };
       if (doubleOptin) {
