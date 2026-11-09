@@ -57,6 +57,12 @@ tr.mod-detail td,tr.mod-reject td{background:var(--sink)}
 .mod-foot.floating .btn{pointer-events:auto;box-shadow:var(--shadow)}
 .mod-msg{margin:12px 20px 0}
 .mod-msg:empty{display:none}
+tr.mod-rejected td{background:var(--crit-bg);color:var(--crit-ink);font-size:.88rem;font-weight:500}
+.rej-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rej-line a{color:inherit}
+.rej-ico{display:inline-flex;width:20px;height:20px;flex:none}
+.rej-ico svg{width:100%;height:100%}
+.rej-close{margin-inline-start:auto}
 .reject-box{display:grid;gap:10px;padding:6px 4px;font-size:.86rem;color:var(--ink)}
 .reject-box .btns{display:flex;gap:8px;flex-wrap:wrap}
 .reject-box blockquote{margin:0;padding:8px 12px;border-inline-start:3px solid var(--line);color:var(--muted);white-space:pre-wrap}

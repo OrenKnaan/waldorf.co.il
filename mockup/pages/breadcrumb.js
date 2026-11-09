@@ -466,7 +466,8 @@
     });
   }
 
-  var artHero = main.querySelector('.art-hero');
+  // A library work has no picture hero; its title block plays the part.
+  var artHero = main.querySelector('.art-hero') || main.querySelector(':scope > .lib-head');
   var ticking = false;
   function schedule() {
     if (ticking) return;

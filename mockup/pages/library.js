@@ -83,16 +83,21 @@
        wrapper is absolute and full height, starting at the article's own top
        edge; the nav inside it is sticky, so the rail follows a long chapter
        down instead of scrolling away at the first screen.
-       It sticks at 54px, not 16px: the breadcrumb is itself sticky at 8px,
-       spans the full width and carries z-index 15, so at 16px it was painted
-       over the rail's heading. The breadcrumb rests 38px tall at a fixed
-       12.5px font that the accessibility text scale does not touch, so a
-       constant clears it safely. */
+       It sticks at 66px: the breadcrumb is itself sticky at 8px, 44px tall
+       (the bar height every page uses), spans the full width and carries
+       z-index 15, so the rail starts 14px below it, the same gap the bar
+       keeps from the hero on other pages. Both are fixed sizes that the
+       accessibility text scale does not touch, so a constant is safe. */
+    'main > .pagebanner{height:44px;padding-block:0;white-space:nowrap}',
+    // Under the title block (see where it is moved) the hidden bar must not
+    // take room: its slot is cancelled, so the title keeps its old distance
+    // from the text, and the bar floats over the text once it sticks.
+    'main > .lib-head + .pagebanner{margin-block-end:-44px}',
     '.lib-with-toc{position:relative}',
     '.lib-col{max-width:68ch;margin-inline:auto;min-width:0}',
     '.lib-with-toc .lib-body{max-width:none;margin-inline:0}',
     '.lib-toc-wrap{position:absolute;inset-block:0 auto;inset-inline-start:0;width:214px;height:100%}',
-    '.lib-toc{position:sticky;inset-block-start:54px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);padding:14px 6px 12px 12px;max-height:calc(100vh - 72px);overflow:auto;overscroll-behavior:contain}',
+    '.lib-toc{position:sticky;inset-block-start:66px;background:var(--white);border:1.5px solid var(--beige);border-radius:var(--radius-organic);box-shadow:var(--shadow);padding:14px 6px 12px 12px;max-height:calc(100vh - 84px);overflow:auto;overscroll-behavior:contain}',
     '.lib-toc-title{margin:0 0 8px;padding:0 8px;font-family:var(--font-head);font-size:.88rem;color:var(--brown-dark);border:0}',
     '.lib-toc ol{list-style:none;margin:0;padding:0;counter-reset:none}',
     '.lib-toc li{margin:0}',
@@ -720,6 +725,12 @@
             note.textContent = 'תצוגה מקדימה: הפריט אינו מוצג באתר, והקישור הזה פתוח רק למי שקיבל אותו ממערכת הניהול.';
             main.insertBefore(note, main.querySelector('.lib-head'));
           }
+          // The breadcrumb goes under the title block, where it sits under the
+          // hero on other pages: breadcrumb.js keeps it hidden until the block
+          // has scrolled away, so it appears with the content, not above it.
+          var banner = main.querySelector(':scope > .pagebanner');
+          var head = main.querySelector(':scope > .lib-head');
+          if (banner && head) head.after(banner);
           initItemPage();
           var target = !pass && location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
           if (target) target.scrollIntoView();

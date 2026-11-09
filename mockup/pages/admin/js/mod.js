@@ -193,7 +193,18 @@
       foot.hidden = !foot.firstChild;
 
       t.tbody.textContent = '';
-      if (!shown.length) return A.emptyRow(t.tbody, cfg.cols.length, mode === 'unread' ? 'אין פריטים שלא נקראו' : 'אין פריטים');
+      // Rows of posts rejected in this view stay where the post was (rejectedRow).
+      function putNotices() {
+        if (!cfg.notices) return;
+        Object.keys(cfg.notices).map(function (id) { return cfg.notices[id]; })
+          .sort(function (a, b) { return a.index - b.index; })
+          .forEach(function (n) { t.tbody.insertBefore(n.node, t.tbody.children[n.index] || null); });
+      }
+      if (!shown.length) {
+        if (!cfg.notices || !Object.keys(cfg.notices).length) A.emptyRow(t.tbody, cfg.cols.length, mode === 'unread' ? 'אין פריטים שלא נקראו' : 'אין פריטים');
+        putNotices();
+        return;
+      }
       var moderator = A.atLeast('admin');
       shown.forEach(function (it) {
         var unseen = tracking && !isRead(cfg.col, it.id);
@@ -227,6 +238,7 @@
         t.tbody.appendChild(tr);
         if (open[it.id]) t.tbody.appendChild(detailRow(cfg, it, function () { open[it.id] = false; delete held[it.id]; setRead(cfg.col, [it.id], false); cfg.draw(); }));
       });
+      putNotices();
     };
     cfg.draw();
     host.appendChild(panel);
@@ -247,6 +259,22 @@
     return el('tr', { class: 'mod-detail' }, [el('td', { colspan: String(cfg.cols.length) }, kids)]);
   }
 
+  // The row a rejected post leaves behind: the reject icon and the outcome,
+  // with a button that removes it.
+  function rejectedRow(cfg, id, parts) {
+    var row;
+    var ico = el('span', { class: 'rej-ico', 'aria-hidden': 'true' });
+    ico.innerHTML = A.icons.reject;
+    var shut = el('button', { class: 'btn btn-ghost btn-sm rej-close', type: 'button', text: 'סגירה', onclick: function () {
+      delete cfg.notices[id];
+      row.remove();
+    } });
+    row = el('tr', { class: 'mod-rejected' }, [el('td', { colspan: String(cfg.cols.length) }, [
+      el('div', { class: 'rej-line' }, [ico, el('span', {}, parts), shut])
+    ])]);
+    return row;
+  }
+
   // Rejecting asks one question first: tell the submitter, or not. Telling them
   // sends the Worker's fixed paragraph, plus whatever the moderator adds.
   function openReject(cfg, it, tr, msg) {
@@ -260,27 +288,33 @@
     function close() { row.remove(); }
     function go(notify, extra, buttons) {
       buttons.forEach(function (b) { b.disabled = true; });
+      // Taken now: the store redraws the table as soon as the server answers,
+      // which removes this row before the code below runs.
+      var at = Array.prototype.indexOf.call(tr.parentNode.children, tr);
       WStore.reject(cfg.col, it.id, notify, extra).then(function (r) {
         setRead(cfg.col, [it.id], true);
         close();
-        msg.textContent = '';
-        msg.className = 'mod-msg';
+        // The rejected post's own row turns into the outcome, in place, so the
+        // moderator sees it where they clicked; draw() puts it back at that
+        // position until it is closed. The status line only announces it.
+        var parts = [];
         if (!r.notice) {
-          msg.appendChild(document.createTextNode('"' + name + '" נדחה והועבר לסל המחזור.'));
+          parts.push(document.createTextNode('"' + name + '" נדחה והועבר לסל המחזור.'));
         } else if (r.notice.mailed) {
-          msg.appendChild(document.createTextNode('"' + name + '" נדחה, וההסבר נשלח אל '));
-          msg.appendChild(el('bdi', { text: r.notice.to }));
-          msg.appendChild(document.createTextNode('.'));
+          parts.push(document.createTextNode('"' + name + '" נדחה, וההסבר נשלח אל '));
+          parts.push(el('bdi', { text: r.notice.to }));
+          parts.push(document.createTextNode('.'));
         } else {
-          // No mail provider yet (RESEND_API_KEY on the Worker), so the notice goes
+          // No mail provider (RESEND_API_KEY on the Worker), so the notice goes
           // out through the moderator's own mail app.
-          msg.className = 'mod-msg notice';
-          msg.appendChild(el('span', {}, [
-            document.createTextNode('"' + name + '" נדחה. ההסבר לא נשלח מהשרת, כי שליחת דוא״ל עוד לא הוגדרה: '),
-            el('a', { href: 'mailto:' + encodeURIComponent(r.notice.to) + '?subject=' + encodeURIComponent(r.notice.subject) + '&body=' + encodeURIComponent(r.notice.text),
-                      text: 'פתיחת ההודעה המוכנה בתוכנת הדואר' })
-          ]));
+          parts.push(document.createTextNode('"' + name + '" נדחה. ההסבר לא נשלח מהשרת, כי שליחת דוא״ל אינה מוגדרת: '));
+          parts.push(el('a', { href: 'mailto:' + encodeURIComponent(r.notice.to) + '?subject=' + encodeURIComponent(r.notice.subject) + '&body=' + encodeURIComponent(r.notice.text),
+                               text: 'פתיחת ההודעה המוכנה בתוכנת הדואר' }));
         }
+        var notices = cfg.notices || (cfg.notices = {});
+        notices[it.id] = { index: at, node: rejectedRow(cfg, it.id, parts) };
+        msg.className = 'mod-msg mod-sr';
+        msg.textContent = parts.map(function (n) { return n.textContent; }).join('');
         A.refreshAll();
       }).catch(function (e) {
         buttons.forEach(function (b) { b.disabled = false; });
