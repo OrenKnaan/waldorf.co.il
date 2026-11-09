@@ -771,7 +771,7 @@ WDyn.applyAbout({intro:'#about-intro',activities:'#about-activities',admission:'
     var up=WStore.get('events').filter(function(e){return e.status==='published'&&e.date>=today;})
       .sort(function(a,b){return a.date<b.date?-1:1;});
     if(!up.length){
-      m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'}));
+      m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים.'}));
       return;
     }
     /* The card events.html already renders, date badge and all, so one event

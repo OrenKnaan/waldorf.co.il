@@ -600,7 +600,7 @@ WDyn.applyAbout({intro:'#about-intro',activities:'#about-activities',admission:'
   var today=WDyn.todayISO();
   var up=WStore.get('events').filter(function(e){return e.status==='published'&&e.date>=today;})
     .sort(function(a,b){return a.date<b.date?-1:1;});
-  if(!up.length){ m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים — הלוח מתעדכן דרך ממשק הניהול.'})); return; }
+  if(!up.length){ m.appendChild(WDyn.el('div',{class:'dyn-empty',text:'אין כרגע אירועים קרובים.'})); return; }
   var e=up[0];
   m.appendChild(WDyn.el('div',{class:'dyn-item'},[
     WDyn.el('h3',{text:e.title}),
