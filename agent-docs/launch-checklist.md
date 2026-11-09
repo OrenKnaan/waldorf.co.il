@@ -63,7 +63,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   as `waldorf-admin`. It supports `_redirects`, `_headers`, a 404 page and a configurable
   `html_handling` (Pages cannot turn off the `.html` redirect). Either way the apex needs the
   zone on Cloudflare, so the nameservers move (C4).
-- [ ] **A5 [Oren] GitHub Pages after launch.** Recommendation: switch it off, so there is no
+- [x] **A5 [Oren] GitHub Pages after launch.** Recommendation: switch it off, so there is no
   second public copy of the site. The daily search-index rebuild, the `_*.html` drop and the
   admin-redirect step in `pages.yml` move into the new deploy (B9).
 - [x] **A6 [forum + Oren] `/wp-content/uploads/`.** Recommendation: copy the whole uploads **Done 2026-11-06: `migration/mirror-uploads.mjs` copied all 430 files (215 MiB) from the media library; they are in the R2 bucket `waldorf-uploads` and the Worker serves them at their original paths. Posts and pages link no other uploads. Files put on the server outside WordPress are not covered (B1 still needed for those).**
@@ -221,7 +221,9 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   `WAdminConfig.site` and the admin CSP name `https://www.waldorf.co.il`; the site sends
   `Access-Control-Allow-Origin` for `forum.html`, which the about editor reads (GitHub
   Pages had sent `*`). The admin itself stays on `waldorf-admin.orenknaan.workers.dev`.
-- [ ] **C11 [Oren]** Switch off GitHub Pages (A5).
+- [x] **C11 [Oren]** Switch off GitHub Pages (A5). Done 2026-11-09 differently: `pages.yml` now
+  publishes one redirect page per preview page to the same page on www, and `site.yml`
+  builds and deploys the live site on every push and daily (secret `CLOUDFLARE_API_TOKEN`).
 
 ## D. Email tests (after C8; check inbox **and** spam, and read the headers)
 

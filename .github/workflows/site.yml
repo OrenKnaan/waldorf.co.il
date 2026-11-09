@@ -1,0 +1,45 @@
+name: Deploy www.waldorf.co.il
+
+# Builds the public site from mockup/pages (site/build.mjs) and deploys the
+# Worker waldorf-site. On every push to main, by hand, and daily, so the search
+# index and the sitemap follow what the admin publishes, hides or approves in
+# D1 even when nothing is pushed.
+#
+# CLOUDFLARE_API_TOKEN is a repository secret (the scoped token in
+# ~/.config/waldorf/cf-token on Oren's Mac). The account id is not a secret.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '45 2 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Rebuilt from D1 at deploy time rather than trusted from the commit. If
+      # the API cannot be reached, the committed index ships instead of a
+      # partial one (search-index.mjs exits non-zero in that case).
+      - name: Rebuild the search index
+        run: node mockup/search-index.mjs || git checkout -- mockup/pages/search-index.json
+      - name: Build the site
+        run: node site/build.mjs
+      - name: Deploy
+        working-directory: site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: c2e58837297984adaa4cd6141ecd72cd
+        run: npx --yes wrangler@4 deploy

@@ -1,18 +1,16 @@
-name: Deploy mockup preview to GitHub Pages
+name: GitHub Pages redirects to www.waldorf.co.il
 
-# Publishes the self-contained content mockups in mockup/pages/ to GitHub Pages
-# so they can be shared for review. This is the preview mockup only — the real
-# Astro site is deployed separately on Cloudflare Pages.
+# The pre-launch preview used to be published here, at
+# https://orenknaan.github.io/waldorf.co.il/. Since the launch (2026-11-06) the
+# site is www.waldorf.co.il (site.yml), so this publishes one small page per
+# old preview page that sends the visitor to the same page there, query and
+# hash kept: links shared with the forum during review still land. The admin
+# pages send to the admin's own origin, as before.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Daily, so the search index follows D1: a work hidden in the admin drops out
-  # of it, and a newly approved post becomes findable, within a day even when
-  # nothing is pushed.
-  schedule:
-    - cron: '45 2 * * *'
 
 permissions:
   contents: read
@@ -31,32 +29,32 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Drop internal probe/harness files from the published preview
-        run: rm -f mockup/pages/_*.html
-      # Rebuilt from D1 at deploy time rather than trusted from the commit. If
-      # the API cannot be reached, the committed index ships instead of a
-      # partial one (search-index.mjs exits non-zero in that case).
-      - name: Rebuild the search index
-        run: node mockup/search-index.mjs || git checkout -- mockup/pages/search-index.json
-      # The admin has its own origin (admin-site/, waldorf-admin.orenknaan.workers.dev),
-      # so no public page shares its localStorage, where the session token and the
-      # management key live. Here each admin page becomes a redirect to the same
-      # path there, query and hash included, so bookmarks and set-password links
-      # minted before the move still land. The triage data goes with it: it is
-      # admin-only and was never meant to be public.
-      - name: Replace the admin with redirects to its own origin
+      - name: Write a redirect page for every preview page
         run: |
-          cd mockup/pages/admin
-          for f in *.html; do
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive"><title>מערכת הניהול</title>' \
-              "<script>location.replace('https://waldorf-admin.orenknaan.workers.dev/admin/$f' + location.search + location.hash);</script>" \
-              "<a href=\"https://waldorf-admin.orenknaan.workers.dev/admin/$f\">מערכת הניהול עברה לכתובת חדשה</a>" > "$f.stub"
+          out=gh-pages-redirects
+          mkdir -p "$out/admin"
+          stub() {
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>הפורום הארצי לחינוך ולדורף</title>' \
+              "<link rel=\"canonical\" href=\"$1\"><meta http-equiv=\"refresh\" content=\"0; url=$1\">" \
+              "<script>location.replace('$1' + location.search + location.hash);</script>" \
+              "<a href=\"$1\">$1</a>"
+          }
+          for f in mockup/pages/*.html; do
+            n=$(basename "$f")
+            case "$n" in
+              _*) continue ;;
+              index.html|home.html) t=https://www.waldorf.co.il/ ;;
+              *) t="https://www.waldorf.co.il/$n" ;;
+            esac
+            stub "$t" > "$out/$n"
           done
-          find . -mindepth 1 ! -name '*.stub' -exec rm -rf {} +
-          for f in *.stub; do mv "$f" "${f%.stub}"; done
+          for f in mockup/pages/admin/*.html; do
+            n=$(basename "$f")
+            stub "https://waldorf-admin.orenknaan.workers.dev/admin/$n" > "$out/admin/$n"
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: mockup/pages
+          path: gh-pages-redirects
       - id: deployment
         uses: actions/deploy-pages@v4
