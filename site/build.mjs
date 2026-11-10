@@ -158,7 +158,7 @@ const redirects = execFileSync('node', [join(root, 'migration', 'build-redirects
   .map((l) => l.replace(/ \/home\.html 301$/, ' / 301'))
   .join('\n');
 writeFileSync(join(dist, '_redirects'), redirects
-  + '\n# The admin has its own Worker.\n/admin https://waldorf-admin.orenknaan.workers.dev/admin/ 302\n/admin/* https://waldorf-admin.orenknaan.workers.dev/admin/:splat 302\n');
+  + '\n# The admin has its own Worker.\n/admin https://admin.waldorf.co.il/admin/ 302\n/admin/* https://admin.waldorf.co.il/admin/:splat 302\n');
 
 const left = readdirSync(dist).filter((f) => f.endsWith('.html') && readFileSync(join(dist, f), 'utf8').includes('class="ph"'));
 if (left.length) { console.error(`placeholder text left in: ${left.join(', ')}`); process.exit(1); }

@@ -50,7 +50,7 @@ jobs:
           done
           for f in mockup/pages/admin/*.html; do
             n=$(basename "$f")
-            stub "https://waldorf-admin.orenknaan.workers.dev/admin/$n" > "$out/admin/$n"
+            stub "https://admin.waldorf.co.il/admin/$n" > "$out/admin/$n"
           done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

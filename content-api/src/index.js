@@ -467,8 +467,7 @@ const todayIL = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusal
 // *.pages.dev is matched by pattern because Cloudflare Pages mints a new
 // hostname for every branch and PR preview, which is where this is heading.
 const ALLOWED_ORIGINS = [
-  'https://orenknaan.github.io',
-  'https://waldorf-admin.orenknaan.workers.dev',
+  'https://admin.waldorf.co.il',
   'https://waldorf-site.orenknaan.workers.dev',   // the site Worker's rehearsal address
   'https://waldorf.co.il',
   'https://www.waldorf.co.il',

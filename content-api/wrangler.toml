@@ -54,7 +54,7 @@ ACTIVETRAIL_DOUBLE_OPTIN = "true"
 # Without it the Worker falls back to the caller's Origin, right from a browser
 # and empty from anything else, so a link minted by a script or destined for an
 # email comes out relative and unusable.
-ADMIN_BASE_URL = "https://waldorf-admin.orenknaan.workers.dev"
+ADMIN_BASE_URL = "https://admin.waldorf.co.il"
 
 # The demo rows (demo = 1: invented events, videos, podcasts, a job ad, a board
 # post) are hidden from visitors from launch on (launch-checklist B20). The

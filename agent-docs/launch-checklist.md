@@ -43,9 +43,9 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 
 ## A. Decisions, before any build work
 
-- [ ] **A00 [forum] Hosting ends about 2026-11-12, not extended (Oren, 2026-11-06)** (Oren, 2026-11-05: "in a week"). Extend it
+- [x] **A00 [forum] Hosting ends about 2026-11-12, not extended (Oren, 2026-11-06)** (Oren, 2026-11-05: "in a week"). Extend it
   by a month: the old site, the mail server and the only full backup are all on it (E6).
-- [ ] **A0 [Oren] Renew the domain.** ISOC's whois shows `validity: 13-11-2026` (checked
+- [x] **A0 [Oren] Renew the domain.** **Done (Oren, 2026-11-10).** ISOC's whois shows `validity: 13-11-2026` (checked
   2026-11-05). If it lapses, the site and the mail both stop.
 
 - [x] **A1 [Oren] Canonical host: keep `www`.** Decided 2026-11-05. Recommendation: keep `https://www.waldorf.co.il`
@@ -100,8 +100,10 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 ## B. Preparation (no public effect, can start now)
 
 ### Old site
-- [ ] **B1 [Oren] Full WordPress backup from livedns**: files (including all of
+- [ ] **B1 [forum] Full WordPress backup from livedns**: files (including all of
   `wp-content/uploads`) and a database export. Store it outside the repo.
+  **2026-11-10: handed to the forum.** livedns support did not answer Oren; the API stopgap
+  (B4) and the uploads in R2 (A6) are all we hold.
 - [x] **B2 [forum + code] Content freeze** on the old WordPress from an agreed date, then **Rows added 2026-11-06 for 3248, 3251, 3254 (the sitemap had no others). The freeze itself is the forum's: anything posted on WordPress from now on is not on the new site.**
   re-pull the sitemap and add the missing rows (3248, 3251, 3254 and anything newer) to
   `url-map.csv`.
@@ -121,13 +123,15 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   (post type `feedback`), which need a login.
 - [ ] **B5 [Oren] Lower TTLs to 300 seconds** at livedns a day before C4, so a rollback (F1)
   takes effect in minutes.
-- [ ] **B6 [Oren] Mail authentication records**, in the Cloudflare zone (and at livedns if they
+- [ ] **B6 [Oren] Mail authentication records** (all but iv's report address done: the apex SPF came with Email Routing, Resend's with B7), in the Cloudflare zone (and at livedns if they
   are wanted before the move):
   - B6.i ActiveTrail: the four records in `migration/dns-records.md`. **Done 2026-11-07.**
   - B6.ii Resend: the DKIM and `send.` MX/SPF records Resend shows when the domain is added.
   - B6.iii Apex SPF for the livedns mailbox: ask livedns for their include, e.g.
     `v=spf1 a mx include:<livedns> ~all`. Only one SPF record per name.
-  - B6.iv DMARC: `v=DMARC1; p=none; rua=mailto:<forum inbox>` so reports arrive.
+  - B6.iv DMARC: published at `p=none` with ActiveTrail's records, but with **no `rua=`**, so
+    no reports arrive. Fix: Cloudflare dashboard, zone `waldorf.co.il`, Email, DMARC
+    Management, Enable; it adds its own `rua=` address and shows the reports.
 - [x] **B7 [Oren] Resend**: chosen 2026-11-07, working 2026-11-08: the forum's account, the
   domain's records added by Resend's Cloudflare setup, `RESEND_API_KEY` set, `MAIL_FROM` and
   `REPLY_TO` deployed. A password reset to orenknaan@gmail.com was accepted by Resend. Account, add and verify `waldorf.co.il`,
@@ -171,17 +175,20 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   Worker mapping post ids (all known from the REST API) to their `new_path`. Optional but
   cheap, and it rescues every `wp.me` link shared on Facebook.
 - [x] **B17 [code] `_headers`** for the site: long cache on fonts and images, short on HTML. **Done 2026-11-06: `site/static/_headers`.**
-- [ ] **B18 [code] Addresses that change** (`launch-cutover.md` 6a): `WAdminConfig.site`,
+- [x] **B18 [code] Addresses that change** **Done 2026-11-10: the admin moved to `https://admin.waldorf.co.il` (custom domain of `waldorf-admin`; its `workers.dev` and preview addresses off), and `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (the old admin address and `orenknaan.github.io` dropped), the `forum.html` CORS header, the site's `/admin` redirect and `pages.yml`'s stubs name it.** (`launch-cutover.md` 6a): `WAdminConfig.site`,
   `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (both already allow `waldorf.co.il` and
   `www`), the admin CSP and the admin redirect step.
-- [ ] **B19 [Oren] Cloudflare Access on the admin** hostname (`admin-site/wrangler.toml`).
-  Optional: an `admin.waldorf.co.il` custom domain, which adds a pass over B18.
+- [ ] **B19 [Oren] Cloudflare Access on the admin** hostname `admin.waldorf.co.il`.
+  Zero Trust is not enabled on the account yet (the API answers "Access is not enabled"),
+  and neither the API token nor wrangler's login may manage it, so it is a dashboard step.
+  Allow exactly the admin accounts: orenknaan@, giladgoldshmidt@ and haforumwaldorf@gmail.com
+  (all three in D1's `users` since 2026-11-10, each sent a set-password mail that day).
 - [x] **B20 [code] Placeholder removal, prepared as a script ready for C2**: **Done 2026-11-06, in the build rather than a script (the mockup keeps its markers): titles, footer, the stand-in labels. Demo rows: hidden from visitors by `HIDE_DEMO = "1"` in `content-api`, not deleted, so the admin can delete or replace them.**
   the `מוקאפ` suffix in 157 titles, the `גירסה פנימית` footer on 156 pages, the stand-in labels in
   `kinder-articles.html` and `kinder-circle.html`, and the `demo: true` rows in D1.
-- [ ] **B21 [Oren] Web Analytics**: create the `waldorf.co.il` site now so the token is ready
+- [x] **B21 [Oren] Web Analytics** (done as part of C9): create the `waldorf.co.il` site now so the token is ready
   for C9 (`launch-cutover.md` item 10).
-- [ ] **B22 [Oren] Search Console access**: find out who owns the existing property for
+- [x] **B22 [Oren] Search Console access** (done: a verified property, its TXT record kept per `migration/dns-records.md`; E1 submitted sitemaps to it): find out who owns the existing property for
   `waldorf.co.il`. If nobody can be found, verify a **Domain property** by DNS TXT. A newly
   verified property still shows the history Google holds for the site.
 - [x] **B23 [code] Rehearsal on the Worker's `workers.dev` URL**, with `noindex` still on: run **Done 2026-11-06 on `https://waldorf-site.orenknaan.workers.dev`: 906 of 906 old addresses (plus 40 lowercase-encoded variants) give one 301 to a 200, 98 of 98 internal targets answer 200, key pages without script errors at 1440 and 390 px.**
@@ -195,8 +202,8 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [x] **C2 [code]** In one commit: remove the `noindex` meta from all pages (and **Done 2026-11-06, in the build: the mockup keeps `noindex` for the GitHub Pages preview, the deployed copy has none.**
   `src/pages/index.astro`), replace `robots.txt` (B12), apply B20, add the redirects. Deploy
   to the Worker (still only on `workers.dev`) and re-run the B23 crawl.
-- [ ] **C3 [Oren]** Mail check before the switch: send and receive one message on each
-  `@waldorf.co.il` mailbox in use, as a baseline.
+- [x] **C3 [Oren]** Mail check before the switch: send and receive one message on each
+  `@waldorf.co.il` mailbox in use, as a baseline. **Superseded: the mail moved to Email Routing (A10), tested 2026-11-08; closed by Oren 2026-11-10.**
 - [x] **C4 [Oren]** Change the nameservers at the registrar to Cloudflare's pair. The imported
   A records still point at 62.219.78.151, so the old site keeps serving while the change
   spreads. Wait for the zone to show Active.
@@ -210,8 +217,8 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   `www`; PDF from R2 200; sitemap 155 URLs on `www`. Live redirect crawl against `https://www.waldorf.co.il` and the apex:
   every `old_path` gives one 301 to a 200 on `www`. Internal-link crawl: no 404s and no
   redirects. Spot-check `/wp-content/uploads/...` (A6) and `/?p=` (B16).
-- [ ] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
-  `mail.waldorf.co.il` from a public resolver.
+- [x] **C8 [Oren]** Mail check after the switch: repeat C3, and confirm the MX resolves to
+  `mail.waldorf.co.il` from a public resolver. **Superseded like C3: the MX is Cloudflare's; nothing depends on `mail.waldorf.co.il` any more.**
 - [x] **C9 [code]** New Web Analytics token and site tag (B21), re-run `patch-analytics.mjs`.
   **Beacon done 2026-11-06:** Oren created the site in the dashboard (token `7e15f3…`, now in
   `mockup/analytics-config.mjs` and all 159 pages, live). Site tag `59343587…` in
@@ -220,7 +227,7 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [x] **C10 [code]** Deploy `content-api` and the admin with the B18 addresses. Done 2026-11-06:
   `WAdminConfig.site` and the admin CSP name `https://www.waldorf.co.il`; the site sends
   `Access-Control-Allow-Origin` for `forum.html`, which the about editor reads (GitHub
-  Pages had sent `*`). The admin itself stays on `waldorf-admin.orenknaan.workers.dev`.
+  Pages had sent `*`). The admin itself moved to `admin.waldorf.co.il` on 2026-11-10 (B18).
 - [x] **C11 [Oren]** Switch off GitHub Pages (A5). Done 2026-11-09 differently: `pages.yml` now
   publishes one redirect page per preview page to the same page on www, and `site.yml`
   builds and deploys the live site on every push and daily (secret `CLOUDFLARE_API_TOKEN`).
@@ -230,8 +237,9 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 For each mail below, open it in Gmail and use "Show original" to confirm SPF, DKIM and
 DMARC all say PASS.
 
-- [ ] **D1** Newsletter: sign up on `forum-newsletter.html` with a real address, receive
-  ActiveTrail's confirmation, click it, and see the contact in group 715085.
+- [ ] **D1** Newsletter: sign up on `forum-newsletter.html` with a real address and see the
+  contact in group 715085 as Subscribed. ActiveTrail sends no confirmation mail for API
+  signups (`agent-docs/newsletter.md`).
 - [ ] **D2** An ActiveTrail test campaign to Gmail, Outlook and one Israeli provider, sent
   from a `waldorf.co.il` address. Check its score on a tester such as mail-tester.com.
 - [ ] **D3** Admin invitation: create a user, receive the set-password mail through Resend,

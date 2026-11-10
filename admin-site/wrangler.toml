@@ -12,11 +12,17 @@
 #     node admin-site/build.mjs
 #     cd admin-site && npx wrangler@4 deploy
 #
-# Production should also put Cloudflare Access in front of this hostname
-# (Workers & Pages -> waldorf-admin -> Settings -> Domains & Routes -> workers.dev
-# -> enable Cloudflare Access), so the login page is not the only door.
+# Served at admin.waldorf.co.il since 2026-11-10 (it was on
+# waldorf-admin.orenknaan.workers.dev before). Cloudflare Access sits in front of
+# that hostname, so the login page is not the only door; the workers.dev and
+# preview addresses are off because Access would not cover them.
 name = "waldorf-admin"
 compatibility_date = "2026-08-01"
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "admin.waldorf.co.il", custom_domain = true },
+]
 
 [assets]
 directory = "./dist"

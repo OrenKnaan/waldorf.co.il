@@ -43,7 +43,7 @@
   // longer sit in the public site's localStorage at all. Credentials go only from
   // that origin, or from localhost, where both are served together for testing.
   // On any other origin, anything an older admin left behind is cleared.
-  var ADMIN_ORIGIN = 'https://waldorf-admin.orenknaan.workers.dev';
+  var ADMIN_ORIGIN = 'https://admin.waldorf.co.il';
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var ADMIN_PAGE = /\/admin\//.test(location.pathname) && (location.origin === ADMIN_ORIGIN || LOCAL);
   if (location.origin !== ADMIN_ORIGIN && !LOCAL) {

@@ -32,8 +32,7 @@ const ALLOWED_DAYS = [1, 7, 30, 90];
 // The admin, the only caller that holds DASH_KEY, has an origin of its own
 // (admin-site/); the site's own origins stay for the transition.
 const ALLOWED_ORIGINS = [
-  'https://waldorf-admin.orenknaan.workers.dev',
-  'https://orenknaan.github.io',
+  'https://admin.waldorf.co.il',
   'https://waldorf.co.il',
   'https://www.waldorf.co.il',
 ];
