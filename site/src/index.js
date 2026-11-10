@@ -14,6 +14,39 @@ const noindex = (res) => {
   return out;
 };
 
+// Where an address this site does not have should go instead, or null. Zone
+// analytics after the launch (launch-checklist E4) showed old links arriving
+// with WordPress's extras on the end: a post's comment feed (/feed/) or
+// oEmbed (/embed/), page N of an old listing (/page/4/), a stray double slash
+// at the start, and thumbnail sizes WordPress generated (-300x225.jpg), of
+// which only the originals were copied. Strip those, and answer only if what
+// is left exists or is an old address with its own redirect.
+async function oldAddress(env, origin, path) {
+  const base = path
+    .replace(/^\/{2,}/, '/')
+    .replace(/\/(?:feed(?:\/atom|\/rss2?)?|embed|page\/\d+)\/?$/, '/');
+  if (base.startsWith(UPLOADS)) {
+    let key, asked;
+    try { key = decodeURIComponent(base).slice(1); asked = decodeURIComponent(path).slice(1); } catch { return null; }
+    for (const k of new Set([key, key.replace(/-\d+x\d+(\.[a-z0-9]+)$/i, '$1')])) {
+      if (k !== asked && await env.UPLOADS.head(k)) {
+        return '/' + k.split('/').map(encodeURIComponent).join('/');
+      }
+    }
+    return null;
+  }
+  // The homepage is never the answer: a bare /feed/ is not a page anyone lost.
+  if (base === path || base === '/') return null;
+  // manual, or the lookup follows the redirect itself and the visitor gets two hops.
+  const hit = await env.ASSETS.fetch(new Request(origin + base, { redirect: 'manual' }));
+  if (hit.status === 200) return base;
+  if (hit.status >= 301 && hit.status <= 308) {
+    const to = new URL(hit.headers.get('location'), origin);
+    return to.pathname + to.search;
+  }
+  return null;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -64,6 +97,12 @@ export default {
         const file = new Response(request.method === 'HEAD' ? null : obj.body, { headers });
         return onDomain ? file : noindex(file);
       }
+    }
+
+    // 6. Old links with WordPress's extras on the end (see oldAddress).
+    if (res.status === 404 && onDomain) {
+      const to = await oldAddress(env, url.origin, path);
+      if (to) return Response.redirect(url.origin + to, 301);
     }
     return onDomain ? res : noindex(res);
   },

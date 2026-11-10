@@ -123,15 +123,14 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   (post type `feedback`), which need a login.
 - [ ] **B5 [Oren] Lower TTLs to 300 seconds** at livedns a day before C4, so a rollback (F1)
   takes effect in minutes.
-- [ ] **B6 [Oren] Mail authentication records** (all but iv's report address done: the apex SPF came with Email Routing, Resend's with B7), in the Cloudflare zone (and at livedns if they
+- [x] **B6 [Oren] Mail authentication records** (the apex SPF came with Email Routing, Resend's with B7, the DMARC report address on 2026-11-10), in the Cloudflare zone (and at livedns if they
   are wanted before the move):
   - B6.i ActiveTrail: the four records in `migration/dns-records.md`. **Done 2026-11-07.**
   - B6.ii Resend: the DKIM and `send.` MX/SPF records Resend shows when the domain is added.
   - B6.iii Apex SPF for the livedns mailbox: ask livedns for their include, e.g.
     `v=spf1 a mx include:<livedns> ~all`. Only one SPF record per name.
-  - B6.iv DMARC: published at `p=none` with ActiveTrail's records, but with **no `rua=`**, so
-    no reports arrive. Fix: Cloudflare dashboard, zone `waldorf.co.il`, Email, DMARC
-    Management, Enable; it adds its own `rua=` address and shows the reports.
+  - B6.iv DMARC: **done 2026-11-10**: DMARC Management is on, and the record now carries
+    Cloudflare's `rua=` address (`p=none` still; D7 raises it after clean reports).
 - [x] **B7 [Oren] Resend**: chosen 2026-11-07, working 2026-11-08: the forum's account, the
   domain's records added by Resend's Cloudflare setup, `RESEND_API_KEY` set, `MAIL_FROM` and
   `REPLY_TO` deployed. A password reset to orenknaan@gmail.com was accepted by Resend. Account, add and verify `waldorf.co.il`,
@@ -269,8 +268,12 @@ DMARC all say PASS.
   that had traffic.
   **Week 1 (2026-11-10):** `waldorf-site` 7,000-10,000 requests a day since the launch crawl,
   the whole account under 10,000. Redirect crawl 869/872 (the three are `/x.htm/` variants
-  nobody used), internal links 181/181. The 404 paths need Zone Analytics Read on the API
-  token, which it lacks.
+  nobody used), internal links 181/181. 404s since launch (zone analytics, `httpRequestsAdaptiveGroups`
+  filtered on `edgeResponseStatus: 404`): 7,342 requests, nearly all scanners probing for `.env`,
+  `.php` and `wp-login`. The real ones were old links with WordPress's extras (`/feed/`,
+  `/embed/`, `/page/N/`, a doubled leading slash, `-300x225` thumbnails), now handled by
+  `oldAddress()` in `site/src/index.js`; 22 old addresses WordPress used to guess (type `alias`
+  in the URL map); and `/favicon.ico` (85), now `site/static/favicon.ico`.
 - [ ] **E5** Keep the redirects permanently. They cost nothing; Google asks for at least a year.
 - [ ] **E6 [forum + Oren] Cancel the livedns hosting only after all of these**: the new site has
   been live for two weeks without a rollback (F1); the full WordPress backup and the uploads
