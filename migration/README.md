@@ -35,7 +35,7 @@ launch: the forum keeps publishing, so the post count will have moved.
 | column | meaning |
 |---|---|
 | `old_path` | path on the old site, decoded for reading. The redirect file re-encodes it. |
-| `type` | `page`, `post`, `category`, `calendar` |
+| `type` | `page`, `post`, `category`, `calendar`; `legacy` for the three `.htm` addresses of the site before WordPress, which Search Console still reported as 404 after the launch |
 | `title` | the old page's title, so the mapping can be reviewed without opening 431 tabs |
 | `new_path` | target on the new site |
 | `status` | see below |

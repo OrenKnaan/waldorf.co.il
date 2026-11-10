@@ -433,3 +433,6 @@ old_path,type,title,new_path,status,note
 /אסופה-לחגי-תשרי/,post,אסופה לחגי תשרי,/news.html,mapped-section,2026-09-05 · מודעות ופרסומים · added at launch (B2)
 /מהקונפליקט-לנשגב-האולימפיאדה-כשער-לח/,post,מהקונפליקט לנשגב: האולימפיאדה כשער לחוויית העתיד,/content-library.html,mapped-section,2026-09-28 · מאמרים · no library page yet · added at launch (B2)
 /חינוך-הומניסטי-גישות-עקרונות-ושאלות-ל/,post,"חינוך הומניסטי: גישות, עקרונות ושאלות להורים",/content-library.html,mapped-section,2026-10-24 · מאמרים · no library page yet · added at launch (B2)
+/index.htm,legacy,דף הבית (האתר שלפני וורדפרס),/home.html,mapped,pre-WordPress address; crawled by Google 2026-11-07 · added from Search Console
+/forum.htm,legacy,הפורום (האתר שלפני וורדפרס),/forum.html,mapped,pre-WordPress address; crawled by Google 2026-11-06 · added from Search Console
+/waldorf_highschool.htm,legacy,תיכון ולדורף (האתר שלפני וורדפרס),/curriculum.html,mapped-section,pre-WordPress address; target is a guess (the page could not be read from the Wayback Machine) · added from Search Console
