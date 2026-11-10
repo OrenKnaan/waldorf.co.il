@@ -94,6 +94,7 @@
     '.dyn-form .ok-msg{color:var(--brown-dark);background:#E7EEDF;border-radius:var(--radius-organic,999px);padding:6px 15px;font-size:.84rem;font-weight:600}',
     '.dyn-form .ok-msg.err{background:#F1DED7}',
     '.dyn-form .ok-msg:empty{display:none}',
+    '.dyn-form .privacy-note{grid-column:1/-1;margin:0;font-size:.8rem;color:var(--text)}',
     '.dyn-hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%)}',
     '.dyn-note{font-size:.8rem;color:var(--text-muted);margin:2px 0 14px}',
     '.dyn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}',
@@ -290,6 +291,11 @@
             }).then(function () { send.disabled = false; });
           }
         }, fields.concat([
+          el('p', { class: 'privacy-note' }, [
+            document.createTextNode('פרטי הקשר שבמודעה יתפרסמו באתר. כתובת הדוא"ל לעדכון לא תתפרסם, ותשמש רק כדי להודיע לכם על המודעה. פרטים נוספים ב'),
+            el('a', { href: './privacy.html', text: 'מדיניות הפרטיות' }),
+            document.createTextNode('.')
+          ]),
           el('div', { class: 'dyn-hp', 'aria-hidden': 'true' }, [el('label', { for: 'hp-' + cfg2.collection, text: 'אתר' }), hp]),
           el('div', { class: 'actions' }, [send, msg])
         ]))

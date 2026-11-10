@@ -87,10 +87,10 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
   **Settled 2026-11-08:** Cloudflare Email Routing receives the domain's mail; `info@` and a
   catch-all forward to `haforumwaldorf@gmail.com` (`migration/dns-records.md`). Tested the
   same day: mail to `info@` and to a made-up address both arrived.
-- [ ] **A11 [forum] Privacy policy page.** The site collects names, emails and phone numbers
+- [x] **A11 [forum] Privacy policy page.** **Done 2026-11-10 as an interim text until the forum's lawyer reviews it: `privacy.html`, linked from every footer (`mockup/patch-privacy-link.mjs`) and from a notice at each form; the nightly job now deletes throttle IPs after a day, as the page promises.** The site collects names, emails and phone numbers
   (newsletter, noticeboard submissions, the forms). A privacy page is likely required under
   the Privacy Protection Law; the wording is the forum's (or their lawyer's).
-- [ ] **A12 [forum] Accessibility statement**: postal address, the exemption from appointing a
+- [x] **A12 [forum] Accessibility statement** **Done 2026-11-10 with what we have: the postal address (from `contact.html`), "no appointed coordinator, the office handles it", videos without captions under limitations, an alternative channel, the date. Still open for the forum: the certified auditor's check (E9).**: postal address, the exemption from appointing a
   coordinator, and the audit by a certified auditor (`migration/mockup-notes.md`, forum item 2
   and developer item 1).
 - [ ] **A13 [forum] The open content questions** in `migration/mockup-notes.md` (18 forum items)
@@ -178,14 +178,11 @@ Each item has an id (A1, B4…) so it can be referred to. Tick it when done and 
 - [x] **B18 [code] Addresses that change** **Done 2026-11-10: the admin moved to `https://admin.waldorf.co.il` (custom domain of `waldorf-admin`; its `workers.dev` and preview addresses off), and `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (the old admin address and `orenknaan.github.io` dropped), the `forum.html` CORS header, the site's `/admin` redirect and `pages.yml`'s stubs name it.** (`launch-cutover.md` 6a): `WAdminConfig.site`,
   `ADMIN_ORIGIN`, `ADMIN_BASE_URL`, both CORS lists (both already allow `waldorf.co.il` and
   `www`), the admin CSP and the admin redirect step.
-- [ ] **B19 [Oren] Cloudflare Access on the admin** hostname `admin.waldorf.co.il`.
-  Zero Trust is not enabled on the account yet (the API answers "Access is not enabled"),
-  and neither the API token nor wrangler's login may manage it, so it is a dashboard step.
-  Allow exactly the admin accounts: orenknaan@, giladgoldshmidt@ and haforumwaldorf@gmail.com
-  (all three in D1's `users` since 2026-11-10, each sent a set-password mail that day).
-- [x] **B20 [code] Placeholder removal, prepared as a script ready for C2**: **Done 2026-11-06, in the build rather than a script (the mockup keeps its markers): titles, footer, the stand-in labels. Demo rows: hidden from visitors by `HIDE_DEMO = "1"` in `content-api`, not deleted, so the admin can delete or replace them.**
-  the `מוקאפ` suffix in 157 titles, the `גירסה פנימית` footer on 156 pages, the stand-in labels in
-  `kinder-articles.html` and `kinder-circle.html`, and the `demo: true` rows in D1.
+- [x] **B19 [Oren] Cloudflare Access on the admin**: **dropped 2026-11-10.** Oren set it up,
+  found it made every editor sign in to Cloudflare first, and decided the admin's own login
+  (personal accounts, roles, throttled sign-in) is enough for the forum. The admin's only
+  address is `admin.waldorf.co.il` (B18). The three accounts (orenknaan@, giladgoldshmidt@,
+  haforumwaldorf@gmail.com) are in D1's `users`, each sent a set-password mail that day.
 - [x] **B21 [Oren] Web Analytics** (done as part of C9): create the `waldorf.co.il` site now so the token is ready
   for C9 (`launch-cutover.md` item 10).
 - [x] **B22 [Oren] Search Console access** (done: a verified property, its TXT record kept per `migration/dns-records.md`; E1 submitted sitemaps to it): find out who owns the existing property for

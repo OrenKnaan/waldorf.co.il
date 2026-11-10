@@ -569,6 +569,10 @@ async function purgeBin(env) {
   }
   // Spent and expired preview passes go with it.
   await env.DB.prepare("DELETE FROM preview_tokens WHERE expires_at < strftime('%s','now')").run();
+  // And the IP addresses the throttles keep. No window is longer than an hour,
+  // and the privacy policy (privacy.html) promises they are gone within a day.
+  await env.DB.prepare("DELETE FROM rate_limits WHERE window_start < strftime('%s','now') - 86400").run();
+  await env.DB.prepare("DELETE FROM login_attempts WHERE last_fail < strftime('%s','now') - 86400").run();
   return purged;
 }
 

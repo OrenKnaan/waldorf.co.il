@@ -180,8 +180,11 @@
     '.skip-link:focus{inset-block-start:0}',
 
     /* ===== קישור הצהרת הנגישות בתחתית העמוד ===== */
-    '.site-footer .footer-a11y{color:inherit;text-decoration:underline;text-underline-offset:3px}',
-    '.site-footer .footer-a11y:hover{color:var(--brown-dark)}',
+    '.site-footer :is(.footer-a11y,.footer-privacy){color:inherit;text-decoration:underline;text-underline-offset:3px}',
+    '.site-footer :is(.footer-a11y,.footer-privacy):hover{color:var(--brown-dark)}',
+    /* בטלפון כפתור הנגישות וכפתור החזרה למעלה יושבים בפינות התחתונות, מעל שורת
+       התחתית; בלי המרווח הזה קצות השורה מוסתרים מתחתם. */
+    '@media (max-width:560px){body footer.site-footer{padding-inline:76px}}',
 
     /* ===== תפריטי הניווט נפתחים גם במקלדת (WCAG 2.1.1) ===== */
     /* בלי זה .dropdown נשאר display:none ולינקים שבתוכו כלל אינם בסדר ה-Tab. */

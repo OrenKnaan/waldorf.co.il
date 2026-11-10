@@ -13,9 +13,10 @@
 #     cd admin-site && npx wrangler@4 deploy
 #
 # Served at admin.waldorf.co.il since 2026-11-10 (it was on
-# waldorf-admin.orenknaan.workers.dev before). Cloudflare Access sits in front of
-# that hostname, so the login page is not the only door; the workers.dev and
-# preview addresses are off because Access would not cover them.
+# waldorf-admin.orenknaan.workers.dev before); the workers.dev and preview
+# addresses are off, so this is the one way in. The admin's own login is the
+# barrier: Oren decided on 2026-11-10 against a Cloudflare Access wall, which
+# made every editor sign in to Cloudflare first.
 name = "waldorf-admin"
 compatibility_date = "2026-08-01"
 workers_dev = false
