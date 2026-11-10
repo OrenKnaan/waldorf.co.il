@@ -707,7 +707,12 @@ export default {
         console.error('newsletter: ActiveTrail rejected', res.status, detail.slice(0, 300));
         return json({ error: 'upstream_failed' }, 502, origin);
       }
-      return json({ ok: true, doubleOptin }, 200, origin);
+      // Asking for double opt-in is not getting it: ActiveTrail answers with the
+      // contact already "Subscribed" and sends no confirmation mail (see
+      // agent-docs/newsletter.md). Tell the page what happened, not what was
+      // asked for, so it does not promise a mail that never comes.
+      const contact = await res.json().catch(() => ({}));
+      return json({ ok: true, doubleOptin: doubleOptin && contact?.state !== 'Subscribed' }, 200, origin);
     }
 
     // ---- POST /api/forms/contact, /api/forms/workgroup ----
