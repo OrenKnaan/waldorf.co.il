@@ -14,3 +14,11 @@ Permanent, like the accessibility layer and global search (`agent-docs/accessibi
 - Upstream failures return a generic 502 and log the real reply, which can name the account. Never pass ActiveTrail's error body to the browser.
 
 Verified against the live ActiveTrail API with a deliberately invalid token: their 401 says specifically "invalid API Key", which confirms the path and the bare `Authorization` header (no `Bearer` prefix) are right. Also verified 405/400/429/503, the honeypot, and axe-core at the four WCAG tags at 375px, 600px and 1792px, in the default state and with an error showing: **0 violations**.
+
+## Double opt-in does not happen (found 2026-11-09/10)
+
+ActiveTrail accepts the signup but sends **no confirmation mail**: `POST /api/groups/{id}/members` with `status: "None"` and a `double_optin` object answers 200 with the contact in `"state": "Subscribed"` and `"is_optined": false`. So every signup is subscribed at once, unconfirmed.
+
+- `status: "Pending"` is refused: HTTP 500, `Cannot set state from 'Active'('None') to 'Pending' by source 'User'`. Do not ship it: while it was live, every signup failed.
+- The API documentation (`https://webapi.mymarketing.co.il/api/docs`) lists the `double_optin` fields (subject, message, confirmation link text) and the states (`Subscribed`, `Unsubscribed`, `Bounced`, `Blocked`, `Not_Opt_In`) but never says what triggers the mail. The open question went to ActiveTrail support; it is likely an account setting.
+- Test contacts made while finding this (`orenknaan+test@`, `+test2@`, `+test3@gmail.com`) were created in the forum's account; the first two were deleted on 2026-11-09.
