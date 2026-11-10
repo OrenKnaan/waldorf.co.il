@@ -160,6 +160,18 @@ const redirects = execFileSync('node', [join(root, 'migration', 'build-redirects
 writeFileSync(join(dist, '_redirects'), redirects
   + '\n# The admin has its own Worker.\n/admin https://admin.waldorf.co.il/admin/ 302\n/admin/* https://admin.waldorf.co.il/admin/:splat 302\n');
 
+// Every uploaded file (/files/…) the built pages and scripts link to. content-api's
+// quarterly cleanup (cleanFiles) reads this list before it trashes anything, so
+// a file linked by hand from a page is kept even though no database row names it.
+const usedFiles = new Set();
+for (const f of readdirSync(dist, { recursive: true })) {
+  if (!/\.(html|js|json|css|xml)$/.test(f) || f === 'used-files.json') continue;
+  for (const m of readFileSync(join(dist, f), 'utf8').matchAll(/\/(files\/[^\s"'<>)\\]+)/g)) {
+    try { usedFiles.add(decodeURIComponent(m[1])); } catch { usedFiles.add(m[1]); }
+  }
+}
+writeFileSync(join(dist, 'used-files.json'), JSON.stringify({ files: [...usedFiles].sort() }) + '\n');
+
 const left = readdirSync(dist).filter((f) => f.endsWith('.html') && readFileSync(join(dist, f), 'utf8').includes('class="ph"'));
 if (left.length) { console.error(`placeholder text left in: ${left.join(', ')}`); process.exit(1); }
 

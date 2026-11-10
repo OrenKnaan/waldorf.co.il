@@ -509,6 +509,97 @@ async function handleUpload(request, env, url, user, origin) {
   return json({ url: `${env.FILES_BASE}/${path}`, name, size: body.length }, 201, origin);
 }
 
+/* ---------------- cleanup of unused uploads (quarterly) ---------------- */
+// An uploaded file (files/ in the bucket) that nothing on the site links to and
+// nobody has downloaded for FILE_IDLE_DAYS is moved to trash/, and trash/ is
+// emptied TRASH_DAYS later: the same second chance the admin's recycle bin gives.
+// "Links to" means any row of any table in this database (content, drafts,
+// history, the recycle bin) or any built page (used-files.json, written by
+// site/build.mjs). "Downloaded" is file_hits, which the site Worker keeps; until
+// a file has been downloaded once, its upload date stands in.
+//
+// Only files/ is ever touched. The old site's mirror (wp-content/uploads/) is the
+// one copy of those files left, and links from outside point at them, so it is
+// out of scope; wp-export/ is a backup.
+//
+// Any failure before the moves (the page list cannot be read, the database
+// looks empty) stops the run with nothing moved.
+const FILE_IDLE_DAYS = 90;
+const TRASH_DAYS = 30;
+// Tables that never hold content, skipped when looking for links.
+// Cloudflare's own tables (_cf_…) refuse to be read at all.
+const NOT_CONTENT = new Set(['sessions', 'password_resets', 'login_attempts', 'rate_limits', 'file_hits', 'd1_migrations']);
+
+// The 1st of January, April, July and October, by the daily cron's date.
+const isCleanupDay = (d) => d.getUTCDate() === 1 && d.getUTCMonth() % 3 === 0;
+
+async function cleanFiles(env, now = Date.now()) {
+  const pages = await fetch(`${env.FILES_BASE}/used-files.json`, { cf: { cacheTtl: 0 } });
+  if (!pages.ok) throw new Error(`used-files.json: ${pages.status}`);
+  const fromPages = new Set((await pages.json()).files);
+
+  let haystack = '';
+  const { results: tables } = await env.DB.prepare(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+  ).all();
+  for (const { name } of tables) {
+    if (NOT_CONTENT.has(name) || name.startsWith('_cf_')) continue;
+    const { results } = await env.DB.prepare(`SELECT * FROM "${name}"`).all();
+    haystack += JSON.stringify(results);
+  }
+  // The site's content is several MB (the seed alone is 60,000 characters);
+  // anything near empty means a read went wrong.
+  if (haystack.length < 20000) throw new Error(`content looks empty (${haystack.length} chars)`);
+  const folded = haystack.toLowerCase();
+
+  const hits = new Map();
+  const { results: rows } = await env.DB.prepare("SELECT key, last_hit FROM file_hits WHERE key LIKE 'files/%'").all();
+  for (const r of rows) hits.set(r.key, r.last_hit * 1000);
+
+  // The env overrides are for testing with wrangler dev; production sets neither.
+  const cutoff = now - Number(env.FILE_IDLE_DAYS ?? FILE_IDLE_DAYS) * 86400000;
+  const idle = [];
+  let cursor, seen = 0;
+  do {
+    const page = await env.FILES.list({ prefix: 'files/', cursor });
+    for (const obj of page.objects) {
+      seen++;
+      const lastUsed = Math.max(obj.uploaded.getTime(), hits.get(obj.key) || 0);
+      if (lastUsed > cutoff || fromPages.has(obj.key)) continue;
+      // A stored address is percent-encoded (as the upload answered it) or, if
+      // pasted by hand, may be plain Hebrew or lower-case escapes.
+      const enc = obj.key.split('/').map(encodeURIComponent).join('/').toLowerCase();
+      if (haystack.includes(obj.key) || folded.includes(enc)) continue;
+      idle.push(obj.key);
+    }
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+
+  for (const key of idle) {
+    const obj = await env.FILES.get(key);
+    if (!obj) continue;
+    await env.FILES.put(`trash/${key}`, await obj.arrayBuffer(), {
+      httpMetadata: obj.httpMetadata,
+      customMetadata: { ...obj.customMetadata, trashedAt: new Date(now).toISOString() },
+    });
+    await env.FILES.delete(key);
+  }
+  return { seen, trashed: idle };
+}
+
+/** Deletes for good what has been in trash/ longer than TRASH_DAYS. Daily. */
+async function emptyFileTrash(env, now = Date.now()) {
+  const cutoff = now - Number(env.TRASH_DAYS ?? TRASH_DAYS) * 86400000;
+  let cursor, gone = 0;
+  do {
+    const page = await env.FILES.list({ prefix: 'trash/', cursor });
+    const old = page.objects.filter((o) => o.uploaded.getTime() < cutoff).map((o) => o.key);
+    if (old.length) { await env.FILES.delete(old); gone += old.length; }
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+  return gone;
+}
+
 /* ---------------- roles ---------------- */
 // editor edits content; admin also moderates (approve, reject, bin a submission)
 // and deletes for good; super_admin also manages users. The management key is a
@@ -1391,5 +1482,13 @@ export default {
   // has sat in it for BIN_DAYS.
   async scheduled(event, env, ctx) {
     ctx.waitUntil(purgeBin(env).then((n) => console.log(`recycle bin: ${n} row(s) purged`)));
+    ctx.waitUntil(emptyFileTrash(env).then((n) => console.log(`file trash: ${n} file(s) deleted for good`)));
+    // FILE_CLEANUP_ANY_DAY is for testing with wrangler dev --test-scheduled only.
+    if (isCleanupDay(new Date(event.scheduledTime)) || env.FILE_CLEANUP_ANY_DAY === '1') {
+      ctx.waitUntil(cleanFiles(env).then(
+        (r) => console.log(`file cleanup: ${r.trashed.length} of ${r.seen} upload(s) moved to trash/`, r.trashed),
+        (e) => console.error('file cleanup stopped, nothing moved:', String(e)),
+      ));
+    }
   },
 };

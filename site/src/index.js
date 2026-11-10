@@ -51,7 +51,7 @@ async function oldAddress(env, origin, path) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     // 1. One address for every page: https on www (launch-checklist A1, C6).
@@ -100,6 +100,17 @@ export default {
         headers.set('cache-control', 'public, max-age=31536000, immutable');
         headers.set('x-content-type-options', 'nosniff');
         const file = new Response(request.method === 'HEAD' ? null : obj.body, { headers });
+        // When it was last downloaded, for content-api's quarterly cleanup of
+        // uploads nobody uses (cleanFiles). At most one write per file a day:
+        // the update only lands when the stored day is older. After the response,
+        // and a failure here never costs the visitor the file.
+        if (onDomain) {
+          ctx.waitUntil(env.DB.prepare(
+            `INSERT INTO file_hits (key, last_hit) VALUES (?, strftime('%s','now'))
+             ON CONFLICT(key) DO UPDATE SET last_hit = excluded.last_hit
+             WHERE excluded.last_hit - file_hits.last_hit > 86400`,
+          ).bind(key).run().catch(() => {}));
+        }
         return onDomain ? file : noindex(file);
       }
     }

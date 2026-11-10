@@ -37,3 +37,10 @@ run_worker_first = true
 [[r2_buckets]]
 binding = "UPLOADS"
 bucket_name = "waldorf-uploads"
+
+# The content database, for one thing only: file_hits, the day each file in the
+# bucket was last downloaded (content-api/migrations/0018_file_hits.sql).
+[[d1_databases]]
+binding = "DB"
+database_name = "waldorf-content"
+database_id = "a8bb8c4e-5f95-4c8b-a246-2d4cf8adcc86"
