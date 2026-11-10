@@ -257,11 +257,20 @@ DMARC all say PASS.
   this move keeps the domain.
 - [ ] **E3** URL Inspection on the homepage, the main section pages and two or three `lib-*`
   works (B15): check the rendered HTML contains the text, then Request Indexing.
+  **2026-11-10, our half:** every page tested answers 200 with a self canonical and no robots
+  meta or header; the API host's `robots.txt` has no rules, so Google may fetch it. Rendered as
+  Googlebot, the text is there, but the raw HTML of `lib-*` pages carries none of it (84
+  characters against 900 to 43,000 rendered) and `content-library.html` 15% of it: B15 stands.
+  Search Console's URL Inspection and Request Indexing are Oren's.
 - [ ] **E4** Weekly for six weeks: the Worker's daily request count (`run_worker_first` makes
   every file, not only every page, a Worker request: about 9 per page view against the free
   plan's 100,000 a day), and the Pages report (Not found, Page with redirect, Duplicate
   without user-selected canonical) and the Worker's 404 paths. Add a redirect for any 404
   that had traffic.
+  **Week 1 (2026-11-10):** `waldorf-site` 7,000-10,000 requests a day since the launch crawl,
+  the whole account under 10,000. Redirect crawl 869/872 (the three are `/x.htm/` variants
+  nobody used), internal links 181/181. The 404 paths need Zone Analytics Read on the API
+  token, which it lacks.
 - [ ] **E5** Keep the redirects permanently. They cost nothing; Google asks for at least a year.
 - [ ] **E6 [forum + Oren] Cancel the livedns hosting only after all of these**: the new site has
   been live for two weeks without a rollback (F1); the full WordPress backup and the uploads
