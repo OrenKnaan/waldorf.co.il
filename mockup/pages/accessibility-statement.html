@@ -470,6 +470,13 @@
     .linkcard .body{flex:1 1 100%;order:2}
     .linkcard .go{order:3;margin-inline-start:auto}
   }
+  /* The breadcrumb bar comes before the picture on this page and stays hidden
+     until the picture scrolls away (breadcrumb.js), but hidden it still held its
+     height, an empty band under the header. A fixed height and an equal negative
+     bottom margin take it out of the flow; the picture then sits as close under
+     the header as on the slideshow pages. */
+  main > .pagebanner:first-child{height:44px;padding-block:0;white-space:nowrap;margin-block:0 -44px}
+  @media (min-width:721px){main{padding-top:10px}}
 </style>
 <script type="application/ld+json">
 {
