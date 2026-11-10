@@ -20,21 +20,21 @@
       { name: 'author', label: 'מחבר/ת' },
       { name: 'date', label: 'שנה' },
       // Where the item opens: a PDF, a Drive link, or its own page on the site.
-      { name: 'url', label: 'קישור למסמך', placeholder: 'https://…',
-        hint: 'הדביקו כתובת של קובץ PDF או של מסמך ב-Google Drive. העלאת קובץ ישירות מהמחשב תתאפשר רק אחרי שיחובר אחסון קבצים (R2); כרגע אין לאן לשמור אותו.' },
+      { name: 'url', label: 'קישור למסמך', placeholder: 'https://…', upload: 'document',
+        hint: 'הדביקו כתובת של קובץ PDF או של מסמך ב-Google Drive, או העלו קובץ מהמחשב.' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
     ], cols: ['סוג', 'כותרת', 'מחבר/ת', 'שנה', ''],
     row: function (it) { return [td(it.kind || A.NONE, 'muted'), A.titleCell(it.title, it.demo, it), td(it.author || A.NONE, 'muted'), td(it.date || A.NONE, 'muted')]; } },
     { col: 'teaching', title: 'חומרי הוראה', fields: [
       { name: 'title', label: 'כותרת' },
       { name: 'group', label: 'קבוצה', type: 'select', options: ['סיפורים, שירים ודקלומים', 'דפי עבודה להדפסה', 'מצגות ותמונות להוראה', 'חומרי העשרה לתיכון'] },
-      { name: 'url', label: 'קישור לקובץ' }
+      { name: 'url', label: 'קישור לקובץ', upload: 'teaching' }
     ], cols: ['קבוצה', 'כותרת', 'קובץ', ''],
     row: function (it) { return [td(it.group || A.NONE, 'muted'), A.titleCell(it.title, it.demo, it), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } },
     { col: 'forms', title: 'מאגר טפסים', fields: [
       { name: 'title', label: 'שם הטופס' },
       { name: 'category', label: 'קטגוריה', type: 'select', options: ['הרשמה', 'בקשות', 'אישורים'] },
-      { name: 'url', label: 'קישור לקובץ' },
+      { name: 'url', label: 'קישור לקובץ', upload: 'document' },
       { name: 'description', label: 'תיאור', type: 'textarea', wide: true }
     ], cols: ['קטגוריה', 'שם', 'קובץ', ''],
     row: function (it) { return [td(it.category || A.NONE, 'muted'), A.titleCell(it.title, it.demo, it), td(it.url ? 'מקושר' : 'חסר', 'muted')]; } }

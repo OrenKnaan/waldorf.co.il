@@ -442,6 +442,73 @@ const COLLECTIONS = {
 
 const SINGLETONS = ['about'];
 
+/* ---------------- file uploads (R2) ---------------- */
+// The admin attaches a file to a library work, a teaching material, a form or a
+// news item by uploading it here instead of pasting an address. Files go to the
+// waldorf-uploads bucket under files/, which the site Worker serves at
+// https://www.waldorf.co.il/files/…; the old site's mirror (wp-content/) and the
+// WordPress export (wp-export/) share the bucket but sit outside that prefix,
+// and nothing here can write to them.
+//
+// R2's free tier is 10 GB, so each type has a ceiling well inside it. The type
+// is checked twice, by extension against what the field takes and by the file's
+// first bytes, so a renamed file of another kind is refused; the stored
+// Content-Type comes from the extension, never from the browser.
+const MB = 1024 * 1024;
+const OLE = [0xd0, 0xcf, 0x11, 0xe0];   // .doc, .ppt
+const ZIP = [0x50, 0x4b, 0x03, 0x04];   // .docx, .pptx
+const FILE_TYPES = {
+  pdf:  { mime: 'application/pdf', max: 20 * MB, magic: [0x25, 0x50, 0x44, 0x46] },
+  doc:  { mime: 'application/msword', max: 20 * MB, magic: OLE },
+  docx: { mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', max: 20 * MB, magic: ZIP },
+  ppt:  { mime: 'application/vnd.ms-powerpoint', max: 30 * MB, magic: OLE },
+  pptx: { mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', max: 30 * MB, magic: ZIP },
+  jpg:  { mime: 'image/jpeg', max: 5 * MB, magic: [0xff, 0xd8, 0xff] },
+  jpeg: { mime: 'image/jpeg', max: 5 * MB, magic: [0xff, 0xd8, 0xff] },
+  png:  { mime: 'image/png', max: 5 * MB, magic: [0x89, 0x50, 0x4e, 0x47] },
+  webp: { mime: 'image/webp', max: 5 * MB, magic: [0x52, 0x49, 0x46, 0x46], at8: [0x57, 0x45, 0x42, 0x50] },
+};
+// What each field takes (`upload` in the admin's field lists).
+const UPLOAD_KINDS = {
+  document: ['pdf', 'doc', 'docx'],                                            // library works, forms
+  teaching: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp'],
+  news:     ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+};
+const startsWith = (bytes, sig, at = 0) => sig.every((b, i) => bytes[at + i] === b);
+
+async function handleUpload(request, env, url, user, origin) {
+  if (!user) return json({ error: 'unauthorized' }, 401, origin);
+  const allowed = UPLOAD_KINDS[url.searchParams.get('kind')];
+  if (!allowed) return json({ error: 'bad_kind' }, 400, origin);
+  const name = (url.searchParams.get('name') || '').normalize('NFC');
+  const dot = name.lastIndexOf('.');
+  const ext = dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
+  const type = allowed.includes(ext) && FILE_TYPES[ext];
+  if (!type) return json({ error: 'type_not_allowed', allowed }, 415, origin);
+  const tooLarge = () => json({ error: 'too_large', maxMB: type.max / MB }, 413, origin);
+  if (Number(request.headers.get('content-length') || 0) > type.max) return tooLarge();
+  const body = new Uint8Array(await request.arrayBuffer());
+  if (!body.length) return json({ error: 'empty' }, 400, origin);
+  if (body.length > type.max) return tooLarge();
+  if (!startsWith(body, type.magic) || (type.at8 && !startsWith(body, type.at8, 8))) {
+    return json({ error: 'content_mismatch' }, 415, origin);
+  }
+  // files/2026/11/3f9a1c2e-<name>.pdf: the random part keeps two uploads of the
+  // same name apart and makes every address final, so the site can cache it
+  // for a year. Hebrew letters stay; anything that is not a letter, a digit, a
+  // dash or an underscore becomes a dash.
+  const base = name.slice(0, dot).replace(/[^\p{L}\p{N}_-]+/gu, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'file';
+  const now = new Date();
+  const key = `files/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, '0')}/` +
+    `${crypto.randomUUID().slice(0, 8)}-${base}.${ext}`;
+  await env.FILES.put(key, body, {
+    httpMetadata: { contentType: type.mime, contentDisposition: `inline; filename*=UTF-8''${encodeURIComponent(name)}` },
+    customMetadata: { uploadedBy: user.email || user.id, originalName: name },
+  });
+  const path = key.split('/').map(encodeURIComponent).join('/');
+  return json({ url: `${env.FILES_BASE}/${path}`, name, size: body.length }, 201, origin);
+}
+
 /* ---------------- roles ---------------- */
 // editor edits content; admin also moderates (approve, reject, bin a submission)
 // and deletes for good; super_admin also manages users. The management key is a
@@ -585,6 +652,11 @@ export default {
     const parts = url.pathname.split('/').filter(Boolean);   // ['api','content',...]
     const user = await whoami(request, env);
     const admin = Boolean(user);
+
+    // ---- POST /api/uploads?kind=document&name=<file name> (body: the file) ----
+    if (url.pathname === '/api/uploads' && request.method === 'POST') {
+      return handleUpload(request, env, url, user, origin);
+    }
 
     if (url.pathname === '/health') {
       const n = await env.DB.prepare('SELECT COUNT(*) c FROM events').first();

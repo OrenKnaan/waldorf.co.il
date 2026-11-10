@@ -135,6 +135,48 @@
 
   /* ---- the add/edit form ---- */
   var hintSeq = 0;
+  // A field with `upload: '<kind>'` takes an address and also offers a file from
+  // the computer, sent to the Worker (POST /api/uploads), which answers with the
+  // file's address on the site. The types and ceilings are the Worker's
+  // (UPLOAD_KINDS, FILE_TYPES in content-api); these only filter the file
+  // picker and tell the editor before they choose.
+  var UPLOADS = {
+    document: { accept: '.pdf,.doc,.docx', note: 'PDF או Word, עד 20MB' },
+    teaching: { accept: '.pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.webp', note: 'PDF, Word, PowerPoint או תמונה. מסמך עד 20MB, מצגת עד 30MB, תמונה עד 5MB' },
+    news: { accept: '.pdf,.jpg,.jpeg,.png,.webp', note: 'PDF או תמונה. PDF עד 20MB, תמונה עד 5MB' }
+  };
+  function uploadError(err, kind) {
+    var b = (err && err.body) || {};
+    if (err && err.status === 401) return 'צריך להתחבר כדי להעלות קבצים.';
+    if (b.error === 'too_large') return 'הקובץ גדול מדי: עד ' + b.maxMB + 'MB לקובץ מהסוג הזה.';
+    if (b.error === 'type_not_allowed') return 'סוג הקובץ לא מתאים לשדה הזה (' + UPLOADS[kind].note + ').';
+    if (b.error === 'content_mismatch') return 'תוכן הקובץ לא תואם את הסיומת שלו. נסו לשמור אותו מחדש ולהעלות שוב.';
+    if (b.error === 'empty') return 'הקובץ ריק.';
+    return 'ההעלאה נכשלה. בדקו את החיבור ונסו שוב.';
+  }
+  function uploadRow(f, input) {
+    var spec = UPLOADS[f.upload];
+    var status = el('span', { class: 'upload-status', role: 'status' });
+    var picker = el('input', { type: 'file', accept: spec.accept, hidden: '' });
+    var btn = el('button', { class: 'btn btn-ghost btn-sm', type: 'button', text: 'העלאת קובץ מהמחשב', onclick: function () {
+      if (!A.canWrite()) return A.needSignIn();
+      picker.click();
+    } });
+    picker.addEventListener('change', function () {
+      var file = picker.files[0];
+      picker.value = '';
+      if (!file) return;
+      btn.disabled = true;
+      status.textContent = 'מעלה את ' + file.name + '…';
+      WStore.upload(file, f.upload).then(function (r) {
+        input.value = r.url;
+        status.textContent = 'הקובץ ' + r.name + ' הועלה. הוא יקושר לפריט אחרי שמירה.';
+      }, function (err) {
+        status.textContent = uploadError(err, f.upload);
+      }).then(function () { btn.disabled = false; });
+    });
+    return el('div', { class: 'upload-row' }, [btn, el('small', { class: 'field-hint', text: spec.note }), picker, status]);
+  }
   A.openForm = function (panel, fields, item, onSave) {
     var old = panel.querySelector('.aform');
     if (old) old.remove();
@@ -156,7 +198,10 @@
         input.setAttribute('aria-describedby', hid);
         kids.push(el('small', { class: 'field-hint', id: hid, text: f.hint }));
       }
-      return el('label', { class: f.wide ? 'wide' : '' }, kids);
+      var lab = el('label', { class: f.wide ? 'wide' : '' }, kids);
+      // The button sits beside the label, not in it: a label holding two controls
+      // hands every click on it to the first.
+      return f.upload ? el('div', { class: 'upload-field wide' }, [lab, uploadRow(f, input)]) : lab;
     }).concat([
       el('div', { class: 'actions' }, [
         el('button', { class: 'btn btn-primary btn-sm', type: 'submit', style: 'width:auto', text: 'שמירה' }),

@@ -61,7 +61,8 @@
 
   function req(path, opts) {
     opts = opts || {};
-    opts.headers = headers(opts.body ? { 'content-type': 'application/json' } : {});
+    // `type` is for a body that is not JSON: a file on its way to /api/uploads.
+    opts.headers = headers(opts.type ? { 'content-type': opts.type } : opts.body ? { 'content-type': 'application/json' } : {});
     return fetch(API + path, opts).then(function (r) {
       return r.json().catch(function () { return null; }).then(function (body) {
         // A 401 while holding a session means the server no longer knows it (expired
@@ -164,6 +165,13 @@
     discardAboutDraft: function () { return req('/api/singleton/about/draft', { method: 'DELETE' }); },
     deleteAboutVersion: function (versionId) {
       return req('/api/singleton/about/versions/' + encodeURIComponent(versionId), { method: 'DELETE' });
+    },
+
+    // A file for a field that takes an address. The body is the file itself; the
+    // answer is { url, name, size }, the address it is served at on the site.
+    upload: function (file, kind) {
+      return req('/api/uploads?kind=' + encodeURIComponent(kind) + '&name=' + encodeURIComponent(file.name),
+        { method: 'POST', body: file, type: file.type || 'application/octet-stream' });
     },
 
     /* ---- moderation ---- */

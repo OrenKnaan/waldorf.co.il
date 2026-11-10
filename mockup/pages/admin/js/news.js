@@ -14,7 +14,7 @@
     { name: 'expires', label: 'תאריך תפוגה (לא חובה)', type: 'date', hint: 'היום האחרון שבו ההודעה מוצגת באתר. אחריו היא עוברת לפרסומים שפג תוקפם.' },
     { name: 'section', label: 'מדור', type: 'select', options: ['מאמרים', 'מודעות ופרסומים', 'איגרת', 'מוסדות', 'כללי'] },
     { name: 'contact', label: 'שם ופרטי קשר של המפרסם' },
-    { name: 'link', label: 'קישור (לא חובה)' },
+    { name: 'link', label: 'קישור (לא חובה)', upload: 'news' },
     { name: 'summary', label: 'תוכן ההודעה', type: 'textarea', wide: true }
   ];
   A.NEWS_FIELDS = FIELDS;

@@ -5,6 +5,9 @@ import POST_IDS from '../post-ids.json';
 
 const CANONICAL = 'www.waldorf.co.il';
 const UPLOADS = '/wp-content/uploads/';
+// Files uploaded from the admin (content-api, POST /api/uploads). Only these two
+// prefixes of the bucket are ever served; its wp-export/ backup is not.
+const FILES = '/files/';
 
 // The workers.dev address serves the same pages without the noindex meta, so
 // it says noindex in a header instead: one public copy for Google, not two.
@@ -85,7 +88,8 @@ export default {
     // 5. Every file the old site ever uploaded, at its original address (A6):
     //    the bucket holds the mirror (migration/mirror-uploads.mjs); the 40
     //    attachments committed under mockup/pages/wp-content are served first.
-    if (res.status === 404 && path.startsWith(UPLOADS)) {
+    //    Files uploaded from the admin come from the same bucket, under files/.
+    if (res.status === 404 && (path.startsWith(UPLOADS) || path.startsWith(FILES))) {
       let key;
       try { key = decodeURIComponent(path).slice(1); } catch { return res; }
       const obj = await env.UPLOADS.get(key);
@@ -94,6 +98,7 @@ export default {
         obj.writeHttpMetadata(headers);
         headers.set('etag', obj.httpEtag);
         headers.set('cache-control', 'public, max-age=31536000, immutable');
+        headers.set('x-content-type-options', 'nosniff');
         const file = new Response(request.method === 'HEAD' ? null : obj.body, { headers });
         return onDomain ? file : noindex(file);
       }

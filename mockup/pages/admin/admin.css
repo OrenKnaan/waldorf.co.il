@@ -72,3 +72,9 @@ tr.mod-rejected td{background:var(--crit-bg);color:var(--crit-ink);font-size:.88
 .hist-note{font-weight:600;color:var(--ink);margin-bottom:2px}
 .hist-field+.hist-field{border-top:1px dashed var(--line);margin-top:4px;padding-top:4px}
 .hist-field b{color:var(--ink)}
+/* A field that takes an address or an uploaded file (core.js, uploadRow). */
+.aform .upload-field{display:flex;flex-direction:column;gap:8px}
+.aform .upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.aform .upload-row .btn{width:auto}
+.aform .upload-status{font-size:.8rem;color:var(--ink)}
+.aform .upload-status:empty{display:none}
