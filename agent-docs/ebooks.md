@@ -9,6 +9,12 @@ site for free, and future e-books are bought elsewhere. On 2026-11-04 the forum 
 from "ספרים אלקטרוניים" (`ebooks.html`) to "ספרים" (`books.html`), merged its two sections
 into one, "ספרים אלקטרוניים פתוחים לקריאה", and added a second, "חנות ספרים", a single link
 to the forum's own store for the books it publishes (`pay.sumit.co.il/539e34/53mo9d/`).
+On 2026-11-16 the forum replaced that link with the store's five books listed on the page
+itself (title, description, price, cover thumbnail from the store saved to
+`mockup/pages/img/books/`; "חוברת הרצאות" has no cover there, so it shows a book icon) and
+a line saying a book is bought by contacting the forum at info@waldorf.co.il or
++972 55-997-6965. The list is hardcoded in `books.html`, not in D1, so a price or title
+change is a hand edit.
 Nothing redirects from `ebooks.html`: the mockup had no visitors to keep.
 
 - `mockup/pages/books.html` hardcodes the one fully open book, "חינוך ולדורף, עקרונות

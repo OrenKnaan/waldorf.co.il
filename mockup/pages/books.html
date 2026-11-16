@@ -460,6 +460,21 @@
   .book-feature h3{margin:0 0 4px;font-family:var(--font-head);font-size:1.25rem;line-height:1.3;color:var(--brown-dark)}
   .book-feature .bf-by{margin:0 0 8px;font-size:.86rem;color:var(--text-muted)}
   .book-feature p{margin:0 0 12px}
+  /* The forum's own books (חנות ספרים): a cover thumbnail framed like the featured
+     book's, text beside it. Bought by contacting the forum, so nothing here links out. */
+  .shop-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:12px}
+  .shop-item{display:flex;align-items:flex-start;gap:18px;padding:16px 18px;border-radius:var(--radius-organic);background:var(--beige)}
+  .shop-item .shot{flex:none;display:block;padding:5px;background:var(--white);border-radius:var(--radius-organic-sm);box-shadow:var(--shadow-lg)}
+  .shop-item .shot img{display:block;border-radius:2px;margin:0}
+  .shop-item .no-cover{width:120px;height:120px;box-sizing:content-box;display:flex;align-items:center;justify-content:center;color:var(--text-muted)}
+  .shop-item .no-cover svg{width:44px;height:44px}
+  .shop-item .si-body{flex:1;min-width:0}
+  .shop-item h3{margin:0 0 6px;font-family:var(--font-head);font-size:1.12rem;line-height:1.3;color:var(--brown-dark)}
+  .shop-item p{margin:0 0 8px}
+  .shop-item .si-price{margin:0;font-weight:700;color:var(--brown-dark)}
+  .shop-contact{margin:0;font-weight:600}
+  .shop-contact a[dir="ltr"]{unicode-bidi:isolate;white-space:nowrap}
+  @media (max-width:480px){.shop-item{gap:12px;padding:12px}.shop-item .shot img,.shop-item .no-cover{width:80px;height:80px}}
 
   /* ===== shape: plain rounded corners for text containers and images, the
      organic blob for everything else =====
@@ -697,10 +712,49 @@
 </section>
 <section class="card">
 <h2 id="sec-152n7zs"><svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg> חנות ספרים</h2>
-<p>ספרים בהוצאת הפורום הארצי לחינוך ולדורף, לרכישה בחנות המקוונת של הפורום.</p>
-<div class="btn-row">
-<a class="btn btn-primary" href="https://pay.sumit.co.il/539e34/53mo9d/" target="_blank" rel="noopener">לחנות הספרים <span aria-hidden="true">←</span><span class="sr-only"> (נפתח בחלון חדש)</span></a>
+<p>ספרים בהוצאת הפורום הארצי לחינוך ולדורף.</p>
+<ul class="shop-list">
+<li class="shop-item">
+<span class="shot"><img src="./img/books/curriculum-goals.webp" alt="" width="120" height="120" loading="lazy" decoding="async"></span>
+<div class="si-body">
+<h3>עקרונות ויעדים של תוכנית הלימודים בחינוך ולדורף</h3>
+<p>"ספר הקוריקולום". עיבוד לשפה העברית ולתרבות הישראלית והיהודית של הנחיות לתכנית הלימודים.</p>
+<p class="si-price">60 ₪</p>
 </div>
+</li>
+<li class="shop-item">
+<span class="shot"><img src="./img/books/meditative-deepening.webp" alt="" width="120" height="120" loading="lazy" decoding="async"></span>
+<div class="si-body">
+<h3>העמקה מדיטטיבית בעבודת המורה והמחנך בחינוך ולדורף</h3>
+<p>הספר מבקש לשרת את העמקת העבודה של מחנכים ומורים דרך אספקטים רוחניים ותודעתיים. הספר כולל גם אסופת כתבים ורשימות, הצעות עבודה וורסים וברכות.</p>
+<p class="si-price">50 ₪</p>
+</div>
+</li>
+<li class="shop-item">
+<span class="shot"><img src="./img/books/will-to-responsibility.webp" alt="" width="120" height="120" loading="lazy" decoding="async"></span>
+<div class="si-body">
+<h3>הרצון לאחריות</h3>
+<p>הספר בוחן ומבקר את צורות הארגון והניהול הקיימות היום ברוב בתי ספר ולדורף ומציע כיוונים חדשים ורלוונטיים, אשר 'אחריות' היא המוטיב העיקרי בהם. מטרת הספר להקנות בשפה בהירה ואקטואלית כלים לכל מורה, כך שיוכל לשאת באחריות לניהול בית הספר. ניתן להשתמש בתוכנו כבסיס מצוין להעמקה ושיפור האווירה והעבודה הניהולית-חינוכית.</p>
+<p class="si-price">65 ₪</p>
+</div>
+</li>
+<li class="shop-item">
+<span class="shot"><img src="./img/books/sad-anxious-children.webp" alt="" width="120" height="120" loading="lazy" decoding="async"></span>
+<div class="si-body">
+<h3>על ילדים עצובים, חרדים וחסרי שקט</h3>
+<p>ספר זה הוא אוצר של התבוננויות, תובנות ועצות מעשיות, הפונה להורים ולאנשי חינוך באשר הם בשפה פשוטה וחמה ובשילוב מופתי של מדעיות, אמנותיות ורוחניות. הוא משמיע את קולם של ילדים רבים מאוד המתמודדים כיום עם קשיי התפתחות שונים ועוזר לנו לסייע להם, תוך הבנתם וקבלתם, יחד עם קבלה וחינוך עצמיים שלנו.</p>
+<p class="si-price">85 ₪</p>
+</div>
+</li>
+<li class="shop-item">
+<span class="shot no-cover" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5.2 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.7-6 2z"/><path d="M12 6.5v13"/></svg></span>
+<div class="si-body">
+<h3>חוברת הרצאות</h3>
+<p class="si-price">40 ₪</p>
+</div>
+</li>
+</ul>
+<p class="shop-contact">לרכישת ספר מהפורום יש לפנות אלינו בדוא"ל <a href="mailto:info@waldorf.co.il">info@waldorf.co.il</a> או בטלפון <a href="tel:+972559976965" dir="ltr">+972 55-997-6965</a>.</p>
 </section>
 
 </main>
