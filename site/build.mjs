@@ -95,7 +95,10 @@ for (const name of [...readdirSync(dist).filter((f) => f.endsWith('.html')), 'ho
   html = html.replace(/(<svg\b[^>]*>(?:(?!<\/svg>)[\s\S])*<\/svg>\s*)?<span class="ph">מיקום<\/span>\s*\u00b7\s*/g, '')
     .replace(/(\s*[\u2014\u2013-]\s*<span class="ph">[^<]*<\/span>)+/g, '');
   html = html.replace(/href="\.\/home\.html(#[^"]*)?"/g, (m, hash) => `href="./${hash || ''}"`)
-    .replace(/"item": "\.\/home\.html"/g, '"item": "./"')
+    // Google reads the breadcrumb JSON-LD from the raw HTML too, where the
+    // run-time fix in breadcrumb.js has not happened yet, and rejects a
+    // relative "item" ("Invalid URL in field id"). The build knows the domain.
+    .replace(/"item":\s*"\.\/([^"]*)"/g, (m, path) => `"item": "${ORIGIN}/${path === 'home.html' ? '' : encodeURI(path)}"`)
     .replace(/\|\|'home\.html'\)/g, "||'')");
 
   let title = text((html.match(/<title>([\s\S]*?)<\/title>/) || ['', ''])[1]).replace(/\s*[\u2014\u2013-]\s*מוקאפ\s*$/, '');
