@@ -118,7 +118,8 @@ const pushDoc = (doc) => docs.push({ id: docs.length, ...doc });
 
 const pageFiles = readdirSync(pagesDir)
   // 404.html is the not-found page and shape-test.html a layout test: neither is content.
-  .filter((f) => f.endsWith('.html') && !['index.html', '404.html', 'shape-test.html'].includes(f))
+  // community-board.html is hidden for now (patch-community-board-nav.mjs).
+  .filter((f) => f.endsWith('.html') && !['index.html', '404.html', 'shape-test.html', 'community-board.html'].includes(f))
   .sort();
 
 const skipped = [];
@@ -224,7 +225,8 @@ const COLLECTIONS = [
   { key: 'news', file: 'news.html', label: 'הודעות', title: (r) => r.title, text: (r) => [r.summary, r.section, r.date].filter(Boolean).join(' · ') },
   { key: 'library', file: 'content-library.html', label: 'ספריית תוכן', title: (r) => r.title, text: (r) => [r.description, r.kind].filter(Boolean).join(' · ') },
   { key: 'teaching', file: 'content-library.html', label: 'מאגר משאבים למורים', title: (r) => r.title, text: (r) => r.group || '' },
-  { key: 'board', file: 'community-board.html', label: 'לוח קהילתי', title: (r) => r.title, text: (r) => [r.description, r.category, r.region].filter(Boolean).join(' · ') },
+  // Hidden with its page for now (patch-community-board-nav.mjs).
+  // { key: 'board', file: 'community-board.html', label: 'לוח קהילתי', title: (r) => r.title, text: (r) => [r.description, r.category, r.region].filter(Boolean).join(' · ') },
   { key: 'jobs', file: 'job-board.html', label: 'לוח משרות', title: (r) => r.role, text: (r) => [r.institution, r.description, r.region, r.scope].filter(Boolean).join(' · ') },
   { key: 'videos', file: 'media.html', label: 'סרטונים', title: (r) => r.title, text: (r) => r.description || '' },
   { key: 'podcast', file: 'media.html', label: 'פודקאסט', title: (r) => r.title, text: (r) => [r.description, r.date, r.duration].filter(Boolean).join(' · ') },

@@ -32,7 +32,9 @@ const API = 'https://waldorf-content-api.orenknaan.workers.dev/api/content';
 const HOME_TITLE = 'חינוך ולדורף בישראל \u2013 מידע על חינוך ולדורף עבור הורים, מתעניינים ומחנכים';
 
 const LEAVE_OUT = new Set(['admin', 'data.js', 'sorting.js', 'robots.txt', 'index.html', 'home.html',
-  'shape-test.html', 'home-hero-light.html']);
+  'shape-test.html', 'home-hero-light.html',
+  // Hidden for now, and sent to news.html below (mockup/patch-community-board-nav.mjs).
+  'community-board.html']);
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
@@ -158,6 +160,7 @@ const redirects = execFileSync('node', [join(root, 'migration', 'build-redirects
   .map((l) => l.replace(/ \/home\.html 301$/, ' / 301'))
   .join('\n');
 writeFileSync(join(dist, '_redirects'), redirects
+  + '\n# The community board is hidden for now; 302 so it can come back.\n/community-board.html /news.html 302\n'
   + '\n# The admin has its own Worker.\n/admin https://admin.waldorf.co.il/admin/ 302\n/admin/* https://admin.waldorf.co.il/admin/:splat 302\n');
 
 // Every uploaded file (/files/…) the built pages and scripts link to. content-api's
