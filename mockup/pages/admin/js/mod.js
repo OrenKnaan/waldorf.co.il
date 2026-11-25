@@ -1,5 +1,7 @@
-/* mod.js: מודרציה, the three boards visitors post to (announcements, community
- * board, jobs).
+/* mod.js: the boards visitors post to. Announcements are drawn in the לוח
+ * מודעות tab (news.js has their fields), jobs in the לוח משרות tab; each board
+ * appears in one tab only. The community board is hidden with its page for now
+ * (mockup/patch-community-board-nav.mjs), and its panel with it.
  *
  * Each board lists the signed-in user's unread posts first, then tops up with
  * read ones to MOD_LIMIT lines. "Show all" lists everything, PAGE_SIZE to a page,
@@ -9,7 +11,8 @@
  *
  * A post past its expiry date is off the site and filed under past posts, which
  * are kept. A deleted or rejected one goes to the recycle bin. Approving,
- * rejecting, freezing and binning are an admin's; an editor reads and edits.
+ * rejecting, freezing and binning are an admin's; an editor reads and edits,
+ * and may also freeze and bin an announcement that is up (bin.js).
  */
 (function () {
   'use strict';
@@ -27,11 +30,12 @@
 
   // `detail` is what a moderator reads before deciding, shown when a row is opened.
   var PANELS = [
-    { col: 'news', title: 'לוח מודעות (פתוח לציבור)', cols: ['תאריך פרסום', 'כותרת', 'מדור', 'מפרסם', 'תפוגה', 'סטטוס', ''],
+    { col: 'news', view: 'news', title: 'לוח מודעות', add: function () { return A.NEWS_ADD; }, cols: ['תאריך פרסום', 'כותרת', 'מדור', 'מפרסם', 'תפוגה', 'סטטוס', ''],
       detail: [['summary', 'תוכן ההודעה'], ['link', 'קישור'], ['contact', 'פרטי קשר (מתפרסמים)']],
       fields: function () { return A.NEWS_FIELDS.concat([EMAIL]); },
       row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.section || A.NONE, 'muted'), td(it.contact || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status || 'approved'))]; } },
-    { col: 'board', title: 'לוח קהילתי', cols: ['תאריך פרסום', 'כותרת', 'קטגוריה', 'אזור', 'תפוגה', 'סטטוס', ''],
+    /* Hidden with community-board.html; restore with it.
+    { col: 'board', view: 'mod', title: 'לוח קהילתי', cols: ['תאריך פרסום', 'כותרת', 'קטגוריה', 'אזור', 'תפוגה', 'סטטוס', ''],
       detail: [['description', 'תיאור'], ['contact', 'פרטי קשר (מתפרסמים)']],
       fields: function () {
         return [{ name: 'title', label: 'כותרת המודעה' }].concat(DATES, [
@@ -41,7 +45,8 @@
           { name: 'description', label: 'תיאור', type: 'textarea', wide: true }]);
       },
       row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.category || A.NONE, 'muted'), td(it.region || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status))]; } },
-    { col: 'jobs', title: 'לוח משרות', cols: ['תאריך פרסום', 'תפקיד', 'מוסד', 'קטגוריה', 'תפוגה', 'סטטוס', ''],
+    */
+    { col: 'jobs', view: 'mod', title: 'לוח משרות', cols: ['תאריך פרסום', 'תפקיד', 'מוסד', 'קטגוריה', 'תפוגה', 'סטטוס', ''],
       detail: [['description', 'תיאור'], ['scope', 'היקף'], ['region', 'אזור'], ['contact', 'פרטי קשר (מתפרסמים)']],
       fields: function () {
         return [{ name: 'role', label: 'תפקיד' }, { name: 'institution', label: 'מוסד' }].concat(DATES, [
@@ -104,8 +109,21 @@
     var past = el('details', { class: 'archive' }, [pastSum,
       el('p', { class: 'empty-hint', text: 'פרסומים שעבר תאריך התפוגה שלהם. הם כבר לא מוצגים באתר ונשמרים כאן. כדי להחזיר אחד לאתר, ערכו את תאריך התפוגה.' }), pastT.wrap]);
     var bin = A.makeBin(cfg.col);
+    var head = [el('h2', { text: cfg.title }), unreadPill, el('div', { class: 'grow' }), markAll];
+    var add = cfg.add && cfg.add();
+    if (add) {
+      var addBtn = el('button', { class: 'btn btn-primary btn-sm', type: 'button', style: 'width:auto', onclick: function () {
+        A.openForm(panel, cfg.fields(), add.defaults(), function (out) {
+          add.beforeSave(out);
+          WStore.add(cfg.col, out); A.refreshAll();
+        });
+      } });
+      addBtn.innerHTML = A.icons.plus;
+      addBtn.appendChild(document.createTextNode(add.label));
+      head.push(addBtn);
+    }
     var panel = el('div', { class: 'panel mod-panel' }, [
-      el('div', { class: 'panel-head' }, [el('h2', { text: cfg.title }), unreadPill, el('div', { class: 'grow' }), markAll]),
+      el('div', { class: 'panel-head' }, head),
       msg, hint, t.wrap, pager, foot, past, bin.node
     ]);
     function setMode(m) { mode = m; page = 0; held = {}; cfg.draw(); }
@@ -357,12 +375,13 @@
     ask();
   }
 
+  // One view object for both tabs, since they share the read marks.
+  var HOSTS = { news: '#newsAdmin', mod: '#modAdmin' };
   A.view({
-    name: 'mod',
+    name: 'boards',
     render: function () {
-      var host = A.$('#modAdmin');
-      host.textContent = '';
-      PANELS.forEach(function (cfg) { renderPanel(host, cfg); });
+      Object.keys(HOSTS).forEach(function (v) { A.$(HOSTS[v]).textContent = ''; });
+      PANELS.forEach(function (cfg) { renderPanel(A.$(HOSTS[cfg.view]), cfg); });
       loadReads();
     },
     draw: drawAll,

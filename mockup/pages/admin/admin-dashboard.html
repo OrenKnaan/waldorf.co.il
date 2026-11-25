@@ -351,7 +351,7 @@ td.muted{color:var(--muted)}
       <a class="nav-link" href="#events" data-view="events">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>אירועים<span class="count"></span></a>
       <a class="nav-link" href="#news" data-view="news">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>לוח מודעות</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>לוח מודעות<span class="count" id="newsCount"></span></a>
       <a class="nav-link" href="#inst" data-view="inst">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count"></span></a>
       <a class="nav-link" href="#lib" data-view="lib">
@@ -367,7 +367,7 @@ td.muted{color:var(--muted)}
       <a class="nav-link" href="#people" data-view="people">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><circle cx="17" cy="9" r="2.3"/></svg>נציגי פורום</a>
       <a class="nav-link" href="#mod" data-view="mod">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>מודרציה — לוחות<span class="count" id="modCount"></span></a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>לוח משרות<span class="count" id="modCount"></span></a>
       <a class="nav-link" href="#nl" data-view="nl">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>ניוזלטר</a>
       <div class="side-sec">חומר למיון (ארכיון)</div>
@@ -446,16 +446,8 @@ td.muted{color:var(--muted)}
 
         <!-- NEWS -->
         <section class="view" data-view="news" hidden>
-          <p class="crumb">הודעות ועדכונים לקהילה</p>
-          <div class="panel">
-            <div class="panel-head"><h2>לוח מודעות</h2><div class="grow"></div><button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>הודעה חדשה</button></div>
-            <div class="table-wrap"><table>
-              <thead><tr><th>תאריך</th><th>כותרת</th><th>מדור</th><th>סטטוס</th><th></th></tr></thead>
-              <tbody>
-                <tr><td class="muted" colspan="5">טוען…</td></tr>
-              </tbody>
-            </table></div>
-          </div>
+          <p class="crumb">הודעות הפורום והודעות שהוגשו מהטופס הציבורי: כתיבה, אישור, דחייה ועריכה</p>
+          <div id="newsAdmin"></div>
         </section>
 
         <!-- INSTITUTIONS -->
@@ -492,7 +484,7 @@ td.muted{color:var(--muted)}
           <div id="mediaAdmin"></div>
         </section>
         <section class="view" data-view="mod" hidden>
-          <p class="crumb">אישור מודעות ומשרות שהוגשו מהטפסים הציבוריים</p>
+          <p class="crumb">משרות שהוגשו מהטופס הציבורי: אישור, דחייה ועריכה</p>
           <div id="modAdmin"></div>
         </section>
         <section class="view" data-view="about" hidden>
@@ -532,7 +524,7 @@ td.muted{color:var(--muted)}
 <script>
 (function(){
   var root=document.documentElement; root.setAttribute('dir','rtl');
-  var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'לוח מודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
+  var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'לוח מודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'לוח משרות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
   var BASE_TITLE=document.title;
   /* Every view has its own address, admin-dashboard.html#<view>, so a view can be
      reloaded, bookmarked, opened in a new tab and reached with Back. The hash is the

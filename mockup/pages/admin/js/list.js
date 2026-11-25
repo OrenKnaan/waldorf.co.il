@@ -2,9 +2,9 @@
  *
  * A table, an add button that opens the form above it, and per row: freeze,
  * edit, move to the recycle bin, plus whatever the view adds. The bin sits under
- * the table. Events, news, institutions, map points, the three library lists and
- * the two media lists are all this; the moderation view is not, having unread
- * tracking, paging and rejection of its own (mod.js).
+ * the table. Events, institutions, map points, the three library lists and the
+ * two media lists are all this; the boards visitors post to (announcements and
+ * jobs) are not, having unread tracking, paging and rejection of their own (mod.js).
  *
  *   A.listPanel({
  *     col, cols, row(it) -> [td...], fields, defaults,

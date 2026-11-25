@@ -24,9 +24,11 @@
   // reserves for admins; elsewhere any signed-in editor may freeze or bin. News
   // is the forum's own as well as visitors': an editor may freeze, unfreeze and
   // bin an announcement already on the site (`it`), but not approve or restore.
+  // Signed out, the buttons show as they do on every other list, and a click
+  // asks to sign in: hiding them made it look as if they did not exist.
   A.EDITOR_FREEZES = { news: true };
   A.mayChangeStatus = function (col, it) {
-    if (!A.MODERATED[col] || A.atLeast('admin')) return true;
+    if (!A.MODERATED[col] || A.atLeast('admin') || !A.canWrite()) return true;
     return Boolean(A.EDITOR_FREEZES[col] && it && (it.status === 'approved' || it.status === 'frozen') && A.atLeast('editor'));
   };
 
@@ -40,12 +42,16 @@
     var live = A.LIVE[col] || 'published', frozen = it.status === 'frozen';
     if (!frozen && it.status !== live) return null;
     return A.actBtn(frozen ? 'thaw' : 'freeze', frozen ? 'ביטול הקפאה: החזרה לאתר' : 'הקפאה: הסתרה מהאתר', function () {
+      if (!A.canWrite()) return A.needSignIn();
       WStore.update(col, it.id, { status: frozen ? live : 'frozen' }); A.refreshAll();
     });
   };
   A.binBtn = function (col, it) {
     if (!A.mayChangeStatus(col, it)) return null;
-    return A.actBtn('bin', 'העברה לסל המחזור', function () { WStore.update(col, it.id, { status: 'deleted' }); A.refreshAll(); });
+    return A.actBtn('bin', 'העברה לסל המחזור', function () {
+      if (!A.canWrite()) return A.needSignIn();
+      WStore.update(col, it.id, { status: 'deleted' }); A.refreshAll();
+    });
   };
 
   function daysLeft(it, binDays) {

@@ -12,8 +12,10 @@
     var events = WStore.get('events').filter(live);
     var upcoming = events.filter(function (e) { return e.status === 'published' && e.date >= today; });
     var libTotal = WStore.get('library').concat(WStore.get('teaching'), WStore.get('forms')).filter(live).length;
-    var pending = WStore.get('news').concat(WStore.get('board'), WStore.get('jobs'))
-      .filter(function (i) { return i.status === 'pending' && !A.expired(i); }).length;
+    // The community board is hidden for now (mod.js), so its queue is not counted.
+    var waiting = function (col) { return WStore.get(col).filter(function (i) { return i.status === 'pending' && !A.expired(i); }).length; };
+    var newsPending = waiting('news'), jobsPending = waiting('jobs');
+    var pending = newsPending + jobsPending;
 
     A.setText('#kpiEvents', String(upcoming.length));
     A.setText('#kpiEventsSub', upcoming.length ? 'מתוך ' + events.length + ' אירועים במאגר' : 'אין אירועים עתידיים');
@@ -26,8 +28,10 @@
     A.setText('.nav-link[data-view="events"] .count', String(events.length));
     A.setText('.nav-link[data-view="lib"] .count', String(libTotal));
     A.setText('.nav-link[data-view="inst"] .count', String(WStore.get('institutions').filter(live).length));
-    var modCount = A.$('#modCount');
-    if (modCount) { modCount.textContent = String(pending); modCount.style.background = pending ? 'var(--warn)' : ''; }
+    [['#newsCount', newsPending], ['#modCount', jobsPending]].forEach(function (c) {
+      var n = A.$(c[0]);
+      if (n) { n.textContent = String(c[1]); n.style.background = c[1] ? 'var(--warn)' : ''; }
+    });
 
     var tbody = A.$('.view[data-view="home"] tbody');
     if (tbody) {
@@ -83,7 +87,6 @@
     { col: 'forms', view: 'lib', label: 'טופס', field: 'title' },
     { col: 'videos', view: 'media', label: 'סרטון', field: 'title' },
     { col: 'podcast', view: 'media', label: 'פודקאסט', field: 'title' },
-    { col: 'board', view: 'mod', label: 'מודעה', field: 'title' },
     { col: 'jobs', view: 'mod', label: 'משרה', field: 'role' }
   ];
   // Hebrew final letters and quote marks differ between how people type and how
@@ -149,7 +152,7 @@
     lib: [['content-library.html', 'ספריית תוכן'], ['books.html', 'ספרים']],
     media: [['media.html', 'מדיה']],
     about: [['forum.html', 'הפורום']],
-    mod: [['news.html', 'לוח מודעות'], ['community-board.html', 'לוח קהילתי'], ['job-board.html', 'לוח משרות']],
+    mod: [['job-board.html', 'לוח משרות']],
     nl: [['forum-newsletter.html', 'איגרת תקופתית']]
   };
   var EXT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
