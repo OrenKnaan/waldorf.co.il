@@ -144,12 +144,12 @@
   var SITE_PAGES = {
     home: [['home.html', 'דף הבית']],
     events: [['events.html', 'אירועים'], ['home.html', 'דף הבית'], ['forum.html', 'הפורום']],
-    news: [['news.html', 'הודעות'], ['home.html', 'דף הבית']],
+    news: [['news.html', 'לוח מודעות'], ['home.html', 'דף הבית']],
     inst: [['kinder-list.html', 'רשימת גני ילדים'], ['school-list.html', 'רשימת בתי ספר']],
     lib: [['content-library.html', 'ספריית תוכן'], ['books.html', 'ספרים']],
     media: [['media.html', 'מדיה']],
     about: [['forum.html', 'הפורום']],
-    mod: [['news.html', 'הודעות'], ['community-board.html', 'לוח קהילתי'], ['job-board.html', 'לוח משרות']],
+    mod: [['news.html', 'לוח מודעות'], ['community-board.html', 'לוח קהילתי'], ['job-board.html', 'לוח משרות']],
     nl: [['forum-newsletter.html', 'איגרת תקופתית']]
   };
   var EXT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';

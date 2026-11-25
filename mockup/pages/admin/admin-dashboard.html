@@ -351,7 +351,7 @@ td.muted{color:var(--muted)}
       <a class="nav-link" href="#events" data-view="events">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>אירועים<span class="count"></span></a>
       <a class="nav-link" href="#news" data-view="news">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>הודעות</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 8h3v9a2 2 0 0 1-2 2M8 9h6M8 13h6"/></svg>לוח מודעות</a>
       <a class="nav-link" href="#inst" data-view="inst">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/></svg>מוסדות חינוך<span class="count"></span></a>
       <a class="nav-link" href="#lib" data-view="lib">
@@ -448,7 +448,7 @@ td.muted{color:var(--muted)}
         <section class="view" data-view="news" hidden>
           <p class="crumb">הודעות ועדכונים לקהילה</p>
           <div class="panel">
-            <div class="panel-head"><h2>הודעות</h2><div class="grow"></div><button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>הודעה חדשה</button></div>
+            <div class="panel-head"><h2>לוח מודעות</h2><div class="grow"></div><button type="button" class="btn btn-primary btn-sm" style="width:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>הודעה חדשה</button></div>
             <div class="table-wrap"><table>
               <thead><tr><th>תאריך</th><th>כותרת</th><th>מדור</th><th>סטטוס</th><th></th></tr></thead>
               <tbody>
@@ -532,7 +532,7 @@ td.muted{color:var(--muted)}
 <script>
 (function(){
   var root=document.documentElement; root.setAttribute('dir','rtl');
-  var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'הודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
+  var TITLES={home:'לוח בקרה',analytics:'ניתוח תנועה',events:'אירועים',news:'לוח מודעות',inst:'מוסדות חינוך',lib:'ספריית תוכן',media:'מדיה',mod:'מודרציה — לוחות',about:'אודות הפורום',people:'נציגי פורום',nl:'ניוזלטר',set:'הגדרות'};
   var BASE_TITLE=document.title;
   /* Every view has its own address, admin-dashboard.html#<view>, so a view can be
      reloaded, bookmarked, opened in a new tab and reached with Back. The hash is the

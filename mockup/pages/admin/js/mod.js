@@ -27,7 +27,7 @@
 
   // `detail` is what a moderator reads before deciding, shown when a row is opened.
   var PANELS = [
-    { col: 'news', title: 'הודעות (לוח פתוח לציבור)', cols: ['תאריך פרסום', 'כותרת', 'מדור', 'מפרסם', 'תפוגה', 'סטטוס', ''],
+    { col: 'news', title: 'לוח מודעות (פתוח לציבור)', cols: ['תאריך פרסום', 'כותרת', 'מדור', 'מפרסם', 'תפוגה', 'סטטוס', ''],
       detail: [['summary', 'תוכן ההודעה'], ['link', 'קישור'], ['contact', 'פרטי קשר (מתפרסמים)']],
       fields: function () { return A.NEWS_FIELDS.concat([EMAIL]); },
       row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.section || A.NONE, 'muted'), td(it.contact || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status || 'approved'))]; } },

@@ -222,7 +222,7 @@ try {
 // purpose, being map markers whose towns already appear in kinder-list.html.
 const COLLECTIONS = [
   { key: 'events', file: 'events.html', label: 'אירועים', title: (r) => r.title, text: (r) => [r.description, r.location, r.date, r.time].filter(Boolean).join(' · ') },
-  { key: 'news', file: 'news.html', label: 'הודעות', title: (r) => r.title, text: (r) => [r.summary, r.section, r.date].filter(Boolean).join(' · ') },
+  { key: 'news', file: 'news.html', label: 'לוח מודעות', title: (r) => r.title, text: (r) => [r.summary, r.section, r.date].filter(Boolean).join(' · ') },
   { key: 'library', file: 'content-library.html', label: 'ספריית תוכן', title: (r) => r.title, text: (r) => [r.description, r.kind].filter(Boolean).join(' · ') },
   { key: 'teaching', file: 'content-library.html', label: 'מאגר משאבים למורים', title: (r) => r.title, text: (r) => r.group || '' },
   // Hidden with its page for now (patch-community-board-nav.mjs).
