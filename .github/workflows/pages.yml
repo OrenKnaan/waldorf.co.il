@@ -21,12 +21,12 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+# Upload and deploy are separate jobs, as in GitHub's own Pages template: with
+# both in one job, deploy-pages sometimes looked for the artifact a second
+# after the upload and found none ("No artifacts named github-pages").
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Write a redirect page for every preview page
@@ -56,5 +56,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: gh-pages-redirects
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
