@@ -104,7 +104,15 @@
     currentUser: function () { var s = session(); return s ? s.user : null; },
     isSignedIn: function () { return Boolean(session()); },
     // Who the server says this browser is. A 401 here also drops a dead session (req).
-    me: function () { return req('/api/auth/me'); },
+    // The stored copy is what login returned, so a role changed since then is
+    // written back here; until it was, a promoted editor kept an editor's screen.
+    me: function () {
+      return req('/api/auth/me').then(function (r) {
+        var s = session();
+        if (s && r && r.user) { s.user = r.user; writeLS(KEY_SESS, s); }
+        return r;
+      });
+    },
     login: function (email, password) {
       return req('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: email, password: password }) })
         .then(function (r) {

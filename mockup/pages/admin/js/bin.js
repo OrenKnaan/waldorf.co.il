@@ -21,8 +21,14 @@
   A.LIVE = { events: 'published', news: 'approved', board: 'approved', jobs: 'approved', institutions: 'active' };
   A.MODERATED = { news: true, board: true, jobs: true };
   // On a board every status change is a moderation decision, which the Worker
-  // reserves for admins; elsewhere any signed-in editor may freeze or bin.
-  A.mayChangeStatus = function (col) { return !A.MODERATED[col] || A.atLeast('admin'); };
+  // reserves for admins; elsewhere any signed-in editor may freeze or bin. News
+  // is the forum's own as well as visitors': an editor may freeze, unfreeze and
+  // bin an announcement already on the site (`it`), but not approve or restore.
+  A.EDITOR_FREEZES = { news: true };
+  A.mayChangeStatus = function (col, it) {
+    if (!A.MODERATED[col] || A.atLeast('admin')) return true;
+    return Boolean(A.EDITOR_FREEZES[col] && it && (it.status === 'approved' || it.status === 'frozen') && A.atLeast('editor'));
+  };
 
   A.BIN = ['deleted', 'rejected'];
   A.inBin = function (it) { return A.BIN.indexOf(it.status) !== -1; };
@@ -30,7 +36,7 @@
   // Only a live or frozen row gets the toggle: a draft or a pending submission is
   // already off the site.
   A.freezeBtn = function (col, it) {
-    if (!A.mayChangeStatus(col)) return null;
+    if (!A.mayChangeStatus(col, it)) return null;
     var live = A.LIVE[col] || 'published', frozen = it.status === 'frozen';
     if (!frozen && it.status !== live) return null;
     return A.actBtn(frozen ? 'thaw' : 'freeze', frozen ? 'ביטול הקפאה: החזרה לאתר' : 'הקפאה: הסתרה מהאתר', function () {
@@ -38,7 +44,7 @@
     });
   };
   A.binBtn = function (col, it) {
-    if (!A.mayChangeStatus(col)) return null;
+    if (!A.mayChangeStatus(col, it)) return null;
     return A.actBtn('bin', 'העברה לסל המחזור', function () { WStore.update(col, it.id, { status: 'deleted' }); A.refreshAll(); });
   };
 

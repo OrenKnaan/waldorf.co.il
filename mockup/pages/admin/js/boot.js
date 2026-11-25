@@ -31,7 +31,13 @@
   A.showUser();
   // A stored session can outlive the server's copy of it. Asking now drops a dead
   // one (store.js does that on 401), so the page says "signed out" on arrival.
-  if (WStore.isSignedIn()) WStore.me().catch(function () { A.showUser(); });
+  // It also brings back a role changed since signing in.
+  if (WStore.isSignedIn()) {
+    var was = (WStore.currentUser() || {}).role;
+    WStore.me().then(function () {
+      if ((WStore.currentUser() || {}).role !== was) A.authChanged();
+    }, function () { A.showUser(); });
+  }
   var out = A.$('#logoutBtn');
   if (out) out.addEventListener('click', function (e) {
     e.preventDefault();

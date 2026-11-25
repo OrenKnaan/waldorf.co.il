@@ -409,7 +409,9 @@ const COLLECTIONS = {
   // 'published' returned zero rows and would have emptied the homepage feed.
   // news.html invites anyone to post, so it takes public submissions like the
   // boards; without publicSubmit every visitor's post was refused with a 401.
-  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
+  // editorFreezes: an editor may freeze, unfreeze and bin an announcement that
+  // is already up (approved or frozen); approving and restoring stay an admin's.
+  news:     { table: 'news',       order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true, editorFreezes: true,
               private: ['submitterEmail', 'rejectNote'],
               fields: { title: 'title', date: 'date', expires: 'expires', section: 'section', summary: 'summary', link: 'link', contact: 'contact', submitterEmail: 'submitter_email', rejectNote: 'reject_note', status: 'status', demo: 'demo' } },
   board:    { table: 'board',      order: 'date DESC',      statuses: ['pending', 'approved', 'frozen', 'rejected', 'deleted'], publicStatus: ['approved'], publicSubmit: true, moderated: true,
@@ -1439,7 +1441,11 @@ export default {
         if (!spec.statuses.includes(body.status)) return json({ error: 'bad_status' }, 400, origin);
         // On a board, every status change is a moderation decision: approving,
         // freezing, binning, restoring. An editor may still edit the text.
-        if (spec.moderated && !atLeast(user, 'admin')) return json({ error: 'forbidden' }, 403, origin);
+        if (spec.moderated && !atLeast(user, 'admin')) {
+          const LIVE = ['approved', 'frozen'];
+          const cur = spec.editorFreezes && await env.DB.prepare(`SELECT status FROM ${spec.table} WHERE id = ?`).bind(id).first();
+          if (!cur || !LIVE.includes(cur.status) || ![...LIVE, 'deleted'].includes(body.status)) return json({ error: 'forbidden' }, 403, origin);
+        }
       }
       // Approval is publication, so a board post's date becomes the day it went
       // up, unless the moderator set one in the same request.
