@@ -88,19 +88,76 @@
       : st === 'expired' ? pill('פג תוקף', 'neutral')
       : pill(st || A.NONE, 'neutral');
   };
+  /* ---- tables that fit their panel ---- */
+  // A table wider than its wrapper is drawn as cards (.cards, in the dashboard's
+  // stylesheet) rather than scrolled sideways. Which tables fit depends on what
+  // is in them and on the window, so it is measured: with the class off, does
+  // the table overflow? Measured again when the wrapper's width changes and when
+  // its rows do. Both observers are kept on A: one held only by a local variable
+  // is collected, and the tables stop following the window.
+  function labelCells(table) {
+    var heads = [].map.call(table.querySelectorAll('thead th'), function (th) { return th.textContent.trim(); });
+    // display:block takes a table's meaning away from a screen reader; the roles keep it.
+    table.setAttribute('role', 'table');
+    [].forEach.call(table.querySelectorAll('thead, tbody'), function (g) { g.setAttribute('role', 'rowgroup'); });
+    [].forEach.call(table.querySelectorAll('th'), function (th) { th.setAttribute('role', 'columnheader'); });
+    [].forEach.call(table.querySelectorAll('tr'), function (tr) {
+      tr.setAttribute('role', 'row');
+      [].forEach.call(tr.children, function (td, i) {
+        if (td.tagName !== 'TD') return;
+        td.setAttribute('role', 'cell');
+        if (heads[i] && !td.hasAttribute('colspan')) td.setAttribute('data-label', heads[i]);
+      });
+    });
+  }
+  function fit(wrap) {
+    var table = wrap.querySelector('table');
+    if (!table) return;
+    labelCells(table);
+    wrap.classList.remove('cards');
+    // Hidden (another view is showing): nothing to measure until it is shown.
+    if (wrap.clientWidth && wrap.scrollWidth > wrap.clientWidth + 1) wrap.classList.add('cards');
+  }
+  var widths = typeof WeakMap === 'function' ? new WeakMap() : null;
+  A.tableResize = window.ResizeObserver && widths ? new ResizeObserver(function (entries) {
+    entries.forEach(function (e) {
+      // Only a change of width: turning into cards changes the height, which
+      // would otherwise call this again for nothing.
+      var w = e.target.clientWidth;
+      if (widths.get(e.target) === w) return;
+      widths.set(e.target, w);
+      fit(e.target);
+    });
+  }) : null;
+  A.tableRows = window.MutationObserver ? new MutationObserver(function (records) {
+    var seen = [];
+    records.forEach(function (r) {
+      var wrap = r.target.closest ? r.target.closest('.table-wrap') : null;
+      if (wrap && seen.indexOf(wrap) === -1) { seen.push(wrap); fit(wrap); }
+    });
+  }) : null;
+  A.fitTable = function (wrap) {
+    if (A.tableResize) A.tableResize.observe(wrap);
+    if (A.tableRows) A.tableRows.observe(wrap, { childList: true, subtree: true });
+    fit(wrap);
+  };
+  // The tables written into the page itself; the built ones come through makeTable.
+  [].forEach.call(document.querySelectorAll('.table-wrap'), A.fitTable);
+
   A.makeTable = function (headers) {
     var tbody = el('tbody');
     var wrap = el('div', { class: 'table-wrap' }, [
       // The unnamed column is the one of the row's buttons (td.acts below).
       el('table', {}, [el('thead', {}, [el('tr', {}, headers.map(function (h) { return el('th', { class: h ? '' : 'acts', text: h }); }))]), tbody])
     ]);
+    A.fitTable(wrap);
     return { wrap: wrap, tbody: tbody };
   };
   A.td = function (content, cls) {
     var c = el('td', { class: cls || '' });
     if (typeof content === 'string') c.textContent = content;
     else if (content) c.appendChild(content);
-    // The cell of a row's buttons, which the stylesheet keeps in view.
+    // The cell of a row's buttons, which closes the row's card on a narrow screen.
     if (content && content.classList && content.classList.contains('row-actions')) c.classList.add('acts');
     return c;
   };

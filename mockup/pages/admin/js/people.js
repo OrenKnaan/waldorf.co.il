@@ -98,7 +98,7 @@
           ]);
           t.tbody.appendChild(el('tr', {}, [
             A.titleCell(u.name + (u.id === me.id ? ' (אני)' : ''), false),
-            td(u.email, 'muted'),
+            td(u.email, 'muted wrap'),
             // An account with no password yet cannot be logged into at all.
             td(u.hasPassword ? A.pill('פעיל', 'neutral')
               : el('span', { class: 'pill warn', title: 'טרם הוגדרה סיסמה: יש לשלוח קישור', text: 'ממתין להגדרת סיסמה' })),

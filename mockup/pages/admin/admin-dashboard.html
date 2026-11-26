@@ -235,15 +235,32 @@ tbody tr:hover{background:var(--hover-tint-soft)}
    reached them. */
 td.title,td.wrap{white-space:normal;min-width:11em}
 td.wrap{overflow-wrap:anywhere}
-/* In a window too narrow even so, the table still scrolls sideways, and the
-   buttons' cell stays at the edge it ends on, over whatever scrolls under it.
-   core.js marks it (A.td, makeTable). Not on a phone: there the pinned cell
-   would cover half the table, and a sideways swipe is what a hand tries. */
-@media (min-width:640px){
-  td.acts,th.acts{position:sticky;inset-inline-end:0}
-  td.acts{background:var(--paper)}
-  tbody tr:hover td.acts{background:var(--hover-tint-soft)}
-}
+/* A table still too wide for its panel (a tablet, a phone) is not scrolled
+   sideways: core.js (fitTable) measures it and sets .cards on its wrapper, and
+   each row is then drawn as a card, one line per cell, the column's heading
+   (data-label) before the value. The title leads the card and the row's
+   buttons close it. */
+.table-wrap.cards{overflow-x:visible}
+.cards table,.cards tbody,.cards tr,.cards td{display:block}
+.cards thead{display:none}
+/* As many columns of fields as fit: one on a phone, two or three on a tablet. */
+.cards tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));column-gap:24px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.cards td.title,.cards td.acts,.cards td[colspan]{grid-column:1/-1}
+.cards tbody tr:last-child{border-bottom:none}
+.cards td{padding:3px 0;border:0;white-space:normal;min-width:0;overflow-wrap:anywhere}
+.cards td.muted{color:var(--ink)}
+.cards td[data-label]{display:flex;align-items:baseline;gap:10px}
+.cards td[data-label]::before{content:attr(data-label);flex:0 0 6.5em;color:var(--muted);font-size:.76rem;font-weight:600}
+.cards td.title{display:block;order:-1;font-size:.96rem;font-weight:600;padding-bottom:6px}
+.cards td.title::before{content:none}
+.cards td.acts{padding-top:8px}
+.cards td:empty{display:none}
+.cards .row-actions{justify-content:flex-start;gap:8px}
+.cards .act{width:42px;height:42px;border-color:var(--line)}
+.cards tr.mod-detail,.cards tr.mod-reject,.cards tr.mod-rejected{padding:0}
+.cards tr.mod-detail td,.cards tr.mod-reject td,.cards tr.mod-rejected td{padding:12px 16px}
+/* A finger needs more than a pointer does. */
+@media (pointer:coarse){.act{width:40px;height:40px}}
 td.muted{color:var(--muted)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:var(--r-organic-sm);white-space:nowrap}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
@@ -270,14 +287,50 @@ td.muted{color:var(--muted)}
 .act-item .when{font-size:.74rem;color:var(--muted)}
 
 .empty-hint{color:var(--muted);font-size:.86rem;padding:16px 20px}
-@media (max-width:880px){
-  .dash{grid-template-columns:1fr}
-  .sidebar{flex-direction:row;overflow-x:auto;padding:8px}
-  .side-sec,.side-foot,.side-brand span{display:none}
-  .stat-row{grid-template-columns:repeat(2,1fr)}
-  .two-col{grid-template-columns:1fr}
-  .search{display:none}
+.panel-head{flex-wrap:wrap}
+.nav-btn,.nav-close,.nav-shade{display:none}
+/* Tablet and phone: nothing scrolls sideways. Up to 1200px the menu is a drawer
+   that the button in the top bar opens over the page, so the content has the
+   whole width; it used to turn into a strip of links to be dragged sideways,
+   with the settings link dropped. The inline script opens and closes it. */
+@media (max-width:1200px){
+  .dash{grid-template-columns:minmax(0,1fr)}
+  .nav-btn{display:grid;flex:none}
+  .sidebar{position:fixed;inset-block:0;inset-inline-start:0;z-index:40;width:min(290px,86vw);overflow-y:auto;overscroll-behavior:contain;
+    transform:translateX(100%);visibility:hidden;transition:transform .2s,visibility 0s .2s;box-shadow:var(--shadow-lg)}
+  /* Visible at once on opening (focus moves in straight away), hidden only after sliding out. */
+  .nav-open .sidebar{transform:none;visibility:visible;transition:transform .2s,visibility 0s}
+  .nav-shade{display:block;position:fixed;inset:0;z-index:39;background:rgba(20,12,6,.5);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+  .nav-open .nav-shade{opacity:1;visibility:visible;transition:opacity .2s,visibility 0s}
+  .nav-close{display:grid;flex:none;margin-inline-start:auto;background:transparent;color:#EFE4D4;border-color:rgba(255,255,255,.3)}
+  .nav-close:hover{background:rgba(255,255,255,.1)}
+  /* The links' own `transition:.15s` covers every property, the visibility they
+     inherit from the drawer included, which kept them hidden, and unfocusable,
+     for the first moments after it opened. */
+  .nav-link{padding-block:12px;transition-property:color,background-color,border-color}
+  .side-foot{padding-bottom:16px}
+  .content{max-width:none}
 }
+@media (max-width:880px){
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:minmax(0,1fr)}
+  /* The search takes a row of its own under the title. */
+  .topbar{flex-wrap:wrap;gap:10px;padding:10px 14px}
+  .search{order:5;flex:1 0 100%;min-width:0}
+  .content{padding:16px 14px 40px}
+  .panel-head{padding:13px 16px;gap:10px}
+  .empty-hint{padding:14px 16px}
+  /* 16px: below it, iOS zooms the page in on every field that takes focus. */
+  .search input,.aform input,.aform select,.aform textarea,.reject-box textarea,.field input{font-size:16px}
+}
+@media (max-width:560px){
+  .topbar h1{font-size:1.12rem}
+  .user .who{display:none}
+  .stat{padding:13px 14px}
+  .stat .num{font-size:1.7rem}
+}
+/* A short screen (a phone on its side) cannot give two rows to a bar that stays. */
+@media (max-width:880px) and (max-height:560px){.topbar{position:static}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   /* ===== ניתוח תנועה ===== */
   .an-toolbar{display:flex;align-items:center;gap:10px;margin:0 0 8px;flex-wrap:wrap}
@@ -355,10 +408,13 @@ td.muted{color:var(--muted)}
 <body style="margin:0">
 <div id="app">
 <div id="dash" class="dash">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sideNav" aria-label="תפריט מערכת הניהול">
       <div class="side-brand">
         <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#C4A882"/><path d="M16 6c-6 3-8 8-8 13 5-1 9-5 10-13-1 0-1 0-2 0z" fill="#3D2B1F"/></svg>
         <div><b>מערכת הניהול</b><br><span>ולדורף · פורום ארצי</span></div>
+        <button type="button" class="icon-btn nav-close" id="navClose" aria-label="סגירת התפריט">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
       <a class="nav-link active" href="#home" data-view="home" aria-current="page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>לוח בקרה</a>
@@ -394,8 +450,12 @@ td.muted{color:var(--muted)}
       </div>
     </aside>
 
+    <div class="nav-shade" id="navShade"></div>
     <div class="main">
       <header class="topbar">
+        <button type="button" class="icon-btn nav-btn" id="navBtn" aria-label="תפריט" aria-expanded="false" aria-controls="sideNav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
         <h1 id="page-title">לוח בקרה</h1>
         <div class="grow"></div>
         <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input type="search" placeholder="חיפוש תוכן…" aria-label="חיפוש"></div>
@@ -555,6 +615,7 @@ td.muted{color:var(--muted)}
     });
     document.getElementById('page-title').textContent=TITLES[view];
     document.title=view==='home'?BASE_TITLE:TITLES[view]+' · '+BASE_TITLE;
+    setNav(false);
     if(silent)return;
     // .main, not .content: the topbar is sticky, so aligning .content to the top
     // slides its first lines (the notice, the crumb) underneath the bar.
@@ -569,6 +630,22 @@ td.muted{color:var(--muted)}
     var sun='<path d="M21 12.8A8 8 0 1 1 11.2 3a6.3 6.3 0 0 0 9.8 9.8z"/>';
     var i=document.getElementById('themeIcon'); if(i)i.innerHTML=next==='dark'?sun:moon;
   }
+  /* The menu as a drawer (tablet and phone; the stylesheet decides when). Closed,
+     it is visibility:hidden, so its links are out of the tab order too. Opening
+     moves focus to the current view's link; Escape, the shade, the close button
+     and choosing a view all close it. */
+  var dash=document.getElementById('dash'), navBtn=document.getElementById('navBtn');
+  function setNav(open,refocus){
+    if(!dash||!navBtn||dash.classList.contains('nav-open')===open)return;
+    dash.classList.toggle('nav-open',open);
+    navBtn.setAttribute('aria-expanded',open?'true':'false');
+    // Reading a size applies the class first: a link still hidden refuses focus.
+    if(open){var cur=document.querySelector('.sidebar .nav-link.active')||document.querySelector('.sidebar .nav-link'); void dash.offsetWidth; if(cur)cur.focus();}
+    else if(refocus)navBtn.focus();
+  }
+  if(navBtn)navBtn.addEventListener('click',function(){setNav(true);});
+  ['navClose','navShade'].forEach(function(id){var n=document.getElementById(id); if(n)n.addEventListener('click',function(){setNav(false,true);});});
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape')setNav(false,true); });
   var th=document.getElementById('themeBtn'); if(th)th.addEventListener('click',toggleTheme);
   window.addEventListener('hashchange',function(){navTo(viewFromHash());});
   // A link to the view already showing changes no hash, so no hashchange: refresh it

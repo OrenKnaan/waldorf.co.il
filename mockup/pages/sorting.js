@@ -51,6 +51,8 @@
     '.si-bucket > h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:9px}',
     '.si-bucket-n{font-family:var(--font-body);font-size:.8rem;font-weight:500;color:var(--text-muted)}',
     '.si-list{list-style:none;margin:0;padding:0}',
+    // anywhere: an excerpt holding a long address would otherwise widen the page on a phone.
+    '.si-item{overflow-wrap:anywhere}',
     '.si-item{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);',
     '  padding:14px 18px;margin:0 0 10px}',
     '.si-item > h3{margin:0;font-size:1.02rem;line-height:1.5}',
