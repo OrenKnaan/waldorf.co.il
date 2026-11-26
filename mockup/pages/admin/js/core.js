@@ -91,7 +91,8 @@
   A.makeTable = function (headers) {
     var tbody = el('tbody');
     var wrap = el('div', { class: 'table-wrap' }, [
-      el('table', {}, [el('thead', {}, [el('tr', {}, headers.map(function (h) { return el('th', { text: h }); }))]), tbody])
+      // The unnamed column is the one of the row's buttons (td.acts below).
+      el('table', {}, [el('thead', {}, [el('tr', {}, headers.map(function (h) { return el('th', { class: h ? '' : 'acts', text: h }); }))]), tbody])
     ]);
     return { wrap: wrap, tbody: tbody };
   };
@@ -99,6 +100,8 @@
     var c = el('td', { class: cls || '' });
     if (typeof content === 'string') c.textContent = content;
     else if (content) c.appendChild(content);
+    // The cell of a row's buttons, which the stylesheet keeps in view.
+    if (content && content.classList && content.classList.contains('row-actions')) c.classList.add('acts');
     return c;
   };
   // `it`, when given, is the row: a table with no status column marks a frozen row here.

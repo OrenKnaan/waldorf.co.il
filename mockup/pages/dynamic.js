@@ -303,6 +303,21 @@
       return d;
     }
     draw();
+
+    // The visitor's own post sits here marked as waiting. Back on this tab, a
+    // moderator may have approved it meanwhile (the forum's own people post from
+    // here and approve in the admin, in the next tab), so the board asks again
+    // rather than go on saying "waiting" until the page is refreshed.
+    var asking = false;
+    function recheck() {
+      if (document.hidden || asking) return;
+      var waiting = WStore.get(cfg.collection).some(function (it) { return it.status === 'pending' && WStore.isMine(it.id); });
+      if (!waiting) return;
+      asking = true;
+      WStore.reload().then(draw, function () {}).then(function () { asking = false; });
+    }
+    window.addEventListener('focus', recheck);
+    document.addEventListener('visibilitychange', recheck);
   }
 
   /* ---------- ספרייה, חומרי הוראה, טפסים ---------- */

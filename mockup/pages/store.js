@@ -16,6 +16,10 @@
  * without a round trip, and the request follows. If the server rejects it the
  * cache is reloaded and onError fires, so the screen cannot keep showing an
  * edit that did not save.
+ *
+ * A read of everything that crossed a write on the way is thrown away and asked
+ * again (reload): it was answered from before the write, and showing it would
+ * put the screen back to what the write just changed.
  */
 (function () {
   'use strict';
@@ -77,6 +81,18 @@
 
   function emit(err) { listeners.forEach(function (fn) { try { fn(err || null); } catch (e) {} }); }
 
+  // Every request that changes content goes through write(), which counts it
+  // while it is on its way, so reload() can tell a read that crossed one.
+  var writing = 0, written = 0, idlers = [];
+  function write(path, opts) {
+    writing++; written++;
+    var done = function () { if (!--writing) idlers.splice(0).forEach(function (fn) { fn(); }); };
+    var p = req(path, opts);
+    p.then(done, done);
+    return p;
+  }
+  function idle() { return writing ? new Promise(function (ok) { idlers.push(ok); }) : Promise.resolve(); }
+
   var ready = req('/api/content')
     .then(function (data) { cache = data; return data; })
     .catch(function (err) {
@@ -89,9 +105,32 @@
     return cache;
   }
 
-  /** Re-fetch everything; used after a failed write so the screen matches the server. */
+  // A visitor's own post that still waits for a moderator is in no public
+  // answer, so it is carried over from the old cache until an answer has it.
+  function keepMine(next) {
+    if (ADMIN_PAGE || !cache) return;
+    Object.keys(next).forEach(function (col) {
+      if (!Array.isArray(next[col]) || !Array.isArray(cache[col])) return;
+      var have = {};
+      next[col].forEach(function (it) { have[it.id] = true; });
+      cache[col].filter(function (it) { return it.status === 'pending' && !have[it.id] && WStore.isMine(it.id); })
+        .reverse().forEach(function (it) { next[col].unshift(it); });
+    });
+  }
+
+  /** Re-fetch everything: after a failed write, so the screen matches the
+   *  server, and on coming back to the tab. The admin does the second on every
+   *  focus, and the read takes seconds, so a moderator can click before it is
+   *  back: an answer that left before that click's write landed still says
+   *  "pending" for the post just approved. Such an answer is dropped and the
+   *  read repeated once nothing is being written. */
   function reload() {
-    return req('/api/content').then(function (d) { cache = d; emit(); return d; });
+    var at = written;
+    return req('/api/content').then(function (d) {
+      if (writing || written !== at) return idle().then(reload);
+      keepMine(d);
+      cache = d; emit(); return d;
+    });
   }
 
   var WStore = {
@@ -163,11 +202,11 @@
       return req('/api/singleton/about/draft', { method: 'PUT', body: JSON.stringify({ value: value, note: note }) });
     },
     publishAbout: function (value, note) {
-      return req('/api/singleton/about', { method: 'PUT', body: JSON.stringify({ value: value, note: note }) })
+      return write('/api/singleton/about', { method: 'PUT', body: JSON.stringify({ value: value, note: note }) })
         .then(function (r) { if (cache) cache.about = r.value; emit(); return r; });
     },
     restoreAbout: function (versionId) {
-      return req('/api/singleton/about/restore', { method: 'POST', body: JSON.stringify({ versionId: versionId }) })
+      return write('/api/singleton/about/restore', { method: 'POST', body: JSON.stringify({ versionId: versionId }) })
         .then(function (r) { if (cache) cache.about = r.value; emit(); return r; });
     },
     discardAboutDraft: function () { return req('/api/singleton/about/draft', { method: 'DELETE' }); },
@@ -194,7 +233,7 @@
     // Not optimistic like update(): the answer says whether a notice was mailed,
     // and the admin words what happened from it.
     reject: function (col, id, notify, message) {
-      return req('/api/content/' + col + '/' + encodeURIComponent(id) + '/reject',
+      return write('/api/content/' + col + '/' + encodeURIComponent(id) + '/reject',
         { method: 'POST', body: JSON.stringify({ notify: Boolean(notify), message: message || '' }) })
         .then(function (r) {
           (cache[col] || []).forEach(function (it, i, arr) { if (it.id === id) arr[i] = r.item; });
@@ -222,7 +261,7 @@
       if (!rec.id) rec.id = 'tmp' + Date.now().toString(36);
       (all[col] = all[col] || []).unshift(rec);          // optimistic
       emit();
-      req('/api/content/' + col, { method: 'POST', body: JSON.stringify(item) })
+      write('/api/content/' + col, { method: 'POST', body: JSON.stringify(item) })
         .then(function (saved) {
           var arr = cache[col] || [];
           for (var i = 0; i < arr.length; i++) if (arr[i].id === rec.id) { arr[i] = saved; break; }
@@ -237,7 +276,7 @@
      *  has to say whether it went through, and the server may refuse it (too
      *  many posts from one address, 429). Resolves with the saved row. */
     submit: function (col, item) {
-      return req('/api/content/' + col, { method: 'POST', body: JSON.stringify(item) }).then(function (saved) {
+      return write('/api/content/' + col, { method: 'POST', body: JSON.stringify(item) }).then(function (saved) {
         if (cache) (cache[col] = cache[col] || []).unshift(saved);
         emit();
         return saved;
@@ -248,7 +287,7 @@
       var all = requireCache();
       (all[col] || []).forEach(function (it) { if (it.id === id) Object.assign(it, patch); });
       emit();
-      req('/api/content/' + col + '/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify(patch) })
+      write('/api/content/' + col + '/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify(patch) })
         .catch(function (e) { reload().finally(function () { emit(e); }); });
     },
 
@@ -256,7 +295,7 @@
       var all = requireCache();
       all[col] = (all[col] || []).filter(function (it) { return it.id !== id; });
       emit();
-      req('/api/content/' + col + '/' + encodeURIComponent(id), { method: 'DELETE' })
+      write('/api/content/' + col + '/' + encodeURIComponent(id), { method: 'DELETE' })
         .catch(function (e) { reload().finally(function () { emit(e); }); });
     },
 
@@ -270,11 +309,11 @@
       val.forEach(function (it, i) { byId[it.id] = i; });
       var ops = [];
       before.forEach(function (it) {
-        if (!(it.id in byId)) ops.push(req('/api/content/' + col + '/' + encodeURIComponent(it.id), { method: 'DELETE' }));
+        if (!(it.id in byId)) ops.push(write('/api/content/' + col + '/' + encodeURIComponent(it.id), { method: 'DELETE' }));
       });
       val.forEach(function (it, i) {
         var patch = JSON.parse(JSON.stringify(it)); patch.position = i; delete patch.id;
-        ops.push(req('/api/content/' + col + '/' + encodeURIComponent(it.id), { method: 'PATCH', body: JSON.stringify(patch) }));
+        ops.push(write('/api/content/' + col + '/' + encodeURIComponent(it.id), { method: 'PATCH', body: JSON.stringify(patch) }));
       });
       Promise.all(ops).catch(function (e) { reload().finally(function () { emit(e); }); });
     },
@@ -284,7 +323,7 @@
       var all = requireCache();
       all[key] = value;
       emit();
-      return req('/api/singleton/' + key, { method: 'PUT', body: JSON.stringify(value) })
+      return write('/api/singleton/' + key, { method: 'PUT', body: JSON.stringify(value) })
         .catch(function (e) { reload().finally(function () { emit(e); }); });
     },
 

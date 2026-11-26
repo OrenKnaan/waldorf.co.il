@@ -33,7 +33,7 @@
     { col: 'news', view: 'news', title: 'לוח מודעות', add: function () { return A.NEWS_ADD; }, cols: ['תאריך פרסום', 'כותרת', 'מדור', 'מפרסם', 'תפוגה', 'סטטוס', ''],
       detail: [['summary', 'תוכן ההודעה'], ['link', 'קישור'], ['contact', 'פרטי קשר (מתפרסמים)']],
       fields: function () { return A.NEWS_FIELDS.concat([EMAIL]); },
-      row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.section || A.NONE, 'muted'), td(it.contact || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status || 'approved'))]; } },
+      row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.section || A.NONE, 'muted'), td(it.contact || A.NONE, 'muted wrap'), expiresCell(it), td(A.statusPill(it.status || 'approved'))]; } },
     /* Hidden with community-board.html; restore with it.
     { col: 'board', view: 'mod', title: 'לוח קהילתי', cols: ['תאריך פרסום', 'כותרת', 'קטגוריה', 'אזור', 'תפוגה', 'סטטוס', ''],
       detail: [['description', 'תיאור'], ['contact', 'פרטי קשר (מתפרסמים)']],
@@ -56,7 +56,7 @@
           { name: 'contact', label: 'יצירת קשר (מתפרסם)' }, EMAIL,
           { name: 'description', label: 'תיאור המשרה', type: 'textarea', wide: true }]);
       },
-      row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.institution || A.NONE, 'muted'), td(it.category || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status))]; } }
+      row: function (it, title) { return [td(A.fmtDate(it.date), 'muted tnum'), title, td(it.institution || A.NONE, 'muted wrap'), td(it.category || A.NONE, 'muted'), expiresCell(it), td(A.statusPill(it.status))]; } }
   ];
 
   /* ---- read marks ---- */

@@ -36,7 +36,7 @@
           return [
             td(A.fmtDate(ev.date), 'muted tnum'),
             A.titleCell(ev.title, ev.demo),
-            td(ev.location || A.NONE, 'muted'),
+            td(ev.location || A.NONE, 'muted wrap'),
             td(ev.time || A.NONE, 'muted tnum'),
             td(ev.status === 'frozen' ? A.statusPill('frozen') : past ? A.pill('הסתיים', 'neutral') : A.statusPill(ev.status))
           ];

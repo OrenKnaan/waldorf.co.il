@@ -228,7 +228,22 @@ th,td{text-align:start;padding:12px 16px;border-bottom:1px solid var(--line);ver
 th{background:var(--sink);color:var(--ink);font-family:var(--font-head);font-weight:700;font-size:.78rem;letter-spacing:.02em;position:sticky;top:0}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--hover-tint-soft)}
-td .title{color:var(--ink);font-weight:600;white-space:normal}
+/* Free text (a title, a publisher's contact line) wraps: a long one makes its
+   row taller, not the table wider than its panel. Every cell used to be nowrap,
+   so one long line pushed the last columns, the status and the row's buttons,
+   out past the panel's edge, where only a sideways scroll nobody looks for
+   reached them. */
+td.title,td.wrap{white-space:normal;min-width:11em}
+td.wrap{overflow-wrap:anywhere}
+/* In a window too narrow even so, the table still scrolls sideways, and the
+   buttons' cell stays at the edge it ends on, over whatever scrolls under it.
+   core.js marks it (A.td, makeTable). Not on a phone: there the pinned cell
+   would cover half the table, and a sideways swipe is what a hand tries. */
+@media (min-width:640px){
+  td.acts,th.acts{position:sticky;inset-inline-end:0}
+  td.acts{background:var(--paper)}
+  tbody tr:hover td.acts{background:var(--hover-tint-soft)}
+}
 td.muted{color:var(--muted)}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:var(--r-organic-sm);white-space:nowrap}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
